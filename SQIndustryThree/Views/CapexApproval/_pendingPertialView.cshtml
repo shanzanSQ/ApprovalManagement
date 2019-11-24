@@ -1,0 +1,79 @@
+﻿@model IEnumerable<SQIndustryThree.Models.CapexInformationMaster>
+@{
+    ViewBag.Title = "_pendingPertialView";
+}
+<style>
+    th {
+        text-align: center;
+    }
+
+    td {
+        text-align: center;
+    }
+</style>
+<div class="box">
+    <!-- /.box-header -->
+    <div class="box-body">
+        <div class="col-xs-12" id="personlocdiv">
+            <table id="capexshowTable" class="table-bordered table table-responsive">
+                <thead>
+                    <tr>
+                        <th>SL</th>
+                        <th>Capex Name</th>
+                        <th>Business Unit</th>
+                        <th>Created Date</th>
+                        <th>Capex Catagory</th>
+                        <th>Created By</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ int count = 1;}
+                    @foreach (var item in Model)
+                    {
+                    <tr>
+                        <td>@count</td>
+                        <td>@item.CapexName</td>
+                        <td>@item.BusinessUnitName</td>
+                        <td>@item.CapexCreateDate.ToString("dd MMM yyyy")</td>
+                        <td>@item.CapexCatagoryName</td>
+                        <td>@item.UserName</td>
+                        @if (item.IsApproved == 0)
+                        {
+                            <td style="color:red">Pending</td>
+                            <td> <button type="button" class="btn  btn-block btn-success" data-toggle="modal" data-target="#myModal" data-idkey="@item.CapexInfoId">Preview</button></td>
+                        }
+                        else if (item.IsApproved == 1)
+                        {
+                            <td style="color:green">Approved</td>
+                            <td> <button type="button" class="btn  btn-block btn-success" data-toggle="modal" data-target="#showmodal" data-idkey="@item.CapexInfoId">Preview</button></td>
+
+                        }
+                        else if (item.IsApproved == 2)
+                        {
+                            <td style="color:red">Rejected</td>
+                            <td> <button type="button" class="btn  btn-block btn-danger" data-toggle="modal" data-target="#showmodal" data-idkey="@item.CapexInfoId">Preview</button></td>
+                        }
+                        else if (item.IsApproved == 3)
+                        {
+                            <td style="color:red">Pending By Others </td>
+                            <td> <button type="button" class="btn  btn-block btn-success" data-toggle="modal" data-target="#myModal" data-idkey="@item.CapexInfoId">Pending Others </button></td>
+                        }
+                        else
+                        {
+                            <td style="color:red">Approval Pending</td>
+                            <td> <button type="button" class="btn  btn-block btn-success" data-toggle="modal" data-target="#showmodal" data-idkey="@item.CapexInfoId">Show</button></td>
+                        }
+                    </tr>
+                        count++;
+
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <!-- /.box-body -->
+</div>
+<!-- /.box -->

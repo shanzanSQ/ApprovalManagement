@@ -1,0 +1,231 @@
+﻿
+@{
+    ViewBag.Title = "CapexInformationView";
+}
+
+<div class="container-fluid">
+    <section style="margin-top:60px;" class="content" >
+        <div class="row">
+            <div class="col-md-2">
+                <ul>
+                    @if (Convert.ToInt32(Session["SQdesignation"]) > 4)
+                    {
+                        <li><a href="#" onclick="getAllPendingCapex(4)">My Capex<span><p id="pending_Capex"></p></span></a></li>
+                    }
+                    else
+                    {
+                        <li><a href="#" onclick="getAllPendingCapex(0)">All Pending Capex <span><p id="pending_Capex"></p></span></a></li>
+                        <li><a href="#" onclick="getAllPendingCapex(1)">All Approved So Far <span><p id="pending_Capex"></p></span></a></li>
+                        <li><a href="#" onclick="getAllPendingCapex(2)">All Rejected Capex So Far <span><p id="pending_Capex"></p></span></a></li>
+                    }
+
+                </ul>
+            </div>
+            <div class="col-md-10">
+                <h2 text-align:center"><b>ALL CAPEX INFORMATION</b></h2>
+                <hr />
+                <div class="box box-default" id="pendingCapexTable"> </div>
+            </div>
+        </div>
+    </section>
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h5 class="modal-title" id="myModalLabel">Capex Information</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 modal_body_map">
+                        <div class="location-map" id="location-map">
+                            <div style="text-align:left" id="update_canvas"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 modal_body_end">
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="text-align:center">
+                <label for="remarks_box">Enter Comments Here</label>
+                <input type="text" placeholder="Enter Remarks " id="remarks_box" class="form-control" />
+                <br />
+                <button class="btn btn-success" id="approvedButton">APPROVE</button>
+                <button class="btn btn-danger" id="rejectButton">REJECT</button> 
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="showmodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h5 class="modal-title" id="myModalLabel">Capex Information</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 modal_body_map">
+                        <div class="location-map" id="location-map">
+                                
+                                <div style="text-align:left" id="showcanvas"></div>
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 modal_body_end">
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="text-align:center">
+                <button style="text-align:right" class="btn btn-success" id="printCapex">Print This Capex</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(function () {
+                getAllPendingCapex(0);     
+            });
+      
+           // Re-init map before show modal
+        $('#myModal').on('show.bs.modal', function(event) {
+            var modalmap = $(event.relatedTarget);
+            approvedOrUpdateCapex(modalmap.data('idkey'));
+        });
+
+
+        $('#showmodal').on('show.bs.modal', function(event) {
+            var modalmap = $(event.relatedTarget);
+            ShowSelectedCapex(modalmap.data('idkey'));
+        });
+        function getAllPendingCapex(status) {
+             var urlpath = '@Url.Action("showCapexInformation", "CapexApproval")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {status:status},
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $('#pendingCapexTable').empty();
+                            $('#pendingCapexTable').html(data);
+                            $("#capexshowTable").DataTable();
+                        }
+                    }
+                });
+        }
+
+        //only show the capex
+        function ShowSelectedCapex(primarykey) {
+            var urlpath = '@Url.Action("IndividualCapexShow", "CapexApproval")';
+            $.ajax({
+                data: {primarykey:primarykey},
+                url: urlpath,
+                type: "Post",
+                async: true,
+                        success: function(data) {
+                            if (data) {
+                                $('#showcanvas').empty();
+                                $('#showcanvas').append(data);
+                            }
+                        }
+                    });
+        }
+        //from this modal update and approve can done
+        function approvedOrUpdateCapex(primarykey) {
+            var urlpath = '@Url.Action("IndividualCapexShow", "CapexApproval")';
+            $.ajax({
+                data: {primarykey:primarykey},
+                url: urlpath,
+                type: "Post",
+                async: true,
+                        success: function(data) {
+                            if (data) {
+                                $('#update_canvas').empty();
+                                $('#update_canvas').append(data);
+                            }
+                        }
+                    });
+        }
+
+
+
+        function updateApprove(approve) {
+                var urlpath = '@Url.Action("UpdatedCapexInfo", "CapexApproval")';
+                $.ajax({
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(approve),
+                    dataType: 'json',
+                    url: urlpath,
+                    type: "Post",
+                    async: true,
+                    success: function (result) {
+                        if (result.isSuccess) {
+                            swal({
+                                            title: 'CAPEX APPROVED SUCCSSFULLY',
+                                            type: 'success',
+                                            closeOnCancel: true
+                                        },
+                                function () {
+                                     window.location.href = '@Url.Action("CapexInformationView", "CapexApproval")';
+                                        });
+                        }
+                    }
+                });
+        }
+
+
+
+        $("#approvedButton").click(function () {
+            var jsonData = {};
+            jsonData["CapexInfoId"] = $('#primarykey').val();
+            if ($('#remarks_box').val() == "") {
+                jsonData["CapexReview"] = " ";
+            } else {
+                jsonData["CapexReview"] = $('#remarks_box').val();
+            }
+
+            jsonData["IsApproved"] = 1;
+            updateApprove(jsonData);
+        });
+
+        $("#rejectButton").click(function () {
+            var jsonData = {};
+            jsonData["CapexInfoId"] = $('#primarykey').val();
+            if ($('#remarks_box').val() == "") {
+                swal({
+                    title: 'Please Comment Before Reject',
+                    type: 'error',
+                    closeOnCancel: true
+                });
+            } else {
+                jsonData["CapexReview"] = $('#remarks_box').val();
+            }
+            jsonData["IsApproved"] = 2;
+            updateApprove(jsonData);
+        });
+
+        $("#printCapex").click(function () {
+            var print_div = document.getElementById("myprintmodal");
+            var print_area = window.open();
+
+            print_area.document.write("<img width='20' height='20' src='../../Images/logo.png' /><img style='width:80px;' src='../../Images/slogan.png' />");
+            print_area.document.write(print_div.innerHTML);
+            print_area.document.close();
+            print_area.focus();
+            print_area.print();
+            print_area.close();
+        });
+    </script>
+}

@@ -1,0 +1,575 @@
+﻿
+@{
+    ViewBag.Title = "CreateCapex";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+@Styles.Render("~/Content/capexform.css")
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+
+<div class="container">
+    <h2 style="margin-top:60px; text-align:center"><b>CAPEX APPROVAL FORM</b></h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <label for="business_unit">Business Unit</label>
+            <select id="business_unit" name="business_unit" class="form-control"> </select>
+        </div>
+        <div class="col-md-4">
+            <label for="catagory_caperx">Capex Catagory</label>
+            <select id="catagory_caperx" name="catagory_caperx" class="form-control"> </select>
+        </div>
+        <div class="col-md-4">
+            <label for="project_type">Asset Type</label>
+            <select id="project_type" name="project_type" class="form-control" onchange='CheckColors(this.value);'>
+                <option>New Asset</option>
+                <option>Replacement</option>
+                <option>Renovation</option>
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <label for="projectname">Project/Subject Name : </label>
+            <input type="text" class="form-control form-inline" id="projectname">
+        </div>
+        <div class="col-md-4">
+            <label for="current_date">Current Date</label>
+            <input disabled type="text" id="current_date" class="form-control">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <label for="project_description">Description</label>
+            <textarea type="text" id="project_description" placeholder="Description" class="form-control"></textarea>
+        </div>
+    </div>
+    <div>
+        <div style="margin-top:10px" class="form-group">
+            <label for="assets_description">Description Assets</label>
+            <button class="btn btn-success" style="float:right" id="addrow">Add Row</button>
+        </div>
+        <table id="assets_description"  class="table order-list">
+            <thead>
+                <tr>
+                    <td>Asset Catagory</td>
+                    <td>Description</td>
+                    <td>Qty</td>
+                    <td>Unit price</td>
+                    <td>Estimated Cost</td>
+                    <td>Curency</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td  class="col-sm-2">
+                        <input type="text"  id="asset_catagory" name="asset_catagory" class="form-control" />
+                    </td>
+                    <td class="col-sm-4">
+                        <input type="text" id="asset_description" name="asset_description" class="form-control" />
+                    </td>
+                    <td class="col-sm-1">
+                        <input type="text" id="asse_qty" onchange="calculateGrandTotal()" name="asse_qty" class="form-control" />
+                    </td>
+                    <td class="col-sm-2">
+                        <input type="text" id="asset_unitPrice" onchange="calculateGrandTotal()" name="asset_unitPrice" class="form-control" />
+                    </td>
+                    <td class="col-sm-2">
+                        <input type="text" id="asset_estimated_cost" name="asset_estimated_cost" disabled class="form-control" />
+                    </td>
+                    <td class="col-sm-1">
+                        <a class="deleteRow"></a>
+                    </td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                <tr>
+                    <td><b>Total</b></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td id="grandtotal" name="grandtotal"><b>0.0</b></td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div>
+                <label for="file_uploaded">Attach Files</label>
+                <input accept="image/jpeg,image/png,application/pdf" name="file_uploaded[]" type="file" multiple class="filestyles gallery-images form-control " id="file_uploaded" />
+            </div>
+
+            <div style="padding:10px" class="box box-default fileList" id="fileList" >
+            </div>
+            <button id="file_uploadButton" class="btn btn-success">Upload</button>
+          <!-- <button id="remove_button" class="btn btn-success">Remove Files</button>-->
+        </div>
+        <div class="col-md-8">
+            <label for="approver">Approver</label>
+            <Table class="table">
+                <tr>
+                    <td>1.</td>
+                    <td>Head Of Department</td>
+                    <td id="headOfDepartment" ></td>
+                </tr>
+                <tr>
+                    <td>2.</td>
+                    <td>Chief, IIAE</td>
+                    <td id="Cheif"></td>
+                </tr>
+                <tr>
+                    <td>3.</td>
+                    <td>Business Finance Controller</td>
+                    <td ><p id="businessFinanceConroller"></p></td>
+                </tr>
+                <tr>
+                    <td>4.</td>
+                    <td>Chief Executive , BU</td>
+                    <td ><p id="cheifexecutive"></p></td>
+                </tr>
+            </Table>
+        </div>
+    </div>
+    <div style="margin-top:20px;text-align:center" class="row">
+        <button class="btn btn-danger" id="cancel_button">Cancel</button>
+        <button id="save_button" class="btn btn-info">Next</button>
+    </div>
+
+</div>
+
+<div class="modal" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" style="text-align:center">Capex Preview</h4>
+            </div>
+            <div id="modalbody" class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-info" id="confirmCapexInfo">Submit</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+@Scripts.Render("~/bundles/jquery")
+
+<script type="text/javascript">
+
+    window.onload = function () {
+        GetDate();
+        LoadBusinessUnit();
+        LoadCapexCatagory();
+         $("#Cheif").append($("<p></p>").val('11')
+             .html("Shihan Hasan"));
+    };
+
+    function imagesPreview(input, placeToInsertImagePreview) {
+        if (input.files) {
+            var filesAmount = input.files.length;
+            for (i = 0; i < filesAmount; i++) {
+                var reader = new FileReader();
+                reader.name = input.files[i].name;
+                reader.onload = function (event) {
+                    var htmlImage = '<div class="row">';
+                    htmlImage = htmlImage + '<p style="float:left" class="" >' + event.target.name+ '</p>';  
+                       // htmlImage = htmlImage +  '<input style="padding-top:1px;padding-bottom:1px;float:right" class="btn btn-danger" onclick="removeImage($(this))" type="button" value="X" />'; 
+                        htmlImage = htmlImage +  '</div>';        
+                    $($.parseHTML(htmlImage)).appendTo(placeToInsertImagePreview);
+                }
+                reader.readAsDataURL(input.files[i]);
+            }
+        }
+
+    }
+
+     function removeImage(item) {
+      //alert(item);
+         item.parent().remove();
+    }
+    
+    $('#file_uploaded').on('change', function() {
+        imagesPreview(this, 'div.fileList');
+    });
+     $('#file_uploadButton').on('click', function() {
+         uploadFiles();
+     });
+
+     $('#remove_button').on('click', function() {
+         var urlpath = '@Url.Action("DeleteFiles", "CapexApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+                swal({
+                    title: 'Uploaded files deleated please Reupload file for next time !',
+                    type: 'success',
+                    closeOnCancel: true
+                });
+            }
+        });
+    });
+
+
+            function uploadFiles(){
+                 var fileUpload = $("#file_uploaded").get(0);
+                var files = fileUpload.files;
+
+                // Create  a FormData object
+                var fileData = new FormData();
+
+                // if there are multiple files , loop through each files
+                for (var i = 0; i < files.length; i++) {
+                    fileData.append(files[i].name, files[i]);
+                }
+                 var urlpath = '@Url.Action("UploadFiles", "CapexApproval")';
+                $.ajax({
+                    url: urlpath,//URL to upload files 
+                    type: "POST", //as we will be posting files and other method POST is used
+                    processData: false, //remember to set processData and ContentType to false, otherwise you may get an error
+                    contentType: false,      
+                    data: fileData,
+                    success: function (result) {
+                        alert(result);
+                    },
+                    error: function (err) {
+                        alert(err.statusText);
+                    }
+                });
+            }   
+
+  
+    $("#save_button").click(function () {
+        //SaveCapexApproval();
+        modalView();
+    });
+     $("#confirmCapexInfo").click(function () {
+        SaveCapexApproval();
+     });
+    $("#cancel_button").click(function () {
+        window.location.href = '@Url.Action("Index", "Home")';
+     });
+    
+    function GetDate() {
+        var dt = new Date();
+        var dd;
+        var mm;
+        dd = dt.getDate();
+        mm = dt.getMonth() + 1;
+        document.getElementById('current_date').value = mm + '/' + dd + '/' + dt.getFullYear();
+
+    }
+
+    $(document).ready(function () {
+        var counter = 0;
+
+        $("#addrow").on("click", function () {
+
+            counter = $('#myTable tr').length - 2;
+
+            var newRow = $("<tr>");
+            var cols = "";
+
+
+
+            cols += '<td><input type="text" class="form-control"  name="asset_catagory' + counter + '"/></td>';
+            cols += '<td><input type="text" class="form-control"  name="asset_description' + counter + '"/></td>';
+            cols += '<td><input type="text" class="form-control" onchange="calculateGrandTotal()"  name="asse_qty' + counter + '"/></td>';
+            cols += '<td><input type="text" class="form-control" onchange="calculateGrandTotal()" name="asset_unitPrice' + counter + '"/></td>';
+            cols += '<td><input type="text" class="form-control" disabled name="asset_estimated_cost' + counter + '"/></td>';
+
+            cols += '<td><input type="button" class="btn btn-danger ibtnDel"  value="X"></td>';
+            newRow.append(cols);
+            if (counter == 4) $('#addrow').attr('disabled', true).prop('value', "You've reached the limit");
+            $("table.order-list").append(newRow);
+            counter++;
+            calculateGrandTotal();
+        });
+
+        $("table.order-list").on("change", 'input[name^="asset_estimated_cost"]', function (event) {
+            calculateRow($(this).closest("tr"));
+            calculateGrandTotal();
+        });
+
+
+        $("table.order-list").on("click", ".ibtnDel", function (event) {
+            $(this).closest("tr").remove();
+            calculateGrandTotal();
+
+            counter -= 1
+            $('#addrow').attr('disabled', false).prop('value', "Add Row");
+        });
+
+
+    });
+
+
+
+    function calculateRow(row) {
+        var price = +row.find('input[name^="asset_estimated_cost"]').val();
+    }
+
+    function calculateGrandTotal() {
+        var grandTotal = 0;
+        $("#assets_description tr").each(function () {
+                var qnty = $(this).find('input[name^="asse_qty"]').val();
+                var unitprice = $(this).find('input[name^="asset_unitPrice"]').val();
+                $(this).find('input[name^="asset_estimated_cost"]').val(qnty * unitprice);
+        });
+
+        $("table.order-list").find('input[name^="asset_estimated_cost"]').each(function () {
+            grandTotal += +$(this).val();
+        });
+        $("#grandtotal").text(grandTotal);
+    }
+
+
+    function CheckColors(val) {
+        var element = document.getElementById('project_type_others');
+        if (val == 'others')
+            element.style.display = 'block';
+        else
+            element.style.display = 'none'
+    }
+
+    function LoadBusinessUnit() {
+        $('#business_unit').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadBusinessUnit", "CapexApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+                $('#business_unit').empty();
+                $('#business_unit').append("<option value='0'>--Select Business Unit--</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#business_unit").append($("<option></option>").val(data[i].BusinessUnitId)
+                        .html(data[i].BusinessUnitName));
+                }
+            }
+        });
+    }
+    function LoadCapexCatagory() {
+        $('#catagory_caperx').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadCapexCatagory", "CapexApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+                $('#catagory_caperx').empty();
+                $('#catagory_caperx').append("<option value='0'>--Select Capex Catagory--</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#catagory_caperx").append($("<option></option>").val(data[i].CapexCatagoryID)
+                        .html(data[i].CapexCatagoryName));
+                }
+            }
+        });
+    }
+    $('#catagory_caperx').on('change',
+        function () {
+          $('#catagory_caperx').css({ "border-color": "#d3d3d3" });
+          loadApprover($(this).val());
+        });
+    $('#business_unit').on('change',
+        function () {
+             $('#business_unit').css({ "border-color": "#d3d3d3" });
+            loadCFOBYBusinessUnit($(this).val(),'2');
+            loadCFOBYBusinessUnit($(this).val(),'3');
+        });
+
+    function loadCFOBYBusinessUnit(buid,sorID) {
+        var urlpath = '@Url.Action("LoadBFCORCFOByBusinessUnit", "CapexApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Get",
+            data: {
+                Designation: sorID,
+                BusinessUnit : buid
+            },
+            async: true,
+            success: function (data) {
+                if (sorID == '2') {
+                    $('#businessFinanceConroller').empty();
+                    $("#businessFinanceConroller").append($("<p></p>").val(data.UserInformationId)
+                        .html(data.UserInformationName));
+                } else if (sorID=='3') {
+                    $('#cheifexecutive').empty();
+                    $("#cheifexecutive").append($("<p></p>").val(data.UserInformationId)
+                        .html(data.UserInformationName));
+                }
+               
+            }
+        });
+    }
+   
+    function loadApprover(id) {
+        var urlpath = '@Url.Action("LoadCapexApprover", "CapexApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {CatagoryId:id},
+            async: true,
+            success: function (data) {
+                $('#headOfDepartment').empty();
+               $("#headOfDepartment").append($("<p></p>").val(data.UserInformationId)
+                        .html(data.UserInformationName));
+            }
+        });
+    }
+
+
+    function SaveCapexApproval() {
+        var valid = false;
+        var jsonData = {};
+            jsonData["BusinessUnitId"] = $('#business_unit').val();
+            jsonData["BusinessUnitName"] = $('#business_unit').children("option:selected").html();
+            jsonData["CapexCatagoryID"] = $('#catagory_caperx').val();
+            jsonData["CapexCatagoryName"] = $('#catagory_caperx').children("option:selected").html();
+            jsonData["CapexAssetType"] = $('#project_type').val();
+            jsonData["CapexName"] = $('#projectname').val();
+            jsonData["CapexCreateDate"] = $('#current_date').val();
+            jsonData["CapexDescription"] = $('#project_description').val();
+
+            var jsonObj = [];
+
+            $('#assets_description tr').each(function () {
+                var myData = {};
+                myData["CapexAssetCatagory"] = $(this).find('input[name^="asset_catagory"]').val();
+                myData["CapexAssetDescription"] = $(this).find('input[name^="asset_description"]').val();
+                myData["CapexDetailsQty"] = $(this).find('input[name^="asse_qty"]').val();
+                myData["CapexUnitPrice"] = $(this).find('input[name^="asset_unitPrice"]').val();
+                var qty = $(this).find('input[name^="asse_qty"]').val();
+                var price = $(this).find('input[name^="asset_unitPrice"]').val();
+                myData["CapexEstimatedCost"] = qty * price;
+                if (Number.isInteger(myData["CapexEstimatedCost"]) && parseInt(myData["CapexEstimatedCost"]) > 0) {
+                    jsonObj.push(myData);
+                }
+            });
+            if (jsonObj.length > 0) {
+                valid = true;
+            }
+            jsonData["CapexInformationDetails"] = jsonObj;
+        if (valid == true) {
+            var urlpath = '@Url.Action("SaveCapexInformation", "CapexApproval")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsonData),
+                dataType: 'json',
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function (result) {
+                    if (result.isSuccess) {
+                        swal({
+                                        title: 'Capex Saved Successfully!!',
+                                        type: 'success',
+                                        closeOnCancel: true
+                                    },
+                            function () {
+                                 window.location.href = '@Url.Action("CapexInformationView", "CapexApproval")';
+                                    });
+                    }
+                }
+            });
+        } else {
+            swal({
+                title: 'PLEASE ENTER ALL THE FIELD!!',
+                type: 'error',
+                closeOnCancel: true
+            });
+        }
+        
+    }
+    function modalView() {
+            var submit = true;
+               var jsonData = {};
+            if ($('#business_unit').val() == "0") {
+                $('#business_unit').css({ "border-color": "#FF0000" });
+                submit = false;
+            } else if ($('#catagory_caperx').val() == "0") {
+                $('#catagory_caperx').css({ "border-color": "#FF0000" });
+                submit = false;
+            } else if ($('#projectname').val().length<1) {
+                submit = false;
+            } else if ($('#project_description').val().length<1) {
+                submit = false;
+            }
+
+            jsonData["BusinessUnitId"] = $('#business_unit').val();
+            jsonData["BusinessUnitName"] = $('#business_unit').children("option:selected").html();
+            jsonData["CapexCatagoryID"] = $('#catagory_caperx').val();
+            jsonData["CapexCatagoryName"] = $('#catagory_caperx').children("option:selected").html();
+            if ($('#project_type').val() == "others") {
+                jsonData["CapexAssetType"] = $('#project_type_others').val();
+            } else {
+                 jsonData["CapexAssetType"] = $('#project_type').val();
+            }
+           
+            jsonData["CapexName"] = $('#projectname').val();
+            jsonData["CapexCreateDate"] = $('#current_date').val();
+            jsonData["CapexDescription"] = $('#project_description').val();
+
+            var jsonObj = [];
+
+            $('#assets_description tr').each(function () {
+                var myData = {};
+                myData["CapexAssetCatagory"] = $(this).find('input[name^="asset_catagory"]').val();
+                myData["CapexAssetDescription"] = $(this).find('input[name^="asset_description"]').val();
+                myData["CapexDetailsQty"] = $(this).find('input[name^="asse_qty"]').val();
+                myData["CapexUnitPrice"] = $(this).find('input[name^="asset_unitPrice"]').val();
+
+                var qty = $(this).find('input[name^="asse_qty"]').val();
+                var price = $(this).find('input[name^="asset_unitPrice"]').val();
+                myData["CapexEstimatedCost"] = qty * price;
+               if (Number.isInteger(myData["CapexEstimatedCost"]) && parseInt(myData["CapexEstimatedCost"]) > 0) {
+                    jsonObj.push(myData);
+               }
+            });
+        jsonData["CapexInformationDetails"] = jsonObj;
+
+        if (submit == true) {
+            var urlpath = '@Url.Action("ShowPertialviewModal", "CapexApproval")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsonData),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    $("#modalbody").html("");
+                    $("#modalbody").append(data);
+                    $("#myModal").modal("show");
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+        } else {
+            swal({
+                title: 'PLEASE ENTER ALL THE FIELD!!',
+                type: 'error',
+                closeOnCancel: true
+            });
+        }
+    }
+
+</script>

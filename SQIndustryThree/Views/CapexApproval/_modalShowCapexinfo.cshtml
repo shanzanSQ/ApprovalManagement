@@ -1,0 +1,94 @@
+﻿@model SQIndustryThree.Models.CapexInformationMaster
+
+@{
+    ViewBag.Title = "_modalShowCapexinfo";
+}
+<div>
+    <div style="margin:5px" class="row">
+        <table style="overflow: scroll;overflow: auto;" class="table table-bordered">
+            <tbody>
+                <tr>
+                    <td width="30%">Capex Name</td>
+                    <td width="70%">@Model.CapexName</td>
+                </tr>
+                <tr>
+
+                    <td>Business Unit</td>
+                    <td>@Model.BusinessUnitName</td>
+                </tr>
+                <tr>
+
+                    <td>Capex Asset Type</td>
+                    <td>@Model.CapexAssetType</td>
+                </tr>
+                <tr>
+                    <td>Capex Descriptions</td>
+                    <td style="width:100%;overflow-wrap:break-word">@Model.CapexDescription</td>
+                </tr>
+                <tr>
+                    <td> Raised BY</td>
+                    <td>@Model.UserName</td>
+                </tr>
+                <tr>
+                    <td>Create Date</td>
+                    <td>@Model.CapexCreateDate.ToString("dd MMM yyyy")</td>
+                </tr>
+                <tr>
+                    <td>Catagory Name</td>
+                    <td>@Model.CapexCatagoryName</td>
+                </tr>
+            </tbody>
+        </table>
+        @if (Model.CapexInformationDetails != null)
+        {
+            <table id="capex_details" class="table details_list table-responsive table-bordered ">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Asset Catagory</th>
+                        <th>Asset Descriptions</th>
+                        <th>Asset quantity</th>
+                        <th>Asset Unit Price</th>
+                        <th>Asset Estimated Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{double total = 0; int count = 1;}
+                    @foreach (var item in Model.CapexInformationDetails)
+                    {
+                        total += Convert.ToDouble(item.CapexEstimatedCost);
+                        <tr>
+                            <td width="5%">@count</td>
+                            <td width="15%">@item.CapexAssetCatagory</td>
+                            <td width="35%">@item.CapexAssetDescription</td>
+                            <td width="15%">@item.CapexDetailsQty</td>
+                            <td width="15%">@item.CapexUnitPrice</td>
+                            <td width="15%" id="est_@count" name="estimeted">@item.CapexEstimatedCost</td>
+                        </tr>
+                        count++;
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>Total</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th id="total_price">@total</th>
+                    </tr>
+                </tfoot>
+            </table>
+        }
+        @if (Model.CapexFileUpload != null)
+        {
+        <ul>
+            @foreach (var item in Model.CapexFileUpload)
+            {
+                <li><a  href="/CapexApproval/DownloadFile?filename=@item.CapexFilePath" target="_blank"  >@item.CapexFileName</a></li>
+            }
+        </ul>
+           
+        }
+        </div>
+</div>

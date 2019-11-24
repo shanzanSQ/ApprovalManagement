@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29503.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQIndustryThree", "SQIndustryThree\SQIndustryThree.csproj", "{3BAEFCE5-0735-4E77-AA01-B7762B10CD6A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3BAEFCE5-0735-4E77-AA01-B7762B10CD6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BAEFCE5-0735-4E77-AA01-B7762B10CD6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BAEFCE5-0735-4E77-AA01-B7762B10CD6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BAEFCE5-0735-4E77-AA01-B7762B10CD6A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {09D8E646-FC59-4B20-BFED-0734F058A637}
+	EndGlobalSection
+EndGlobal
