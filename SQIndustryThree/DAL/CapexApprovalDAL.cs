@@ -148,6 +148,7 @@ namespace SQIndustryThree.DAL
                 aParameters.Add(new SqlParameter("@CapexAssetType", capexmaster.CapexAssetType));
                 aParameters.Add(new SqlParameter("@CapexCreateDate", capexmaster.CapexCreateDate));
                 aParameters.Add(new SqlParameter("@CapexDescription", capexmaster.CapexDescription));
+                aParameters.Add(new SqlParameter("@Currency", capexmaster.Currency));
                 aParameters.Add(new SqlParameter("@UserID", userId));
 
                 masterId = accessManager.SaveDataReturnPrimaryKey("sp_SaveCapexMasterInfo", aParameters);
@@ -236,8 +237,10 @@ namespace SQIndustryThree.DAL
                     capexInformationMaster.CapexDescription = dr["CapexDescription"].ToString();
                     capexInformationMaster.BusinessUnitName = dr["BusinessUnitName"].ToString();
                     capexInformationMaster.CapexCatagoryName = dr["CapexCatagoryName"].ToString();
+                    capexInformationMaster.Currency = dr["Currency"].ToString();
                     capexInformationMaster.UserName = dr["UserName"].ToString();
                     capexInformationMaster.UserId = (int)dr["UserId"];
+                    capexInformationMaster.Revision = (int)dr["Revision"];
                 }
                 dr.Close();
                 capexInformationMaster.CapexInformationDetails = new List<CapexInformationDetails>();
@@ -262,7 +265,7 @@ namespace SQIndustryThree.DAL
                     query.ApprovalId =(int)dr["CapApproverId"];
                     query.IsApproved =(int)dr["IsApproved"];
                     query.ApproverUserId =(int)dr["UserId"];
-                    query.UpdateDate =(DateTime)dr["UpdateDate"];
+                    query.UpdateDate =dr["UpdateDate"].ToString();
                     query.ReplyMessage =dr["ReplyMessComment"].ToString();
                     query.ReviewComment =dr["ReviewComment"].ToString();
                     query.DesignationName =dr["DesignationName"].ToString();
@@ -283,7 +286,7 @@ namespace SQIndustryThree.DAL
                     capexInformationMaster.CommentsTables.Add(comment);
                 }
                 capexInformationMaster.CapexFileUpload = new List<CapexFileUploadDetails>();
-                capexInformationMaster.CapexFileUpload = GetUploadedFilesByID(capexInfoId);
+                capexInformationMaster.CapexFileUpload = GetUploadedFilesByID(capexInfoId,userId);
                 return capexInformationMaster;
             }
             catch (Exception e)
@@ -363,6 +366,7 @@ namespace SQIndustryThree.DAL
                 aList.Add(new SqlParameter("@CapexFileName", capexFile.CapexFileName));
                 aList.Add(new SqlParameter("@CapexFilePath", capexFile.CapexFilePath));
                 aList.Add(new SqlParameter("@CapexInfoId", capexFile.CapexInfoId));
+                aList.Add(new SqlParameter("@UserId", capexFile.userId));
                 result = accessManager.SaveData("sp_SaveUploadedFiles", aList);
                 return result;
             }
@@ -377,9 +381,74 @@ namespace SQIndustryThree.DAL
             }
         }
 
+        public bool DeleteFileFromDatabase(int capexInfo,int userId)
+        {
+            bool result = true;
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<SqlParameter> aParameters = new List<SqlParameter>();
+                List<SqlParameter> aList = new List<SqlParameter>();
+                aList.Add(new SqlParameter("@capinfo", capexInfo));
+                aList.Add(new SqlParameter("@userId", userId));
+                result = accessManager.DeleteData("sp_deleteFilesFromTables", aList);
+                return result;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+
+
+        public ResultResponse RevisedCapexInformation(CapexInformationMaster capexmaster, int userId)
+        {
+            ResultResponse result = new ResultResponse();
+            try
+            {
+                int masterId = 0;
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<SqlParameter> aParameters = new List<SqlParameter>();
+                aParameters.Add(new SqlParameter("@CapexDescription", capexmaster.CapexDescription));
+                aParameters.Add(new SqlParameter("@capexInfo", capexmaster.CapexInfoId));
+                aParameters.Add(new SqlParameter("@UserID", userId));
+
+                result.isSuccess = accessManager.UpdateData("sp_updateCapexInfoMaster", aParameters);
+                foreach (CapexInformationDetails item in capexmaster.CapexInformationDetails)
+                {
+                    List<SqlParameter> aList = new List<SqlParameter>();
+                    aList.Add(new SqlParameter("@CapexInfoDetailsId", item.CapexInfoDetailsId));
+                    aList.Add(new SqlParameter("@CapexAssetCatagory", item.CapexAssetCatagory));
+                    aList.Add(new SqlParameter("@CapexAssetDescription", item.CapexAssetDescription));
+                    aList.Add(new SqlParameter("@CapexDetailsQty", item.CapexDetailsQty));
+                    aList.Add(new SqlParameter("@CapexUnitPrice", item.CapexUnitPrice));
+                    aList.Add(new SqlParameter("@CapexEstimatedCost", item.CapexEstimatedCost));
+                    aList.Add(new SqlParameter("@CapexInfoId", capexmaster.CapexInfoId));
+                    result.isSuccess = accessManager.SaveData("sp_SaveCapexDetails", aList);
+                }
+                return result;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+
 
         //get files 
-        public List<CapexFileUploadDetails> GetUploadedFilesByID(int pmkey)
+        public List<CapexFileUploadDetails> GetUploadedFilesByID(int pmkey,int userid)
         {
             List<CapexFileUploadDetails> filedetails = new List<CapexFileUploadDetails>();
             try
@@ -388,6 +457,7 @@ namespace SQIndustryThree.DAL
                 List<SqlParameter> aParameters = new List<SqlParameter>();
                 List<SqlParameter> aList = new List<SqlParameter>();
                 aList.Add(new SqlParameter("@capexId",pmkey));
+                aList.Add(new SqlParameter("@userId", userid));
                 SqlDataReader dr = accessManager.GetSqlDataReader("sp_GetFileDetails", aList);
                 while (dr.Read())
                 {

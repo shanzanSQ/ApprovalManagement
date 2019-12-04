@@ -29,12 +29,12 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-left">
-                    <li>@Html.ActionLink("Dashboard", "DashboardCapex", "Dashboard")</li>
+                    <li ><a href="#" id="showhome">Homepage</a></li>
                     <li>@Html.ActionLink("All Capex View", "CapexInformationView", "CapexApproval")</li>
                     <li>@Html.ActionLink("Create Capex", "CreateCapex", "CapexApproval")</li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li>@Html.ActionLink(@Session["SQuserName"].ToString(), "Index", "Home")</li>
+                    <li></li>
                     <li id="logoutButton">
                         <a>
                             Log off
@@ -45,8 +45,9 @@
             </div>
         </div>
     </div>
-    <div class="container-fluid body-content" style="margin-top:60px">
-        @RenderBody()
+    
+    <div id="content_div" class="container-fluid body-content" style="margin-top:60px">
+            @RenderBody()
         <hr />
         <footer>
             <p>&copy; @DateTime.Now.Year - SQ Group IT </p>
@@ -55,35 +56,4 @@
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
-    @RenderSection("scripts", required: false)
-    <script>
-        $("#logoutButton").click(function () {
-        var urlpath = '@Url.Action("Logout", "Account")';
-            $.ajax({
-                contentType: "application/json; charset=utf-8",
-                data: {},
-                dataType: 'json',
-                url: urlpath,
-                type: "Post",
-                async: true,
-                success: function (result) {
-                if (result) {
-                    swal({
-                                    title: 'Log out Successfully',
-                                    type: 'success',
-                                    closeOnCancel: true
-                                },
-                        function () {
-                             window.location.href = '@Url.Action("Index", "Account")';
-                                });
-                }
-            }
-        });
-        });
-    </script>
-    <!-- DataTables -->
-    <script src="~/Assets/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
-    <script src="~/Assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-    <script src="~/Scripts/sweetalert.min.js"></script>
-</body>
-</html>
+

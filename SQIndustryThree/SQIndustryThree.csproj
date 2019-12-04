@@ -123,9 +123,12 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\CapexApprovalController.cs" />
+    <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="DAL\CapexApprovalDAL.cs" />
+    <Compile Include="DAL\DashboardDAL.cs" />
     <Compile Include="DAL\HomeDAL.cs" />
     <Compile Include="DataManager\DataAccessManager.cs" />
     <Compile Include="DataManager\DataBase.cs" />
@@ -140,6 +143,7 @@
     <Compile Include="Models\CapexFileUploadDetails.cs" />
     <Compile Include="Models\CapexInformationDetails.cs" />
     <Compile Include="Models\CapexInformationMaster.cs" />
+    <Compile Include="Models\ChartModel.cs" />
     <Compile Include="Models\CommentsTable.cs" />
     <Compile Include="Models\QueryModel.cs" />
     <Compile Include="Models\ResultResponse.cs" />
@@ -6409,7 +6413,10 @@
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\c3.css" />
+    <Content Include="Content\c3.min.css" />
     <Content Include="Content\capexform.css" />
+    <Content Include="Content\sweetalert.css" />
     <Content Include="css\style.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
@@ -6418,6 +6425,7 @@
     <Content Include="Images\logo.png" />
     <Content Include="Images\slogan.png" />
     <Content Include="Images\sqbackgraound.jpg" />
+    <Content Include="LICENSE.txt" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="fonts\Asap-Regular.ttf" />
@@ -6898,9 +6906,33 @@
     <Content Include="Assets\bower_components\select2\src\scss\_dropdown.scss" />
     <Content Include="Assets\bower_components\select2\src\scss\_multiple.scss" />
     <Content Include="Assets\bower_components\select2\src\scss\_single.scss" />
+    <Content Include="fonts\poppins\Poppins-Black.ttf" />
+    <Content Include="fonts\poppins\Poppins-BlackItalic.ttf" />
+    <Content Include="fonts\poppins\Poppins-Bold.ttf" />
+    <Content Include="fonts\poppins\Poppins-BoldItalic.ttf" />
+    <Content Include="fonts\poppins\Poppins-ExtraBold.ttf" />
+    <Content Include="fonts\poppins\Poppins-ExtraBoldItalic.ttf" />
+    <Content Include="fonts\poppins\Poppins-ExtraLight.ttf" />
+    <Content Include="fonts\poppins\Poppins-ExtraLightItalic.ttf" />
+    <Content Include="fonts\poppins\Poppins-Italic.ttf" />
+    <Content Include="fonts\poppins\Poppins-Light.ttf" />
+    <Content Include="fonts\poppins\Poppins-LightItalic.ttf" />
+    <Content Include="fonts\poppins\Poppins-Medium.ttf" />
+    <Content Include="fonts\poppins\Poppins-MediumItalic.ttf" />
+    <Content Include="fonts\poppins\Poppins-Regular.ttf" />
+    <Content Include="fonts\poppins\Poppins-SemiBold.ttf" />
+    <Content Include="fonts\poppins\Poppins-SemiBoldItalic.ttf" />
+    <Content Include="fonts\poppins\Poppins-Thin.ttf" />
+    <Content Include="fonts\poppins\Poppins-ThinItalic.ttf" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
+    <None Include="Properties\PublishProfiles\FolderProfile1.pubxml" />
+    <None Include="Properties\PublishProfiles\FolderProfile2.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
+    <Content Include="Scripts\c3.js" />
+    <Content Include="Scripts\c3.min.js" />
+    <Content Include="Scripts\d3.js" />
+    <Content Include="Scripts\d3.min.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />
     <Content Include="Scripts\jquery-3.3.1.slim.js" />
@@ -6933,6 +6965,10 @@
     <Content Include="Views\CapexApproval\PendingCapex.cshtml" />
     <Content Include="Views\CapexApproval\CapexInformationView.cshtml" />
     <Content Include="Views\CapexApproval\_modalShowCapexinfo.cshtml" />
+    <Content Include="Views\CapexApproval\_updateCapexpertialView.cshtml" />
+    <Content Include="Views\Dashboard\DashboardCapex.cshtml" />
+    <Content Include="Views\Shared\_AdminPanelLayout.cshtml" />
+    <Content Include="Views\Admin\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

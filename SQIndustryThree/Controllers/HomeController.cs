@@ -39,6 +39,51 @@ namespace SQIndustryThree.Controllers
             bool result = homedal.SAveUsersToDataBase(users);
             return Json(result,JsonRequestBehavior.AllowGet);
         }
+        [HttpPost]
+        public ActionResult GetUserInformation()
+        {
+
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+            int userID = Convert.ToInt32(Session["SQuserId"].ToString());
+            UserInformation users = homedal.GetUserInformation(userID);
+            return Json(users, JsonRequestBehavior.AllowGet);
+        }
+        [HttpPost]
+        public ActionResult RecoveryPassword()
+        {
+
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+            int userID = Convert.ToInt32(Session["SQuserId"].ToString());
+            bool result= homedal.RecoveryPassword(userID);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult ChangePassword(string email,string oldpass, string newpass)
+        {
+            bool result = false;
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+            int userID = Convert.ToInt32(Session["SQuserId"].ToString());
+            UserInformation users = homedal.CheckUserLogin(email, oldpass);
+            if (users.Empty)
+            {
+                result = false;
+            }
+            else
+            {
+                result = homedal.changePassword(userID, newpass);
+            }
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
 
     }
 }

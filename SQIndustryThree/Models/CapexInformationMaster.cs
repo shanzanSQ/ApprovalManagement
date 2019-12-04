@@ -23,6 +23,8 @@ namespace SQIndustryThree.Models
         public string CapexCatagoryName { get; set; }
         public string UserName { get; set; }
         public string CapexReview { get; set; }
+        public string Currency { get; set; }
+        public int Revision { get; set; }
 
         public List<CapexInformationDetails> CapexInformationDetails { get; set; }
         public List<QueryModel> ApproverQueryModelList { get; set; }

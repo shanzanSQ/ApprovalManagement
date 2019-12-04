@@ -2,102 +2,106 @@
 @{
     ViewBag.Title = "CapexInformationView";
 }
+<style>
+   
+#container {
+  padding-left: 300px;
+}
 
+#content {
+  padding: 20px;
+}
+</style>
 <div class="container-fluid">
-    <section style="margin-top:60px;" class="content" >
-        <div class="row">
-            <div class="col-md-2">
-                <ul>
-                    @if (Convert.ToInt32(Session["SQdesignation"]) > 4)
-                    {
-                        <li><a href="#" onclick="getAllPendingCapex(4)">My Capex<span><p id="pending_Capex"></p></span></a></li>
-                    }
-                    else
-                    {
-                        <li><a href="#" onclick="getAllPendingCapex(0)">All Pending Capex <span><p id="pending_Capex"></p></span></a></li>
-                        <li><a href="#" onclick="getAllPendingCapex(1)">All Approved So Far <span><p id="pending_Capex"></p></span></a></li>
-                        <li><a href="#" onclick="getAllPendingCapex(2)">All Rejected Capex So Far <span><p id="pending_Capex"></p></span></a></li>
-                    }
-
-                </ul>
-            </div>
-            <div class="col-md-10">
-                <h2 text-align:center"><b>ALL CAPEX INFORMATION</b></h2>
-                <hr />
-                <div class="box box-default" id="pendingCapexTable"> </div>
-            </div>
+    <h2 style="text-align:center;"><b>ALL CAPEX INFORMATION</b></h2>
+    <hr />
+    <div class="row">
+        <div class="sidebar" style="width:15%;float:left">
+            <ul class="nav">
+                @if (Convert.ToInt32(Session["SQdesignation"]) > 4)
+                {
+                    <li><a href="#" onclick="getAllPendingCapex(4)">My Capex</a></li>
+                }
+                else
+                {
+                    <li><a href="#" onclick="getAllPendingCapex(0)">All Pending Capex <span style="color:red;" id="pending_Capex"></span></a></li>
+                    <li><a href="#" onclick="getAllPendingCapex(1)">All Approved So Far </a></li>
+                    <li><a href="#" onclick="getAllPendingCapex(2)">All Rejected Capex So Far</a></li>
+                }
+            </ul>
         </div>
-    </section>
-</div>
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h5 class="modal-title" id="myModalLabel">Capex Information</h5>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-12 modal_body_map">
-                        <div class="location-map" id="location-map">
-                            <div style="text-align:left" id="update_canvas"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4 modal_body_end">
-
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer" style="text-align:center">
-                <label for="remarks_box">Enter Comments Here</label>
-                <input type="text" placeholder="Enter Remarks " id="remarks_box" class="form-control" />
-                <br />
-                <button class="btn btn-success" id="approvedButton">APPROVE</button>
-                <button class="btn btn-danger" id="rejectButton">REJECT</button> 
-            </div>
+        <div style="text-align:center;width:85%;float:right">
+            <div id="pendingCapexTable"> </div>
         </div>
     </div>
 </div>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h5 class="modal-title" id="myModalLabel">Capex Information</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12 modal_body_map">
+                            <div class="location-map" id="location-map">
+                                <div style="text-align:left" id="update_canvas"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 modal_body_end">
 
-<div class="modal fade" id="showmodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h5 class="modal-title" id="myModalLabel">Capex Information</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="text-align:center">
+                    <label for="remarks_box">Enter Comments Here</label>
+                    <input type="text" placeholder="Enter Remarks " id="remarks_box" class="form-control" />
+                    <br />
+                    <button class="btn btn-success" id="approvedButton">APPROVE</button>
+                    <button class="btn btn-danger" id="rejectButton">REJECT</button>
+                </div>
             </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-12 modal_body_map">
-                        <div class="location-map" id="location-map">
-                                
+        </div>
+    </div>
+
+    <div class="modal fade" id="showmodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h5 class="modal-title" id="myModalLabel">Capex Information</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12 modal_body_map">
+                            <div class="location-map" id="location-map">
                                 <div style="text-align:left" id="showcanvas"></div>
-                            
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 modal_body_end">
+
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-4 modal_body_end">
-
-                    </div>
+                <div class="modal-footer" style="text-align:center">
+                    <button style="text-align:right" class="btn btn-success" id="printCapex">Print This Capex</button>
                 </div>
-            </div>
-            <div class="modal-footer" style="text-align:center">
-                <button style="text-align:right" class="btn btn-success" id="printCapex">Print This Capex</button>
             </div>
         </div>
     </div>
-</div>
 
-@section Scripts {
-    <script type="text/javascript">
+    @section Scripts {
+        <script type="text/javascript">
         $(function () {
-                getAllPendingCapex(0);     
+            getAllPendingCapex(0);
             });
-      
+
            // Re-init map before show modal
         $('#myModal').on('show.bs.modal', function(event) {
             var modalmap = $(event.relatedTarget);
@@ -109,8 +113,9 @@
             var modalmap = $(event.relatedTarget);
             ShowSelectedCapex(modalmap.data('idkey'));
         });
+
         function getAllPendingCapex(status) {
-             var urlpath = '@Url.Action("showCapexInformation", "CapexApproval")';
+            var urlpath = '@Url.Action("showCapexInformation", "CapexApproval")';
             $.ajax({
                 url: urlpath,
                 type: "Post",
@@ -121,6 +126,11 @@
                             $('#pendingCapexTable').empty();
                             $('#pendingCapexTable').html(data);
                             $("#capexshowTable").DataTable();
+                            if (status == 0) {
+                                $('#pending_Capex').show();
+                            } else {
+                                $('#pending_Capex').hide();
+                            }
                         }
                     }
                 });
@@ -156,12 +166,12 @@
                                 $('#update_canvas').append(data);
                             }
                         }
-                    });
+                });
         }
 
 
 
-        function updateApprove(approve) {
+        function updateApprove(approve,status) {
                 var urlpath = '@Url.Action("UpdatedCapexInfo", "CapexApproval")';
                 $.ajax({
                     contentType: "application/json; charset=utf-8",
@@ -173,7 +183,7 @@
                     success: function (result) {
                         if (result.isSuccess) {
                             swal({
-                                            title: 'CAPEX APPROVED SUCCSSFULLY',
+                                            title:status,
                                             type: 'success',
                                             closeOnCancel: true
                                         },
@@ -197,7 +207,7 @@
             }
 
             jsonData["IsApproved"] = 1;
-            updateApprove(jsonData);
+            updateApprove(jsonData,'CAPEX APPROVED SUCCESSFULLY!!');
         });
 
         $("#rejectButton").click(function () {
@@ -213,7 +223,7 @@
                 jsonData["CapexReview"] = $('#remarks_box').val();
             }
             jsonData["IsApproved"] = 2;
-            updateApprove(jsonData);
+            updateApprove(jsonData,'CAPEX REJECTED !!');
         });
 
         $("#printCapex").click(function () {
@@ -227,5 +237,24 @@
             print_area.print();
             print_area.close();
         });
-    </script>
-}
+
+
+            function updateCapex() {
+                 var primarykey = $("#update_primarykey").val();
+                var urlpath = '@Url.Action("Editcapexmodal", "CapexApproval")';
+                $.ajax({
+                    data: {primarykey:primarykey},
+                    url: urlpath,
+                    type: "Post",
+                    async: true,
+                            success: function(data) {
+                                if (data) {
+                                     $('#pendingCapexTable').empty();
+                                    $('#pendingCapexTable').html(data);
+                                }
+                            }
+                        });
+            }
+
+        </script>
+    }

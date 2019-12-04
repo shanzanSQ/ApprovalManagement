@@ -1,0 +1,393 @@
+﻿@model SQIndustryThree.Models.CapexInformationMaster
+@{
+    ViewBag.Title = "_updateCapexpertialView";
+}
+
+<style>
+    input {
+        text-align: center;
+    }
+
+    th {
+        text-align: center;
+        font-weight: bold;
+    }
+</style>
+<div id="myprintmodal">
+    <p style="color:red;text-align:center;font-weight:bold">Revised Capex No : @Model.CapexInfoId</p>
+
+    <div class="row">
+        <table style="overflow:scroll" width="90%" align="center" border="1">
+            <caption>Approval Status</caption>
+            <thead>
+                <tr>
+                    <th width="5%">No</th>
+                    <th width="15%">Approver Name</th>
+                    <th width="15%">Designation</th>
+                    <th width="10%">Status</th>
+                    <th width="15%">Date</th>
+                    <th width="40%">Comment</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ int approver = 1;}
+                @foreach (var query in Model.ApproverQueryModelList)
+                {
+                    <tr>
+                        <td>@approver</td>
+                        <td style="word-wrap:break-word">@query.ApproverName</td>
+                        <td style="word-wrap:break-word">@query.DesignationName</td>
+                        @{
+                            if (query.IsApproved == 0)
+                            {
+                                <td style="color:red">Pending</td>
+                            }
+                            else if (query.IsApproved == 1)
+                            {
+                                <td style="color:green">Approved</td>
+                            }
+                            else if (query.IsApproved == 2)
+                            {
+                                <td style="color:red">Rejected</td>
+                            }
+                            else
+                            {
+                                <td style="color:Red">Pending</td>
+                            }
+                        }
+                        <td style="word-wrap:break-word">@query.UpdateDate</td>
+                        @{
+                            <td style="word-wrap:break-word">@query.ReviewComment</td>
+                        }
+                    </tr>
+                    approver++;
+                }
+            </tbody>
+
+        </table>
+
+        <div>
+            <input id="primarykey" type="hidden" value="@Model.CapexInfoId" />
+            <table border="1" width="90%" align="center" style="overflow-wrap:initial" class="">
+                <caption>Capex Information</caption>
+                <tbody>
+                    <tr>
+                        <td width="20%">Capex Number</td>
+                        <td width="80%">@Model.CapexInfoId</td>
+                    </tr>
+                    <tr>
+                        <td width="20%">Capex Name</td>
+                        <td width="80%">@Model.CapexName</td>
+                    </tr>
+                    <tr>
+
+                        <td>Business Unit</td>
+                        <td>@Model.BusinessUnitName</td>
+                    </tr>
+                    <tr>
+                        <td>Capex Asset Type</td>
+                        <td>@Model.CapexAssetType</td>
+                    </tr>
+                    <tr>
+                        <td>Capex Descriptions</td>
+                        <td><input class="form-control" id="project_description" style="width:100%;overflow-wrap:break-word" type="text" value="@Model.CapexDescription" /> </td>
+                    </tr>
+                    <tr>
+                        <td>Catagory Name</td>
+                        <td>@Model.CapexCatagoryName</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+<div>
+    <div style="margin-top:10px" class="form-group">
+        <label for="assets_description">Description Assets</label>
+        <button class="btn btn-success" id="addrow">Add Row</button>
+    </div>
+    <table style="overflow:scroll" width="90%" align="center" border="1" id="assets_description" class="order-list">
+        <thead>
+            <tr>
+                <td>Asset Catagory</td>
+                <td>Description</td>
+                <td>Qty</td>
+                <td>Unit price</td>
+                <td>Estimated Cost</td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>
+            @{ int cnt = 1; double total = 0;}
+            @if (Model.CapexDescription != null)
+            {
+                foreach (var item in Model.CapexInformationDetails)
+                {
+                    total += Convert.ToDouble(item.CapexEstimatedCost);
+                <tr>
+                    <td style="display:none"><input type="hidden" class="form-control" name="capdetailsId" value="@item.CapexInfoDetailsId" /></td>
+                    <td><input id="asset_catagory" name="asset_catagory"  type="text" class="form-control" value="@item.CapexAssetCatagory" /></td>
+                    <td><input id="asset_description" name="asset_description" type="text" class="form-control" value="@item.CapexAssetDescription" /></td>
+                    <td><input id="asse_qty" onchange="calculateGrandTotal()" name="asse_qty" type="text" class="form-control" value="@item.CapexDetailsQty" /></td>
+                    <td><input id="asset_unitPrice" onchange="calculateGrandTotal()" name="asset_unitPrice" type="text" class="form-control" value="@item.CapexUnitPrice" /></td>
+                    <td><input id="asset_estimated_cost" name="asset_estimated_cost" disabled type="text" class="form-control" value="@item.CapexEstimatedCost" /></td>
+                    <td></td>
+
+                </tr>
+
+                    cnt++;
+
+                }
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+            <tr>
+                <td><b>Total</b></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td id="grandtotal" name="grandtotal"><b>@total</b></td>
+                <td>(In @Model.Currency)</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+
+
+<div class="row">
+    <table style="overflow:scroll" width="50%" align="center">
+        <tr>
+            <td>
+                <input accept="image/jpeg,image/png,application/pdf" name="file_uploaded[]" type="file" multiple class="filestyles gallery-images form-control " id="file_uploaded" />
+            </td>
+            <td>
+                <button id="file_uploadButton" class="btn btn-success">Upload</button>
+            </td>
+        </tr>
+    </table>
+</div>
+@if (Model.CapexFileUpload != null)
+{
+    <div class="fileList">
+        @foreach (var item in Model.CapexFileUpload)
+        {
+            <a href="/CapexApproval/DownloadFile?filename=@item.CapexFilePath" target="_blank">@item.CapexFileName</a>
+        }
+    </div>
+}
+
+
+<br />
+<div>
+    <button class="btn btn-danger" onclick="getAllPendingCapex(0)" id="cancel_button">Cancel</button>
+    <button id="updatecapex_button" class="btn btn-info">Update</button>
+</div>
+<script>
+    $(document).ready(function () {
+        var counter = 0;
+
+        $("#addrow").on("click", function () {
+            counter = $('#myTable tr').length - 2;
+            var newRow = $("<tr>");
+            var cols = "";
+            cols += '<td style="display:none"><input type="hidden" class="form-control"  name="capdetailsId'+ counter +'" value="0" /></td>';
+            cols += '<td><input type="text" class="form-control"  name="asset_catagory' + counter + '"/></td>';
+            cols += '<td><input type="text" class="form-control"  name="asset_description' + counter + '"/></td>';
+            cols += '<td><input type="text" class="form-control" onchange="calculateGrandTotal()"  name="asse_qty' + counter + '"/></td>';
+            cols += '<td><input type="text" class="form-control" onchange="calculateGrandTotal()" name="asset_unitPrice' + counter + '"/></td>';
+            cols += '<td><input type="text" class="form-control" disabled name="asset_estimated_cost' + counter + '"/></td>';
+
+            cols += '<td><input type="button" class="btn btn-danger ibtnDel"  value="X"></td>';
+            newRow.append(cols);
+            if (counter == 4) $('#addrow').attr('disabled', true).prop('value', "You've reached the limit");
+            $("table.order-list").append(newRow);
+            counter++;
+            calculateGrandTotal();
+        });
+
+        $("table.order-list").on("change", 'input[name^="asset_estimated_cost"]', function (event) {
+            calculateRow($(this).closest("tr"));
+            calculateGrandTotal();
+        });
+
+
+        $("table.order-list").on("click", ".ibtnDel", function (event) {
+            $(this).closest("tr").remove();
+            calculateGrandTotal();
+
+            counter -= 1
+            $('#addrow').attr('disabled', false).prop('value', "Add Row");
+        });
+
+
+    });
+
+
+
+    function calculateRow(row) {
+        var price = +row.find('input[name^="asset_estimated_cost"]').val();
+    }
+
+    function calculateGrandTotal() {
+        var grandTotal = 0;
+        $("#assets_description tr").each(function () {
+            var qnty = $(this).find('input[name^="asse_qty"]').val();
+            var unitprice = $(this).find('input[name^="asset_unitPrice"]').val();
+            $(this).find('input[name^="asset_estimated_cost"]').val(qnty * unitprice);
+        });
+
+        $("table.order-list").find('input[name^="asset_estimated_cost"]').each(function () {
+            grandTotal += +$(this).val();
+        });
+        $("#grandtotal").text(grandTotal);
+    }
+
+
+
+    function imagesPreview(input, placeToInsertImagePreview) {
+        if (input.files) {
+            var filesAmount = input.files.length;
+            for (i = 0; i < filesAmount; i++) {
+                var reader = new FileReader();
+                reader.name = input.files[i].name;
+                reader.onload = function (event) {
+                    var htmlImage = '';
+                    htmlImage = htmlImage + '<p>' + event.target.name+ '</a>';
+                       // htmlImage = htmlImage +  '<input style="padding-top:1px;padding-bottom:1px;float:right" class="btn btn-danger" onclick="removeImage($(this))" type="button" value="X" />';
+                        htmlImage = htmlImage +  '';
+                    $($.parseHTML(htmlImage)).appendTo(placeToInsertImagePreview);
+                }
+                reader.readAsDataURL(input.files[i]);
+            }
+        }
+
+    }
+
+
+    $('#file_uploaded').on('change', function() {
+        imagesPreview(this, 'div.fileList');
+    });
+
+
+     $('#file_uploadButton').on('click', function() {
+         uploadFiles();
+     });
+
+    $('#file_removeButton').on('click', function() {
+        var urlpath = '@Url.Action("DeleteFiles", "CapexApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+                if (data) {
+                    swal({
+                    title: 'Uploaded files deleated please Reupload file for next time !',
+                    type: 'success',
+                    closeOnCancel: true
+                });
+              }
+            }
+        });
+     });
+
+            function uploadFiles(){
+                 var fileUpload = $("#file_uploaded").get(0);
+                var files = fileUpload.files;
+
+                // Create  a FormData object
+                var fileData = new FormData();
+
+                // if there are multiple files , loop through each files
+                for (var i = 0; i < files.length; i++) {
+                    fileData.append(files[i].name, files[i]);
+                }
+                 var urlpath = '@Url.Action("UploadFiles", "CapexApproval")';
+                $.ajax({
+                    url: urlpath,//URL to upload files
+                    type: "POST", //as we will be posting files and other method POST is used
+                    processData: false, //remember to set processData and ContentType to false, otherwise you may get an error
+                    contentType: false,
+                    data: fileData,
+                    success: function (result) {
+                        alert(result);
+                    },
+                    error: function (err) {
+                        alert(err.statusText);
+                    }
+                });
+    }
+
+    $('#updatecapex_button').on('click', function() {
+        UpdateCurrentCapex();
+     });
+
+
+    function UpdateCurrentCapex() {
+            var valid = false;
+            var jsonData = {};
+            jsonData["CapexInfoId"] = $('#primarykey').val();
+            jsonData["CapexDescription"] = $('#project_description').val();
+            var jsonObj = [];
+            $('#assets_description tr').each(function () {
+                var myData = {};
+                myData["CapexInfoDetailsId"]=$(this).find('input[name^="capdetailsId"]').val();
+                myData["CapexAssetCatagory"] = $(this).find('input[name^="asset_catagory"]').val();
+                myData["CapexAssetDescription"] = $(this).find('input[name^="asset_description"]').val();
+                myData["CapexDetailsQty"] = $(this).find('input[name^="asse_qty"]').val();
+                myData["CapexUnitPrice"] = $(this).find('input[name^="asset_unitPrice"]').val();
+                var qty = $(this).find('input[name^="asse_qty"]').val();
+                var price = $(this).find('input[name^="asset_unitPrice"]').val();
+                myData["CapexEstimatedCost"] = qty * price;
+                if (Number.isInteger(myData["CapexEstimatedCost"]) && parseInt(myData["CapexEstimatedCost"]) > 0) {
+                    jsonObj.push(myData);
+                }
+            });
+            if (jsonObj.length > 0) {
+                valid = true;
+            }
+            jsonData["CapexInformationDetails"] = jsonObj;
+        if (valid == true) {
+            var urlpath = '@Url.Action("RevisedCapexInformation", "CapexApproval")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsonData),
+                dataType: 'json',
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function (result) {
+                    if (result.isSuccess) {
+                        swal({
+                                        title: 'Capex Update Successfully!!',
+                                        type: 'success',
+                                        closeOnCancel: true
+                                    },
+                            function () {
+                                getAllPendingCapex(0);
+                                    });
+                    }
+                }
+            });
+        } else {
+            swal({
+                title: 'PLEASE ENTER ALL THE FIELD!!',
+                type: 'error',
+                closeOnCancel: true
+            });
+        }
+        
+    }
+
+
+
+
+
+
+
+</script>

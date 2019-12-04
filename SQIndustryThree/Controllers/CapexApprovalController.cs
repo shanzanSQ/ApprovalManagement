@@ -79,6 +79,18 @@ namespace SQIndustryThree.Controllers
             return Json(result, JsonRequestBehavior.AllowGet); 
         }
 
+
+        [HttpPost]
+        public ActionResult RevisedCapexInformation(CapexInformationMaster capexInformationMaster)
+        {
+            ResultResponse result = new ResultResponse();
+            int userID = Convert.ToInt32(Session["SQuserId"].ToString());
+            result = capexApproval.RevisedCapexInformation(capexInformationMaster, userID);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+
+
         [HttpPost]
         public ActionResult UpdatedCapexInfo(CapexInformationMaster capexInformationMaster)
         {
@@ -98,8 +110,9 @@ namespace SQIndustryThree.Controllers
         [HttpPost]
         public ActionResult ShowPertialviewModal(CapexInformationMaster capexInformationMaster)
         {
+            int userID = Convert.ToInt32(Session["SQuserId"].ToString());
             capexInformationMaster.CapexFileUpload = new List<CapexFileUploadDetails>();
-            capexInformationMaster.CapexFileUpload = capexApproval.GetUploadedFilesByID(0);
+            capexInformationMaster.CapexFileUpload = capexApproval.GetUploadedFilesByID(0,userID);
             return PartialView("_modalShowCapexinfo", capexInformationMaster);
         }
 
@@ -126,32 +139,65 @@ namespace SQIndustryThree.Controllers
             return PartialView("_ShowUploadedFiles", capexApproval.GetSavedCapex(userID, primarykey));
         }
 
-        public FileResult DownloadFile(string filename)
+        public ActionResult Editcapexmodal(int primarykey)
         {
-            string name = Path.GetFileName(filename);
-            var ServerSavePath = Path.Combine(Server.MapPath("~/Uploads/") + name);
-            return File(ServerSavePath, "image/png");
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+            int userID = Convert.ToInt32(Session["SQuserId"].ToString());
+            return PartialView("_updateCapexpertialView", capexApproval.GetSavedCapex(userID, primarykey));
+        }
+
+
+        public void DownloadFile(string filename)
+        {
+            //string name = Path.GetFileName(filename);
+            //var ServerSavePath = Path.Combine(Server.MapPath("~/Uploads/") + name);
+            //return File(ServerSavePath, "image/png");
+
+            string fname = Path.GetFileName(filename);
+            Response.ContentType = "application/octet-stream";
+            Response.AppendHeader("Content-Disposition", "attachment;filename=" + fname);
+            string aaa = Server.MapPath("~/Uploads/" + fname);
+            Response.TransmitFile(Server.MapPath("~/Uploads/" + fname));
+            Response.End();
         }
 
         [HttpPost]
         public ActionResult DeleteFiles()
         {
-            List<CapexFileUploadDetails> capexFileUploadDetails = capexApproval.GetUploadedFilesByID(0);
-            foreach (var f in capexFileUploadDetails)
+            int userID = Convert.ToInt32(Session["SQuserId"].ToString());
+            List<CapexFileUploadDetails> capexFileUploadDetails = capexApproval.GetUploadedFilesByID(0,userID);
+            bool rest = false;
+            if (capexFileUploadDetails.Count>0 || capexFileUploadDetails ==null)
             {
-                try
+                foreach (CapexFileUploadDetails f in capexFileUploadDetails)
                 {
-                    System.IO.File.Delete(f.CapexFilePath);
-                }catch (IOException ioExp){
-                    Console.WriteLine(ioExp.Message);
+                    try
+                    {
+                        System.IO.File.Delete(f.CapexFilePath);
+                    }
+                    catch (IOException ioExp)
+                    {
+                        Console.WriteLine(ioExp.Message);
+                    }
                 }
+
+                rest = capexApproval.DeleteFileFromDatabase(0, userID);
             }
-            return View();
+            else
+            {
+                rest = false;
+            }
+            return Json(rest,JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]  //Now we are getting array of files check sign []
         public ActionResult UploadFiles()
         {
+            int userID = Convert.ToInt32(Session["SQuserId"].ToString());
+
             if (Request.Files.Count > 0)
             {
                 var files = Request.Files;
@@ -172,6 +218,7 @@ namespace SQIndustryThree.Controllers
                         capexFileUploadDetails.CapexFileName = InputFileName;
                         capexFileUploadDetails.CapexFilePath = ServerSavePath;
                         capexFileUploadDetails.CapexInfoId = 0;
+                        capexFileUploadDetails.userId = userID;
                         bool res = capexApproval.FileUploadToDatabase(capexFileUploadDetails);
                     }
 

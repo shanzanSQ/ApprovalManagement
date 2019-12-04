@@ -19,6 +19,7 @@
                 <thead>
                     <tr>
                         <th>SL</th>
+                        <th>Capex Number</th>
                         <th>Capex Name</th>
                         <th>Business Unit</th>
                         <th>Created Date</th>
@@ -34,6 +35,7 @@
                     {
                     <tr>
                         <td>@count</td>
+                        <td>@item.CapexInfoId</td>
                         <td>@item.CapexName</td>
                         <td>@item.BusinessUnitName</td>
                         <td>@item.CapexCreateDate.ToString("dd MMM yyyy")</td>
@@ -47,18 +49,24 @@
                         else if (item.IsApproved == 1)
                         {
                             <td style="color:green">Approved</td>
-                            <td> <button type="button" class="btn  btn-block btn-success" data-toggle="modal" data-target="#showmodal" data-idkey="@item.CapexInfoId">Preview</button></td>
+                            <td> <button type="button" class="btn  btn-block btn-success" data-toggle="modal" data-target="#showmodal" data-idkey="@item.CapexInfoId">Show</button></td>
 
                         }
-                        else if (item.IsApproved == 2)
+                        else if (item.IsApproved == 6)
                         {
+                            <input id="update_primarykey" type="hidden" value="@item.CapexInfoId" />
                             <td style="color:red">Rejected</td>
-                            <td> <button type="button" class="btn  btn-block btn-danger" data-toggle="modal" data-target="#showmodal" data-idkey="@item.CapexInfoId">Preview</button></td>
+                            <td> <button type="button" id="update_capex" onclick="updateCapex()" class="btn  btn-block btn-danger">Update </button></td>
                         }
                         else if (item.IsApproved == 3)
                         {
                             <td style="color:red">Pending By Others </td>
                             <td> <button type="button" class="btn  btn-block btn-success" data-toggle="modal" data-target="#myModal" data-idkey="@item.CapexInfoId">Pending Others </button></td>
+                        }
+                        else if (item.IsApproved == 2)
+                        {
+                            <td style="color:red">Rejected</td>
+                            <td> <button type="button" class="btn  btn-block btn-success" data-toggle="modal" data-target="#showmodal" data-idkey="@item.CapexInfoId">Show</button></td>
                         }
                         else
                         {
@@ -77,3 +85,8 @@
     <!-- /.box-body -->
 </div>
 <!-- /.box -->
+<script>
+    $(function () {
+        $("#pending_Capex").html("("+@Model.Count()+")");
+    });
+</script>

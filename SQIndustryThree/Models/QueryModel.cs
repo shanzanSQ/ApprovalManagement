@@ -13,7 +13,7 @@ namespace SQIndustryThree.Models
         public int IsApproved { get; set; }
         public string ReplyMessage { get; set; }
         public string ReviewComment { get; set; }
-        public DateTime UpdateDate { get; set; }
+        public string UpdateDate { get; set; }
         public string DesignationName { get; set; }
     }
 }
