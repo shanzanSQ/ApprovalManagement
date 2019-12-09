@@ -325,8 +325,6 @@
             counter -= 1
             $('#addrow').attr('disabled', false).prop('value', "Add Row");
         });
-
-
     });
 
 
@@ -377,6 +375,7 @@
             }
         });
     }
+
     function LoadCapexCatagory() {
         $('#catagory_caperx').css({ "border-color": "#d3d3d3" });
         var urlpath = '@Url.Action("LoadCapexCatagory", "CapexApproval")';

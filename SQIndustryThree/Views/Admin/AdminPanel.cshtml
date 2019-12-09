@@ -1,0 +1,178 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_AdminPanelLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="sidebar" style="width:20%;float:left">
+        <label for="business_unit">Business Unit</label>
+        <select id="business_unit" name="business_unit" class="form-control"> </select>
+        <label for="catagory_caperx">Capex Catagory</label>
+        <select id="catagory_caperx" name="catagory_caperx" class="form-control"> </select>
+        <label for="sartdate">Start Date</label>
+        <input type="date" id="sartdate" class="form-control" />
+        <label for="enddate">End Date</label>
+        <input type="date" id="enddate" class="form-control" />
+        <hr />
+        <input type="submit" class="form-control btn btn-info" id="subid" />
+    </div>
+    <div style="text-align:center;width:80%;float:right">
+        <div id="pendingCapexTable"> </div>
+    </div>
+</div>
+
+<div class="modal fade" id="showmodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h5 class="modal-title" id="myModalLabel">Capex Information</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 modal_body_map">
+                        <div class="location-map" id="location-map">
+                            <div style="text-align:left" id="showcanvas"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 modal_body_end">
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="text-align:center">
+                <button style="text-align:right" class="btn btn-success" id="printCapex">Print This Capex</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+@Scripts.Render("~/bundles/jquery")
+<script type="text/javascript">
+             window.onload = function () {
+                LoadBusinessUnit();
+                 LoadCapexCatagory();
+                  $('#showmodal').on('show.bs.modal', function (event) {
+                    var modalmap = $(event.relatedTarget);
+                    ShowSelectedCapex(modalmap.data('idkey'));
+            });
+            };
+           
+        //only show the capex
+        function ShowSelectedCapex(primarykey) {
+            var urlpath = '@Url.Action("IndividualCapexShow", "Admin")';
+            $.ajax({
+                data: {primarykey:primarykey},
+                url: urlpath,
+                type: "Post",
+                async: true,
+                        success: function(data) {
+                            if (data) {
+                                $('#showcanvas').empty();
+                                $('#showcanvas').append(data);
+                            }
+                        }
+                    });
+        }
+
+
+            function getAllApprovedCapex(businessId,catagoryId,selectdate,enddate) {
+                var urlpath = '@Url.Action("AllApprovedCapex", "Admin")';
+                $.ajax({
+                    url: urlpath,
+                    type: "Post",
+                    data: { BusinessUnitID: businessId, CatagoryID: catagoryId, SelectDate: selectdate, EndDate: enddate },
+                    async: true,
+                    success: function (result) {
+                        if (result) {
+                            $('#pendingCapexTable').empty();
+                            $('#pendingCapexTable').html(result);
+                            $("#capexshowTable").DataTable();
+                        } 
+                            }
+                        });
+                }
+
+            function LoadBusinessUnit() {
+                $('#business_unit').css({ "border-color": "#d3d3d3" });
+                var urlpath = '@Url.Action("LoadBusinessUnit", "CapexApproval")';
+                $.ajax({
+                    url: urlpath,
+                    dataType: 'json',
+                    type: "Post",
+                    data: {},
+                    async: true,
+                    success: function (data) {
+                        $('#business_unit').empty();
+                        $('#business_unit').append("<option value='0'>--ALL Business Unit --</option>");
+                        for (var i = 0; i < data.length; i++) {
+                            $("#business_unit").append($("<option></option>").val(data[i].BusinessUnitId)
+                                .html(data[i].BusinessUnitName));
+                        }
+                    }
+                });
+            }
+
+            function LoadCapexCatagory() {
+                $('#catagory_caperx').css({ "border-color": "#d3d3d3" });
+                var urlpath = '@Url.Action("LoadCapexCatagory", "CapexApproval")';
+                $.ajax({
+                    url: urlpath,
+                    dataType: 'json',
+                    type: "Post",
+                    data: {},
+                    async: true,
+                    success: function (data) {
+                        $('#catagory_caperx').empty();
+                        $('#catagory_caperx').append("<option value='0'>-- ALL Capex Catagory --</option>");
+                        for (var i = 0; i < data.length; i++) {
+                            $("#catagory_caperx").append($("<option></option>").val(data[i].CapexCatagoryID)
+                                .html(data[i].CapexCatagoryName));
+                        }
+                    }
+                });
+            }
+            $("#subid").click(function () {
+                    var businessId=$('#business_unit').val();
+                     var catagoryId = $('#catagory_caperx').val();
+                if (!$('#sartdate').val() || !$('#enddate').val()) {
+                    swal({
+                        title: "Please Enter Start and End date ",
+                        type: 'error',
+                        closeOnCancel: true
+                    });
+                } else {
+                      var selectdate = formatDate($('#sartdate').val());
+                var enddate = formatDate($('#enddate').val());
+                     getAllApprovedCapex(businessId, catagoryId, selectdate, enddate);
+                }
+            });
+
+            function formatDate(date) {
+                var d = new Date(date),
+                    month = '' + (d.getMonth() + 1),
+                    day = '' + d.getDate(),
+                    year = d.getFullYear();
+
+                if (month.length < 2)
+                    month = '0' + month;
+                if (day.length < 2)
+                    day = '0' + day;
+
+                return [year, month, day].join('-');
+    }
+    $("#printCapex").click(function () {
+            var print_div = document.getElementById("myprintmodal");
+            var print_area = window.open();
+
+            print_area.document.write("<img width='20' height='20' src='../../Images/logo.png' /><img style='width:80px;' src='../../Images/slogan.png' />");
+            print_area.document.write(print_div.innerHTML);
+            print_area.document.close();
+            print_area.focus();
+            print_area.print();
+            print_area.close();
+        });
+</script>

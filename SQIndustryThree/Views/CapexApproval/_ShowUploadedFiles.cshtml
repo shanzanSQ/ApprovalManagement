@@ -258,45 +258,9 @@
             $("#hide_comments").show();
             $("#comments_section").show();
         });
-
-    @*$("#openfile").click(function () {
-            var path = $(this).val();
-            var urlpath = '@Url.Action("DownloadFile", "CapexApproval")';
-                    $.ajax({
-                        contentType: "application/json; charset=utf-8",
-                        data: {filename:path},
-                        dataType: 'json',
-                        url: urlpath,
-                        type: "Post",
-                        async: true,
-                        success: function (result) {
-                            window.open('//result', "_blank");
-                        }
-                    });
-           });*@
-
-
         $("#hide_comments").click(function () {
             $("#show_comments").show();
             $("#hide_comments").hide();
             $("#comments_section").hide();
         });
-
-        //function showComment() {
-        //    document.getElementById("hide_comments").style.display="block";
-        //    document.getElementById("comments_section").style.display="block";
-        //    document.getElementById("show_comments").style.display = "none";
-           
-        //    //$("#show_comments").hide();
-        //    //$("#hide_comments").show();
-        //    // $("#comments_section").show();
-        //}
-        //function hideComment() {
-        //    document.getElementById("show_comments").style.display = "block";
-        //    document.getElementById("hide_comments").style.display="none";
-        //    document.getElementById("comments_section").style.display="none";
-        //     //$("#show_comments").show();
-        //     //$("#hide_comments").hide();
-        //     //$("#comments_section").hide();
-        //}
 </script>

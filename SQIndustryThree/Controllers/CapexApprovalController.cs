@@ -18,13 +18,13 @@ namespace SQIndustryThree.Controllers
         // GET: CapexApproval
         public ActionResult CreateCapex()
         {
-
             if (Session["SQuserId"] == null)
             {
                 return RedirectToAction("Index", "Account");
             }
-            int designation = Convert.ToInt32(Session["SQdesignation"]);
-            if (designation == 1 || designation == 2 || designation==3 || designation==4)
+            int userid = Convert.ToInt32(Session["SQuserId"]);
+            int permission = capexApproval.ModulePermission(1,userid);
+            if (permission != 1)
             {
                 return RedirectToAction("PendingCapex", "CapexApproval");
             }

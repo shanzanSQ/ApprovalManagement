@@ -8,11 +8,179 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Index</title>
+    <title>SQ GROUP - Admin</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/bootstrap.min.css")" rel="stylesheet" type="text/css" />
+    <link href="~/Content/sweetalert.css" rel="stylesheet" />
+    <link href="//fonts.googleapis.com/css?family=Cormorant+SC:300,400,500,600,700" rel="stylesheet">
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i" rel="stylesheet">
+    <style type="text/css">
+        body {
+            background-image: linear-gradient(#fff,rgba(106, 248, 99, 0.55)), url('../../Images/20191204_153909.jpg');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        .form-control {
+            min-height: 41px;
+            background: #fff;
+            box-shadow: none !important;
+            border-color: #e3e3e3;
+        }
+
+            .form-control:focus {
+                border-color: #70c5c0;
+            }
+
+        .form-control, .btn {
+            border-radius: 2px;
+        }
+
+        .login-form {
+            width: 350px;
+            margin: 0 auto;
+            padding: 100px 0 30px;
+        }
+
+            .login-form .logindiv {
+                color: #7a7a7a;
+                border-radius: 2px;
+                margin-bottom: 15px;
+                font-size: 13px;
+                background: #ececec;
+                box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+                padding: 30px;
+                position: relative;
+            }
+
+            .login-form h2 {
+                font-size: 22px;
+                margin: 35px 0 25px;
+            }
+
+            .login-form .avatar {
+                position: absolute;
+                margin: 0 auto;
+                left: 0;
+                right: 0;
+                top: -50px;
+                width: 95px;
+                height: 95px;
+                border-radius: 50%;
+                z-index: 9;
+                background: #FFFFFF;
+                padding: 15px;
+                box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
+            }
+
+                .login-form .avatar img {
+                    width: 100%;
+                }
+
+            .login-form .btn {
+                font-size: 16px;
+                font-weight: bold;
+                background: #70c5c0;
+                border: none;
+                margin-bottom: 20px;
+            }
+
+                .login-form .btn:hover, .login-form .btn:focus {
+                    background: #50b8b3;
+                    outline: none !important;
+                }
+
+            .login-form a {
+                color: #fff;
+                text-decoration: underline;
+            }
+
+                .login-form a:hover {
+                    text-decoration: none;
+                }
+
+            .login-form .logindiv a {
+                color: #7a7a7a;
+                text-decoration: none;
+            }
+
+                .login-form .logindiv a:hover {
+                    text-decoration: underline;
+                }
+    </style>
 </head>
 <body>
-    <div class="container">
-
+    <div class="login-form">
+        <div class="logindiv">
+            <div class="avatar">
+                <img src="~/Images/logo.png" />
+            </div>
+            <h2 class="text-center">Admin Login</h2>
+            <div class="form-group">
+                <input type="text" class="form-control" id="username" name="username" placeholder="Username" required="required">
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-control" id="password" name="password" placeholder="Password" required="required">
+            </div>
+            <div class="form-group">
+                <button type="submit" id="signin" class="btn btn-primary btn-lg btn-block">Sign in</button>
+            </div>
+            <div class="clearfix">
+                <a href="#" class="pull-right">Forgot Password?</a>
+            </div>
+        </div>
     </div>
 </body>
 </html>
+@Scripts.Render("~/bundles/jquery")
+<script src="~/Scripts/sweetalert.min.js"></script>
+<script type="text/javascript">
+     $(document).keypress(function(e) {
+        if (e.keyCode == 13) {
+            var name = $("#username").val();
+            var pass = $("#password").val();
+            checkLogin(name, pass);
+        }
+    });
+    $("#signin").click(function () {
+        var name = $("#username").val();
+        var pass = $("#password").val();
+        checkLogin(name, pass);
+    });
+    function checkLogin(username,userpass) {
+        var urlpath = '@Url.Action("CheckAdminLogin", "Admin")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {
+                UserEmail:username,
+                UserPassword:userpass
+            },
+            async: true,
+            success: function (result) {
+                if (result.isSuccess) {
+                    swal({
+                        title: result.msg,
+                        message: result.msg,
+                                   type: 'error',
+                                    closeOnCancel: true
+                                });
+                } else {
+                    swal({
+                                    title: 'Login Successfully!!',
+                                    type: 'success',
+                                    closeOnCancel: true
+                                },
+                        function () {
+                            window.location.href = result.msg;
+                                });
+                }
+
+            }
+        });
+    }
+</script>
+
+

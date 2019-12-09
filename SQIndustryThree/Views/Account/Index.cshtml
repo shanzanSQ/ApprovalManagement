@@ -51,11 +51,20 @@
 
 <script type="text/javascript">
 
+    $(document).keypress(function(e) {
+        if (e.keyCode == 13) {
+             var name = $("#user_email").val();
+            var pass = $("#user_password").val();
+            checkLogin(name, pass);
+        }
+    });
+
     $("#login_button").click(function () {
         var name = $("#user_email").val();
         var pass = $("#user_password").val();
         checkLogin(name, pass);
     });
+    
     function checkLogin(username,userpass) {
         var urlpath = '@Url.Action("CheckLogin", "Account")';
         $.ajax({

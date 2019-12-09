@@ -15,6 +15,35 @@ namespace SQIndustryThree.DAL
         private DataAccessManager accessManager = new DataAccessManager();
 
 
+        public int ModulePermission(int module, int userId)
+        {
+            int result = 0;
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<SqlParameter> aParameters = new List<SqlParameter>();
+                List<SqlParameter> aList = new List<SqlParameter>();
+                aList.Add(new SqlParameter("@moduleId", module));
+                aList.Add(new SqlParameter("@userId", userId));
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_GetModulePermission",aList);
+                while (dr.Read())
+                {
+                    result = (int)dr["Permission"];
+                }
+                return result;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+
         //get business unit
         public List<BusinessUnit> GetBusinessUnits()
         {

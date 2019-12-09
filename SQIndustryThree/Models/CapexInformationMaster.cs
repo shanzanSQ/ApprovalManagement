@@ -25,7 +25,7 @@ namespace SQIndustryThree.Models
         public string CapexReview { get; set; }
         public string Currency { get; set; }
         public int Revision { get; set; }
-
+        public double Cost{ get; set; }
         public List<CapexInformationDetails> CapexInformationDetails { get; set; }
         public List<QueryModel> ApproverQueryModelList { get; set; }
         public List<CommentsTable> CommentsTables { get; set; }
