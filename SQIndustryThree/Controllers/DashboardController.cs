@@ -13,6 +13,7 @@ namespace SQIndustryThree.Controllers
     {
 
         DashboardDAL dashboardDAL = new DashboardDAL();
+        CapexApprovalDAL capexApprovalDAL = new CapexApprovalDAL();
         // GET: Dashboard
         public ActionResult Index()
         {
@@ -24,6 +25,12 @@ namespace SQIndustryThree.Controllers
             if (Session["SQuserId"] == null)
             {
                 return RedirectToAction("Index", "Account");
+            }
+            int userid = Convert.ToInt32(Session["SQuserId"]);
+            int permission = capexApprovalDAL.ModulePermission(3, userid);
+            if (permission != 1)
+            {
+                return RedirectToAction("PendingCapex", "CapexApproval");
             }
             return View();
         }

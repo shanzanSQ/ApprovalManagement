@@ -14,6 +14,7 @@ namespace SQIndustryThree.Controllers
     {
 
         CapexApprovalDAL capexApproval = new CapexApprovalDAL();
+        AdminDAL adminDAL = new AdminDAL();
 
         // GET: CapexApproval
         public ActionResult CreateCapex()
@@ -46,6 +47,12 @@ namespace SQIndustryThree.Controllers
             {
                 return RedirectToAction("Index", "Account");
             }
+            int userid = Convert.ToInt32(Session["SQuserId"]);
+            int permission = capexApproval.ModulePermission(2, userid);
+            if (permission != 1)
+            {
+                return RedirectToAction("PendingCapex", "CapexApproval");
+            }
             return View();
         }
 
@@ -65,9 +72,9 @@ namespace SQIndustryThree.Controllers
             return Json(capexApproval.GetApproverList(CatagoryId, userID), JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult LoadBFCORCFOByBusinessUnit(int BusinessUnit,int Designation)
+        public ActionResult LoadBFCORCFOByBusinessUnit(int BusinessUnit,int CatagoryId)
         {
-            return Json(capexApproval.GetBFoORCFo(BusinessUnit, Designation), JsonRequestBehavior.AllowGet);
+            return Json(capexApproval.GetBFoORCFo(BusinessUnit, CatagoryId), JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -136,7 +143,16 @@ namespace SQIndustryThree.Controllers
                 return RedirectToAction("Index", "Account");
             }
             int userID = Convert.ToInt32(Session["SQuserId"].ToString());
-            return PartialView("_ShowUploadedFiles", capexApproval.GetSavedCapex(userID, primarykey));
+            int permission = capexApproval.ModulePermission(4, userID);
+            if (permission != 1)
+            {
+                return PartialView("_ShowUploadedFiles", capexApproval.GetSavedCapex(userID, primarykey));
+            }
+            else
+            {
+                return PartialView("_capexIdShowAdmin", capexApproval.GetSavedCapex(userID, primarykey));
+            }
+            
         }
 
         public ActionResult Editcapexmodal(int primarykey)
@@ -230,5 +246,27 @@ namespace SQIndustryThree.Controllers
                 return Json("No files to upload");
             }
         }
+        public ActionResult AdminPanel()
+        {
+            int userID = Convert.ToInt32(Session["SQuserId"].ToString());
+            int permission = capexApproval.ModulePermission(4, userID);
+            if (permission != 1)
+            {
+                return RedirectToAction("PendingCapex", "CapexApproval");
+            }
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult AllApprovedCapex(int BusinessUnitID, int CatagoryID, string SelectDate, string EndDate)
+        {
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+            List<CapexInformationMaster> capexInformationList = adminDAL.GetALLCapexInfo(BusinessUnitID, CatagoryID, SelectDate, EndDate);
+            return PartialView("_pertialCapexForAdmin", capexInformationList);
+        }
     }
+    
 }

@@ -124,27 +124,7 @@
         </div>
         <div class="col-md-8">
             <label for="approver">Approver</label>
-            <Table class="table">
-                <tr>
-                    <td>1.</td>
-                    <td>Head Of Department</td>
-                    <td id="headOfDepartment" ></td>
-                </tr>
-                <tr>
-                    <td>2.</td>
-                    <td>Chief, IIAE</td>
-                    <td id="Cheif"></td>
-                </tr>
-                <tr>
-                    <td>3.</td>
-                    <td>Business Finance Controller</td>
-                    <td ><p id="businessFinanceConroller"></p></td>
-                </tr>
-                <tr>
-                    <td>4.</td>
-                    <td>Chief Executive , BU</td>
-                    <td ><p id="cheifexecutive"></p></td>
-                </tr>
+            <Table id="approver" style="text-align:center" class="table table-bordered">
             </Table>
         </div>
     </div>
@@ -182,8 +162,6 @@
         GetDate();
         LoadBusinessUnit();
         LoadCapexCatagory();
-         $("#Cheif").append($("<p></p>").val('11')
-             .html("Shihan Hasan"));
     };
 
     function imagesPreview(input, placeToInsertImagePreview) {
@@ -397,38 +375,39 @@
     }
     $('#catagory_caperx').on('change',
         function () {
-          $('#catagory_caperx').css({ "border-color": "#d3d3d3" });
-          loadApprover($(this).val());
+            $('#catagory_caperx').css({ "border-color": "#d3d3d3" });
+            loadCFOBYBusinessUnit();
         });
     $('#business_unit').on('change',
         function () {
              $('#business_unit').css({ "border-color": "#d3d3d3" });
-            loadCFOBYBusinessUnit($(this).val(),'2');
-            loadCFOBYBusinessUnit($(this).val(),'3');
+            loadCFOBYBusinessUnit();
         });
 
-    function loadCFOBYBusinessUnit(buid,sorID) {
+    function loadCFOBYBusinessUnit() {
+        buid = $('#business_unit').val();
+        catid = $('#catagory_caperx').val();
         var urlpath = '@Url.Action("LoadBFCORCFOByBusinessUnit", "CapexApproval")';
         $.ajax({
             url: urlpath,
             dataType: 'json',
             type: "Get",
             data: {
-                Designation: sorID,
-                BusinessUnit : buid
+                BusinessUnit : buid,
+                CatagoryId:catid
             },
             async: true,
             success: function (data) {
-                if (sorID == '2') {
-                    $('#businessFinanceConroller').empty();
-                    $("#businessFinanceConroller").append($("<p></p>").val(data.UserInformationId)
-                        .html(data.UserInformationName));
-                } else if (sorID=='3') {
-                    $('#cheifexecutive').empty();
-                    $("#cheifexecutive").append($("<p></p>").val(data.UserInformationId)
-                        .html(data.UserInformationName));
+                $("#approver").empty();
+                 for (var i = 0; i < data.length; i++) {
+                    var newRow = $("<tr>");
+                     var cols = "";
+                     cols += '<td><p>' + data[i].ApproverNo + '</p></td>';
+                     cols += '<td><p>' + data[i].UserInformationName + '</p></td>';
+                     cols += '<td><p>' + data[i].DesignationName + '</p></td>';
+                    newRow.append(cols);
+                    $("#approver").append(newRow);
                 }
-               
             }
         });
     }

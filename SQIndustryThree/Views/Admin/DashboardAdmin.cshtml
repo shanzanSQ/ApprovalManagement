@@ -1,0 +1,43 @@
+﻿
+@{
+    ViewBag.Title = "DashboardAdmin";
+    Layout = "~/Views/Shared/_AdminPanelLayout.cshtml";
+}
+    <div class="container-fluid">
+        <h2 style="text-align:center;"><b>ALL CAPEX INFORMATION</b></h2>
+        <hr />
+        <div class="row">
+            <div class="sidebar" style="width:15%;float:left">
+                <ul class="nav">
+                        <li><a href="#" onclick="changeDiv(0)">Create New User<span style="color:red;" id="pending_Capex"></span></a></li>
+                        <li><a href="#" onclick="changeDiv(1)">CReate New Designation</a></li>
+                        <li><a href="#" onclick="changeDiv(2)">Create Business Unit</a></li>
+                        <li><a href="#" onclick="changeDiv(3)">Create New Module</a></li>
+                        <li><a href="#" onclick="changeDiv(4)">Set Module Permission</a></li>
+                        <li><a href="#" onclick="changeDiv(5)">Set Approver List</a></li>
+                </ul>
+            </div>
+            <div style="text-align:center;width:85%;float:right">
+                <div id="pendingCapexTable"> </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    function changeDiv(status) {
+        var urlpath = '@Url.Action("ChangeDivView", "Admin")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {status:status},
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $('#pendingCapexTable').empty();
+                            $('#pendingCapexTable').html(data);
+                        }
+                    }
+                });
+    }
+</script>
+

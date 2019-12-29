@@ -74,12 +74,24 @@ namespace SQIndustryThree.Controllers
             else
             {
                 result.isSuccess = false;
-                result.msg = Url.Action("AdminPanel", "Admin");
+                result.msg = Url.Action("DashboardAdmin", "Admin");
                 Session["SQAdminID"] = users.UserInformationId;
                 Session["SQAdminName"] = users.UserInformationName;
                 Session["SQAdminEmail"] = users.UserInformationEmail;
                 return Json(result, JsonRequestBehavior.AllowGet);
             }
+        }
+        public ActionResult CreateUser()
+        {
+            return View();
+        }
+        public ActionResult DashboardAdmin()
+        {
+            return View();
+        }
+        public ActionResult ChangeDivView(int status)
+        {
+            return PartialView();
         }
     }
 }

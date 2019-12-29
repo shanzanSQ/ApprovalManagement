@@ -6978,6 +6978,11 @@
     <Content Include="Views\Admin\AdminPanel.cshtml" />
     <Content Include="Views\Admin\_pertialCapexForAdmin.cshtml" />
     <Content Include="Views\Admin\_capexIdShowAdmin.cshtml" />
+    <Content Include="Views\CapexApproval\AdminPanel.cshtml" />
+    <Content Include="Views\CapexApproval\_pertialCapexForAdmin.cshtml" />
+    <Content Include="Views\CapexApproval\_capexIdShowAdmin.cshtml" />
+    <Content Include="Views\Admin\CreateUser.cshtml" />
+    <Content Include="Views\Admin\DashboardAdmin.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

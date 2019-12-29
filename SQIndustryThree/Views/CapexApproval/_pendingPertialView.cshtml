@@ -33,47 +33,47 @@
                     @{ int count = 1;}
                     @foreach (var item in Model)
                     {
-                    <tr>
-                        <td>@count</td>
-                        <td>@item.CapexInfoId</td>
-                        <td>@item.CapexName</td>
-                        <td>@item.BusinessUnitName</td>
-                        <td>@item.CapexCreateDate.ToString("dd MMM yyyy")</td>
-                        <td>@item.CapexCatagoryName</td>
-                        <td>@item.UserName</td>
-                        @if (item.IsApproved == 0)
-                        {
-                            <td style="color:red">Pending</td>
-                            <td> <button type="button" class="btn  btn-block btn-success" data-toggle="modal" data-target="#myModal" data-idkey="@item.CapexInfoId">Preview</button></td>
-                        }
-                        else if (item.IsApproved == 1)
-                        {
-                            <td style="color:green">Approved</td>
-                            <td> <button type="button" class="btn  btn-block btn-success" data-toggle="modal" data-target="#showmodal" data-idkey="@item.CapexInfoId">Show</button></td>
+                        <tr>
+                            <td>@count</td>
+                            <td>@item.CapexInfoId</td>
+                            <td>@item.CapexName</td>
+                            <td>@item.BusinessUnitName</td>
+                            <td>@item.CapexCreateDate.ToString("dd MMM yyyy")</td>
+                            <td>@item.CapexCatagoryName</td>
+                            <td>@item.UserName</td>
+                            @if (item.IsApproved == 0)
+                            {
+                                <td style="color:red">Pending</td>
+                                <td> <button type="button" class="btn  btn-block btn-success" data-toggle="modal" data-target="#myModal" data-idkey="@item.CapexInfoId">Preview</button></td>
+                            }
+                            else if (item.IsApproved == 1)
+                            {
+                                <td style="color:green">Approved</td>
+                                <td> <button type="button" class="btn  btn-block btn-success" data-toggle="modal" data-target="#showmodal" data-idkey="@item.CapexInfoId">Show</button></td>
 
-                        }
-                        else if (item.IsApproved == 6)
-                        {
-                            <input id="update_primarykey" type="hidden" value="@item.CapexInfoId" />
-                            <td style="color:red">Rejected</td>
-                            <td> <button type="button" id="update_capex" onclick="updateCapex()" class="btn  btn-block btn-danger">Update </button></td>
-                        }
-                        else if (item.IsApproved == 3)
-                        {
-                            <td style="color:red">Pending By Others </td>
-                            <td> <button type="button" class="btn  btn-block btn-success" data-toggle="modal" data-target="#myModal" data-idkey="@item.CapexInfoId">Pending Others </button></td>
-                        }
-                        else if (item.IsApproved == 2)
-                        {
-                            <td style="color:red">Rejected</td>
-                            <td> <button type="button" class="btn  btn-block btn-success" data-toggle="modal" data-target="#showmodal" data-idkey="@item.CapexInfoId">Show</button></td>
-                        }
-                        else
-                        {
-                            <td style="color:red">Approval Pending</td>
-                            <td> <button type="button" class="btn  btn-block btn-success" data-toggle="modal" data-target="#showmodal" data-idkey="@item.CapexInfoId">Show</button></td>
-                        }
-                    </tr>
+                            }
+                            else if (item.IsApproved == 6)
+                            {
+                                <input id="update_primarykey" type="hidden" value="@item.CapexInfoId" />
+                                <td style="color:red">Rejected</td>
+                                <td> <button type="button" id="update_capex" onclick="updateCapex()" class="btn  btn-block btn-danger">Update </button></td>
+                            }
+                            else if (item.IsApproved == 3)
+                            {
+                                <td style="color:red">Pending By Others </td>
+                                <td> <button type="button" class="btn  btn-block btn-success" data-toggle="modal" data-target="#myModal" data-idkey="@item.CapexInfoId">Pending Others </button></td>
+                            }
+                            else if (item.IsApproved == 2)
+                            {
+                                <td style="color:red">Rejected</td>
+                                <td> <button type="button" class="btn  btn-block btn-success" data-toggle="modal" data-target="#showmodal" data-idkey="@item.CapexInfoId">Show</button></td>
+                            }
+                            else
+                            {
+                                <td style="color:red">Approval Pending</td>
+                                <td> <button type="button" class="btn  btn-block btn-success" data-toggle="modal" data-target="#showmodal" data-idkey="@item.CapexInfoId">Show</button></td>
+                            }
+                        </tr>
                         count++;
 
                     }
@@ -85,6 +85,8 @@
     <!-- /.box-body -->
 </div>
 <!-- /.box -->
+<script src="~/Assets/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="~/Assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
 <script>
     $(function () {
         $("#pending_Capex").html("("+@Model.Count()+")");

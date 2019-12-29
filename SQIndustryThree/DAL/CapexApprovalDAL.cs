@@ -135,22 +135,26 @@ namespace SQIndustryThree.DAL
             }
         }
 
-        public UserInformation GetBFoORCFo(int BusinessUnit, int Designation)
+        public List<UserInformation> GetBFoORCFo(int BusinessUnit,int CatagoryId)
         {
-            UserInformation user = new UserInformation();
+            List<UserInformation> users = new List<UserInformation>();
             try
             {
                 accessManager.SqlConnectionOpen(DataBase.SQQeye);
                 List<SqlParameter> aList = new List<SqlParameter>();
                 aList.Add(new SqlParameter("@businessUnitId", BusinessUnit));
-                aList.Add(new SqlParameter("@status", Designation));
+                aList.Add(new SqlParameter("@catagoryID", CatagoryId));
                 SqlDataReader dr = accessManager.GetSqlDataReader("sp_GetBFCORCFOBybusinessUnit", aList);
                 while (dr.Read())
                 {
+                    UserInformation user = new UserInformation();
                     user.UserInformationId = (int)dr["UserId"];
                     user.UserInformationName = dr["UserName"].ToString();
+                    user.DesignationName = dr["DesignationName"].ToString();
+                    user.ApproverNo = (int)dr["ApproverNo"];
+                    users.Add(user);
                 }
-                return user;
+                return users;
             }
             catch (Exception exception)
             {

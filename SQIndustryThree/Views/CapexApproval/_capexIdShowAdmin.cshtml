@@ -1,0 +1,173 @@
+﻿@model SQIndustryThree.Models.CapexInformationMaster
+@{
+    ViewBag.Title = "_capexIdShowAdmin";
+}
+
+<div id="myprintmodal">
+    @if (Model.Revision > 0)
+    {
+        <p style="color:red;text-align:center;font-weight:bold">Revised Capex No:  @Model.Revision</p>
+    }
+    <div>
+        <span style="float:left;font-weight:bold;font-size:24px">@Model.BusinessUnitName</span>
+        <span style="float:right;">Capex No: @Model.CapexInfoId</span>
+    </div>
+    <br />
+    <div class="row">
+        <table style="text-align:center;table-layout:fixed" width="90%" align="center" border="1">
+            <caption>Approval Status</caption>
+            <thead>
+                <tr>
+                    <th width="5%">No</th>
+                    <th width="15%">Approver Name</th>
+                    <th width="15%">Designation</th>
+                    <th width="10%">Status</th>
+                    <th width="15%">Date</th>
+                    <th width="40%">Comment</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ int approver = 1;}
+                @foreach (var query in Model.ApproverQueryModelList)
+                {
+                    <tr>
+                        <td>@approver</td>
+                        <td style="word-wrap:break-word">@query.ApproverName</td>
+                        <td style="word-wrap:break-word">@query.DesignationName</td>
+                        @{
+                            if (query.IsApproved == 0)
+                            {
+                                <td style="color:red">Pending</td>
+                            }
+                            else if (query.IsApproved == 1)
+                            {
+                                <td style="color:green">Approved</td>
+                            }
+                            else if (query.IsApproved == 2)
+                            {
+                                <td style="color:red">Rejected</td>
+                            }
+                            else
+                            {
+                                <td style="color:Red">Pending</td>
+                            }
+                        }
+                        <td style="word-wrap:break-word">@query.UpdateDate</td>
+                        @{
+                            <td style="word-wrap:break-word">@query.ReviewComment</td>
+                        }
+                    </tr>
+                    approver++;
+                }
+            </tbody>
+
+        </table>
+
+        <div>
+            <input id="primarykey" type="hidden" value="@Model.CapexInfoId" />
+            <table style="text-align:center;overflow-wrap:initial" border="1" width="90%" align="center">
+                <caption>Capex Information</caption>
+                <tbody>
+                    <tr>
+                        <td width="30%">Capex Name</td>
+                        <td width="70%">@Model.CapexName</td>
+                    </tr>
+                    <tr>
+
+                        <td>Business Unit</td>
+                        <td>@Model.BusinessUnitName</td>
+                    </tr>
+                    <tr>
+                        <td>Capex Asset Type</td>
+                        <td>@Model.CapexAssetType</td>
+                    </tr>
+                    <tr>
+                        <td>Capex Descriptions</td>
+                        <td style="width:100%;overflow-wrap:break-word">@Model.CapexDescription</td>
+                    </tr>
+                    <tr>
+                        <td> Raised BY</td>
+                        <td>@Model.UserName</td>
+                    </tr>
+                    <tr>
+                        <td>Create Date</td>
+                        <td>@Model.CapexCreateDate.ToString("dd-MMM-yyyy HH:mm")</td>
+                    </tr>
+                    <tr>
+                        <td>Catagory Name</td>
+                        <td>@Model.CapexCatagoryName</td>
+                    </tr>
+                </tbody>
+            </table>
+            @if (Model.CapexInformationDetails != null)
+            {
+                <table style="text-align:center" width="90%" id="capex_details" border="1" align="center">
+                    <caption>Asset Details Information</caption>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Asset Catagory</th>
+                            <th>Asset Descriptions</th>
+                            <th>Asset quantity</th>
+                            <th>Asset Unit Price</th>
+                            <th>Asset Estimated Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{double total = 0; int count = 1;}
+                        @foreach (var item in Model.CapexInformationDetails)
+                        {
+                            total += Convert.ToDouble(item.CapexEstimatedCost);
+                            <tr>
+                                <td>@count</td>
+                                <td>@item.CapexAssetCatagory</td>
+                                <td>@item.CapexAssetDescription</td>
+                                <td>@item.CapexDetailsQty</td>
+                                <td style="overflow-wrap:inherit">@item.CapexUnitPrice</td>
+                                <td>@item.CapexEstimatedCost</td>
+                                <td style="display:none" id="detailsId_@count" name="detailsId">@item.CapexInfoDetailsId</td>
+                            </tr>
+                            count++;
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Total</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th id="total_price">@Model.Currency @total </th>
+                        </tr>
+                    </tfoot>
+                </table>
+            }
+        </div>
+    </div>
+
+</div>
+<br />
+<div id="comments_section" class="container" style="overflow-wrap:inherit; overflow-y: scroll;height:200px;width:90%;border:1px solid">
+    <p>Comment Section</p>
+    @if (Model.CommentsTables != null)
+    {
+        foreach (var app in Model.CommentsTables)
+        {
+            <hr style="margin:unset;padding:unset;width:50%" />
+            <p style="margin:unset;padding:unset" class="media-heading user_name"><strong style="color:blue">@app.ReviewerByName</strong>To <strong>@app.ReviewerToName</strong></p>
+            <p style="margin:unset;padding:unset">@app.UpdatedBY.ToString("dd/mm/yyyy hh:mm")</p>
+            <p style="margin:unset;padding:unset">@app.ReviewMessage</p>
+        }
+    }
+</div>
+<div>
+    @if (Model.CapexFileUpload != null)
+    {
+        <ul>
+            @foreach (var item in Model.CapexFileUpload)
+            {
+                <li><a href="/CapexApproval/DownloadFile?filename=@item.CapexFilePath" target="_blank">@item.CapexFileName</a></li>
+            }
+        </ul>
+    }
+</div>
