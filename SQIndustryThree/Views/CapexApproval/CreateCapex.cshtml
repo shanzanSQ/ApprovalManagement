@@ -12,15 +12,19 @@
     <h2 style="text-align:center"><b>CAPEX APPROVAL FORM</b></h2>
     <hr />
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <label for="business_unit">Business Unit</label>
             <select id="business_unit" name="business_unit" class="form-control"> </select>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
+            <label for="locationCheck">Location</label>
+            <select id="locationCheck" name="locationCheck" class="form-control"> </select>
+        </div>
+        <div class="col-md-3">
             <label for="catagory_caperx">Capex Catagory</label>
             <select id="catagory_caperx" name="catagory_caperx" class="form-control"> </select>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <label for="project_type">Asset Type</label>
             <select id="project_type" name="project_type" class="form-control" onchange='CheckColors(this.value);'>
                 <option>New Asset</option>
@@ -48,17 +52,13 @@
     </div>
     <div>
         <div style="margin-top:10px" class="form-group row">
-            <div class="col-md-8">
+            <div class="col-md-6">
                 <label for="assets_description" style="text-align:center">Description Assets</label>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <label style="float:left;width:30%">Select Currency</label>
                 <select id="currency" class="form-control" style="float:left;width:30%">
-                    <option>BDT</option>
-                    <option>EURO</option>
-                    <option>USD</option>
-                    <option>GBP</option>
-                    <option>SGD</option>
+                    
                 </select>
                 <button class="btn btn-success" style="float:right;width:30%"  id="addrow">Add Row</button>
             </div>
@@ -113,8 +113,20 @@
     <div class="row">
         <div class="col-md-4">
             <div>
-                <label for="file_uploaded">Attach Files</label>
-                <input accept="image/jpeg,image/png,application/pdf" name="file_uploaded[]" type="file" multiple class="filestyles gallery-images form-control " id="file_uploaded" />
+                <div class="col-md-6">
+                    <label for="file_uploaded">Attach Files</label>
+                </div>
+                <div class="col-md-6">
+                    
+                </div>
+                <br />
+                <table id="multiplefile" class="table table-striped">
+                    <tr>
+                        <td> <input class="form-control"  accept="image/jpeg,image/png,application/pdf" type="file" name="file_uploaded" id="file_uploaded" /></td>
+                        <td> <button id="add_files" class="btn btn-success">Add Files</button> </td>
+                    </tr>
+                </table>
+                
             </div>
 
             <div style="padding:10px" class="box box-default fileList" id="fileList" >
@@ -162,6 +174,8 @@
         GetDate();
         LoadBusinessUnit();
         LoadCapexCatagory();
+        LoadCurrency();
+        LoadLocation();
     };
 
     function imagesPreview(input, placeToInsertImagePreview) {
@@ -194,6 +208,22 @@
      $('#file_uploadButton').on('click', function() {
          uploadFiles();
      });
+    $('#add_files').on('click', function() {
+            var newRow = $("<tr>");
+            var cols = "";
+            cols += '<td><input type="file" accept="image/jpeg,image/png,application/pdf" class="form-control" id="file_uploaded" name="file_uploaded"/></td>';
+            cols += '<td><input type="button" class="btn btn-danger delfile"  value="X"></td></tr>';
+            newRow.append(cols);
+            $("#multiplefile").append(newRow);
+     });
+
+    $("#multiplefile").on("click", ".delfile", function (event) {
+            $(this).closest("tr").remove();
+            calculateGrandTotal();
+       //     counter -= 1
+         //   $('#add_files').attr('disabled', false).prop('value', "Add Row");
+    });
+
 
      $('#remove_button').on('click', function() {
          var urlpath = '@Url.Action("DeleteFiles", "CapexApproval")';
@@ -215,29 +245,56 @@
     });
 
 
-            function uploadFiles(){
-                 var fileUpload = $("#file_uploaded").get(0);
-                var files = fileUpload.files;
+    function uploadFiles() {
+        var fileData = new FormData();
+        //var tr = $('#multiplefile').closest('tr');
+        //var fup = $('tr').find("input[type='file']");
+        //var totalFiles = fup.length;//Here, getting total file count
+        //  for (var i = 0; i < totalFiles; i++) {
+        //      var file = fup[i].files;//Exception will not occur here
+        //      alert(file.name);
+        //      fileData.append(file, fup[i].file);
+        //   }
+        $('#multiplefile tr').each(function () {
+            var fileUpload = $(this).find('input[name="file_uploaded"]').prop('files');
+            if (fileUpload.length>0) {
+                 for (var i = 0; i < fileUpload.length; i++) {
+                    fileData.append(fileUpload[i].name, fileUpload[i]);
+                 }
+            }
+           
+            //var files = fileUpload.files;
+            //for (var i = 0; i < files.length; i++) {
+                
+            //            //fileData.append(files[i].name, files[i]);
+            // }
+          //fileData.append(fileName,fileUpload);
+        });
+                     
 
                 // Create  a FormData object
-                var fileData = new FormData();
+                
 
                 // if there are multiple files , loop through each files
-                for (var i = 0; i < files.length; i++) {
-                    fileData.append(files[i].name, files[i]);
-                }
+                //for (var i = 0; i < files.length; i++) {
+                //    fileData.append(files[i].name, files[i]);
+                //}
                  var urlpath = '@Url.Action("UploadFiles", "CapexApproval")';
-                $.ajax({
-                    url: urlpath,//URL to upload files 
-                    type: "POST", //as we will be posting files and other method POST is used
-                    processData: false, //remember to set processData and ContentType to false, otherwise you may get an error
-                    contentType: false,
-                    data: fileData ,
+        $.ajax({
+            url: urlpath,//URL to upload files 
+            type: "post", //as we will be posting files and other method POST is used
+            processData: false, //remember to set processData and ContentType to false, otherwise you may get an error
+            contentType: false,
+            data: fileData  ,
                     success: function (result) {
-                        alert(result);
+                        swal({
+                                title: 'File Uploaded Successfully',
+                                type: 'success',
+                                closeOnCancel: true
+                            });
                     },
                     error: function (err) {
-                        alert(err.statusText);
+                        alert(err.responseText);
                     }
                 });
             }   
@@ -325,15 +382,6 @@
         $("#grandtotal").text(grandTotal);
     }
 
-
-    function CheckColors(val) {
-        var element = document.getElementById('project_type_others');
-        if (val == 'others')
-            element.style.display = 'block';
-        else
-            element.style.display = 'none'
-    }
-
     function LoadBusinessUnit() {
         $('#business_unit').css({ "border-color": "#d3d3d3" });
         var urlpath = '@Url.Action("LoadBusinessUnit", "CapexApproval")';
@@ -349,6 +397,44 @@
                 for (var i = 0; i < data.length; i++) {
                     $("#business_unit").append($("<option></option>").val(data[i].BusinessUnitId)
                         .html(data[i].BusinessUnitName));
+                }
+            }
+        });
+    }
+       function LoadLocation() {
+        $('#locationCheck').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadLocation", "CapexApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+                $('#locationCheck').empty();
+                $('#locationCheck').append("<option value='0'>--Select Location --</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#locationCheck").append($("<option></option>").val(data[i].LocationId)
+                        .html(data[i].LocationName));
+                }
+            }
+        });
+    }
+    function LoadCurrency() {
+        $('#currency').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadCurrency", "CapexApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+                $('#currency').empty();
+               $('#currency').append("<option value='0'>--Currency-</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#currency").append($("<option></option>").val(data[i].CurrencyId)
+                        .html(data[i].CurrencyName));
                 }
             }
         });
@@ -380,8 +466,25 @@
         });
     $('#business_unit').on('change',
         function () {
-             $('#business_unit').css({ "border-color": "#d3d3d3" });
-            loadCFOBYBusinessUnit();
+            $('#business_unit').css({ "border-color": "#d3d3d3" });
+             loadCFOBYBusinessUnit();
+        });
+    $('#currency').on('change',
+        function () {
+             $('#currency').css({ "border-color": "#d3d3d3" });
+        });
+    $('#locationCheck').on('change',
+        function () {
+             $('#locationCheck').css({ "border-color": "#d3d3d3" });
+        });
+    
+    $('#projectname').on('click',
+        function () {
+             $('#projectname').css({ "border-color": "#d3d3d3" });
+        });
+    $('#project_description').on('click',
+        function () {
+             $('#project_description').css({ "border-color": "#d3d3d3" });
         });
 
     function loadCFOBYBusinessUnit() {
@@ -391,7 +494,7 @@
         $.ajax({
             url: urlpath,
             dataType: 'json',
-            type: "Get",
+            type: "Post",
             data: {
                 BusinessUnit : buid,
                 CatagoryId:catid
@@ -433,7 +536,9 @@
         var valid = false;
         var jsonData = {};
             jsonData["BusinessUnitId"] = $('#business_unit').val();
+            jsonData["LocationId"] = $('#locationCheck').val();
             jsonData["BusinessUnitName"] = $('#business_unit').children("option:selected").html();
+            jsonData["LocationName"] = $('#locationCheck').children("option:selected").html();
             jsonData["CapexCatagoryID"] = $('#catagory_caperx').val();
             jsonData["CapexCatagoryName"] = $('#catagory_caperx').children("option:selected").html();
             jsonData["CapexAssetType"] = $('#project_type').val();
@@ -441,6 +546,7 @@
             jsonData["CapexCreateDate"] = $('#current_date').val();
             jsonData["CapexDescription"] = $('#project_description').val();
             jsonData["Currency"] = $('#currency').children("option:selected").html();
+            jsonData["CurrencyID"] = $('#currency').val();
 
             var jsonObj = [];
 
@@ -498,12 +604,21 @@
             if ($('#business_unit').val() == "0") {
                 $('#business_unit').css({ "border-color": "#FF0000" });
                 submit = false;
-            } else if ($('#catagory_caperx').val() == "0") {
+            }else if ($('#locationCheck').val() == "0") {
+                $('#locationCheck').css({ "border-color": "#FF0000" });
+                submit = false;
+            } 
+            else if ($('#catagory_caperx').val() == "0") {
                 $('#catagory_caperx').css({ "border-color": "#FF0000" });
                 submit = false;
-            } else if ($('#projectname').val().length<1) {
+            } else if ($('#projectname').val().length < 1) {
+                $('#projectname').css({ "border-color": "#FF0000" });
                 submit = false;
-            } else if ($('#project_description').val().length<1) {
+            } else if ($('#project_description').val().length < 1) {
+                $('#project_description').css({ "border-color": "#FF0000" });
+                submit = false;
+            } else if ($('#currency').val() == "0") {
+                $('#currency').css({ "border-color": "#FF0000" });
                 submit = false;
             }
 
@@ -512,6 +627,7 @@
             jsonData["CapexCatagoryID"] = $('#catagory_caperx').val();
             jsonData["CapexCatagoryName"] = $('#catagory_caperx').children("option:selected").html();
             jsonData["Currency"] = $('#currency').children("option:selected").html();
+            jsonData["LocationName"] = $('#locationCheck').children("option:selected").html();
 
             if ($('#project_type').val() == "others") {
                 jsonData["CapexAssetType"] = $('#project_type_others').val();

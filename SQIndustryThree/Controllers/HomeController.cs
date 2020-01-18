@@ -32,12 +32,8 @@ namespace SQIndustryThree.Controllers
 
             return View();
         }
-        [HttpPost]
-        public ActionResult RegisterUser(UserInformation users)
-        {
-            bool result = homedal.SAveUsersToDataBase(users);
-            return Json(result,JsonRequestBehavior.AllowGet);
-        }
+        
+        
         [HttpPost]
         public ActionResult GetUserInformation()
         {

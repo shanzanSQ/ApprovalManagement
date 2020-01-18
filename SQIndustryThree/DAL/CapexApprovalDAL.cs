@@ -45,7 +45,7 @@ namespace SQIndustryThree.DAL
 
 
         //get business unit
-        public List<BusinessUnit> GetBusinessUnits()
+        public List<BusinessUnit> GetBusinessUnits(int userId)
         {
 
             try
@@ -53,16 +53,73 @@ namespace SQIndustryThree.DAL
                 accessManager.SqlConnectionOpen(DataBase.SQQeye);
                 List<BusinessUnit> businessUnits = new List<BusinessUnit>();
                 List<SqlParameter> aList = new List<SqlParameter>();
-                SqlDataReader dr = accessManager.GetSqlDataReader("sp_GetAllBusinessUnit");
+                aList.Add(new SqlParameter("@userId", userId));
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_UserWiseBusinessUnit",aList);
                 while (dr.Read())
                 {
-                    BusinessUnit businessUnit = new BusinessUnit();
-                    businessUnit.BusinessUnitId = (int)dr["BusinessUnitId"];
-                    businessUnit.BusinessUnitName = dr["BusinessUnitName"].ToString();
-                  
-                    businessUnits.Add(businessUnit);
+                        BusinessUnit businessUnit = new BusinessUnit();
+                        businessUnit.BusinessUnitId = (int)dr["BusinessUnitId"];
+                        businessUnit.BusinessUnitName = dr["BusinessUnitName"].ToString();
+                        businessUnits.Add(businessUnit);
                 }
                 return businessUnits;
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+        public List<LocationModel> GetLocation(int userId)
+        {
+
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<LocationModel> location = new List<LocationModel>();
+                List<SqlParameter> aList = new List<SqlParameter>();
+                aList.Add(new SqlParameter("@userId", userId));
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_GetLocation", aList);
+                while (dr.Read())
+                {
+                    LocationModel lc = new LocationModel();
+                    lc.LocationId = (int)dr["LocationId"];
+                    lc.LocationName= dr["LocationName"].ToString();
+                    location.Add(lc);
+                }
+                return location;
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+
+        public List<CurrencyTable> LoadCurrency()
+        {
+
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<CurrencyTable> currencyTables = new List<CurrencyTable>();
+                List<SqlParameter> aList = new List<SqlParameter>();
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_LoadCurrency");
+                while (dr.Read())
+                {
+                        CurrencyTable currency = new CurrencyTable();
+                        currency.CurrencyId = (int)dr["CurrencyId"];
+                        currency.CurrencyName = dr["CurrencyName"].ToString();
+                        currencyTables.Add(currency);
+                }
+                return currencyTables;
             }
             catch (Exception exception)
             {
@@ -75,8 +132,9 @@ namespace SQIndustryThree.DAL
             }
         }
 
+
         //get capex catagory
-        public List<CapexCatagory> GetCapexCatagory()
+        public List<CapexCatagory> GetCapexCatagory(int userId)
         {
 
             try
@@ -84,7 +142,8 @@ namespace SQIndustryThree.DAL
                 accessManager.SqlConnectionOpen(DataBase.SQQeye);
                 List<CapexCatagory> capexcatagorylist = new List<CapexCatagory>();
                 List<SqlParameter> aList = new List<SqlParameter>();
-                SqlDataReader dr = accessManager.GetSqlDataReader("sp_GetCapexCatagory");
+                aList.Add(new SqlParameter("@userId", userId));
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_GetCapexCatagory",aList);
                 while (dr.Read())
                 {
                     CapexCatagory capexcatagory = new CapexCatagory();
@@ -181,7 +240,8 @@ namespace SQIndustryThree.DAL
                 aParameters.Add(new SqlParameter("@CapexAssetType", capexmaster.CapexAssetType));
                 aParameters.Add(new SqlParameter("@CapexCreateDate", capexmaster.CapexCreateDate));
                 aParameters.Add(new SqlParameter("@CapexDescription", capexmaster.CapexDescription));
-                aParameters.Add(new SqlParameter("@Currency", capexmaster.Currency));
+                aParameters.Add(new SqlParameter("@capexLocationId", capexmaster.LocationId));
+                aParameters.Add(new SqlParameter("@Currency",capexmaster.CurrencyID));
                 aParameters.Add(new SqlParameter("@UserID", userId));
 
                 masterId = accessManager.SaveDataReturnPrimaryKey("sp_SaveCapexMasterInfo", aParameters);
@@ -197,6 +257,7 @@ namespace SQIndustryThree.DAL
                     aList.Add(new SqlParameter("@CapexDetailsQty", item.CapexDetailsQty));
                     aList.Add(new SqlParameter("@CapexUnitPrice", item.CapexUnitPrice));
                     aList.Add(new SqlParameter("@CapexEstimatedCost", item.CapexEstimatedCost));
+                    aList.Add(new SqlParameter("@CurrencyID", capexmaster.CurrencyID));
                     aList.Add(new SqlParameter("@CapexInfoId", masterId));
                     result.isSuccess = accessManager.SaveData("sp_SaveCapexDetails", aList);
                 }
@@ -270,7 +331,7 @@ namespace SQIndustryThree.DAL
                     capexInformationMaster.CapexDescription = dr["CapexDescription"].ToString();
                     capexInformationMaster.BusinessUnitName = dr["BusinessUnitName"].ToString();
                     capexInformationMaster.CapexCatagoryName = dr["CapexCatagoryName"].ToString();
-                    capexInformationMaster.Currency = dr["Currency"].ToString();
+                    capexInformationMaster.Currency = dr["CurrencyName"].ToString();
                     capexInformationMaster.UserName = dr["UserName"].ToString();
                     capexInformationMaster.UserId = (int)dr["UserId"];
                     capexInformationMaster.Revision = (int)dr["Revision"];
@@ -462,6 +523,7 @@ namespace SQIndustryThree.DAL
                     aList.Add(new SqlParameter("@CapexDetailsQty", item.CapexDetailsQty));
                     aList.Add(new SqlParameter("@CapexUnitPrice", item.CapexUnitPrice));
                     aList.Add(new SqlParameter("@CapexEstimatedCost", item.CapexEstimatedCost));
+                    aList.Add(new SqlParameter("@CurrencyID", 1));
                     aList.Add(new SqlParameter("@CapexInfoId", capexmaster.CapexInfoId));
                     result.isSuccess = accessManager.SaveData("sp_SaveCapexDetails", aList);
                 }

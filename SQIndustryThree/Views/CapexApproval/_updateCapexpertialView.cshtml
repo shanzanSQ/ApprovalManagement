@@ -158,26 +158,35 @@
 
 
 <div class="row">
-    <table style="overflow:scroll" width="50%" align="center">
-        <tr>
-            <td>
-                <input accept="image/jpeg,image/png,application/pdf" name="file_uploaded[]" type="file" multiple class="filestyles gallery-images form-control " id="file_uploaded" />
-            </td>
-            <td>
-                <button id="file_uploadButton" class="btn btn-success">Upload</button>
-            </td>
-        </tr>
-    </table>
-</div>
-@if (Model.CapexFileUpload != null)
-{
-    <div class="fileList">
-        @foreach (var item in Model.CapexFileUpload)
-        {
-            <a href="/CapexApproval/DownloadFile?filename=@item.CapexFilePath" target="_blank">@item.CapexFileName</a>
-        }
+    <div class="col-md-6">
+        <table style="overflow:scroll" width="50%" align="center">
+            <tr>
+                <td>
+                    <input accept="image/jpeg,image/png,application/pdf" name="file_uploaded[]" type="file" multiple class="filestyles gallery-images form-control " id="file_uploaded" />
+                </td>
+                <td>
+                </td>
+            </tr>
+
+        </table>
+        <button id="file_uploadButton" class="btn btn-success">Upload</button>
     </div>
-}
+    <div class="col-md-6">
+        @if (Model.CapexFileUpload != null)
+        {
+        <div class="fileList">
+            @foreach (var item in Model.CapexFileUpload)
+            {
+                @Html.ActionLink(@item.CapexFileName, "DownloadFile", "CapexApproval", new { filepath = item.CapexFilePath.ToString(), filename = item.CapexFileName.ToString() }, new { @target = "_blank" })
+                // <a href="/CapexApproval/DownloadFile?filename=@item.CapexFilePath" target="_blank">@item.CapexFileName</a>
+                <br />
+            }
+        </div>
+        }
+
+    </div>
+   
+</div>
 
 
 <br />
@@ -383,11 +392,5 @@
         }
         
     }
-
-
-
-
-
-
 
 </script>

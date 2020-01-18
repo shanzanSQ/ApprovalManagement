@@ -146,6 +146,8 @@
     <Compile Include="Models\CapexInformationMaster.cs" />
     <Compile Include="Models\ChartModel.cs" />
     <Compile Include="Models\CommentsTable.cs" />
+    <Compile Include="Models\CurrencyTable.cs" />
+    <Compile Include="Models\LocationModel.cs" />
     <Compile Include="Models\QueryModel.cs" />
     <Compile Include="Models\ResultResponse.cs" />
     <Compile Include="Models\UserInformation.cs" />
@@ -6424,6 +6426,7 @@
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Images\20191204_153909.jpg" />
+    <Content Include="Images\ams.jpg" />
     <Content Include="Images\Green-revolution-in-Bangladeshi-Apparel-Industry--815.jpg" />
     <Content Include="Images\IMG_20190902_111233.jpg" />
     <Content Include="Images\logo.png" />
@@ -6930,6 +6933,7 @@
     <Content Include="fonts\poppins\Poppins-Thin.ttf" />
     <Content Include="fonts\poppins\Poppins-ThinItalic.ttf" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
+    <None Include="Properties\PublishProfiles\CustomProfile1.pubxml" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Properties\PublishProfiles\FolderProfile1.pubxml" />
     <None Include="Properties\PublishProfiles\FolderProfile2.pubxml" />
@@ -6983,6 +6987,10 @@
     <Content Include="Views\CapexApproval\_capexIdShowAdmin.cshtml" />
     <Content Include="Views\Admin\CreateUser.cshtml" />
     <Content Include="Views\Admin\DashboardAdmin.cshtml" />
+    <Content Include="Views\Admin\_createUsers.cshtml" />
+    <Content Include="Views\Admin\_createDesignation.cshtml" />
+    <Content Include="Views\Admin\_setApproverList.cshtml" />
+    <Content Include="Views\Admin\_showApproverList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

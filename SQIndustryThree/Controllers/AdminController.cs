@@ -13,6 +13,7 @@ namespace SQIndustryThree.Controllers
     {
         AdminDAL adminDAL = new AdminDAL();
         CapexApprovalDAL capexApprovalDAL = new CapexApprovalDAL();
+        HomeDAL homeDAL = new HomeDAL();
         // GET: Admin
         public ActionResult Index()
         {
@@ -89,9 +90,53 @@ namespace SQIndustryThree.Controllers
         {
             return View();
         }
+        [HttpPost]
+        public ActionResult LoadBusinessUnit()
+        {
+            return Json(adminDAL.GetBusinessUnits(), JsonRequestBehavior.AllowGet);
+        }
+        [HttpPost]
+        public ActionResult LoadDesignation()
+        {
+            return Json(adminDAL.GetAllDesignation(), JsonRequestBehavior.AllowGet);
+        }
+        [HttpPost]
+        public ActionResult LoadUsers()
+        {
+            return Json(adminDAL.GetAllUsers(), JsonRequestBehavior.AllowGet);
+        }
+        [HttpPost]
+        public ActionResult RegisterUser(UserInformation users)
+        {
+            bool result = homeDAL.SAveUsersToDataBase(users);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult CreateDesignation(string DesignationName)
+        {
+            bool result = homeDAL.CreateDesignation(DesignationName);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
         public ActionResult ChangeDivView(int status)
         {
-            return PartialView();
+            string viewName = "";
+            switch(status){
+                case 0:
+                    viewName = "_createUsers";
+                    break;
+                case 1:
+                    viewName = "_createDesignation";
+                    break;
+                case 6:
+                    viewName = "_setApproverList";
+                    break;
+                case 7:
+                    viewName = "_showApproverList";
+                    break;
+            }
+            return PartialView(viewName);
+          
         }
     }
 }

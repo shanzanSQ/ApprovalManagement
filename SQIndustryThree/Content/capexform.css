@@ -8,9 +8,7 @@ table {
     padding: 10px;
     text-align: left;
 }
-th {
-    background-color:aquamarine;
-}
+
 tr:nth-child(even) {
     background-color: #f2f2f2;
 }

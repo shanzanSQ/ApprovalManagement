@@ -4,21 +4,23 @@
     Layout = "~/Views/Shared/_AdminPanelLayout.cshtml";
 }
     <div class="container-fluid">
-        <h2 style="text-align:center;"><b>ALL CAPEX INFORMATION</b></h2>
+        <h2 style="text-align:center;"><b>ADMIN DASHBOARD</b></h2>
         <hr />
         <div class="row">
-            <div class="sidebar" style="width:15%;float:left">
+            <div class="sidebar" style="width:20%;float:left">
                 <ul class="nav">
                         <li><a href="#" onclick="changeDiv(0)">Create New User<span style="color:red;" id="pending_Capex"></span></a></li>
-                        <li><a href="#" onclick="changeDiv(1)">CReate New Designation</a></li>
+                        <li><a href="#" onclick="changeDiv(1)">Create New Designation</a></li>
                         <li><a href="#" onclick="changeDiv(2)">Create Business Unit</a></li>
-                        <li><a href="#" onclick="changeDiv(3)">Create New Module</a></li>
-                        <li><a href="#" onclick="changeDiv(4)">Set Module Permission</a></li>
-                        <li><a href="#" onclick="changeDiv(5)">Set Approver List</a></li>
+                        <li><a href="#" onclick="changeDiv(3)">Create Catagory</a></li>
+                        <li><a href="#" onclick="changeDiv(4)">Create New Module</a></li>
+                        <li><a href="#" onclick="changeDiv(5)">Set Module Permission</a></li>
+                        <li><a href="#" onclick="changeDiv(6)">Set Approver List</a></li>
+                        <li><a href="#" onclick="changeDiv(7)">Show Approver List</a></li>
                 </ul>
             </div>
-            <div style="text-align:center;width:85%;float:right">
-                <div id="pendingCapexTable"> </div>
+            <div style="text-align:center;width:80%;float:right">
+                <div id="admin_capex_view"> </div>
             </div>
         </div>
     </div>
@@ -33,8 +35,8 @@
                     async: true,
                     success: function(data) {
                         if (data) {
-                            $('#pendingCapexTable').empty();
-                            $('#pendingCapexTable').html(data);
+                            $('#admin_capex_view').empty();
+                            $('#admin_capex_view').html(data);
                         }
                     }
                 });

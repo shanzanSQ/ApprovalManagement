@@ -78,5 +78,93 @@ namespace SQIndustryThree.DAL
                 accessManager.SqlConnectionClose();
             }
         }
+        //get business unit
+        public List<BusinessUnit> GetBusinessUnits()
+        {
+
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<BusinessUnit> businessUnits = new List<BusinessUnit>();
+                List<SqlParameter> aList = new List<SqlParameter>();
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_GetAllBusinessUnit");
+                while (dr.Read())
+                {
+                        BusinessUnit businessUnit = new BusinessUnit();
+                        businessUnit.BusinessUnitId = (int)dr["BusinessUnitId"];
+                        businessUnit.BusinessUnitName = dr["BusinessUnitName"].ToString();
+                        businessUnits.Add(businessUnit);
+                }
+                return businessUnits;
+            }
+            catch (Exception exception)
+            {
+
+                throw exception;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+        public List<UserInformation> GetAllDesignation()
+        {
+
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<UserInformation> designation = new List<UserInformation>();
+                List<SqlParameter> aList = new List<SqlParameter>();
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_GetAllDesignation");
+                while (dr.Read())
+                {
+                    UserInformation userDesignation = new UserInformation();
+                    userDesignation.DesignationId = (int)dr["DesignationId"];
+                    userDesignation.DesignationName = dr["DesignationName"].ToString();
+                    designation.Add(userDesignation);
+                }
+                return designation;
+            }
+            catch (Exception exception)
+            {
+
+                throw exception;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+        public List<UserInformation> GetAllUsers()
+        {
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<UserInformation> userInformation = new List<UserInformation>();
+                List<SqlParameter> aList = new List<SqlParameter>();
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_GetALlUsers");
+                while (dr.Read())
+                {
+                    UserInformation user = new UserInformation();
+                    user.UserInformationId =(int) dr["UserId"];
+                    user.UserInformationName = dr["UserName"].ToString();
+                    user.UserSQNumber = dr["SqIDNumber"].ToString();
+                    userInformation.Add(user);
+                }
+                return userInformation;
+            }
+            catch (Exception exception)
+            {
+
+                throw exception;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
     }
 }

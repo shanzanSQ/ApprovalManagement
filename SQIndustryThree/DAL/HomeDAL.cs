@@ -25,19 +25,17 @@ namespace SQIndustryThree.DAL
                 aParameters.Add(new SqlParameter("@userPassword",PasswordManager.Encrypt(users.UserInformationPassword)));
                 aParameters.Add(new SqlParameter("@userPhoneNumber",users.UserInformationPhoneNumber));
                 aParameters.Add(new SqlParameter("@userType", (int)users.UserTypeId));
-                aParameters.Add(new SqlParameter("@createBY", (int)users.CreateBY));
+                aParameters.Add(new SqlParameter("@createBY", 1));
                 aParameters.Add(new SqlParameter("@SqIdNumber", users.UserSQNumber));
                 aParameters.Add(new SqlParameter("@DesignationID", (int)users.DesignationId));
                 aParameters.Add(new SqlParameter("@BusinessUnitId",(int) users.BusinessUnitId));
-
                 result = accessManager.SaveData("sp_SaveUserInformation", aParameters);
-               
                 return result;
             }
             catch (Exception e)
             {
                 accessManager.SqlConnectionClose(true);
-                throw;
+                throw e;
             }
             finally
             {
@@ -160,7 +158,7 @@ namespace SQIndustryThree.DAL
                         message.IsBodyHtml = true; //to make message body as html  
                         message.Body = "Dear Mr."+name+ "<br/> You requested for Recover your password <br/> Your Password for the Approval management system is : " + PasswordManager.Decrypt(password)+ " <br/>" +
                             "Thank you For Being with Us <br/>" +
-                            "<br/>Thank You<br/> Approval Management System<br/>SQ Group<br/>sqgc.com";
+                            "<br/>Thank You<br/> Approval Management System<br/>http://10.12.8.152:8080/<br/>sqgc.com";
                         smtp.Port = 587;
                         smtp.Host = "smtp.office365.com"; //for gmail host  
                         smtp.EnableSsl = true;
@@ -173,6 +171,27 @@ namespace SQIndustryThree.DAL
                     }
                     catch (Exception) { }
                 }
+                return success;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw e;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+        public bool CreateDesignation(string designationName)
+        {
+            bool success = false;
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<SqlParameter> aParameters = new List<SqlParameter>();
+                aParameters.Add(new SqlParameter("@desinationName", designationName));
+                success = accessManager.SaveData("sp_CreateDesignation", aParameters);
                 return success;
             }
             catch (Exception e)

@@ -12,7 +12,7 @@ namespace SQIndustryThree.Controllers
 {
     public class CapexApprovalController : Controller
     {
-
+        
         CapexApprovalDAL capexApproval = new CapexApprovalDAL();
         AdminDAL adminDAL = new AdminDAL();
 
@@ -55,23 +55,43 @@ namespace SQIndustryThree.Controllers
             }
             return View();
         }
-
         public ActionResult LoadBusinessUnit()
         {
-            return Json(capexApproval.GetBusinessUnits(), JsonRequestBehavior.AllowGet);
+            int userid = Convert.ToInt32(Session["SQuserId"]);
+            return Json(capexApproval.GetBusinessUnits(userid), JsonRequestBehavior.AllowGet);
         }
-
-
+        [HttpPost]
+        public ActionResult LoadLocation()
+        {
+            int userid = Convert.ToInt32(Session["SQuserId"]);
+            return Json(capexApproval.GetLocation(userid), JsonRequestBehavior.AllowGet);
+        }
+        [HttpPost]
+        public ActionResult LoadCurrency()
+        {
+            int userid = Convert.ToInt32(Session["SQuserId"]);
+            return Json(capexApproval.LoadCurrency(), JsonRequestBehavior.AllowGet);
+        }
         public ActionResult LoadCapexCatagory()
         {
-            return Json(capexApproval.GetCapexCatagory(), JsonRequestBehavior.AllowGet);
+            int userid = Convert.ToInt32(Session["SQuserId"]);
+            int permission = capexApproval.ModulePermission(1, userid);
+            if (permission != 1)
+            {
+                return Json(capexApproval.GetCapexCatagory(0), JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(capexApproval.GetCapexCatagory(userid), JsonRequestBehavior.AllowGet);
+            }
         }
+        [HttpPost]
         public ActionResult LoadCapexApprover(int CatagoryId)
         {
             int userID = Convert.ToInt32(Session["SQuserId"].ToString());
             return Json(capexApproval.GetApproverList(CatagoryId, userID), JsonRequestBehavior.AllowGet);
         }
-
+        [HttpPost]
         public ActionResult LoadBFCORCFOByBusinessUnit(int BusinessUnit,int CatagoryId)
         {
             return Json(capexApproval.GetBFoORCFo(BusinessUnit, CatagoryId), JsonRequestBehavior.AllowGet);
@@ -166,18 +186,21 @@ namespace SQIndustryThree.Controllers
         }
 
 
-        public void DownloadFile(string filename)
+        public FileResult DownloadFile(string filepath, string filename)
         {
             //string name = Path.GetFileName(filename);
             //var ServerSavePath = Path.Combine(Server.MapPath("~/Uploads/") + name);
             //return File(ServerSavePath, "image/png");
+            byte[] fileBytes = System.IO.File.ReadAllBytes(filepath);
+            string fileName = filename;
+            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, Path.GetFileName(filepath));
 
-            string fname = Path.GetFileName(filename);
-            Response.ContentType = "application/octet-stream";
-            Response.AppendHeader("Content-Disposition", "attachment;filename=" + fname);
-            string aaa = Server.MapPath("~/Uploads/" + fname);
-            Response.TransmitFile(Server.MapPath("~/Uploads/" + fname));
-            Response.End();
+            //string fname = Path.GetFileName(filename);
+            //Response.ContentType = "application/octet-stream";
+            //Response.AppendHeader("Content-Disposition", "attachment;filename=" + fname);
+            //string aaa = Server.MapPath("~/Uploads/" + fname);
+            //Response.TransmitFile(Server.MapPath("~/Uploads/" + fname));
+            //Response.End();
         }
 
         [HttpPost]
@@ -226,12 +249,15 @@ namespace SQIndustryThree.Controllers
                     //Checking file is available to save.  
                     if (file != null)
                     {
-                        var InputFileName = Path.GetFileName(file.FileName);
-                        var ServerSavePath = Path.Combine(Server.MapPath("~/Uploads/") + InputFileName);
+                        var currentmilse = DateTime.Now.Ticks;
+                        var InputFileName = Path.GetFileNameWithoutExtension(file.FileName);
+                        var InputFileExtention = Path.GetExtension(file.FileName);
+                        var FullFileWithext = InputFileName + currentmilse+ InputFileExtention;
+                        var ServerSavePath = Path.Combine(Server.MapPath("~/Uploads/") + FullFileWithext);
                         //Save file to server folder  
                         file.SaveAs(ServerSavePath);
 
-                        capexFileUploadDetails.CapexFileName = InputFileName;
+                        capexFileUploadDetails.CapexFileName = file.FileName.ToString();
                         capexFileUploadDetails.CapexFilePath = ServerSavePath;
                         capexFileUploadDetails.CapexInfoId = 0;
                         capexFileUploadDetails.userId = userID;

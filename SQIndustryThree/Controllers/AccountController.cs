@@ -10,6 +10,7 @@ namespace SQIndustryThree.Controllers
     {
 
         HomeDAL homeDAL = new HomeDAL();
+        CapexApprovalDAL capexApproval = new CapexApprovalDAL();
         // GET: Account
         public ActionResult Index()
         {
@@ -34,7 +35,15 @@ namespace SQIndustryThree.Controllers
                 result.msg = Url.Action("CapexInformationView", "CapexApproval");
                 Session["SQuserId"] = users.UserInformationId;
                 Session["SQuserName"] = users.UserInformationName;
-                Session["SQdesignation"] = users.DesignationId;
+                int permission = capexApproval.ModulePermission(1, users.UserInformationId);
+                if (permission != 1)
+                {
+                    Session["Requestor"] = 0;
+                }
+                else
+                {
+                    Session["Requestor"] = 1;
+                }
                 return Json(result, JsonRequestBehavior.AllowGet);
             }
 

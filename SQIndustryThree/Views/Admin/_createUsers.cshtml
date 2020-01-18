@@ -1,0 +1,140 @@
+﻿<style>
+    #total_div {
+        margin-left: 20px;
+    }
+
+    .lable_table {
+        width: 20%;
+        font-weight: bold;
+    }
+</style>
+<div id="total_div" class="container-fluid">
+    <div class="row">
+        <table style="text-align:left" class="table table-responsive table-bordered">
+            <tr>
+                <td class="lable_table">Enter User Name : </td>
+                <td><input type="text" id="user_name" class="form-control" placeholder="Enter  User Name" /></td>
+            </tr>
+            <tr>
+                <td class="lable_table">Enter User Email : </td>
+                <td><input type="text" id="userEmail" class="form-control" placeholder="Enter Your email" /></td>
+            </tr>
+            <tr>
+                <td class="lable_table">Enter Phone Number : </td>
+                <td><input type="text" id="userPhone" class="form-control" placeholder="Enter Your Phone Number" /></td>
+            </tr>
+            <tr>
+                <td class="lable_table">Enter User Password : </td>
+                <td><input type="text" id="user_Password" class="form-control" placeholder="Enter  password" /></td>
+            </tr>
+            <tr>
+                <td class="lable_table">Enter SQ ID : </td>
+                <td><input type="text" id="sqNumber" class="form-control" placeholder="Enter Your SQ ID NUMBER" /></td>
+            </tr>
+            <tr>
+                <td class="lable_table">Select Business Unit : </td>
+                <td>
+                    <select id="business_unit" name="business_unit" class="form-control">
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="lable_table">Select Designation : </td>
+                <td>
+                    <select id="designation_select" name="designation_select" class="form-control">
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="lable_table">Select User Status </td>
+                <td>
+                    <select id="userstatus" name="userstatus" class="form-control">
+                        <option value="1"> Active </option>
+                        <option value="0"> InActive </option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <button id="saveInformation" class="btn btn-primary" >Register</button>
+</div>
+@Scripts.Render("~/bundles/jquery")
+<script type="text/javascript">
+    LoadBusinessUnit();
+    LoadDesignation();
+     function LoadBusinessUnit() {
+        $('#business_unit').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadBusinessUnit", "Admin")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+                $('#business_unit').empty();
+                $('#business_unit').append("<option value='0'>--Select Business Unit--</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#business_unit").append($("<option></option>").val(data[i].BusinessUnitId)
+                        .html(data[i].BusinessUnitName));
+                }
+            }
+        });
+    }
+    function LoadDesignation() {
+        var urlpath = '@Url.Action("LoadDesignation", "Admin")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+                $('#designation_select').empty();
+                $('#designation_select').append("<option value='0'>--Select Designation Unit--</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#designation_select").append($("<option></option>").val(data[i].DesignationId)
+                        .html(data[i].DesignationName));
+                }
+            }
+        });
+    }
+
+        $('#saveInformation').click(function () {
+            RegisterUser();
+        });
+
+       function RegisterUser() {
+            var jsonData = {};
+            jsonData["UserInformationName"] = $('#user_name').val();
+            jsonData["UserInformationEmail"] = $('#userEmail').val();
+            jsonData["UserInformationPassword"] = $('#user_Password').val();
+            jsonData["UserInformationPhoneNumber"] = $('#userPhone').val();
+            jsonData["UserTypeId"] = $('#userstatus').val();
+            jsonData["UserSQNumber"] = $('#sqNumber').val();
+            jsonData["DesignationId"] = $('#designation_select').val();
+            jsonData["BusinessUnitId"] = $('#business_unit').val();
+
+            var urlpath = '@Url.Action("RegisterUser", "Admin")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsonData),
+                dataType: 'json',
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function (result) {
+                    if (result) {
+                        swal({
+                                        title: 'User Register Successfully',
+                                        type: 'success',
+                                        closeOnCancel: true
+                                    },
+                            function () {
+                                 window.location.href = '@Url.Action("DashboardAdmin", "Admin")';
+                                    });
+                    }
+                }
+            });
+        }
+</Script>

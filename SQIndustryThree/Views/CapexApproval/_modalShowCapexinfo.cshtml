@@ -75,7 +75,7 @@
                         <th></th>
                         <th></th>
                         <th></th>
-                        <th id="total_price">@total</th>
+                        <th id="total_price">@total  @Model.Currency</th>
                     </tr>
                 </tfoot>
             </table>
@@ -85,7 +85,8 @@
         <ul>
             @foreach (var item in Model.CapexFileUpload)
             {
-                <li><a  href="/CapexApproval/DownloadFile?filename=@item.CapexFilePath" target="_blank"  >@item.CapexFileName</a></li>
+            <li>@Html.ActionLink(@item.CapexFileName, "DownloadFile", "CapexApproval", new { filepath = item.CapexFilePath.ToString(), filename = item.CapexFileName.ToString() }, new { @target = "_blank" })</li>
+                @*<li><a  href="/CapexApproval/DownloadFile?filename=@item.CapexFilePath" target="_blank"  >@item.CapexFileName</a></li>*@
             }
         </ul>
            
