@@ -96,6 +96,11 @@ namespace SQIndustryThree.Controllers
             return Json(adminDAL.GetBusinessUnits(), JsonRequestBehavior.AllowGet);
         }
         [HttpPost]
+        public ActionResult LoadCatagory()
+        {
+            return Json(capexApprovalDAL.GetCapexCatagory(0), JsonRequestBehavior.AllowGet);
+        }
+        [HttpPost]
         public ActionResult LoadDesignation()
         {
             return Json(adminDAL.GetAllDesignation(), JsonRequestBehavior.AllowGet);
@@ -118,6 +123,18 @@ namespace SQIndustryThree.Controllers
             bool result = homeDAL.CreateDesignation(DesignationName);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
+        [HttpPost]
+        public ActionResult SaveApproverList(ApproverModelClass approverModelClass)
+        {
+            bool result = adminDAL.SaveApproverList(approverModelClass);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+        [HttpPost]
+        public ActionResult showApproverList(int BusinessUnitId,int CatagoryId)
+        {
+            List<UserInformation> userlist  = adminDAL.ShowApproverListByBU(BusinessUnitId,CatagoryId);
+            return Json(userlist, JsonRequestBehavior.AllowGet);
+        }
         public ActionResult ChangeDivView(int status)
         {
             string viewName = "";
@@ -131,8 +148,11 @@ namespace SQIndustryThree.Controllers
                 case 6:
                     viewName = "_setApproverList";
                     break;
+                case 8:
+                    viewName = "_PartialViewExceptionApprover";
+                    break;
                 case 7:
-                    viewName = "_showApproverList";
+                    viewName = "_iouSetapproverList";
                     break;
             }
             return PartialView(viewName);

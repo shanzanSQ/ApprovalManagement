@@ -34,8 +34,7 @@ namespace SQIndustryThree.DAL
             }
             catch (Exception e)
             {
-                accessManager.SqlConnectionClose(true);
-                throw;
+                throw e;
             }
             finally
             {
@@ -102,6 +101,35 @@ namespace SQIndustryThree.DAL
             }
         }
 
+        public List<CapexInformationDetails> GetAssetCatagoryById(int UserId,int CatagoryID)
+        {
+
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<CapexInformationDetails> assetList = new List<CapexInformationDetails>();
+                List<SqlParameter> aList = new List<SqlParameter>();
+                aList.Add(new SqlParameter("@CatagoryId", CatagoryID));
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_GetAssetByCatagory", aList);
+                while (dr.Read())
+                {
+                    CapexInformationDetails cpx= new CapexInformationDetails();
+                    cpx.CapexInfoDetailsId= (int)dr["AssetCatagoryId"];
+                    cpx.CapexAssetCatagory= dr["AssetCatagoryName"].ToString();
+                    
+                    assetList.Add(cpx);
+                }
+                return assetList;
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
 
         public List<CurrencyTable> LoadCurrency()
         {
@@ -267,8 +295,7 @@ namespace SQIndustryThree.DAL
             }
             catch (Exception e)
             {
-                accessManager.SqlConnectionClose(true);
-                throw;
+                throw e;
             }
             finally
             {
@@ -295,6 +322,7 @@ namespace SQIndustryThree.DAL
                     capexInformation.CapexCreateDate = (DateTime)dr["CapexCreateDate"];
                     capexInformation.BusinessUnitName = dr["BusinessUnitName"].ToString();
                     capexInformation.CapexCatagoryName = dr["CapexCatagoryName"].ToString();
+                    capexInformation.LocationName = dr["LocationName"].ToString();
                     capexInformation.UserName = dr["UserName"].ToString();
                     capexInformation.IsApproved = (int)dr["IsApproved"];
                     capexInformationMaster.Add(capexInformation);
@@ -304,7 +332,7 @@ namespace SQIndustryThree.DAL
             catch (Exception e)
             {
                 accessManager.SqlConnectionClose(true);
-                throw;
+                throw e;
             }
             finally
             {
@@ -326,6 +354,7 @@ namespace SQIndustryThree.DAL
                 {
                     capexInformationMaster.CapexInfoId = (int)dr["CapexInfoId"];
                     capexInformationMaster.CapexName = dr["CapexName"].ToString();
+                    capexInformationMaster.CapexCatagoryID = (int)dr["CapexCatagoryID"];
                     capexInformationMaster.CapexAssetType = dr["CapexAssetType"].ToString();
                     capexInformationMaster.CapexCreateDate = (DateTime)dr["CapexCreateDate"];
                     capexInformationMaster.CapexDescription = dr["CapexDescription"].ToString();
@@ -333,6 +362,7 @@ namespace SQIndustryThree.DAL
                     capexInformationMaster.CapexCatagoryName = dr["CapexCatagoryName"].ToString();
                     capexInformationMaster.Currency = dr["CurrencyName"].ToString();
                     capexInformationMaster.UserName = dr["UserName"].ToString();
+                    capexInformationMaster.LocationName = dr["LocationName"].ToString();
                     capexInformationMaster.UserId = (int)dr["UserId"];
                     capexInformationMaster.Revision = (int)dr["Revision"];
                 }
@@ -379,14 +409,26 @@ namespace SQIndustryThree.DAL
                     comment.UpdatedBY= (DateTime)dr["UpdatedBY"];
                     capexInformationMaster.CommentsTables.Add(comment);
                 }
+                capexInformationMaster.LogSections = new List<LogSection>();
+                dr.Close();
+                dr = accessManager.GetSqlDataReader("sp_viewLogTable", aList);
+                while (dr.Read())
+                {
+                    LogSection logSection = new LogSection();
+                    logSection.ActionDate = dr["CreateDate"].ToString();
+                    logSection.ActionBy = dr["UserName"].ToString();
+                    logSection.ActionStatus = dr["Status"].ToString();
+                    logSection.Comments = dr["Comments"].ToString();
+                    capexInformationMaster.LogSections.Add(logSection);
+                }
                 capexInformationMaster.CapexFileUpload = new List<CapexFileUploadDetails>();
-                capexInformationMaster.CapexFileUpload = GetUploadedFilesByID(capexInfoId,userId);
+                capexInformationMaster.CapexFileUpload = GetUploadedFilesByID(capexInfoId, userId);
                 return capexInformationMaster;
             }
             catch (Exception e)
             {
                 accessManager.SqlConnectionClose(true);
-                throw;
+                throw e;
             }
             finally
             {
@@ -413,7 +455,7 @@ namespace SQIndustryThree.DAL
             catch (Exception e)
             {
                 accessManager.SqlConnectionClose(true);
-                throw;
+                throw e;
             }
             finally
             {
@@ -439,16 +481,13 @@ namespace SQIndustryThree.DAL
             catch (Exception e)
             {
                 accessManager.SqlConnectionClose(true);
-                throw;
+                throw e;
             }
             finally
             {
                 accessManager.SqlConnectionClose();
             }
         }
-
-
-
         public bool FileUploadToDatabase(CapexFileUploadDetails capexFile)
         {
             bool result = true;
@@ -467,7 +506,7 @@ namespace SQIndustryThree.DAL
             catch (Exception e)
             {
                 accessManager.SqlConnectionClose(true);
-                throw;
+                throw e;
             }
             finally
             {
@@ -491,22 +530,19 @@ namespace SQIndustryThree.DAL
             catch (Exception e)
             {
                 accessManager.SqlConnectionClose(true);
-                throw;
+                throw e;
             }
             finally
             {
                 accessManager.SqlConnectionClose();
             }
         }
-
-
-
         public ResultResponse RevisedCapexInformation(CapexInformationMaster capexmaster, int userId)
         {
             ResultResponse result = new ResultResponse();
             try
             {
-                int masterId = 0;
+               // int masterId = 0;
                 accessManager.SqlConnectionOpen(DataBase.SQQeye);
                 List<SqlParameter> aParameters = new List<SqlParameter>();
                 aParameters.Add(new SqlParameter("@CapexDescription", capexmaster.CapexDescription));
@@ -532,7 +568,7 @@ namespace SQIndustryThree.DAL
             catch (Exception e)
             {
                 accessManager.SqlConnectionClose(true);
-                throw;
+                throw e;
             }
             finally
             {
@@ -567,7 +603,7 @@ namespace SQIndustryThree.DAL
             catch (Exception e)
             {
                 accessManager.SqlConnectionClose(true);
-                throw;
+                throw e;
             }
             finally
             {

@@ -1,0 +1,48 @@
+﻿@model IEnumerable<SQIndustryThree.Models.BillApproval.BillSubmitModel>
+    <style>
+        th{
+            text-align:center;
+            background-color:lightgray;
+        }
+    </style>
+<div class="col-md-12">
+    <table width="100%" border="1" style="text-align:center">
+        <thead>
+            <tr>
+                <th>Master Key</th>
+                <th>PurchaseOrderNo</th>
+                <th>SupplierName</th>
+                <th>BusinessUnitName</th>
+                <th>UserName</th>
+                <th>CreateDate</th>
+                <th>POQty</th>
+                <th>PoValue</th>
+                <th>PIQty</th>
+                <th>PIValue</th>
+                <th>Discount</th>
+                <th>TotalPayment</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var po in Model)
+            {
+                <tr>
+                    <td>@po.MasterKey</td>
+                    <td>@po.PurchaseOrderNo</td>
+                    <td>@po.SupplierName</td>
+                    <td>@po.BusinessUnitName</td>
+                    <td>@po.UserName</td>
+                    <td>@po.CreateDate</td>
+                    <td>@po.POQty</td>
+                    <td>$@po.PoValue</td>
+                    <td>@po.PIQty</td>
+                    <td>$@po.PIValue</td>
+                    <td>$@po.Discount</td>
+                    <td>$@po.TotalPayment</td>
+                    <td><i class="fa fa-eye" style="color:green">Preview</i></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

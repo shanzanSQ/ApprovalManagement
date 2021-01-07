@@ -1,0 +1,177 @@
+﻿@model SQIndustryThree.Models.BillApproval.BillApprovalPOMasterTable
+<style>
+    td, .moredetails th {
+        text-align: center;
+    }
+    input[type=number]{
+        width:80px;
+        text-align:center;
+    }
+        input[type=number]:disabled{
+            background-color:white;
+            border:0px;
+        }
+        td {
+            margin: 0px;
+        }
+
+    #detailshead th {
+        background-color: lightgray;
+    }
+</style>
+<div class="row">
+    <div class="col-md-12">
+        <div class="col-md-6">
+            <br />
+            <table width="100%" border="1">
+                <caption>Po Information</caption>
+                <tr>
+                    <th width="50%">Supplier Name</th>
+                    <td id="supplier_name">
+                        @Model.SupplierName
+                    </td>
+                </tr>
+                <tr>
+                    <th>Po Qty</th>
+                    <td>
+                        $<input id="poqtyval" type="number" value=" @Model.POQty" disabled />
+                    </td>
+                </tr>
+                <tr>
+                    <th>Advanced Payment</th>
+                    <td id="advancedPayment">
+                        @Model.AdvancedPayment
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <table width="100%" border="1" class="table table-striped">
+                <caption>Approver List</caption>
+                <thead>
+                    <tr>
+                        <th width="5%">No</th>
+                        <th width="45%">Approver/Contoller Name</th>
+                        <th width="35%">Designation</th>
+                        <th width="15%">Role</th>
+                    </tr>
+                </thead>
+                <tbody id="">
+                    @if (Model.Approverlist != null)
+                    {
+
+                        foreach (var i in Model.Approverlist)
+                        { 
+                            <tr>
+                                <th width="5%">@i.ApproverNo</th>
+                                <th width="45%">@i.UserName</th>
+                                <th width="35%">@i.DesignationName</th>
+                                <th width="15%">@i.ApproverStatusName</th>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="col-md-12">
+            <br />
+            <table width="100%" class="moredetails" style="text-align:center" border="1">
+                <caption>More Details</caption>
+                <thead id="detailshead"> 
+                    <tr>
+                        <th width="2%"><input type="checkbox" id="checkall" onclick="CheckaLL()" /></th>
+                        <th width="25%" >Article </th>
+                        @*<th>Color Name </th>
+                        <th>Size  </th>*@
+                        <th>PO Qty</th>
+                        <th style="width:100px;">Rate </th>
+                        <th style="width:100px;">PO Value </th>
+                        <th style="width:100px;">PI Raised Qty </th>
+                        <th style="width:100px;">Balance To Raised QTY </th>
+                        <th style="width:100px;">PI QTY </th>
+                        <th style="width:100px;">PI Value </th>
+                        <th style="width:100px;">Discount </th>
+                        <th style="width:100px;">Total </th>
+                    </tr>
+                </thead>
+                <tbody id="calculationbody">
+                    @{float totalpo = 0, totalrate = 0, totalpi = 0;}
+                    @if (Model.Polist != null)
+                    {
+
+                        foreach (var i in Model.Polist)
+                        {
+                            <tr>
+                                <td><input type="checkbox" value="@i.BillPoDetailskey" /></td>
+                                <td id="articlename">@i.ArticleName </td>
+                                @*<td>@i.ColorName </td>
+                    <td>@i.SizeName  </td>*@
+                                <td><input type="number" name="poqty" value="@i.POQty" disabled /></td>
+                                <td>$<input type="number" name="porate" value="@i.Rate" disabled /></td>
+                                <td>$<input type="number" name="povalue" value="@i.PoValue" disabled /></td>
+                                <td><input type="number" name="piraised" value="@i.PIQty" disabled /></td>
+                                <td>$<input type="number" name="piBalance" value="@i.PIValue" disabled /></td>
+                                <td><input type="number" onchange="Calculatevalue()" name="piqty" value="0" /></td>
+                                <td>$<input type="number" name="pival" disabled value="0" /></td>
+                                <td>$<input type="number" onchange="Calculatevalue()" name="discount" value="0" /></td>
+                                <td>$<input type="number" name="totalval" disabled value="0" /></td>
+                            </tr>
+                            totalpi += @i.PIQty;
+                            totalpo += @i.POQty;
+                            totalrate += @i.Rate;
+                        }
+                    }
+
+                </tbody>
+                <tfoot>
+                    @{float totalval = totalpo * totalrate;float tpirate = totalpi * totalrate;}
+                    <tr>
+                        <th colspan="2">Total</th>
+                        <th>@totalpo</th>
+                        <th>$@totalrate</th>
+                        <th>$@totalval</th>
+                        <th>@totalpi</th>
+                        <th>$@tpirate</th>
+                        <th><input type="number" name="totpiqty" value="0" disabled /></th>
+                        <th>$<input type="number" name="totpival" value="0" disabled /></th>
+                        <th>$<input type="number" name="totpidis" value="0" disabled /></th>
+                        <th>$<input type="number" name="totpitot" value="0" disabled/></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        
+    </div>
+
+</div>
+<script type="text/javascript">
+    function Calculatevalue() {
+        var totalPi = 0, totalpival = 0, totaldis = 0, total = 0;
+        $('#calculationbody tr').each(function () {
+            var piqty = $(this).find('input[name=piqty]').val() || 0;
+            var rate = $(this).find('input[name=porate]').val() || 0;
+            var val = parseFloat(piqty) * parseFloat(rate);
+            $(this).find('input[name=pival]').val(val);
+            var discount = $(this).find('input[name=discount]').val() || 0;
+            var rowtotal = val - parseFloat(discount);
+            $(this).find('input[name=totalval]').val(rowtotal);
+            totalPi = totalPi + parseFloat(piqty);
+            totalpival = totalpival + parseFloat(val);
+            totaldis = totaldis + parseFloat(discount);
+            total = total + parseFloat(rowtotal);
+        });
+        $('input[name=totpiqty]').val(totalPi);
+        $('input[name=totpival]').val(totalpival);
+        $('input[name=totpidis]').val(totaldis);
+        $('input[name=totpitot]').val(total);
+    }
+    function CheckaLL() {
+        if ($('#checkall').is(':checked')) {
+            $("#calculationbody").closest('table').find('td input:checkbox').prop('checked', true);
+        } else {
+            $("#calculationbody").closest('table').find('td input:checkbox').prop('checked', false);
+        }
+    }
+</script>

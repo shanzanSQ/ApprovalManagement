@@ -3,28 +3,29 @@
     ViewBag.Title = "DashboardAdmin";
     Layout = "~/Views/Shared/_AdminPanelLayout.cshtml";
 }
-    <div class="container-fluid">
-        <h2 style="text-align:center;"><b>ADMIN DASHBOARD</b></h2>
-        <hr />
-        <div class="row">
-            <div class="sidebar" style="width:20%;float:left">
-                <ul class="nav">
-                        <li><a href="#" onclick="changeDiv(0)">Create New User<span style="color:red;" id="pending_Capex"></span></a></li>
-                        <li><a href="#" onclick="changeDiv(1)">Create New Designation</a></li>
-                        <li><a href="#" onclick="changeDiv(2)">Create Business Unit</a></li>
-                        <li><a href="#" onclick="changeDiv(3)">Create Catagory</a></li>
-                        <li><a href="#" onclick="changeDiv(4)">Create New Module</a></li>
-                        <li><a href="#" onclick="changeDiv(5)">Set Module Permission</a></li>
-                        <li><a href="#" onclick="changeDiv(6)">Set Approver List</a></li>
-                        <li><a href="#" onclick="changeDiv(7)">Show Approver List</a></li>
-                </ul>
-            </div>
-            <div style="text-align:center;width:80%;float:right">
-                <div id="admin_capex_view"> </div>
-            </div>
+
+<div class="container-fluid">
+    <h2 style="text-align:center;"><b>ADMIN DASHBOARD</b></h2>
+    <hr />
+    <div class="row">
+        <div class="sidebar" style="width:20%;float:left">
+            <ul class="nav">
+                <li><a href="#" onclick="changeDiv(0)">Create New User<span style="color:red;" id="pending_Capex"></span></a></li>
+                <li><a href="#" onclick="changeDiv(1)">Create New Designation</a></li>
+                <li><a href="#" onclick="changeDiv(2)">Create Business Unit</a></li>
+                <li><a href="#" onclick="changeDiv(3)">Create Catagory</a></li>
+                <li><a href="#" onclick="changeDiv(4)">Create New Module</a></li>
+                <li><a href="#" onclick="changeDiv(5)">Set Module Permission</a></li>
+                <li><a href="#" onclick="changeDiv(6)">Set Approver List</a></li>
+                <li><a href="#" onclick="changeDiv(7)">IOU Approver List</a></li>
+                <li><a href="#" onclick="changeDiv(8)">Exception Approver List</a></li>
+            </ul>
+        </div>
+        <div style="text-align:center;width:80%;float:right">
+            <div id="admin_capex_view"> </div>
         </div>
     </div>
-
+</div>
 <script>
     function changeDiv(status) {
         var urlpath = '@Url.Action("ChangeDivView", "Admin")';
@@ -40,6 +41,44 @@
                         }
                     }
                 });
+    }
+    function LoadBusinessUnit() {
+        $('#business_unit').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadBusinessUnit", "Admin")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+                $('#business_unit').empty();
+                $('#business_unit').append("<option value='0'>--Select Business Unit--</option>");
+                    for (var i = 0; i < data.length; i++) {
+                        $("#business_unit").append($("<option></option>").val(data[i].BusinessUnitId)
+                        .html(data[i].BusinessUnitName));
+                    }
+                }
+            });
+    }
+    function LoadLocation() {
+        $('#locationCheck').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadLocation", "CapexApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+                $('#locationCheck').empty();
+                $('#locationCheck').append("<option value='0'>--Select Location --</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#locationCheck").append($("<option></option>").val(data[i].LocationId)
+                        .html(data[i].LocationName));
+                }
+            }
+        });
     }
 </script>
 

@@ -1,0 +1,401 @@
+﻿@model SQIndustryThree.Models.ExceptionRequestMaster
+    <style>
+        th {
+            text-align: left;
+        }
+
+        td {
+            text-align: left;
+        }
+        #genaralInfodt tr th, #genaralInfodt tr td, #approverlist tr td, #approverlist tr th {
+            text-align: center;
+        }
+    </style>  
+<div>
+    <div id="printablearea">
+        @if (Model.RivisionNo > 0)
+        {
+            <p style="color:red;text-align:center;font-weight:bold">Revised Exception  No:  @Model.RivisionNo</p>
+        }
+        <div>
+            <span style="float:left;font-weight:bold;font-size:20px">@Model.BusinessUnitName</span>
+            <span style="float:right;font-weight:bold;font-size:20px">Exception Request No: @Model.ExceptionMasterId</span>
+        </div>
+        @if (Model.ApproverList != null)
+        {
+            <table border="1" width="100%" id="approverlist">
+                <caption>Approver List</caption>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Approver Name</th>
+                        <th>Approver Designation</th>
+                        <th>Update Date</th>
+                        <th>Status</th>
+                        <th>Comment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.ApproverList)
+                    {
+                        <tr>
+                            <td>@item.ApproverNO</td>
+                            <td>@item.ApproverName</td>
+                            <td>@item.DesignationName</td>
+                            <td>
+                                @if (@item.UpdateDate != null)
+                                {@DateTime.Parse(@item.UpdateDate).ToString("dd MMM yyyy")}
+                            </td>
+                            @{
+                                if (item.IsApproved == 3)
+                                {
+                                    <td style="color:red">Pending</td>
+                                }
+                                else if (item.IsApproved == 1)
+                                {
+                                    <td style="color:green">Approved</td>
+                                }
+                                else if (item.IsApproved == 2)
+                                {
+                                    <td style="color:red">Rejected</td>
+                                }
+                                else
+                                {
+                                    <td style="color:darkblue">Not Sent</td>
+                                }
+                            }
+                            <td>@item.ReviewComment</td>
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+        }
+        <div class="row">
+            <div class="col-md-6">
+                <table border="1" width="100%">
+                    <caption>Exception Request</caption>
+                    <tr>
+                        <th width="30%">Create Date</th>
+                        <td width="70%">@DateTime.Parse(Model.CreateDate).ToString("dd MMM yyyy")</td>
+                    </tr>
+                    <tr>
+                        <th>Exception Type  </th>
+                        <td>@Model.ExceptionTypeName</td>
+                    </tr>
+                    <tr>
+                        <th>Exception Reason</th>
+                        <td>@Model.ExceptionReasonName</td>
+                    </tr>
+                    <tr>
+                        <th>Business Unit Name</th>
+                        <td>@Model.BusinessUnitName</td>
+                    </tr>
+                    <tr>
+                        <th>Buyer Name</th>
+                        <td>@Model.BuyerName</td>
+                    </tr>
+                    @*<tr>
+            <th>Original Delivery Date</th>
+            <td>@DateTime.Parse(@Model.Odd).ToString("dd MMM yyyy")</td>
+        </tr>
+        <tr>
+            <th>Revised Delivery Date</th>
+            <td>@DateTime.Parse(@Model.Rdd).ToString("dd MMM yyyy")</td>
+        </tr>*@
+                    <tr>
+                        <th>Remarks</th>
+                        <td style="word-wrap:break-word">@Model.Reasons</td>
+                    </tr>
+                    <tr>
+                        <th>Responsible Person</th>
+                        <td style="word-wrap:break-word">@Model.ResponsiblePerson</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                @if (Model.ExceptionTypeId == 1)
+                {
+                    <table border="1" width="100%">
+                        <caption>@Model.ExceptionTypeName</caption>
+                        <tr>
+                            <th>Gross Weight</th>
+                            <td>@Model.ExceptionDetails.GrossWeight kg</td>
+                        </tr>
+                        <tr>
+                            <th>Volumetric Weight</th>
+                            <td>@Model.ExceptionDetails.VolumetricWeight CC</td>
+                        </tr>
+                        <tr>
+                            <th>Air Freight Rate</th>
+                            <td>@Model.ExceptionDetails.AirFreightRate.ToString("C")</td>
+                        </tr>
+                        <tr>
+                            <th>Air Freight Cost</th>
+                            <td>@Model.ExceptionDetails.AirFreightCost.ToString("C")</td>
+                        </tr>
+                        @if (Model.ExceptionDetails.Recoverable == 1)
+                        {
+                            <tr>
+                                <th width="30%">Recoverable</th>
+                                <td>Yes</td>
+                            </tr>
+                            <tr>
+                                <th>Recoverable From</th>
+                                <td>@Model.ExceptionDetails.RecoverableFrom</td>
+                            </tr>
+                            <tr>
+                                <th>Recoverable Amount</th>
+                                <td>@Model.ExceptionDetails.RecoverableAmmount.ToString("C")</td>
+                            </tr>
+                        }
+                        else if (Model.ExceptionDetails.Recoverable == 2)
+                        {
+                            <tr>
+                                <th width="30%">Recoverable</th>
+                                <td>No</td>
+                            </tr>
+
+                        }
+                    </table>
+                }
+                else if (Model.ExceptionTypeId == 5 ||Model.ExceptionTypeId == 6)
+                {
+                    <table border="1" width="100%">
+                        <caption>@Model.ExceptionTypeName</caption>
+                        <tr>
+                            <th width="30%">Exception Details</th>
+                            <td>@Model.ExceptionDetails.ExceptionDetails</td>
+                        </tr>
+                        <tr>
+                            <th>Loss / Liability To Company</th>
+                            <td>@Model.ExceptionDetails.LossOrLiabilityCompany </td>
+                        </tr>
+                        <tr>
+                            <th>Value of Loss/Liability</th>
+                            <td>@Model.ExceptionDetails.ValueOfLoss</td>
+                        </tr>
+                    </table>
+                }
+                else
+                {
+                    <table border="1" width="100%">
+                        <caption>@Model.ExceptionTypeName</caption>
+                        @{ float SumPovalue = 0;float garmentsSum = 0; }
+                        @if (Model.ExceptionTypeId == 2)
+                        {
+                            <tr>
+                                <th>PO Number</th>
+                                <th>Discount Amount</th>
+                            </tr>
+
+                            foreach (var item in Model.ExpgenaralInfoList)
+                            {
+                                SumPovalue=SumPovalue+@item.Discount;
+                            <tr>
+                                <td>@item.PO</td>
+                                <td>@item.Discount.ToString("C")</td>
+                            </tr>
+
+                            }
+                            <tr>
+                                <th>Total</th>
+                                <th>@SumPovalue.ToString("C")</th>
+                            </tr>
+                         }
+                        else if (Model.ExceptionTypeId == 3)
+                        {
+                            <tr>
+                                <th>PO Number</th>
+                                <th>Claimed Amount</th>
+                            </tr>
+                            foreach (var item in Model.ExpgenaralInfoList)
+                            {
+                                SumPovalue+= item.Claim;
+                            <tr>
+                                <td>@item.PO</td>
+                                <td>@item.Claim.ToString("C")</td>
+                            </tr>
+                            }
+                            <tr>
+                                <th>Total</th>
+                                <th>@SumPovalue.ToString("C")</th>
+                            </tr>
+                        }
+                        else if (Model.ExceptionTypeId == 4)
+                        {
+                            <tr>
+                                <th>PO Number</th>
+                                <th>Garments Liability Amount</th>
+                                <th>Material Liability Amount</th>
+                            </tr>
+                            foreach (var item in Model.ExpgenaralInfoList)
+                            {
+                                SumPovalue+= item.MaterialLiability;
+                                garmentsSum+= item.GarmentsLiability;
+                            <tr>
+                                <td>@item.PO</td>
+                                <td>@item.GarmentsLiability.ToString("C")</td>
+                                <td>@item.MaterialLiability.ToString("C")</td>
+                            </tr>
+                            }
+                            <tr>
+                                <th>Total</th>
+                                <th>@garmentsSum.ToString("C")</th>
+                                <th>@SumPovalue.ToString("C")</th>
+                            </tr>
+                        }
+                    </table> 
+                    }
+                @if (Model.ExceptionFilesList != null)
+                {
+                    <table border="1" width="100%">
+                        <caption>Attached File</caption>
+                        <thead>
+                            <tr>
+                                <th>File Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.ExceptionFilesList)
+                            {
+                                <tr>
+                                    <td>@item.CapexFileName</td>
+                                    <td>@Html.ActionLink("Download", "DownloadFile", "CapexApproval", new { filepath = item.CapexFilePath.ToString(), filename = item.CapexFileName.ToString() }, new { @target = "_blank" })</td>
+                                </tr>
+
+                            }
+                        </tbody>
+                    </table>
+                }
+</div>
+        </div>
+
+        <table border="1" width="100%" id="genaralInfodt">
+            @{float countFob = 0;}
+            <caption>Genaral Information</caption>
+            <thead>
+                <tr>
+                    <th>Style</th>
+                    <th>Color</th>
+                    <th>PO</th>
+                    <th>ODD</th>
+                    <th>RDD</th>
+                    <th>Quantity</th>
+                    <th>FOB Values</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var item in Model.ExpgenaralInfoList)
+                {
+                    <tr>
+                        <td>@item.StyleNo</td>
+                        <td>@item.Color</td>
+                        <td>@item.PO</td>
+                        <td>@item.OriginalDD</td>
+                        <td>@item.RevisedDD</td>
+                        <td>@item.Quantity.ToString("N")</td>
+                        <td>@item.FOB.ToString("C")</td>
+                    </tr>
+                    countFob = countFob + @item.FOB;
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="6">Total </th>
+                    <th>@countFob.ToString("C")</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+
+
+        @if (Model.IsApproved == 0)
+        {
+            <div style="text-align:center">
+                <br />
+                <button type="button" style="width:30%" class="btn btn-primary btn-sm" onclick="SubmitToDatabase()">Submit</button>
+            </div>
+
+        }
+        else
+        {
+            <div>
+                <br />
+                <table width="80%" align="center">
+                    <tr>
+                        <td>
+                            <button value="Comments" onclick="showComments()" class="btn btn-sm btn-primary">Comments</button>
+                        </td>
+                        <td style="padding:5px">
+                            <select id="reviewComment" class="approvalColumn form-control">
+                                @if (Model.ApproverList != null)
+                                {
+                                    foreach (var app in Model.ApproverList)
+                                    {
+                                        if (app.IsApproved != 0)
+                                        {
+                                            if (app.ApproverUserId != Convert.ToInt32(Session["SQuserId"].ToString()))
+                                            {
+                                                <option value="@app.ApproverUserId">@app.ApproverName</option>
+                                            }
+
+                                        }
+
+                                    }
+                                }
+
+                            </select>
+                        </td>
+                        <td style="padding:5px">
+                            <input type="text" id="reviewMessage" class="approvalColumn form-control" rows="3" style="resize:none" />
+                        </td>
+                        <td>
+                            <button style="text-align:center;align-content:center" class="btn btn-info btn-sm" onclick="ReviewComment(@Model.ExceptionMasterId)">Send Review</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <br />
+            @*<button value="Comments" onclick="showComments()" class="btn btn-sm btn-primary">Comments</button>*@
+            <div id="comments_section" class="row" style="display:none">
+                <div class="col-md-9" style="overflow-wrap:inherit; overflow-y: auto;height:200px;">
+                    <p>Comment Section</p>
+                    @if (Model.ExceptionComments != null)
+                    {
+                        foreach (var app in Model.ExceptionComments)
+                        {
+                            <hr style="margin:unset;padding:unset;" />
+                            <p style="margin:unset;padding:unset" class="media-heading user_name"><strong style="color:blue">@app.ReviewerByName</strong>  To <strong>@app.ReviewerToName</strong></p>
+                            <p style="margin:unset;padding:unset">@app.UpdatedBY.ToString("MM/dd/yyyy hh:mm tt")</p>
+                            <p style="margin:unset;padding:unset">@app.ReviewMessage</p>
+                        }
+                    }
+                </div>
+                @*<div class="col-md-3">
+                    <label for="reviewComment">Select Reviwer</label>
+                    <select id="reviewComment" class="form-control">
+                        @if (Model.ApproverList != null)
+                        {
+                            foreach (var app in Model.ApproverList)
+                            {
+                                if (app.IsApproved != 0)
+                                {
+                                    <option value="@app.ApproverUserId">@app.ApproverName</option>
+                                }
+
+                            }
+                        }
+
+                    </select>
+                    <br />
+                    <textarea type="text" id="reviewMessage" class="form-control" rows="3" style="resize:none" />
+                    <br />
+                    <button style="text-align:center;align-content:center" class="btn btn-success btn-sm" onclick="ReviewComment(@Model.ExceptionMasterId)">Send Comment</button>
+                </div>*@
+            </div>
+        }
+    </div>

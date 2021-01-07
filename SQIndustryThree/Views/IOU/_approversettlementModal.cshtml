@@ -1,0 +1,343 @@
+﻿@model SQIndustryThree.Models.IOURequestModel
+<style>
+    th {
+        text-align: left;
+    }
+
+    td {
+        text-align: left;
+    }
+
+    #genaralInfodt tr th, #genaralInfodt tr td, #approverlist tr td, #approverlist tr th {
+        text-align: center;
+    }
+</style>
+<div id="printablearea">
+    @if (Model.RivisionNo > 0)
+    {
+        <p style="color:red;text-align:center;font-weight:bold">Revised  No:  @Model.RivisionNo</p>
+    }
+    <div>
+        <span style="float:left;font-weight:bold;font-size:20px">@Model.BusinessUnitName</span>
+        <span style="float:right;font-weight:bold;font-size:20px">IOU Request No: @Model.IouRequestId</span>
+    </div>
+    @if (Model.SettlementApproverList != null)
+    {
+        <table border="1" width="100%" id="approverlist">
+            <caption>Settlement Approver List</caption>
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Approver Name</th>
+                    <th>Approver Designation</th>
+                    <th>Approver Role</th>
+                    <th>Update Date</th>
+                    <th>Status</th>
+                    <th>Comment</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.SettlementApproverList)
+                {
+                    <tr>
+                        <td>@item.ApproverNo</td>
+                        <td>@item.UserName</td>
+                        <td>@item.DesignationName</td>
+                        <td>@item.ApproverStatusName</td>
+                        <td>
+                            @if (@item.UpdateDate != null)
+                            {@DateTime.Parse(@item.UpdateDate).ToString("dd MMM yyyy")}
+                        </td>
+                        @{
+                            if (item.IsApprove == 3)
+                            {
+                                <td style="color:red">Pending</td>
+                            }
+                            else if (item.IsApprove == 1)
+                            {
+                                if (item.ApproverStatus == 3)
+                                {
+                                    <td style="color:green">Cash Settled</td>
+                                }
+                                else
+                                {
+                                    <td style="color:green">Approved</td>
+                                }
+                            }
+                            else if (item.IsApprove == 2)
+                            {
+                                <td style="color:red">Rejected</td>
+                            }
+                            else
+                            {
+                                <td style="color:darkblue">Not Sent</td>
+                            }
+                        }
+                        <td>@item.Comments</td>
+                    </tr>
+
+                            }
+            </tbody>
+        </table>
+                            }
+<div class="row">
+    <div class="col-md-6">
+        <table border="1" width="100%">
+            <caption>IOU Request Information</caption>
+            <tr>
+                <th width="30%">Request By</th>
+                <td width="70%">@Model.UserName</td>
+            </tr>
+            <tr>
+                <th>Request Date</th>
+                <td>@DateTime.Parse(Model.DateOfRequest).ToString("dd MMM yyyy")</td>
+            </tr>
+            <tr>
+                <th>Location Name</th>
+                <td>@Model.LocationName</td>
+            </tr>
+            <tr>
+                <th>Business Unit Name</th>
+                <td>@Model.BusinessUnitName</td>
+            </tr>
+            <tr>
+                <th>Department Name</th>
+                <td>@Model.DepartmentName</td>
+            </tr>
+            <tr>
+                <th>Required Date</th>
+                <td>
+                    @if (Model.RequiredDate != null)
+                    {@DateTime.Parse(Model.RequiredDate).ToString("dd MMM yyyy")}
+                </td>
+            </tr>
+            <tr>
+                <th>Purpose</th>
+                <td style="word-wrap:break-word">@Model.Purpose</td>
+            </tr>
+        </table>
+    </div>
+    <div class="col-md-6">
+        <table border="1" width="100%">
+            <caption>IOU Settlement Information</caption>
+            <tr>
+                <th width="30%">Approved Amount</th>
+                <td width="70%" style="word-wrap:break-word">@Model.Ammount.ToString("N") BDT</td>
+            </tr>
+            <tr>
+                <th>Disbursed Amount</th>
+                <td style="word-wrap:break-word">@Model.TotalDisburseAmmount.ToString("N") BDT</td>
+            </tr>
+            <tr>
+                <th>Expense Amount</th>
+                <td style="word-wrap:break-word">@Model.TotalExpenceAmmount.ToString("N") BDT</td>
+            </tr>
+            <tr>
+                @{float returnable = Model.TotalDisburseAmmount - Model.TotalExpenceAmmount;}
+                @if (returnable >= 0)
+                {
+                    <th>Returnable Amount</th>
+                    <td style="word-wrap:break-word">@returnable.ToString("N") BDT</td>
+                }
+                else
+                {
+                    returnable = returnable * (-1);
+                    <th>Claimed Amount</th>
+                    <td style="word-wrap:break-word">@returnable.ToString("N") BDT</td>
+                }
+            </tr>
+            <tr>
+                <th>Settlement Date</th>
+                <td>
+                    @if (Model.SettlementDate != "")
+                    {@DateTime.Parse(Model.SettlementDate).ToString("dd MMM yyyy")}
+                </td>
+            </tr>
+            <tr>
+                <th>Apply Date</th>
+                <td style="word-wrap:break-word">
+                    @if (Model.SettlementCreateDate != "")
+                    {@DateTime.Parse(Model.SettlementCreateDate).ToString("dd MMM yyyy")}
+                </td>
+            </tr>
+            <tr>
+                <th>Remarks</th>
+                <td>@Model.RemarksSettlement</td>
+            </tr>
+        </table>
+    </div>
+</div>
+    @if (Model.IouSettlementFiles != null)
+    {
+        <table border="1" width="100%">
+            <caption>Attached File</caption>
+            <thead>
+                <tr>
+                    <th>File Name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.IouSettlementFiles)
+                {
+                    <tr>
+                        <td>@item.CapexFileName</td>
+                        <td>@Html.ActionLink("Download", "DownloadFile", "CapexApproval", new { filepath = item.CapexFilePath.ToString(), filename = item.CapexFileName.ToString() }, new { @target = "_blank" })</td>
+                    </tr>
+
+                }
+            </tbody>
+        </table>
+    }
+    @if (Model.SettlementApproverList.Last().UserID == Convert.ToInt32(Session["SQuserId"].ToString()))
+    {
+        <table border="1" width="100%" id="genaralInfodt">
+                @{float countFob = 0; int countNum = 0;}
+                <caption>Disbursement List</caption>
+                <thead>
+                    <tr>
+                        <th>Sl</th>
+                        <th>Disburse Date</th>
+                        <th>Remarks</th>
+                        <th>Ammount</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var item in Model.DisburseList)
+                    {
+                        countNum++;
+                        <tr>
+                            <td>@countNum</td>
+                            <td>@item.CreateDate</td>
+                            <td>@item.Purpose</td>
+                            <td>@item.Ammount.ToString("N")</td>
+                        </tr>
+                        countFob = countFob + @item.Ammount;
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="3">Total </th>
+                        <th>BDT @countFob.ToString("N")</th>
+                    </tr>
+                </tfoot>
+            </table>
+    }
+</div>
+@if (Model.Status == 1)
+{
+    <div style="text-align:center;width:100%">
+        <br />
+        <table align="center" width="50%">
+            <tr>
+                @if (Model.SettlementApproverList.Last().UserID == Convert.ToInt32(Session["SQuserId"].ToString()))
+                {
+                    <td>
+                        <button type="button" class="approvalColumn btn btn-success" onclick="IouSettlementApprove(1,@Model.IouRequestId,'')">Cash Settled</button>
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        <input type="text" class="approvalColumn form-control" id="commentText" />
+                    </td>
+                    <td>
+                        <button type="button" class="approvalColumn btn btn-success " onclick="IouSettlementApprove(1,@Model.IouRequestId,$('#commentText').val())">Approve</button>
+                    </td>
+                    <td>
+                        <button type="button" class="approvalColumn btn btn-danger " onclick="IouSettlementApprove(2,@Model.IouRequestId,$('#commentText').val())">Reject</button>
+                    </td>
+                }
+            </tr>
+        </table>
+    </div>
+}
+<div>
+    <br />
+    <table width="80%" align="center">
+        <tr>
+            <td>
+                <button value="Comments" onclick="showComments()" class="btn btn-sm btn-primary">Comments</button>
+            </td>
+            <td style="padding:5px">
+                <select id="reviewComment" class="approvalColumn form-control">
+                    @if (Model.SettlementApproverList != null)
+                    {
+                        <option value="@Model.UserId">@Model.UserName</option>
+                        foreach (var app in Model.SettlementApproverList)
+                        {
+                            if (app.UserID != Convert.ToInt32(Session["SQuserId"].ToString()))
+                            {
+                                <option value="@app.UserID">@app.UserName</option>
+                            }
+
+                        }
+                    }
+
+                </select>
+            </td>
+            <td style="padding:5px">
+                <input type="text" id="reviewMessage" class="approvalColumn form-control" rows="3" style="resize:none" />
+            </td>
+            <td>
+                <button style="text-align:center;align-content:center" class="btn btn-info btn-sm" onclick="ReviewComment(@Model.IouRequestId,2)">Send Review</button>
+            </td>
+        </tr>
+    </table>
+
+</div>
+
+
+@*else
+    {*@
+@*<br />*@
+@*<button value="Comments" onclick="showComments()" class="btn btn-sm btn-primary">Comments</button>*@
+<div class="row">
+    <div id="comments_section" class="col-md-6" style="overflow-wrap:inherit; overflow-y: auto;height:200px;display:none">
+        <p>Comment Section</p>
+        @if (Model.IouComments != null)
+        {
+            foreach (var app in Model.IouComments)
+            {
+                <hr style="margin:unset;padding:unset;" />
+                <p style="margin:unset;padding:unset" class="media-heading user_name"><strong style="color:blue">@app.ReviewerByName</strong>  To <strong>@app.ReviewerToName</strong></p>
+                <p style="margin:unset;padding:unset">@app.UpdatedBY.ToString("MM/dd/yyyy hh:mm tt")</p>
+                <p style="margin:unset;padding:unset">@app.ReviewMessage</p>
+            }
+        }
+    </div>
+    <div id="log_section" class="col-md-6" style="overflow-wrap:inherit; overflow-y: auto;height:200px;display:none">
+        <p>Log Section</p>
+
+        @if (Model.IouLogSection != null)
+        {
+            <table width="100%" border="1">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Description</th>
+                        <th>By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var app in Model.IouLogSection)
+                    {
+                        <tr>
+                            <td>@app.ActionDate</td>
+                            <td>@app.ActionStatus</td>
+                            <td>@app.Comments</td>
+                            <td>@app.ActionBy</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        }
+    </div>
+</div>
+@*}
+    </div>*@
+
+

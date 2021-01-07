@@ -1,0 +1,259 @@
+﻿
+@{
+    ViewBag.Title = "IOUCashierView";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .modal-lg {
+        max-width: 80% !important;
+    }
+
+    .sweet-alert {
+        background-color: #DAF7A6;
+    }
+
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    #cashiermenu {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #cashierSubmenu li a {
+        color: white;
+    }
+
+    #cashierNavigarion {
+        background-color: #37474F;
+    }
+    /*#exceptionNavigaton{
+            padding:0px;
+            margin:0px;
+        }*/
+</style>
+<div class="container-fluid">
+    <h3 style="text-align: center;"><b>IOU Cashier View </b></h3>
+    <hr style="margin:0px" />
+    <div class="row">
+        <div id="cashierNavigarion" class="navbar navbar-inverse navbar-static-top">
+            <div id="cashiermenu">
+                <div>
+                    <ul id="cashierSubmenu" class="nav navbar-nav">
+                        <li onclick="GetCashierList(3,1)"><a href="#">Waiting For Disburse</a></li>
+                        <li onclick="GetCashierList(3,2)"><a href="#">Disbursed So Far</a></li>
+                        <li onclick="CashierSettlementList(4,3)"><a href="#">Pending Settlement</a></li>
+                        <li onclick="CashierSettlementList(4,1)"><a href="#">Settled Cash</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        @*  style="height:400px;width:100%;overflow:scroll"*@
+        <div id="iouApprovalDashboard">
+
+        </div>
+    </div>
+    <div class="modal" id="myModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">IOU Request Preview</h4>
+                </div>
+                <div id="modalbody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+</div>
+@Scripts.Render("~/bundles/jquery")
+<script type="text/javascript">
+    $('#cashierSubmenu > li > a').click(function() {
+        $('li').removeClass();
+        $(this).parent().addClass('active');
+       // $("#spmenuid").html($(this).html());
+    });
+    function GetCashierList(status,progrss) {
+        var urlpath = '@Url.Action("GetAllIOURequest", "IOU")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: {Status: status,ViewName: '_allIouRequestPartial',Progrss:progrss},
+            async: true,
+            success: function (data) {
+                if (data) {
+                    $('#iouApprovalDashboard').empty();
+                    $('#iouApprovalDashboard').append(data);
+                    $('#allIourequestTable').DataTable();
+                }
+            }
+        });
+    }
+    function IouDetailsApprover(masterID,status) {
+        var urlpath = '@Url.Action("IouRequestDetails", "IOU")';
+        $.ajax({
+            data: { MasterID: masterID, ViewName:"_cashierDetailsPartial",Status:status},
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $("#iouApprovalDashboard").empty();
+                $("#iouApprovalDashboard").append(data);
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+    function SaveDisburseAmmount(iouRequestId,remainingAmount) {
+        var insertDisburse = $("#insertdisburse").val();
+        var remarks = $("#remaksdisburse").val();
+        if (insertDisburse > remainingAmount || insertDisburse==0) {
+            swal({
+                title: 'Disburse amount is greater than approved amount',
+                type: 'error',
+                closeOnCancel: true
+            });
+        } else {
+            var urlpath = '@Url.Action("SaveDisburseAmount", "IOU")';
+            $.ajax({
+                data: { IouRequestId: iouRequestId, Remarks: remarks, Amount: insertDisburse },
+                    dataType: 'json',
+                    url: urlpath,
+                    type: "Post",
+                    async: true,
+                    success: function (result) {
+                        if (result) {
+                            swal({
+                                            title: 'Amount Disbursed',
+                                            type: 'success',
+                                            closeOnCancel: true
+                                        },
+                                function () {
+                                    IouDetailsApprover(iouRequestId, 0);
+                                });
+                        }
+                    }
+                });
+        }
+    }
+    function showComments() {
+        $("#comments_section").toggle();
+        $("#log_section").toggle();
+    }
+    function ReviewComment(masterID,status) {
+        if ($("#reviewMessage").val() == "") {
+            $("#reviewMessage").css({ "border-color": "#FF0000" });
+        } else {
+            var reviewTo = $("#reviewComment").val();
+            var reviewMessage = $("#reviewMessage").val();
+            var urlpath = '@Url.Action("SendIOUComments", "IOU")';
+            $.ajax({
+                    data: { MasterID: masterID, ReviewTo: reviewTo, ReviewMessage: reviewMessage },
+                    dataType: 'json',
+                    url: urlpath,
+                    type: "Post",
+                    async: true,
+                    success: function (result) {
+                        if (result) {
+                            swal({
+                                            title: 'Comment Sent Successfully',
+                                            type: 'success',
+                                            closeOnCancel: true
+                                        },
+                                function () {
+                                    if (status == 1) {
+                                        IouDetailsApprover(masterID, 0);
+                                    } else {
+                                        IouDetailsSettlement(masterID, 0);
+                                    }
+                                });
+                        }
+                    }
+                });
+        }
+        
+    }
+
+    function CashierSettlementList(status,progrss) {
+        var urlpath = '@Url.Action("GetAllIOURequest", "IOU")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: {Status: status,ViewName: '_iouApproverSettlementList',Progrss:progrss},
+            async: true,
+            success: function (data) {
+                if (data) {
+                    $('#iouApprovalDashboard').empty();
+                    $('#iouApprovalDashboard').append(data);
+                    $('#iousettlementApproverTable').DataTable();
+                }
+            }
+        });
+    }
+    function IouDetailsSettlement(masterID,status) {
+        var urlpath = '@Url.Action("IouRequestDetails", "IOU")';
+        $.ajax({
+            data: { MasterID: masterID, ViewName:"_approversettlementModal",Status:status},
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $("#modalbody").html("");
+                $("#modalbody").append(data);
+                $("#myModal").modal("show");
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+     function PrintModal() {
+            var print_div = document.getElementById("printablearea");
+            var print_area = window.open();
+            print_area.document.write("<style>table{border-collapse:collapse;}</style><img width='20' height='20' src='../../Images/logo.png' /><img style='width:80px;' src='../../Images/logo.png' />");
+            print_area.document.write("<h1 style='text-align:center'>IOU Preview</h1>");
+            print_area.document.write(print_div.innerHTML);
+            print_area.document.close();
+            print_area.focus();
+            print_area.print();
+            print_area.close();
+    }
+    function IouSettlementApprove(progress,masterId,commentText) {
+        var urlpath = '@Url.Action("IouSettlementApprove", "IOU")';
+        $.ajax({
+            data: { CommentText: commentText, Progress: progress, IOuRequestId: masterId },
+            dataType: 'json',
+            url: urlpath,
+            type: "Post",
+            async: true,
+            success: function (result) {
+                if (result) {
+                    swal({
+                        title: 'Done Successfully',
+                        type: 'success',
+                        closeOnCancel: true
+                    },function () {
+                            $("#myModal").modal("hide");
+                            CashierSettlementList(4, 3);
+                    });
+                }
+            }, error: function (xhr, status, error) {
+                swal({
+                    title: 'Error Occoured',
+                    type: 'error',
+                    closeOnCancel: true
+                });
+            }
+        });
+    }
+</script>

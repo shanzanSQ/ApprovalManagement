@@ -1,0 +1,361 @@
+﻿<style type="text/css">
+    .modal-lg {
+        max-width: 80% !important;
+    }
+
+    .sweet-alert {
+        background-color: #DAF7A6;
+    }
+
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    #expmenu {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #exceptionSubmrnu li a {
+        color: white;
+    }
+
+    #exceptionNavigaton {
+        background-color: #37474F;
+    }
+    /*#exceptionNavigaton{
+        padding:0px;
+        margin:0px;
+    }*/
+</style>
+<div class="container-fluid">
+    <h3 style="text-align: center;"><b>Visitor Request Approval </b></h3>
+    <hr style="margin:0px" />
+    <div class="row">
+        <div id="exceptionNavigaton" class="navbar navbar-default navbar-static-top">
+            <div id="expmenu">
+                <div class="navbar-collapse collapse">
+                    <ul id="exceptionSubmrnu" class="nav navbar-nav">
+                        <li onclick="GetApproverRequestList(2,3)"><a href="#">Pending Request</a></li>
+                        <li onclick="GetApproverRequestList(2,1)"><a href="#">Approved Request</a></li>
+                        <li onclick="GetApproverRequestList(2,2)"><a href="#">Rejected Request</a></li>
+                        @*<li onclick="GetApproverRequestList(4,0)"><a href="#">HR Interaction</a></li>*@
+                    </ul>
+                </div>
+            </div>
+        </div>
+        @*  style="height:400px;width:100%;overflow:scroll"*@
+        <div id="iouApprovalDashboard">
+
+        </div>
+    </div>
+    <div class="modal" id="myModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Visitor Request Preview</h4>
+                </div>
+                <div id="modalbody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content" style="background-color:beige">
+                <div class="modal-body">
+                    <h3 style="text-align:center">HR InterAction</h3>
+                    <h5 style="text-align:center">Necessary measures to be taken</h5>
+                    <input type="text" id="takeHrsteps" onchange="" placeholder="Necessary steps taken" class="form-control" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" onclick="hideModal()">No</button>
+                    <button type="button" class="btn btn-primary" onclick="HrInterAction()">Yes Interect</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@Scripts.Render("~/bundles/jquery")
+<script type="text/javascript">
+    $("#iousubmenu").find('li:nth-child(1)').addClass("active");
+    GetApproverRequestList(2, 3);
+    $('#iousubmenu > li > a').click(function() {
+        $('li').removeClass();
+        $(this).parent().addClass('active');
+       // $("#spmenuid").html($(this).html());
+    });
+    var ExceptionRequestId = 0;
+    function GetApproverRequestList(status,progrss) {
+        var urlpath = '@Url.Action("GetAllVisitorRequest", "Visitor")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: {Status: status,ViewName: '_allVisitorApprovalPartial',Progrss:progrss},
+            async: true,
+            success: function (data) {
+                if (data) {
+                    console.log(data);
+                    $('#iouApprovalDashboard').empty();
+                    $('#iouApprovalDashboard').append(data);
+                    $('#VisitorRequestTable').DataTable();
+                }
+            }
+        });
+    }
+        function VisitorDetailsApprover(masterID,status) {
+            var urlpath = '@Url.Action("VisitorRequestDetails", "Visitor")';
+        $.ajax({
+            data: { MasterID: masterID, ViewName:"_approverModalView",Status:status},
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $("#modalbody").html("");
+                $("#modalbody").append(data);
+                $("#myModal").modal("show");
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+
+    @*function ExceptionDetails(masterID,usertype) {
+        var urlpath = '@Url.Action("IndividualExceptionRequest", "Exception")';
+        $.ajax({
+            data: { MasterID: masterID,ViewName:"_approveOrRejectmodal",UserType:usertype},
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    $("#modalbody").html("");
+                    $("#modalbody").append(data);
+                    $("#myModal").modal("show");
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+    }*@
+    function showComments() {
+        $("#comments_section").toggle();
+    }
+
+    function VisitorApproveOrReject(progress, masterId, commentText) {
+        if (progress == 2 && commentText == "") {
+            swal({
+                title: 'Please Add comment Before Reject',
+                type: 'error',
+                closeOnCancel: true
+            });
+        } else {
+            var urlpath = '@Url.Action("VisitorApproveOrReject", "Visitor")';
+        $.ajax({
+            data: { CommentText: commentText, Progress: progress, RequestorId: masterId },
+            dataType: 'json',
+            url: urlpath,
+            type: "Post",
+            async: true,
+            success: function (result) {
+                if (result) {
+                    swal({
+                        title: 'Done Successfully',
+                        type: 'success',
+                        closeOnCancel: true
+                    },function () {
+                            $("#myModal").modal("hide");
+                            GetApproverRequestList(2, 3);
+                    });
+                }
+            }, error: function (xhr, status, error) {
+                swal({
+                    title: 'Error Occoured',
+                    type: 'error',
+                    closeOnCancel: true
+                });
+            }
+        });
+        }
+
+    }
+
+    function ReviewComment(masterID) {
+        var reviewTo = $("#reviewComment").val();
+        var reviewMessage = $("#reviewMessage").val();
+        if ($("#reviewMessage").val()=="") {
+            $("#reviewMessage").css({ "border-color": "#FF0000" });
+        } else {
+            var urlpath = '@Url.Action("SendVisitorComments", "Visitor")';
+            $.ajax({
+                    data: { MasterID: masterID, ReviewTo: reviewTo, ReviewMessage: reviewMessage },
+                    dataType: 'json',
+                    url: urlpath,
+                    type: "Post",
+                    async: true,
+                    success: function (result) {
+                        if (result) {
+                            swal({
+                                            title: 'Comment Added Successfully',
+                                            type: 'success',
+                                            closeOnCancel: true
+                                        },
+                                function () {
+                                    $("#myModal").modal("hide");
+                                    GetApproverRequestList(2,3);
+                                });
+                        }
+                    }
+                });
+        }
+
+    }
+    function hideModal() {
+        $("#exampleModalCenter").modal("hide");
+        $("#myModal").modal("hide");
+         GetApproverRequestList(2, 3);
+    }
+    function ApprovalSection(progress, masterId, commentText) {
+        var urlpath = '@Url.Action("ApproveOrReject", "Exception")';
+            $.ajax({
+                data: { CommentText: commentText, Progress: progress, ExceptionMasterId: masterId },
+                dataType: 'json',
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function (result) {
+                    if (result) {
+
+                        swal({
+                            title: 'Done Successfully',
+                            type: 'success',
+                            closeOnCancel: true
+                        },function () {
+                               $("#myModal").modal("hide");
+                                GetApproverRequestList(2, 3);
+                            });
+                    }
+                }, error: function (xhr, status, error) {
+                    swal({
+                        title: 'Error Occoured',
+                        type: 'error',
+                        closeOnCancel: true
+                    });
+                }
+                    });
+    }
+    function CEApprovalOrReject(progress, masterId, commentText) {
+        if (progress == 2 && commentText == "") {
+            swal({
+                    title: 'Please Enter The Comment First',
+                    type: 'error',
+                    closeOnCancel: true
+                });
+        }
+        else {
+            var urlpath = '@Url.Action("ApproveOrReject", "Exception")';
+            $.ajax({
+                data: { CommentText: commentText, Progress: progress, ExceptionMasterId: masterId },
+                dataType: 'json',
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function (result) {
+                    if (result) {
+                        swal({
+                            title: 'Done Successfully',
+                            type: 'success',
+                            closeOnCancel: false
+                        }, function () {
+                                $("#exampleModalCenter").modal("show");
+                                ExceptionRequestId = masterId;
+                        });
+                    }
+                }, error: function (xhr, status, error) {
+                    swal({
+                        title: 'Error Occoured',
+                        type: 'error',
+                        closeOnCancel: true
+                    });
+                }
+                    });
+        }
+    }
+    function HrInterAction() {
+        var necessaryStpes = $("#takeHrsteps").val();
+        if (necessaryStpes == "") {
+             $("#takeHrsteps").css({ "border-color": "#FF0000" });
+        } else {
+            ApprovalSection(4, ExceptionRequestId, necessaryStpes);
+            $("#exampleModalCenter").modal("hide");
+        }
+    }
+    function ChangeColor(id) {
+        $(id).css({ "border-color": "#d3d3d3" });
+    }
+    function ApproveOrreject(progress, masterId, commentText) {
+        if (progress == 2) {
+            if (commentText == "") {
+                swal({
+                    title: 'Please Enter The Comment First',
+                    type: 'error',
+                    closeOnCancel: true
+                });
+            } else {
+                ApprovalSection(progress, masterId, commentText);
+            }
+        } else {
+            ApprovalSection(progress, masterId, commentText);
+        }
+        //swal({
+        //        title: 'Are you sure?',
+        //        text: "You won't be able to revert this!",
+        //        type: 'warning',
+        //    showCancelButton: true,
+        //        closeOnConfirm: true,
+        //        confirmButtonText: 'Yes'
+        //    },function () {
+        //        finalApproverProceed(progress, masterId, commentText);
+        //    });
+
+
+    }
+    function SubmitToHr(masterId) {
+        swal({
+            title: "HR Interaction",
+            text: "Necessary measures to be taken",
+            type: "input",
+            showCancelButton: true,
+            confirmButtonClass: "btn-primary",
+            cancelButtonClass:"btn-danger",
+            confirmButtonText: "Yes, Submit!",
+            cancelButtonText: "Cencel",
+            inputPlaceholder: "Write something",
+            closeOnConfirm: false,
+            closeOnCancel: true
+        }, function (inputValue) {
+                if (inputValue) {
+                    ApprovalSection(4, masterId, inputValue);
+                }
+        });
+    }
+    function PrintModal() {
+            var print_div = document.getElementById("printablearea");
+            var print_area = window.open();
+            print_area.document.write("<style>table{border-collapse:collapse;}</style><img width='20' height='20' src='../../Images/logo.png' /><img style='width:80px;' src='../../Images/logo.png' />");
+            print_area.document.write("<h1 style='text-align:center'>Exception Request Preview</h1>");
+            print_area.document.write(print_div.innerHTML);
+            print_area.document.close();
+            print_area.focus();
+            print_area.print();
+            print_area.close();
+    }
+</script>

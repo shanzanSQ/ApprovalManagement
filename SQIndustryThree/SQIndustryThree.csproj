@@ -26,7 +26,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <TypeScriptToolsVersion>3.6</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>3.7</TypeScriptToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,6 +36,19 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptJSXEmit>React</TypeScriptJSXEmit>
+    <TypeScriptModuleKind />
+    <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
+    <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
+    <TypeScriptRemoveComments>False</TypeScriptRemoveComments>
+    <TypeScriptOutFile />
+    <TypeScriptOutDir />
+    <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
+    <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
+    <TypeScriptSourceMap>True</TypeScriptSourceMap>
+    <TypeScriptMapRoot />
+    <TypeScriptSourceRoot />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -47,6 +60,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Dapper, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapper.2.0.78\lib\net461\Dapper.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -124,13 +140,23 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\BillApprovalController.cs" />
     <Compile Include="Controllers\CapexApprovalController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
+    <Compile Include="Controllers\ExceptionController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\IOUController.cs" />
+    <Compile Include="Controllers\VisitorController - Copy.cs" />
+    <Compile Include="Controllers\VisitorController.cs" />
     <Compile Include="DAL\AdminDAL.cs" />
+    <Compile Include="DAL\BillApprovalDAL.cs" />
     <Compile Include="DAL\CapexApprovalDAL.cs" />
     <Compile Include="DAL\DashboardDAL.cs" />
+    <Compile Include="DAL\ExceptionDAL.cs" />
     <Compile Include="DAL\HomeDAL.cs" />
+    <Compile Include="DAL\IOUDAL.cs" />
+    <Compile Include="DAL\VisitorDAL.cs" />
+    <Compile Include="DAL\VisitorDAL_1.cs" />
     <Compile Include="DataManager\DataAccessManager.cs" />
     <Compile Include="DataManager\DataBase.cs" />
     <Compile Include="DataManager\EncryptDecrypt.cs" />
@@ -139,18 +165,39 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\ApproverModelClass.cs" />
+    <Compile Include="Models\BillApproval\BillApprovalPOMasterTable.cs" />
+    <Compile Include="Models\BillApproval\BillAprrovalPoDetails.cs" />
+    <Compile Include="Models\BillApproval\BillSubmitModel.cs" />
+    <Compile Include="Models\BillApproval\BillTransactionTable.cs" />
     <Compile Include="Models\BusinessUnit.cs" />
+    <Compile Include="Models\BuyerListModel.cs" />
     <Compile Include="Models\CapexCatagory.cs" />
     <Compile Include="Models\CapexFileUploadDetails.cs" />
     <Compile Include="Models\CapexInformationDetails.cs" />
     <Compile Include="Models\CapexInformationMaster.cs" />
     <Compile Include="Models\ChartModel.cs" />
     <Compile Include="Models\CommentsTable.cs" />
+    <Compile Include="Models\CommonModel.cs" />
     <Compile Include="Models\CurrencyTable.cs" />
+    <Compile Include="Models\ExceptionDetailsTable.cs" />
+    <Compile Include="Models\ExceptionGenaralInformation.cs" />
+    <Compile Include="Models\ExceptionRequestMaster.cs" />
+    <Compile Include="Models\GenaralInformationModal.cs" />
+    <Compile Include="Models\IOUApproverModel.cs" />
+    <Compile Include="Models\IOURequestModel.cs" />
     <Compile Include="Models\LocationModel.cs" />
+    <Compile Include="Models\LogSection.cs" />
+    <Compile Include="Models\ModuleModel.cs" />
     <Compile Include="Models\QueryModel.cs" />
+    <Compile Include="Models\RequestorModel.cs" />
     <Compile Include="Models\ResultResponse.cs" />
     <Compile Include="Models\UserInformation.cs" />
+    <Compile Include="Models\VisitorApproval\VisitorApprover.cs" />
+    <Compile Include="Models\VisitorApproval\VisitorCategory.cs" />
+    <Compile Include="Models\VisitorApproval\VisitorSubCategory.cs" />
+    <Compile Include="Models\VisitorModel.cs" />
+    <Compile Include="Models\VisitorRequestModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -6416,16 +6463,21 @@
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\bootstrap4-toggle.min.css" />
     <Content Include="Content\c3.css" />
     <Content Include="Content\c3.min.css" />
     <Content Include="Content\capexform.css" />
+    <Content Include="Content\customcss.css" />
+    <Content Include="Content\LoadingModal.css" />
     <Content Include="Content\sweetalert.css" />
+    <Content Include="Content\toastr.css" />
     <Content Include="css\style.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Images\20191204_153909.jpg" />
+    <Content Include="Images\ajax-loader.gif" />
     <Content Include="Images\ams.jpg" />
     <Content Include="Images\Green-revolution-in-Bangladeshi-Apparel-Industry--815.jpg" />
     <Content Include="Images\IMG_20190902_111233.jpg" />
@@ -6433,6 +6485,7 @@
     <Content Include="Images\slogan.png" />
     <Content Include="Images\sqbackgraound.jpg" />
     <Content Include="Images\SQ_STATION_BANNER.jpg" />
+    <Content Include="Images\Velocity.gif" />
     <Content Include="LICENSE.txt" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -6934,6 +6987,7 @@
     <Content Include="fonts\poppins\Poppins-ThinItalic.ttf" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Properties\PublishProfiles\CustomProfile1.pubxml" />
+    <None Include="Properties\PublishProfiles\CustomProfile2.pubxml" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Properties\PublishProfiles\FolderProfile1.pubxml" />
     <None Include="Properties\PublishProfiles\FolderProfile2.pubxml" />
@@ -6952,8 +7006,11 @@
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\jszip.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Scripts\sweetalert.min.js" />
+    <Content Include="Scripts\toastr.js" />
+    <Content Include="Scripts\xlsx.full.min.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -6991,9 +7048,70 @@
     <Content Include="Views\Admin\_createDesignation.cshtml" />
     <Content Include="Views\Admin\_setApproverList.cshtml" />
     <Content Include="Views\Admin\_showApproverList.cshtml" />
+    <Content Include="Views\Visitor\VisitorApproval.cshtml" />
+    <Content Include="Views\Visitor\AdminApproverView.cshtml" />
+    <Content Include="Views\Visitor\_allRequestPartialView.cshtml" />
+    <Content Include="Views\Visitor\_modalVisitorRequest.cshtml" />
+    <Content Include="Views\Exception\ExceptionRequest.cshtml" />
+    <Content Include="Views\Exception\_exceptionRequestForm.cshtml" />
+    <Content Include="Views\Visitor\VisitorApprovalView.cshtml" />
+    <Content Include="Views\Visitor\FrontDeskView.cshtml" />
+    <Content Include="Views\Visitor\_allFrontDeskPartialView.cshtml" />
+    <Content Include="Views\Admin\_PartialViewExceptionApprover.cshtml" />
+    <Content Include="Views\Exception\_ReviewExceptionModal.cshtml" />
+    <Content Include="Views\Exception\_MyExceptionRequest.cshtml" />
+    <Content Include="Views\Shared\_LayoutPage1.cshtml" />
+    <Content Include="Views\Visitor\Index.cshtml" />
+    <Content Include="Views\Shared\DefaultLayout.cshtml" />
+    <Content Include="Views\Exception\ExceptionApproval.cshtml" />
+    <Content Include="Views\Exception\_allApprovalPartial.cshtml" />
+    <Content Include="Views\Exception\_approveOrRejectmodal.cshtml" />
+    <Content Include="Views\Exception\ExceptionHRView.cshtml" />
+    <Content Include="Views\Exception\_hrPartialView.cshtml" />
+    <Content Include="Views\Exception\_hrDetailsException.cshtml" />
+    <Content Include="Views\Exception\_UpdateExceptionRequest.cshtml" />
+    <Content Include="Views\IOU\IOUManagementView.cshtml" />
+    <Content Include="Views\IOU\iouRequestCreateView.cshtml" />
+    <Content Include="Views\Admin\_iouSetapproverList.cshtml" />
+    <Content Include="Views\IOU\_modalRequestView.cshtml" />
+    <Content Include="Views\IOU\_myIouRequestor.cshtml" />
+    <Content Include="Views\IOU\IouApproverView.cshtml" />
+    <Content Include="Views\IOU\_allIouRequestPartial.cshtml" />
+    <Content Include="Views\IOU\_approverModalView.cshtml" />
+    <Content Include="Views\IOU\IOUCashierView.cshtml" />
+    <Content Include="Views\IOU\_cashierDetailsPartial.cshtml" />
+    <Content Include="Views\IOU\_iouSettlementRequest.cshtml" />
+    <Content Include="Views\IOU\_MyIouSettlementList.cshtml" />
+    <Content Include="Views\IOU\_mySettlementModal.cshtml" />
+    <Content Include="Views\IOU\IOUSettlementView.cshtml" />
+    <Content Include="Views\IOU\_iouApproverSettlementList.cshtml" />
+    <Content Include="Views\IOU\_approversettlementModal.cshtml" />
+    <Content Include="Views\IOU\_IouRequestUpdateModal.cshtml" />
+    <Content Include="Views\Exception\ExceptionReportView.cshtml" />
+    <Content Include="Views\Exception\_excpReportAllList.cshtml" />
+    <Content Include="Views\Exception\_excpReportDetailsById.cshtml" />
+    <Content Include="Views\IOU\_iouSettlementApprove.cshtml" />
+    <Content Include="Views\IOU\_updateIouSettlement.cshtml" />
+    <Content Include="Views\BillApproval\BillApprovalRequest.cshtml" />
+    <Content Include="Views\BillApproval\POUploadInterface.cshtml" />
+    <Content Include="Views\BillApproval\_podetailsview.cshtml" />
+    <Content Include="Views\BillApproval\_submitForApprovalModal.cshtml" />
+    <Content Include="Views\BillApproval\MyRequestSoFar.cshtml" />
+    <Content Include="Views\BillApproval\_RequestListSoFar.cshtml" />
+    <Content Include="Views\Visitor\VisitorRequestForm.cshtml" />
+    <Content Include="Views\Visitor\FactoryGateView.cshtml" />
+    <Content Include="Views\Visitor\FactoryGateViewCelsius2.cshtml" />
+    <Content Include="Views\Visitor\VisitorApproval_1.cshtml" />
+    <Content Include="Views\Visitor\_allVisitorApprovalPartial.cshtml" />
+    <Content Include="Views\Visitor\_approverModalView.cshtml" />
+    <Content Include="Views\Visitor\_myVisitorRequestor.cshtml" />
+    <Content Include="Views\Visitor\_visitorModalRequestView.cshtml" />
+    <Content Include="Views\Visitor\_VisitorRequestUpdateModal.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="ExceptionFileUpload\" />
+    <Folder Include="IOUFileUpload\" />
     <Folder Include="Uploads\" />
   </ItemGroup>
   <ItemGroup>

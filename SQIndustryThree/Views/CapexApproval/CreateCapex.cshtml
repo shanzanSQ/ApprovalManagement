@@ -7,8 +7,14 @@
 @Styles.Render("~/Content/capexform.css")
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
-
-<div class="container" style="background-color:white">
+<link href="~/Content/LoadingModal.css" rel="stylesheet" />
+<style type="text/css">
+    .form-control,.btn{
+        border-radius:0px;
+        
+    }
+</style>
+<div class="container-fluid" style="background-color:white">
     <h2 style="text-align:center"><b>CAPEX APPROVAL FORM</b></h2>
     <hr />
     <div class="row">
@@ -21,12 +27,12 @@
             <select id="locationCheck" name="locationCheck" class="form-control"> </select>
         </div>
         <div class="col-md-3">
-            <label for="catagory_caperx">Capex Catagory</label>
+            <label for="catagory_caperx">Capex Category</label>
             <select id="catagory_caperx" name="catagory_caperx" class="form-control"> </select>
         </div>
         <div class="col-md-3">
             <label for="project_type">Asset Type</label>
-            <select id="project_type" name="project_type" class="form-control" onchange='CheckColors(this.value);'>
+            <select id="project_type" name="project_type" class="form-control" >
                 <option>New Asset</option>
                 <option>Replacement</option>
                 <option>Renovation</option>
@@ -52,22 +58,26 @@
     </div>
     <div>
         <div style="margin-top:10px" class="form-group row">
-            <div class="col-md-6">
-                <label for="assets_description" style="text-align:center">Description Assets</label>
+            <div class="col-md-4">
+                <label for="assets_description" style="text-align: center">Description Assets</label>
             </div>
-            <div class="col-md-6">
-                <label style="float:left;width:30%">Select Currency</label>
-                <select id="currency" class="form-control" style="float:left;width:30%">
+            <div class="col-md-4">
+                <select id="assetSelect" class="form-control">
                     
                 </select>
-                <button class="btn btn-success" style="float:right;width:30%"  id="addrow">Add Row</button>
+            </div>
+            <div class="col-md-4">
+                <label style="float:left;width:30%">Select Currency</label>
+                <select id="currency" class="form-control" style="float:left;width:30%">
+                </select>
+                <button class="btn btn-success btn-sm" style="float:right;width:30%" id="addrow">Add Row</button>
             </div>
         </div>
-        
+
         <table id="assets_description" class="table order-list">
             <thead>
                 <tr>
-                    <td>Asset Catagory</td>
+                    <td>Asset Category</td>
                     <td>Description</td>
                     <td>Qty</td>
                     <td>Unit price</td>
@@ -77,24 +87,24 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="col-sm-2">
-                        <input type="text" id="asset_catagory" name="asset_catagory" class="form-control" />
-                    </td>
-                    <td class="col-sm-4">
-                        <input type="text" id="asset_description" name="asset_description" class="form-control" />
-                    </td>
-                    <td class="col-sm-1">
-                        <input type="text" id="asse_qty" onchange="calculateGrandTotal()" name="asse_qty" class="form-control" />
-                    </td>
-                    <td class="col-sm-2">
-                        <input type="text" id="asset_unitPrice" onchange="calculateGrandTotal()" name="asset_unitPrice" class="form-control" />
-                    </td>
-                    <td class="col-sm-2">
-                        <input type="text" id="asset_estimated_cost" name="asset_estimated_cost" disabled class="form-control" />
-                    </td>
-                    <td class="col-sm-1">
-                        <a class="deleteRow"></a>
-                    </td>
+                    @*<td class="col-sm-2">
+                            <input type="text" id="asset_catagory" name="asset_catagory" class="form-control" />
+                        </td>
+                        <td class="col-sm-4">
+                            <input type="text" id="asset_description" name="asset_description" class="form-control" />
+                        </td>
+                        <td class="col-sm-1">
+                            <input type="text" id="asse_qty" onchange="calculateGrandTotal()" name="asse_qty" class="form-control" />
+                        </td>
+                        <td class="col-sm-2">
+                            <input type="text" id="asset_unitPrice" onchange="calculateGrandTotal()" name="asset_unitPrice" class="form-control" />
+                        </td>
+                        <td class="col-sm-2">
+                            <input type="text" id="asset_estimated_cost" name="asset_estimated_cost" disabled class="form-control" />
+                        </td>
+                        <td class="col-sm-1">
+                            <a class="deleteRow"></a>
+                        </td>*@
                 </tr>
             </tbody>
             <tfoot>
@@ -117,22 +127,22 @@
                     <label for="file_uploaded">Attach Files</label>
                 </div>
                 <div class="col-md-6">
-                    
+
                 </div>
                 <br />
                 <table id="multiplefile" class="table table-striped">
                     <tr>
-                        <td> <input class="form-control"  accept="image/jpeg,image/png,application/pdf" type="file" name="file_uploaded" id="file_uploaded" /></td>
-                        <td> <button id="add_files" class="btn btn-success">Add Files</button> </td>
+                        <td> <input class="form-control" accept="image/jpeg,image/png,application/pdf" type="file" name="file_uploaded" id="file_uploaded" /></td>
+                        <td> <button id="add_files" class="btn btn-primary btn-sm">Add Files</button> </td>
                     </tr>
                 </table>
-                
+
             </div>
 
-            <div style="padding:10px" class="box box-default fileList" id="fileList" >
+            <div style="padding:10px" class="box box-default fileList" id="fileList">
             </div>
-            <button id="file_uploadButton" class="btn btn-success">Upload</button>
-          <!-- <button id="remove_button" class="btn btn-success">Remove Files</button>-->
+            <button id="file_uploadButton" class="btn btn-primary btn-sm">Upload</button>
+            <!-- <button id="remove_button" class="btn btn-success">Remove Files</button>-->
         </div>
         <div class="col-md-8">
             <label for="approver">Approver</label>
@@ -166,6 +176,26 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+<!-- / Loading modal  -->
+<div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="loader"></div>
+                <div clas="loader-txt">
+                    <p>
+                        Please Wait Until The file is Processing....................<br>
+                        <br><small>
+                            File Uploading ...........................
+                            <br />
+                            SQ Group Approval Management System
+                        </small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @Scripts.Render("~/bundles/jquery")
 
 <script type="text/javascript">
@@ -177,6 +207,28 @@
         LoadCurrency();
         LoadLocation();
     };
+    $("#catagory_caperx").change(function () {
+        AssetSelect($("#catagory_caperx").val());
+    });
+
+    function AssetSelect(catagoryId) {
+        $('#assetSelect').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("AssetSelect", "CapexApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { CatagoryId: catagoryId },
+            async: true,
+            success: function (data) {
+                $('#assetSelect').empty();
+                for (var i = 0; i < data.length; i++) {
+                    $("#assetSelect").append($("<option></option>").val(data[i].CapexInfoDetailsId)
+                        .html(data[i].CapexAssetCatagory));
+                }
+            }
+        });
+    }
 
     function imagesPreview(input, placeToInsertImagePreview) {
         if (input.files) {
@@ -186,9 +238,9 @@
                 reader.name = input.files[i].name;
                 reader.onload = function (event) {
                     var htmlImage = '<div class="row">';
-                    htmlImage = htmlImage + '<p style="float:left" class="" >' + event.target.name+ '</p>';  
-                       // htmlImage = htmlImage +  '<input style="padding-top:1px;padding-bottom:1px;float:right" class="btn btn-danger" onclick="removeImage($(this))" type="button" value="X" />'; 
-                        htmlImage = htmlImage +  '</div>';        
+                    htmlImage = htmlImage + '<p style="float:left" class="" >' + event.target.name+ '</p>';
+                       // htmlImage = htmlImage +  '<input style="padding-top:1px;padding-bottom:1px;float:right" class="btn btn-danger" onclick="removeImage($(this))" type="button" value="X" />';
+                        htmlImage = htmlImage +  '</div>';
                     $($.parseHTML(htmlImage)).appendTo(placeToInsertImagePreview);
                 }
                 reader.readAsDataURL(input.files[i]);
@@ -201,11 +253,16 @@
       //alert(item);
          item.parent().remove();
     }
-    
+
     $('#file_uploaded').on('change', function() {
-        imagesPreview(this, 'div.fileList');
+        //imagesPreview(this, 'div.fileList');
     });
-     $('#file_uploadButton').on('click', function() {
+    $('#file_uploadButton').on('click', function () {
+         $("#loadMe").modal({
+              backdrop: "static", //remove ability to close modal with click
+              keyboard: false, //remove option to close with keyboard
+              show: true //Display loader!
+            });
          uploadFiles();
      });
     $('#add_files').on('click', function() {
@@ -216,15 +273,12 @@
             newRow.append(cols);
             $("#multiplefile").append(newRow);
      });
-
     $("#multiplefile").on("click", ".delfile", function (event) {
             $(this).closest("tr").remove();
             calculateGrandTotal();
        //     counter -= 1
          //   $('#add_files').attr('disabled', false).prop('value', "Add Row");
     });
-
-
      $('#remove_button').on('click', function() {
          var urlpath = '@Url.Action("DeleteFiles", "CapexApproval")';
         $.ajax({
@@ -243,8 +297,6 @@
             }
         });
     });
-
-
     function uploadFiles() {
         var fileData = new FormData();
         //var tr = $('#multiplefile').closest('tr');
@@ -262,18 +314,18 @@
                     fileData.append(fileUpload[i].name, fileUpload[i]);
                  }
             }
-           
+
             //var files = fileUpload.files;
             //for (var i = 0; i < files.length; i++) {
-                
+
             //            //fileData.append(files[i].name, files[i]);
             // }
           //fileData.append(fileName,fileUpload);
         });
-                     
+
 
                 // Create  a FormData object
-                
+
 
                 // if there are multiple files , loop through each files
                 //for (var i = 0; i < files.length; i++) {
@@ -281,12 +333,13 @@
                 //}
                  var urlpath = '@Url.Action("UploadFiles", "CapexApproval")';
         $.ajax({
-            url: urlpath,//URL to upload files 
+            url: urlpath,//URL to upload files
             type: "post", //as we will be posting files and other method POST is used
             processData: false, //remember to set processData and ContentType to false, otherwise you may get an error
             contentType: false,
             data: fileData  ,
-                    success: function (result) {
+            success: function (result) {
+                        $("#loadMe").modal("hide");
                         swal({
                                 title: 'File Uploaded Successfully',
                                 type: 'success',
@@ -297,9 +350,7 @@
                         alert(err.responseText);
                     }
                 });
-            }   
-
-  
+            }
     $("#save_button").click(function () {
         //SaveCapexApproval();
         modalView();
@@ -310,7 +361,7 @@
     $("#cancel_button").click(function () {
         window.location.href = '@Url.Action("Index", "Home")';
      });
-    
+
     function GetDate() {
         var dt = new Date();
         var dd;
@@ -320,20 +371,19 @@
         document.getElementById('current_date').value = mm + '/' + dd + '/' + dt.getFullYear();
 
     }
-
     $(document).ready(function () {
         var counter = 0;
 
         $("#addrow").on("click", function () {
 
             counter = $('#myTable tr').length - 2;
-
+            var assetCata = $("#assetSelect").children("option:selected").html();
             var newRow = $("<tr>");
             var cols = "";
 
 
 
-            cols += '<td><input type="text" class="form-control"  name="asset_catagory' + counter + '"/></td>';
+            cols += '<td><input type="text" disabled class="form-control"  name="asset_catagory' + counter + '" value="'+assetCata+'" /></td>';
             cols += '<td><input type="text" class="form-control"  name="asset_description' + counter + '"/></td>';
             cols += '<td><input type="text" class="form-control" onchange="calculateGrandTotal()"  name="asse_qty' + counter + '"/></td>';
             cols += '<td><input type="text" class="form-control" onchange="calculateGrandTotal()" name="asset_unitPrice' + counter + '"/></td>';
@@ -361,13 +411,9 @@
             $('#addrow').attr('disabled', false).prop('value', "Add Row");
         });
     });
-
-
-
     function calculateRow(row) {
         var price = +row.find('input[name^="asset_estimated_cost"]').val();
     }
-
     function calculateGrandTotal() {
         var grandTotal = 0;
         $("#assets_description tr").each(function () {
@@ -381,7 +427,6 @@
         });
         $("#grandtotal").text(grandTotal);
     }
-
     function LoadBusinessUnit() {
         $('#business_unit').css({ "border-color": "#d3d3d3" });
         var urlpath = '@Url.Action("LoadBusinessUnit", "CapexApproval")';
@@ -401,7 +446,7 @@
             }
         });
     }
-       function LoadLocation() {
+    function LoadLocation() {
         $('#locationCheck').css({ "border-color": "#d3d3d3" });
         var urlpath = '@Url.Action("LoadLocation", "CapexApproval")';
         $.ajax({
@@ -451,7 +496,7 @@
             async: true,
             success: function (data) {
                 $('#catagory_caperx').empty();
-                $('#catagory_caperx').append("<option value='0'>--Select Capex Catagory--</option>");
+                $('#catagory_caperx').append("<option value='0'>--Select Capex Category--</option>");
                 for (var i = 0; i < data.length; i++) {
                     $("#catagory_caperx").append($("<option></option>").val(data[i].CapexCatagoryID)
                         .html(data[i].CapexCatagoryName));
@@ -477,7 +522,7 @@
         function () {
              $('#locationCheck').css({ "border-color": "#d3d3d3" });
         });
-    
+
     $('#projectname').on('click',
         function () {
              $('#projectname').css({ "border-color": "#d3d3d3" });
@@ -514,7 +559,7 @@
             }
         });
     }
-   
+
     function loadApprover(id) {
         var urlpath = '@Url.Action("LoadCapexApprover", "CapexApproval")';
         $.ajax({
@@ -530,8 +575,6 @@
             }
         });
     }
-
-
     function SaveCapexApproval() {
         var valid = false;
         var jsonData = {};
@@ -559,7 +602,7 @@
                 var qty = $(this).find('input[name^="asse_qty"]').val();
                 var price = $(this).find('input[name^="asset_unitPrice"]').val();
                 myData["CapexEstimatedCost"] = qty * price;
-                if (Number.isInteger(myData["CapexEstimatedCost"]) && parseInt(myData["CapexEstimatedCost"]) > 0) {
+                if (Number.isNaN(myData["CapexEstimatedCost"]) == false && parseFloat(myData["CapexEstimatedCost"]) > 0) {
                     jsonObj.push(myData);
                 }
             });
@@ -596,7 +639,7 @@
                 closeOnCancel: true
             });
         }
-        
+
     }
     function modalView() {
             var submit = true;
@@ -607,7 +650,7 @@
             }else if ($('#locationCheck').val() == "0") {
                 $('#locationCheck').css({ "border-color": "#FF0000" });
                 submit = false;
-            } 
+            }
             else if ($('#catagory_caperx').val() == "0") {
                 $('#catagory_caperx').css({ "border-color": "#FF0000" });
                 submit = false;
@@ -634,7 +677,7 @@
             } else {
                  jsonData["CapexAssetType"] = $('#project_type').val();
             }
-           
+
             jsonData["CapexName"] = $('#projectname').val();
             jsonData["CapexCreateDate"] = $('#current_date').val();
             jsonData["CapexDescription"] = $('#project_description').val();
@@ -651,7 +694,7 @@
                 var qty = $(this).find('input[name^="asse_qty"]').val();
                 var price = $(this).find('input[name^="asset_unitPrice"]').val();
                 myData["CapexEstimatedCost"] = qty * price;
-               if (Number.isInteger(myData["CapexEstimatedCost"]) && parseInt(myData["CapexEstimatedCost"]) > 0) {
+                if (Number.isNaN(myData["CapexEstimatedCost"]) == false && parseFloat(myData["CapexEstimatedCost"]) > 0) {
                     jsonObj.push(myData);
                }
             });

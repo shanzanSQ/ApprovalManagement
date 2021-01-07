@@ -1,0 +1,403 @@
+﻿@model SQIndustryThree.Models.IOURequestModel
+<style>
+    th {
+        text-align: left;
+    }
+
+    td {
+        text-align: left;
+    }
+
+    #genaralInfodt tr th, #genaralInfodt tr td, #approverlist tr td, #approverlist tr th {
+        text-align: center;
+    }
+
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    #disburseAmmount, #remainingAmmount {
+        background: #ffffff;
+        width: 80%;
+        border: none;
+    }
+</style>
+<div class="col-md-12">
+    <div class="col-md-12">
+        @if (Model.RivisionNo > 0)
+        {
+            <p style="color:red;text-align:center;font-weight:bold">Revised  No:  @Model.RivisionNo</p>
+        }
+        <div>
+            <span style="float:left;font-weight:bold;font-size:20px">@Model.BusinessUnitName</span>
+            <span style="float:right;font-weight:bold;font-size:20px">IOU Request No: @Model.IouRequestId</span>
+        </div>
+    </div>
+    <div class="col-md-6">
+        @if (Model.SettlementApproverList != null)
+        {
+            <table border="1" width="100%" id="approverlist">
+                <caption>Settlement Approver List</caption>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Approver Name</th>
+                        <th>Approver Designation</th>
+                        @*<th>Approver Role</th>*@
+                        @*<th>Update Date</th>*@
+                        <th>Status</th>
+                        <th>Comment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.SettlementApproverList)
+                    {
+                        <tr>
+                            <td>@item.ApproverNo</td>
+                            <td>@item.UserName</td>
+                            <td>@item.DesignationName</td>
+                            @*<td>@item.ApproverStatusName</td>
+                                <td>
+                                    @if (@item.UpdateDate != null)
+                                    {@DateTime.Parse(@item.UpdateDate).ToString("dd MMM yyyy")}
+                                </td>*@
+                            @{
+                                if (item.IsApprove == 1)
+                                {
+                                    <td style="color:red">Approve</td>
+                                }
+                                else if (item.IsApprove == 2)
+                                {
+                                    <td style="color:red">Rejected</td>
+                                }
+                                else
+                                {
+                                    <td style="color:darkblue">Not Sent</td>
+                                }
+
+                            }
+                            <td>@item.Comments</td>
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+        }
+        <table border="1" width="100%">
+            <caption>IOU Request</caption>
+            <tr>
+                <th>Requested By</th>
+                <td>@Model.UserName</td>
+            </tr>
+            <tr>
+                <th width="30%">Request Date</th>
+                <td width="70%">@DateTime.Parse(Model.DateOfRequest).ToString("dd MMM yyyy")</td>
+            </tr>
+            <tr>
+                <th>Location Name</th>
+                <td>@Model.LocationName</td>
+            </tr>
+            <tr>
+                <th>Business Unit Name</th>
+                <td>@Model.BusinessUnitName</td>
+            </tr>
+            <tr>
+                <th>Department Name</th>
+                <td>@Model.DepartmentName</td>
+            </tr>
+            <tr>
+                <th>Required Date</th>
+                <td>
+                    @if (Model.RequiredDate != null)
+                    {@DateTime.Parse(Model.RequiredDate).ToString("dd MMM yyyy")}
+                </td>
+            </tr>
+            <tr>
+                <th>Total Approved Amount</th>
+                <td style="word-wrap:break-word">@Model.Ammount.ToString("N") BDT</td>
+            </tr>
+            <tr>
+                <th>Purpose</th>
+                <td style="word-wrap:break-word">@Model.Purpose</td>
+            </tr>
+            <tr>
+                <th>Date of Settlement </th>
+                <td>
+                    @if (Model.SettlementDate != "")
+                    {@DateTime.Parse(Model.SettlementDate).ToString("dd MMM yyyy")}
+                </td>
+            </tr>
+
+        </table>
+        @if (Model.IsApproved != 0)
+        {
+            <table width="100%" align="center">
+                <tr>
+                    <td>
+                        <button value="Comments" onclick="showComments()" class="btn btn-sm btn-primary">Comments</button>
+                    </td>
+                    <td style="padding:5px">
+                        <select id="reviewComment" class="approvalColumn form-control">
+                            @if (Model.IOUApproverList != null)
+                            {
+                                foreach (var app in Model.IOUApproverList)
+                                {
+
+                                    if (app.IsApprove != 0)
+                                    {
+
+                                        <option value="@app.UserID">@app.UserName</option>
+
+                                    }
+
+                                }
+                            }
+
+                        </select>
+                    </td>
+                    <td style="padding:5px">
+                        <input type="text" id="reviewMessage" class="approvalColumn form-control" rows="3" style="resize:none" />
+                    </td>
+                    <td>
+                        <button style="text-align:center;align-content:center" class="btn btn-info btn-sm" onclick="ReviewComment(@Model.IouRequestId,1)">Send Review</button>
+                    </td>
+                </tr>
+            </table>
+        }
+        <div id="comments_section" class="row" style="display:none">
+            <div class="col-md-9" style="overflow-wrap:inherit; overflow-y: auto;height:200px;">
+                <p>Comment Section</p>
+                @if (Model.IouComments != null)
+                {
+                    foreach (var app in Model.IouComments)
+                    {
+                        <hr style="margin:unset;padding:unset;" />
+                        <p style="margin:unset;padding:unset" class="media-heading user_name"><strong style="color:blue">@app.ReviewerByName</strong>  To <strong>@app.ReviewerToName</strong></p>
+                        <p style="margin:unset;padding:unset">@app.UpdatedBY.ToString("MM/dd/yyyy hh:mm tt")</p>
+                        <p style="margin:unset;padding:unset">@app.ReviewMessage</p>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div>
+            @{float disburseamnt = 0; int discount = 0;}
+            @if (Model.DisburseList != null)
+            {
+                <table border="1" width="100%" id="genaralInfodt">
+
+                    <caption>Disbursement Summary</caption>
+                    <thead>
+                        <tr>
+                            <th>Sl</th>
+                            <th>Disburse Date</th>
+                            <th>Remarks</th>
+                            <th>Ammount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.DisburseList)
+                        {
+                            discount++;
+                            <tr>
+                                <td>@discount</td>
+                                <td>@DateTime.Parse(item.CreateDate).ToString("dd MMM yyyy")</td>
+                                <td>@item.Purpose</td>
+                                <td>@item.Ammount.ToString("N")</td>
+                            </tr>
+                            disburseamnt = disburseamnt + @item.Ammount;
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="3">Total Disburse Ammount </th>
+                            <th>BDT @disburseamnt.ToString("N")</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            }
+        </div>
+        @if (Model.IouSettlementFiles != null)
+        {
+            <table border="1" width="100%">
+                <caption>Attached Settlement File</caption>
+                <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.IouSettlementFiles)
+                    {
+                        <tr>
+                            <td>@item.CapexFileName</td>
+                            <td>@Html.ActionLink("Download", "DownloadFile", "CapexApproval", new { filepath = item.CapexFilePath.ToString(), filename = item.CapexFileName.ToString() }, new { @target = "_blank" })</td>
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+        }
+        <div class="row">
+            <div class="col-md-6">
+                <label>Upload Settlement File(if any)</label>
+                <input type="file" onchange="FileUploadOnChange()" id="ioufileuploadbutton" />
+            </div>
+            <div class="col-md-6">
+                <label>Attached File</label>
+                <table style="width:100%" border="1" id="iouuploadedtable">
+                    <thead>
+                        <tr>
+                            <th>File Name</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attachedFileTable">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div>
+            <table width="100%">
+                <caption>IOU Settlement</caption>
+                <thead>
+                    <tr>
+                        <th>Total Approved Amount</th>
+                        <td>@Model.Ammount.ToString("N") BDT </td>
+                    </tr>
+                    <tr>
+                        <th>Total Disburse Amount</th>
+                        <td>@disburseamnt.ToString("N") BDT</td>
+                    </tr>
+                    <tr>
+                        <th>Total Expense Amount</th>
+                        <td><input style="width:70%" placeholder="Enter Total Expense" id="totalexpence" type="number" onchange="returnableAmmount()" value="@Model.TotalExpenceAmmount" />BDT</td>
+                    </tr>
+                </thead>
+                <tbody id="claimorreturnable">
+                    <tr>
+                        @{float returnable = Model.TotalDisburseAmmount - Model.TotalExpenceAmmount;}
+                        @if (returnable >= 0)
+                        {
+                            <th>Returnable Amount</th>
+                            <td style="word-wrap:break-word">@returnable.ToString("N") BDT</td>
+                        }
+                        else
+                        {
+                            returnable = returnable * (-1);
+                            <th>Claimed Amount</th>
+                            <td style="word-wrap:break-word">@returnable.ToString("N") BDT</td>
+                        }
+
+                    </tr>
+                    @*<tr>
+            <th>Returnable Amount</th>
+            <td><input id="remainammount" type="number" style="width:100%" value="0" disabled /></td>
+        </tr>*@
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>Remarks</th>
+                        <td colspan="3"><textarea id="remaksSettlement" style="resize:none;width:100%" rows="3">@Model.RemarksSettlement</textarea></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center" colspan="4">
+                            <br />
+                            <input type="button" class="btn btn-sm btn-danger" value="Update IOU Settlement" onclick="VarifyBeforSettlement(@Model.IouRequestId) " />
+                        </td>
+                    </tr>
+                </tfoot>
+
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function returnableAmmount() {
+        var totalExpence = $("#totalexpence").val();
+        var ammountdis =@disburseamnt;
+        var remaining = ammountdis - totalExpence;
+        $("#remainammount").val(remaining);
+        if (remaining >= 0) {
+            $('#claimorreturnable').empty();
+            var tr = '<tr><th>Returnable Amount</th><td><input id="remainammount" type="number" style="width:70%" value="' + remaining + '" disabled /> BDT<td></tr>';
+            $('#claimorreturnable').append(tr);
+        } else {
+            $('#claimorreturnable').empty();
+            var tr = '<tr><th>Claimed Amount</th><td><input id="remainammount" type="number" style="width:70%" value="' + (remaining*(-1)) + '" disabled /> BDT<td></tr>';
+            $('#claimorreturnable').append(tr);
+        }
+    }
+    function VarifyBeforSettlement(iourequestId) {
+        @*if ($("#totalexpence").val() >@disburseamnt) {
+            swal({
+                                title: 'Maximum Expense Limit '+@disburseamnt+' BDT',
+                                type: 'error',
+                                closeOnCancel: true
+            });
+        } else*@
+        if ($('#remaksSettlement').val() == "") {
+            swal({
+                                title: 'Please Add some remarks before submit',
+                                type: 'error',
+                                closeOnCancel: true
+            });
+        } else {
+            swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover this change!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonClass: "btn-primary",
+            cancelButtonClass:"btn-danger",
+            confirmButtonText: "Yes, Submit!",
+            cancelButtonText: "Cancel",
+            closeOnConfirm: false,
+            closeOnCancel: true
+        }, function (isConfirm) {
+                if (isConfirm) {
+                    SubmitForSettlement(iourequestId);
+                }
+        });
+        }
+
+    }
+    function SubmitForSettlement(iourequestId) {
+        var jsonData = {};
+        jsonData["IouRequestId"] = iourequestId;
+        jsonData["TotalDisburseAmmount"] = @disburseamnt;
+        jsonData["TotalExpenceAmmount"] = $("#totalexpence").val();
+        jsonData["RemarksSettlement"] = $("#remaksSettlement").val();
+        var fileUpload = [];
+        $('#attachedFileTable tr').each(function () {
+            var filedate = {};
+            filedate["CapexFileName"] = $(this).find('td[name^="fileName"]').html();
+            filedate["CapexFilePath"] = $(this).find('td[name^="filePath"]').html();
+                fileUpload.push(filedate);
+        });
+        jsonData["IOurequestfiles"] = fileUpload;
+        var urlpath = '@Url.Action("SubmitForSettlement", "IOU")';
+                    $.ajax({
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(jsonData),
+                        url: urlpath,
+                        type: "POST",
+                        async: true,
+                        success: function (data) {
+                            swal({
+                                title: 'IOU Settlement Submit Successully',
+                                type: 'success',
+                                closeOnCancel: true
+                            });
+                            $("#iousubmenu").find('li').removeClass();
+                            $("#iousubmenu").find('li:nth-child(4)').addClass("active");
+                            GetAllIOUSettlement(5, 0);
+                        }, error: function () {
+                            alert("Error");
+                        }
+                    });
+    }
+</script>

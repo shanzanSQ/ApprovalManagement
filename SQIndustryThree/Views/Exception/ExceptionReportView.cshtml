@@ -1,0 +1,216 @@
+﻿
+@{
+    ViewBag.Title = "ExceptionReportView";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+ <link href="~/Assets/bower_components/select2/dist/css/select2.min.css" rel="stylesheet" />
+<style type="text/css">
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    #inputTable tr td {
+        padding: 2px;
+    }
+</style>
+<div class="container-fluid">
+    <h3 style="text-align: center;">
+        <b>Exception Request Report View</b>
+    </h3>
+    <hr style="margin:0px" />
+    <div class="row">
+        <div class="col-md-12">
+            <table width="100%" id="inputTable">
+                <tr>
+                    <td width="10%">
+                        <label for="fromDate">From Date</label>
+                        <input type="date" id="fromDate" onchange="ChangeColor('#fromDate')" class="form-control" />
+                    </td>
+                    <td width="10%">
+                        <label for="toDate">To Date</label>
+                        <input type="date" id="toDate" onchange="ChangeColor('#toDate')" class="form-control" />
+                    </td>
+                    <td width="20%">
+                        <label for="business_unit">Business Unit</label>
+                        <select class="form-control" id="business_unit"></select>
+                    </td>
+                    <td width="20%">
+                        <label for="excepTionType">Exception Type</label>
+                        <select id="excepTionType" class="form-control">
+                            <option value="0">ALL Exception Type</option>
+                            <option value="1">Air Freight</option>
+                            <option value="2">Discount </option>
+                            <option value="3">Claim </option>
+                            <option value="4">Order Cancel</option>
+                            <option value="5">Others</option>
+                            <option value="6">Over Purchase</option>
+                        </select>
+                    </td>
+                    <td width="20%">
+                        <label>Exception Reason</label>
+                        <select class="form-control" id="exceptionReasons"></select>
+                    </td>
+                    <td width="20%">
+                        <label for="loadbuyer">Buyer</label>
+                        <select id="loadbuyer"  class="form-control select2"></select>
+                    </td>
+                </tr>
+            </table>
+            <div style="text-align:center">
+                <br />
+                <input type="button" class="btn  btn-success" value="Get Report" onclick="GetAllExceptioNReport()" />
+            </div>
+        </div>
+        <div id="exceptionReportDashboard">
+
+        </div>
+    </div>
+    <div class="modal" id="myModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Exception Request Preview</h4>
+                </div>
+                <div id="modalbody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+<script src="~/Assets/bower_components/select2/dist/js/select2.min.js"></script>
+<script type="text/javascript">
+    $('.select2').select2();
+    LoadBusinessUnit();
+    LoadReasonCategory();
+    LoadBuyerList();
+    function LoadBuyerList() {
+        $('#loadbuyer').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("AllBuyerList", "Exception")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+                $('#loadbuyer').empty();
+                $('#loadbuyer').append("<option value='0'>ALL Buyer</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#loadbuyer").append($("<option></option>").val(data[i].BuyerId)
+                        .html(data[i].BuyerName));
+                }
+            }
+        });
+    }
+    function LoadBusinessUnit() {
+        $('#business_unit').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadBusinessUnit", "Admin")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+                $('#business_unit').empty();
+                $('#business_unit').append("<option value='0'>ALL Business Unit</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#business_unit").append($("<option></option>").val(data[i].BusinessUnitId)
+                        .html(data[i].BusinessUnitName));
+                }
+            }
+        });
+    }
+    function LoadReasonCategory() {
+        $('#exceptionReasons').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadReasonCategory", "Exception")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+                $('#exceptionReasons').empty();
+                $('#exceptionReasons').append("<option value='0'>ALL Reason</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#exceptionReasons").append($("<option></option>").val(data[i].ExceptioReasonsId)
+                        .html(data[i].ExceptionReasonName));
+                }
+            }
+        });
+    }
+    function ChangeColor(id) {
+        $(id).css({ "border-color": "#d3d3d3" });
+    }
+    function GetAllExceptioNReport() {
+        var formDate = $("#fromDate").val();
+        var toDate = $("#toDate").val();
+        if (formDate == "") {
+            $('#fromDate').css({ "border-color": "#FF0000" });
+        } else if (toDate=="") {
+            $('#toDate').css({ "border-color": "#FF0000" });
+        } else {
+        var businessunit = $("#business_unit").val();
+        var exptype = $("#excepTionType").val();
+        var expreason = $("#exceptionReasons").val();
+        var buyerid = $("#loadbuyer").val();
+
+        var urlpath = '@Url.Action("GetExceptionReportList", "Exception")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: { FromDate: formDate, ToDate: toDate, BusinessUnit: businessunit, BuyerName: buyerid, ExceptionType: exptype,ReasonCatagory:expreason },
+            async: true,
+            success: function (data) {
+                if (data) {
+                    $('#exceptionReportDashboard').empty();
+                    $('#exceptionReportDashboard').append(data);
+                    $('#excepReportTable').DataTable({
+                        "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
+                    });
+                }
+            }
+        });
+        }
+    }
+    function ExceptionReportDetails(masterID) {
+        var urlpath = '@Url.Action("IndividualExceptionRequest", "Exception")';
+        $.ajax({
+            data: { MasterID: masterID,ViewName:"_excpReportDetailsById",UserType:0},
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    $("#modalbody").html("");
+                    $("#modalbody").append(data);
+                    $("#myModal").modal("show");
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+    }
+    function PrintModal() {
+            var print_div = document.getElementById("printablearea");
+            var print_area = window.open();
+            print_area.document.write("<style>table{border-collapse:collapse;}</style><img width='20' height='20' src='../../Images/logo.png' /><img style='width:80px;' src='../../Images/logo.png' />");
+            print_area.document.write("<h1 style='text-align:center'>Exception Request Preview</h1>");
+            print_area.document.write(print_div.innerHTML);
+            print_area.document.close();
+            print_area.focus();
+            print_area.print();
+            print_area.close();
+    }
+</script>

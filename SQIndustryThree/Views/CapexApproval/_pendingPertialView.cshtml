@@ -56,7 +56,7 @@
                             {
                                 <input id="update_primarykey" type="hidden" value="@item.CapexInfoId" />
                                 <td style="color:red">Rejected</td>
-                                <td> <button type="button" id="update_capex" onclick="updateCapex()" class="btn  btn-block btn-danger">Update </button></td>
+                                <td> <button type="button" id="update_capex" onclick="updateCapex(@item.CapexInfoId)" class="btn  btn-block btn-danger">Update </button></td>
                             }
                             else if (item.IsApproved == 3)
                             {
@@ -75,10 +75,8 @@
                             }
                         </tr>
                         count++;
-
                     }
                 </tbody>
-
             </table>
         </div>
     </div>

@@ -3,13 +3,17 @@
     ViewBag.Title = "_ShowUploadedFiles";
 }
     <div id="myprintmodal">
-        @if (Model.Revision > 0)
-        {
-            <p style="color:red;text-align:center;font-weight:bold">Revised Capex No:  @Model.Revision</p>
-        } 
+       
+        <h3 style="color:black;text-align:center;font-weight:bold">Capex No: @Model.CapexInfoId </h3>
         <div>
             <span style="float:left;font-weight:bold;font-size:24px">@Model.BusinessUnitName</span>
-            <span style="float:right;">Capex No: @Model.CapexInfoId</span>
+            <span style="float:right;">
+                @if (Model.Revision > 0)
+                { 
+                   <p style="text-align:center;font-weight:bold">
+                    No. of Revision: @Model.Revision</p>
+                }
+            </span>
         </div>
         <br />
         <div class="row">
@@ -81,6 +85,10 @@
                             <td>@Model.CapexAssetType</td>
                         </tr>
                         <tr>
+                            <td>Location Name</td>
+                            <td>@Model.LocationName</td>
+                        </tr>
+                        <tr>
                             <td>Capex Descriptions</td>
                             <td style="width:100%;overflow-wrap:break-word">@Model.CapexDescription</td>
                         </tr>
@@ -122,8 +130,8 @@
                                     <td>@item.CapexAssetCatagory</td>
                                     <td>@item.CapexAssetDescription</td>
                                     <td>@item.CapexDetailsQty</td>
-                                    <td style="overflow-wrap:inherit">@item.CapexUnitPrice</td>
-                                    <td>@item.CapexEstimatedCost</td>
+                                    <td style="overflow-wrap:inherit">@item.CapexUnitPrice.ToString("N")</td>
+                                    <td>@item.CapexEstimatedCost.ToString("N")</td>
                                     <td style="display:none" id="detailsId_@count" name="detailsId">@item.CapexInfoDetailsId</td>
                                 </tr>
                                 count++;
@@ -136,7 +144,7 @@
                                 <th></th>
                                 <th></th>
                                 <th></th>
-                                <th id="total_price">@Model.Currency @total </th>
+                                <th id="total_price">@Model.Currency @total.ToString("N") </th>
                             </tr>
                         </tfoot>
                     </table>
@@ -145,10 +153,12 @@
         </div>
 
     </div>
-<div style="text-align:right;margin:unset;padding:5px;">
-    <button id="show_comments" class="btn btn-success" value="1">Show Comments </button>
-    <button id="hide_comments" style="display:none" class="btn btn-info" value="1">Hide Comments </button>
-</div>
+    <div style="text-align:right;margin:unset;padding:5px;">
+        <button id="show_comments" class="btn btn-success" value="1">Show Comments </button>
+        <button id="hide_comments" style="display:none" class="btn btn-info" value="1">Hide Comments </button>
+        <button id="show_history" class="btn btn-success" value="1">Approval History </button>
+        <button id="hide_history" style="display:none" class="btn btn-info" value="1">Hide </button>
+    </div>
 
 <div id="comments_section" class="container" style="overflow-wrap:inherit; overflow-y: scroll;height:200px;width:90%;border:1px solid" hidden>
     <p>Comment Section</p>
@@ -158,7 +168,7 @@
         {
             <hr style="margin:unset;padding:unset;width:50%" />
             <p style="margin:unset;padding:unset" class="media-heading user_name"><strong style="color:blue">@app.ReviewerByName</strong>To <strong>@app.ReviewerToName</strong></p>
-            <p style="margin:unset;padding:unset">@app.UpdatedBY.ToString("dd/mm/yyyy hh:mm")</p>
+            <p style="margin:unset;padding:unset">@app.UpdatedBY.ToString("MM/dd/yyyy hh:mm tt")</p>
             <p style="margin:unset;padding:unset">@app.ReviewMessage</p>
         }
     }
@@ -204,6 +214,35 @@
         <button type="button" class="btn btn-primary" onclick="updateComment()" id="btnreview">Review</button>
     </div>
 </div>
+<br />
+<div id="logsection" class="container" style="overflow-wrap:inherit; overflow-y: scroll;height:200px;width:90%;" hidden >
+    <p>Approvel History</p>
+    @if (Model.LogSections != null)
+    {
+        <table width="100%" border="1">
+            <thead>
+                <tr>
+                    <th width="20%">Date </th>
+                    <th width="15%">Action By </th>
+                    <th width="15%">Status</th>
+                    <th width="50%">Comments</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var log in Model.LogSections)
+                {
+                <tr>
+                    <td style="word-wrap:break-word">@log.ActionDate</td>
+                    <td style="word-wrap:break-word">@log.ActionBy</td>
+                    <td style="word-wrap:break-word">@log.ActionStatus</td>
+                    <td style="word-wrap:break-word">@log.Comments</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+</div>
 <script src="~/Scripts/jquery-3.3.1.min.js"></script>
 <script type="text/javascript">
         function ReviewComment(approve) {
@@ -223,7 +262,7 @@
                                             closeOnCancel: true
                                         },
                                 function () {
-                                     window.location.href = '@Url.Action("CapexInformationView", "CapexApproval")';
+                                    window.location.href = result.msg;
                                         });
                         }
                     }
@@ -263,5 +302,16 @@
             $("#show_comments").show();
             $("#hide_comments").hide();
             $("#comments_section").hide();
+        });
+
+        $("#show_history").click(function () {
+            $("#show_history").hide();
+            $("#hide_history").show();
+            $("#logsection").show();
+        });
+        $("#hide_history").click(function () {
+            $("#show_history").show();
+            $("#hide_history").hide();
+            $("#logsection").hide();
         });
 </script>

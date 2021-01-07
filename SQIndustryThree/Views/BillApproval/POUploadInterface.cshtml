@@ -1,0 +1,92 @@
+﻿<div class="row">
+    <div class="col-md-12">
+        <div class="col-md-4">
+            <label>Upload WFX PO</label>
+            <input type="file" placeholder="Upload PO" id="fileUpload" class="form-control form-control-sm" />
+            <br />
+            <input type="button" value="Upload" onclick="Upload()" class="btn btn-sm btn-success" />
+        </div>
+    </div>
+</div>
+<script src="~/Scripts/jszip.js"></script>
+<script src="~/Scripts/xlsx.full.min.js"></script>
+<script type="text/javascript">
+    function Upload() {
+        //Reference the FileUpload element.
+        var fileUpload = document.getElementById("fileUpload");
+        //Validate whether File is valid Excel file.
+        var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx)$/;
+        if (regex.test(fileUpload.value.toLowerCase())) {
+            if (typeof (FileReader) != "undefined") {
+                var reader = new FileReader();
+
+                //For Browsers other than IE.
+                if (reader.readAsBinaryString) {
+                    reader.onload = function (e) {
+                        ProcessExcel(e.target.result);
+                    };
+                    reader.readAsBinaryString(fileUpload.files[0]);
+                } else {
+                    //For IE Browser.
+                    reader.onload = function (e) {
+                    var data = "";
+                    var bytes = new Uint8Array(e.target.result);
+                    for (var i = 0; i < bytes.byteLength; i++) {
+                        data += String.fromCharCode(bytes[i]);
+                    }
+                        ProcessExcel(data);
+                    };
+                    reader.readAsArrayBuffer(fileUpload.files[0]);
+                }
+            } else {
+                alert("This browser does not support HTML5.");
+            }
+        } else {
+            alert("Please upload a valid Excel file.");
+        }
+    };
+    function ProcessExcel(data) {
+        var BillDetailsList = [];
+      //  var commonType = $('#typeId').val();
+        if ($('#fileUpload').val() == "") {
+            swal("Please Upload The File First");
+        } else {
+            //Read the Excel File data.
+            var workbook = XLSX.read(data, {type: 'binary'});
+            //Fetch the name of First Sheet.
+            var firstSheet = workbook.SheetNames[0];
+            //Read all rows from First Sheet into an JSON array.
+            var excelRows = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[firstSheet]);
+            //Add the data rows from Excel file.
+            for (var i = 0; i < excelRows.length; i++) {
+                var PoDetails = {};
+                PoDetails["PONumber"]=excelRows[i].PONo || "0";
+                PoDetails["SupllierName"] = excelRows[i].Supplier || "0";
+                PoDetails["ArticleName"] = excelRows[i].Article || "0";
+                PoDetails["ColorName"] = excelRows[i].ColorName || "N/A";
+                PoDetails["SizeName"] = excelRows[i].Size || "N/A";
+                PoDetails["POQty"] = excelRows[i].POQty || 0;
+                PoDetails["Rate"] = excelRows[i].Rate || 0;
+                PoDetails["PoValue"] = (parseFloat(excelRows[i].POQty) * parseFloat(excelRows[i].Rate))|| 0;
+                if (excelRows[i].POQty != 0) {
+                    BillDetailsList.push(PoDetails);
+                }
+            }
+            var urlpath = '@Url.Action("UploadExcelData", "BillApproval")';
+            $.ajax({
+                contentType: "application/json;charset=utf-8",
+                data: JSON.stringify(BillDetailsList),
+                dataType: 'json',
+                url: urlpath,
+                type: "post",
+                async: true,
+                success: function (result) {
+                    swal("Data Uploaded Successfully");
+                },
+                error: function (xhr, status, error) {
+                    alert(xhr.responseText);
+                }
+            });
+        }
+    };
+</script>

@@ -10,6 +10,7 @@ namespace SQIndustryThree.Models
         public int CapexFileUploadId { get; set; }
         public string CapexFileName { get; set; }
         public string CapexFilePath { get; set; }
+        public string ServerFileName { get; set; }
         public int CapexInfoId { get; set; }
         public int userId { get; set; }
         public DateTime CreateDate { get; set; }

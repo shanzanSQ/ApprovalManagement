@@ -1,0 +1,200 @@
+﻿<link href="~/Assets/bower_components/select2/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .form-control, .selet2 {
+        border-radius: 0px;
+        margin-top: 5px;
+    }
+    select{
+        height:20px;
+    }
+        .form-control:disabled {
+            background-color: white;
+        }
+</style>
+
+<div class="row">
+    <h3 style="text-align:center">Bill Request Form</h3>
+    <div class="col-md-12">
+        <div class="col-md-6">
+            <input type="hidden" value="1" id="billcategory" />
+            <table width="100%">
+                <tr>
+                    <th width="50%">Business Unit</th>
+                    <td>
+                        <select id="selectBusinessUnit" style="width:100%;" class="form-control select2">
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th width="50%">Po Number</th>
+                    <td>
+                        <select id="po_numberbill" onchange="IndividualPoInfo(this)" style="width:100%;" class="form-control select2">
+                        </select>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <input type="button" onclick="ModalShowForApproval()" value="Preview Before Approval" class="btn btn-info btn-sm" style="border-radius:0px;" />
+        </div>
+    </div>
+    <div class="col-md-12" id="podetailscontainer"></div>
+
+</div>
+<div class="modal" id="myModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" style="text-align: center">Bill Approval Request Preview</h4>
+            </div>
+            <div id="modalbody" class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+@Scripts.Render("~/bundles/jquery")
+<script src="~/Assets/bower_components/select2/dist/js/select2.min.js"></script>
+<script type="text/javascript">
+    $('#po_numberbill').select2();
+    GetAllBillApprovalPO(0);
+    LoadBusinessUnit();
+    function GetAllBillApprovalPO(status) {
+        var urlpath = '@Url.Action("GetBillApprovalPolist", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {Status:status},
+            async: true,
+            success: function (data) {
+                $('#po_numberbill').empty();
+                $("#po_numberbill").append($("<option></option>").val(0)
+                        .html("--Select PO Value--"));
+                for (var i = 0; i < data.length;i++) {
+                    $("#po_numberbill").append($("<option></option>").val(data[i].MasterKey)
+                        .html(data[i].PurchaseOrderNo));
+                }
+
+            }
+        });
+    }
+    function IndividualPoInfo(key) {
+        var pomasterKey = $(key).val();
+        var businessUnit = $('#billcategory').val();
+        var categorykey = $('#billcategory').val();
+        var urlpath = '@Url.Action("GetIndividualPODetails", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'html',
+            type: "Post",
+            data: {PoMasterKey:pomasterKey,BUnit:businessUnit,CatKey:categorykey},
+            async: true,
+            success: function (data) {
+                $('#podetailscontainer').empty();
+                $('#podetailscontainer').html(data);
+            }
+        });
+    }
+    function GetAllInputValue() {
+        var MasterPo = {};
+        var masterpolist = [];
+        MasterPo["PurchaseOrderNo"] = $('#po_numberbill').children("option:selected").html();
+        MasterPo["MasterKey"] = $('#po_numberbill').val();
+        MasterPo["SupplierName"] = $('#supplier_name').html();
+        MasterPo["POQty"] = $('#poqtyval').val();
+        MasterPo["BusinessUnitId"] = $('#selectBusinessUnit').val();
+        MasterPo["CategoryId"] = $('#billcategory').val();
+        MasterPo["AdvancedPayment"] = $('#advancedPayment').html();
+        var totalPi = 0, totalpival = 0, totaldis = 0, total = 0;
+        $('#calculationbody tr').each(function () {
+            var podet = {};
+            podet["ArticleName"] = $(this).find('#articlename').html() || "";
+            podet["POQty"] = $(this).find('input[name=poqty]').val() || 0;
+            podet["BillPoDetailskey"] = $(this).find('input[type=checkbox]').val() || 0;
+            podet["Rate"]=$(this).find('input[name=porate]').val() || 0;
+            podet["PoValue"]=$(this).find('input[name=povalue]').val() || 0;
+            podet["PIRaised"] = $(this).find('input[name=piraised]').val() || 0;
+            podet["PIBalance"]=$(this).find('input[name=piBalance]').val() || 0;
+            podet["PIQty"] = $(this).find('input[name=piqty]').val() || 0;
+            podet["PIValue"]=$(this).find('input[name=pival]').val() || 0;
+            podet["Discount"]=$(this).find('input[name=discount]').val() || 0;
+            podet["TotalPayment"]=$(this).find('input[name=totalval]').val() || 0;
+            podet["MasterKey"]=$('#po_numberbill').val() || 0;
+
+            totalPi = totalPi + parseFloat(podet["PIQty"]);
+            totalpival = totalpival + parseFloat(podet["PIValue"]);
+            totaldis = totaldis + parseFloat(podet["Discount"]);
+            total = total + parseFloat(podet["TotalPayment"]);
+            if ($(this).find('input[type=checkbox]').is(':checked')) {
+                masterpolist.push(podet);
+            }
+        });
+        MasterPo["Polist"] = masterpolist;
+        MasterPo["Status"] = 1;
+        return MasterPo;
+    }
+    function ModalShowForApproval() {
+        var urlpath = '@Url.Action("PreviewApproval", "BillApproval")';
+         $.ajax({
+                contentType: "application/json;charset=utf-8",
+                data: JSON.stringify(GetAllInputValue()),
+                dataType: 'html',
+                url: urlpath,
+                type: "post",
+                async: true,
+                success: function (result) {
+                    $('#modalbody').empty();
+                    $('#modalbody').html(result);
+                    $("#myModal").modal("show");
+                },
+                error: function (xhr, status, error) {
+                    alert(xhr.responseText);
+                }
+            });
+    }
+    function SubmitForApproval() {
+        var urlpath = '@Url.Action("SubmitForBillApprovalRequest", "BillApproval")';
+         $.ajax({
+                contentType: "application/json;charset=utf-8",
+                data: JSON.stringify(GetAllInputValue()),
+                dataType: 'html',
+                url: urlpath,
+                type: "post",
+                async: true,
+                success: function (result) {
+                    alert("Request Submitted Successfully");
+                },
+                error: function (xhr, status, error) {
+                    alert(xhr.responseText);
+                }
+            });
+    }
+    function LoadBusinessUnit() {
+        $('#business_unit').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadBusinessUnit", "CapexApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+                $('#selectBusinessUnit').empty();
+                $('#selectBusinessUnit').append("<option value='0'>--Select Business Unit--</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#selectBusinessUnit").append($("<option></option>").val(data[i].BusinessUnitId)
+                        .html(data[i].BusinessUnitName));
+                }
+            }
+        });
+    }
+
+</script>

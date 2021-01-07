@@ -1,6 +1,7 @@
 ﻿
 @{
     ViewBag.Title = "DashboardCapex";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <link href="~/Content/c3.min.css" rel="stylesheet" />
 <link href="~/Content/Site.css" rel="stylesheet" />
@@ -9,6 +10,8 @@
 <script src="~/Scripts/jquery-3.3.1.min.js"></script>
 
 <div id="chart_container">
+    <h3 style="text-align:center;"><b>Summery</b></h3>
+    <hr />
     <div class="row container">
         <div class="col-md-3">
             <label for="year_picker">Select Year</label>
@@ -61,7 +64,7 @@
                         data[e.Month] = e.Cost;
                         total += e.Cost;
                     })
-                    $("#costtotal").html(total);
+                    $("#costtotal").html(parseFloat(total).toLocaleString('en'));
                     var chart = c3.generate({
                         bindto: '#bar_chart',
                         data: {

@@ -1,0 +1,470 @@
+﻿@model SQIndustryThree.Models.IOURequestModel
+<style>
+    th {
+        text-align: left;
+    }
+
+    td {
+        text-align: left;
+    }
+
+    #genaralInfodt tr th, #genaralInfodt tr td, #approverlist tr td, #approverlist tr th {
+        text-align: center;
+    }
+    .addbutton {
+        height: 25px;
+        width: 25px;
+        border-radius: 50%;
+    }
+    #ammountsummeryList input[type=text], #ammountsummeryList input[type=number] {
+        width: 100%;
+    }
+    select{width:80%;}
+    p{
+        margin:0px;padding:0px;
+    }
+</style>
+<div id="printablearea" class="col-md-12">
+    @if (Model.RivisionNo > 0)
+    {
+        <p style="color:red;text-align:center;font-weight:bold">Revised  No:  @Model.RivisionNo</p>
+    }
+    <div>
+        <span style="float:left;font-weight:bold;font-size:20px">@Model.BusinessUnitName</span>
+        <span style="float:right;font-weight:bold;font-size:20px">IOU Request No: @Model.IouRequestId</span>
+    </div>
+    @if (Model.IOUApproverList != null)
+    {
+        <table border="1" width="100%" id="approverlist">
+            <caption>Approver List</caption>
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Approver Name</th>
+                    <th>Approver Designation</th>
+                    <th>Approver Role</th>
+                    <th>Update Date</th>
+                    <th>Status</th>
+                    <th>Comment</th>
+                </tr>
+            </thead>
+            <tbody id="Iouapproverlist">
+                @foreach (var item in Model.IOUApproverList)
+                {
+                    <tr>
+                        <td><p name="approverNo">@item.ApproverNo</p></td>
+                        <td><p style="display:none" name="userId">@item.UserID</p><p name="userName">@item.UserName</p></td>
+                        <td><p name="designationName">@item.DesignationName</p></td>
+                        <td><p name="approverstatus">@item.ApproverStatusName</p></td>
+                        <td>
+                            <p style="display:none" name="apstatusid">@item.IsApprove</p>
+                            @if (@item.UpdateDate != null)
+                            {@DateTime.Parse(@item.UpdateDate).ToString("dd MMM yyyy")}
+                        </td>
+                        @{
+                            if (item.IsApprove == 3)
+                            {
+                                <td style="color:red">Pending</td>
+                            }
+                            else if (item.IsApprove == 1)
+                            {
+                                if (item.ApproverStatus == 3)
+                                {
+                                    <td style="color:green">Disbursed</td>
+                                }
+                                else
+                                {
+                                    <td style="color:green">Approved</td>
+                                }
+                            }
+                            else if (item.IsApprove == 2)
+                            {
+                                <td style="color:red">Rejected</td>
+                            }
+                            else
+                            {
+                                <td style="color:darkblue">Not Sent</td>
+                            }
+                        }
+                        <td>@item.Comments</td>
+                    </tr>
+
+                }
+            </tbody>
+        </table>
+    }
+    <div class="row">
+        <div class="col-md-6">
+            <table border="1" width="100%">
+                <caption>Iou Request</caption>
+                <tr>
+                    <th width="30%">Requestor Name</th>
+                    <td width="70%">@Model.UserName</td>
+                </tr>
+                <tr>
+                    <th >Request Date</th>
+                    <td >@DateTime.Parse(Model.DateOfRequest).ToString("dd MMM yyyy")</td>
+                </tr>
+                <tr>
+                    <th>Location Name</th>
+                    <td>
+                        <select id="upLocation" onchange="LoadApproverList()">
+                            <option value="@Model.LocationId">@Model.LocationName</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Business Unit Name</th>
+                    <td>
+                        <select id="upBusinessunit" onchange="LoadApproverList()">
+                            <option value="@Model.BusinessUnitId">@Model.BusinessUnitName</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Department Name</th>
+                    <td><select id="upDepartment" onchange="OnChangeDepartmentHead(this)">
+                            <option value="@Model.DepartmentID">@Model.DepartmentName</option>
+                        </select><i style="width:20%;color:green;padding-left:2px;cursor:pointer" onclick="GetUserDepartment(0,0,'#upDepartment');" class="fa fa-refresh">Change</i></td>
+                </tr>
+                <tr>
+                    <th>Amount</th>
+                    <td style="word-wrap:break-word" ><input disabled type="number" id="updateFinalAmmount" value="@Model.Ammount"/> BDT</td>
+                </tr>
+                <tr>
+                    <th>Required Date</th>
+                    <td>
+                        @if (Model.RequiredDate != null)
+                        {
+                            <input type="date" id="revisedddate" style="width:100%" value='@DateTime.Parse(@Model.RequiredDate).ToString("yyyy-MM-dd")' />
+                        }
+                        else
+                        {
+                            <input type="date" id="revisedddate" style="width:100%"  />
+                        }
+
+                    </td>
+                </tr>
+                <tr>
+                    <th>Purpose</th>
+                    <td style="word-wrap:break-word"><textarea id="purposeupdate" rows="3" style="width:100%;resize:none">@Model.Purpose</textarea></td>
+                </tr>
+            </table>
+            @if (Model.IOurequestfiles != null)
+            {
+                <p>Attached File</p>
+                <ul>
+                    @foreach (var item in Model.IOurequestfiles)
+                    {
+                        <li>@Html.ActionLink(@item.CapexFileName, "DownloadFile", "CapexApproval", new { filepath = item.CapexFilePath.ToString(), filename = item.CapexFileName.ToString() }, new { @target = "_blank" })</li>
+                    }
+                </ul>
+            }
+
+            @if (Model.IsApproved != 0)
+            {
+                <div>
+                    <br />
+                    <table width="100%" align="center">
+                        <tr>
+                            <td>
+                                <button value="Comments" onclick="showComments()" class="btn btn-sm btn-primary">Comments</button>
+                            </td>
+                            <td style="padding:5px">
+                                <select id="reviewComment" class="approvalColumn form-control">
+                                    @if (Model.IOUApproverList != null)
+                                    {
+                                        foreach (var app in Model.IOUApproverList)
+                                        {
+                                            if (app.IsApprove != 0)
+                                            {
+                                                <option value="@app.UserID">@app.UserName</option>
+                                            }
+                                        }
+                                    }
+
+                                </select>
+                            </td>
+                            <td style="padding:5px">
+                                <input type="text" id="reviewMessage" class="approvalColumn form-control" rows="3" style="resize:none" />
+                            </td>
+                            <td>
+                                <button style="text-align:center;align-content:center" class="btn btn-info btn-sm" onclick="ReviewComment(@Model.IouRequestId,2)">Send Review</button>
+                            </td>
+                        </tr>
+                    </table>
+
+                </div>
+            }
+        <div class="row">
+            <div id="comments_section" class="col-md-12" style="overflow-wrap:inherit; overflow-y: auto;height:200px;display:none">
+                <div>
+                    <p>Comment Section</p>
+                    @if (Model.IouComments != null)
+                    {
+                        foreach (var app in Model.IouComments)
+                        {
+                            <hr style="margin:unset;padding:unset;" />
+                            <p style="margin:unset;padding:unset" class="media-heading user_name"><strong style="color:blue">@app.ReviewerByName</strong>  To <strong>@app.ReviewerToName</strong></p>
+                            <p style="margin:unset;padding:unset">@app.UpdatedBY.ToString("MM/dd/yyyy hh:mm tt")</p>
+                            <p style="margin:unset;padding:unset">@app.ReviewMessage</p>
+                        }
+                    }
+                </div>
+                <div id="log_section" class="col-md-12" style="overflow-wrap:inherit; overflow-y: auto;height:200px;display:none">
+                    <p>Log Section</p>
+
+                    @if (Model.IouLogSection != null)
+                    {
+                        <table width="100%">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Description</th>
+                                    <th>By</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var app in Model.IouLogSection)
+                                {
+                                    <tr>
+                                        <th>@app.ActionDate</th>
+                                        <th>@app.ActionStatus</th>
+                                        <th>@app.Comments</th>
+                                        <th>@app.ActionBy</th>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                    }
+                </div>
+            </div>
+            
+        </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-6">
+                    <label>Upload Settlement File(if any)</label>
+                    <input type="file" onchange="FileUploadOnChange()" id="ioufileuploadbutton" />
+                </div>
+                <div class="col-md-6">
+                    <label>Attached File</label>
+                    <table style="width:100%" border="1" id="iouuploadedtable">
+                        <thead>
+                            <tr>
+                                <th>File Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attachedFileTable">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <table border="1" width="100%" id="genaralInfodt">
+                @{float countFob = 0; }
+                <caption>Amount List</caption>
+                <thead>
+                    <tr>
+                        <th>Item Name</th>
+                        <th>Remarks</th>
+                        <th>Ammount(In BDT)</th>
+                        <th><input type="button" value="+" class="addbutton" onclick="addUpdaterow()" style="background-color:green;color:white" /></th>
+                    </tr>
+                </thead>
+                <tbody id="ammountsummeryList">
+                    @foreach (var item in Model.AmmountList)
+                    {
+                        <tr>
+                            <td><input type="hidden" name="tableitemId" value="@item.IouAmmountId" /><input type="text" name="tableitemName" value="@item.ItemName" /></td>
+                            <td><input type="text" name="tablepurpose" value="@item.Purpose" /></td>
+                            <td><input type="number" name="tableammount" onchange="TotalAmountUpdate()" value="@item.Ammount" /></td>
+                            <td><input type="button" value="x" class="addbutton" onclick="DeleteAmount(@item.IouAmmountId,this)" style="background-color:red;color:white" /></td>
+                        </tr>
+                        countFob = countFob + @item.Ammount;
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="2">Total </th>
+                        <th id="totalammount">@countFob.ToString("N") BDT</th>
+                    </tr>
+                </tfoot>
+            </table>
+            <div style="text-align:center">
+                <br />
+                <button type="button" style="width:30%" class="btn btn-primary btn-sm" onclick="Updatevarified(@Model.IouRequestId)">Update Request</button>
+            </div>
+        </div>
+    </div>
+    
+  
+    
+    @*@if (Model.IsSettled == 2)
+        {
+            <div style="text-align:center">
+                <br />
+                <button type="button" style="width:30%" class="btn btn-success btn-sm" onclick="">Apply For Settlement</button>
+            </div>
+
+        }*@
+
+</div>
+
+
+
+
+@*else
+    {*@
+@*<br />*@
+@*<button value="Comments" onclick="showComments()" class="btn btn-sm btn-primary">Comments</button>*@
+
+@*}
+    </div>*@
+<script type="text/javascript">
+    
+    function OnChangeDepartmentHead(deheadVal) {
+        var department = $(deheadVal).val();
+        GetUserDepartment(1, department,'#upLocation');
+        GetUserDepartment(2, department,'#upBusinessunit');
+    }
+    var trrowNo = 0;
+    function DeleteAmount(amountId, rowno) {
+        $(rowno).closest('tr').remove();
+        TotalAmountUpdate();
+        LoadApproverList();
+        @*if (amountId == 0) {
+            $(rowno).closest('tr').remove();
+        } else {
+            
+            var urlpath = '@Url.Action("DeleteIouItemRow", "IOU")';
+            $.ajax({
+                data: { RowID: amountId },
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    if (data == true) {
+                        $(rowno).closest('tr').remove();
+                    }
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+        }
+         TotalAmountUpdate();*@
+        
+    }
+    function addUpdaterow() {
+            trrowNo++;
+            var col = '<tr id="' + trrowNo + '">'
+            col += '<td ><input type="hidden" name="tableitemId" value="0" /><input type="text"  name="tableitemName" placeholder="Enter Item Name"  /></td>';
+            col += '<td ><input type="text" name="tablepurpose" placeholder="Enter Remarks"   /></td>';
+            col += '<td ><input type="number" onchange="TotalAmountUpdate()"  placeholder="In BDT"   name="tableammount" value="0" /></td>'; 
+            col += '<td><input type="button" value="x" class="addbutton" onclick="DeleteAmount(0,this)" style="background-color:red;color:white" /></td></tr>';
+            $("#ammountsummeryList").append(col);
+            TotalAmountUpdate();
+    }
+    function TotalAmountUpdate() {
+        var grandTotal = 0;
+        $("#ammountsummeryList tr").each(function () {
+            var myammount = $(this).find('input[name="tableammount"]').val();
+                grandTotal+=(myammount*1);
+         });
+        $("#totalammount").html(grandTotal + " BDT");
+        $("#updateFinalAmmount").val(grandTotal);
+        LoadApproverList();
+    }
+
+    
+    function Updatevarified(ioureqid) {
+        $('input').css({ "border-color": "#d3d3d3" });
+        $('select').css({ "border-color": "#d3d3d3" });
+        if ($('#upDepartment').val() == 0) {
+            $('#upDepartment').css({ "border-color": "#FF0000" });
+        } else if ($('#upLocation').val() == 0 || $('#upLocation').val() == "") {
+             $('#upLocation').css({ "border-color": "#FF0000" });
+        } else if ($('#upBusinessunit').val() == 0 || $('#upBusinessunit').val() == "") {
+            $('#upBusinessunit').css({ "border-color": "#FF0000" });
+        } else if ($('#revisedddate').val() == '') {
+            $('#revisedddate').css({ "border-color": "#FF0000" });
+        } else if ($('#updateFinalAmmount').val()< 1) {
+             $('#updateFinalAmmount').css({ "border-color": "#FF0000" });
+        }else if ($('#upLocation').val() == 2 && parseFloat($('#updateFinalAmmount').val()) > 25000) {
+            swal({
+                title: 'From Factory You can not raise more than 25K',
+                type: 'error',
+                closeOnCancel: true
+            });
+        } else if ($('#Iouapproverlist tr').length<1) {
+            swal({
+                title: 'No Approver Defined',
+                type: 'error',
+                closeOnCancel: true
+            });
+        } else {
+            var jsondate = UpdateIouRequest(ioureqid);
+            var urlpath = '@Url.Action("ModalBeforeIOUSubmit", "IOU")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsondate),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    $("#modalbody").html("");
+                    $("#modalbody").append(data);
+                    $("#myModal").modal("show");
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+        }
+    }
+   
+    function LoadApproverList() {
+        var buid = $('#upBusinessunit').val() || '0';
+        var locationId = $('#upLocation').val() || '0';
+        var departmentId = $('#upDepartment').val() || '0';
+        var ammount = $('#updateFinalAmmount').val() || 0;
+        var urlpath = '@Url.Action("GetApproverList", "IOU")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {
+                BusinessUnit: buid,
+                LocationId: locationId,
+                DepartmentId: departmentId,
+                Ammount:ammount
+            },
+            async: true,
+            success: function (data) {
+                $("#Iouapproverlist").empty();
+                 for (var i = 0; i < data.length; i++) {
+                    var newRow = $("<tr>");
+                     var cols = "";
+                     
+                     cols += '<td><p name="approverNo">' + data[i].ApproverNo + '</p></td>';
+                     cols += '<td><p name="userName">' + data[i].UserName + '</p></td>';
+                     cols += '<td><p name="designationName">' + data[i].DesignationName + '</p></td>';
+                     cols += '<td><p name="approverstatus">' + data[i].ApproverStatusName + '</p></td>';
+                     cols += '<td ><p style="display:none" name="userId">' + data[i].UserID + '</p></td>';
+                     cols += '<td ><p style="display:none" name="apstatusid">' + data[i].ApproverStatus + '</p></td>';
+                     cols += '<td ></td></tr>';
+                    newRow.append(cols);
+                    $("#Iouapproverlist").append(newRow);
+                }
+            },
+            error: function () {
+                alert("error");
+            }
+        });
+    }
+    
+</script>

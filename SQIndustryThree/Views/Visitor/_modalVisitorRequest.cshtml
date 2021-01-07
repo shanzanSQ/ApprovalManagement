@@ -1,0 +1,229 @@
+﻿@model SQIndustryThree.Models.VisitorRequestModel
+<style type="text/css">
+    th{
+        text-align:left;
+    }
+</style>
+<input value="@Model.VisitorId" type="hidden" id="visitorId"/>
+<table width="100%"  border="1">
+    <caption>Requestor Information</caption>
+    <tr>
+        <td>Request ID </td>
+        <td>@Model.VisitorId</td>
+    </tr>
+    <tr>
+        <td>Business Unit</td>
+        <td>@Model.BusinessUnitName</td>
+    </tr>
+    <tr>
+        <td>Requestor Name : </td>
+        <td>@Model.RequestorName</td>
+    </tr>
+    <tr>
+        <td>Requestor Email : </td>
+        <td>@Model.RequestorEmail</td>
+    </tr>
+    <tr>
+        <td>Requestor Department : </td>
+        <td>@Model.RequestorDepartment</td>
+    </tr>
+    <tr>
+        <td>Requestor Designation : </td>
+        <td>@Model.RequestorDesignation</td>
+    </tr>
+    <tr>
+        <td>Requestor Mobile : </td>
+        <td>@Model.RequerstorMobile</td>
+    </tr>
+    <tr>
+        <td>Date Of Visit : </td>
+        <td>@Model.VisitDate.ToString("dd MMM yyyy")</td>
+    </tr>
+</table>
+<table width="100%" border="1">
+    <caption>Visitor Information</caption>
+    <tr>
+        <td>Purpose of visit SQ: </td>
+        <td>@Model.PurposeOfVisitSQ</td>
+    </tr>
+    <tr>
+        <td>Remarks : </td>
+        <td>@Model.Remarks</td>
+    </tr>
+    <tr>
+        <td>Visitor Name : </td>
+        <td>@Model.VisitorName</td>
+    </tr>
+    <tr>
+        <td>Visitor Email : </td>
+        <td>@Model.VisitorEmail</td>
+    </tr>
+    <tr>
+        <td>Visitor Designation : </td>
+        <td>@Model.VisitorDesignation</td>
+    </tr>
+    <tr>
+        <td>Visitor Company : </td>
+        <td>@Model.VisitorCompany</td>
+    </tr>
+    <tr>
+        <td>Visitor Mobile : </td>
+        <td>@Model.VisitorMobile</td>
+    </tr>
+    <tr>
+        <td>Visitor Nationality: </td>
+        <td>@Model.VisitorNationality</td>
+    </tr>
+    <tr>
+        <td>China Visit: </td>
+        <td>@Model.Chainavisit</td>
+    </tr>
+</table>
+@*@if (Model.IsApproved == 1)
+{
+    <table style="text-align:center" width="100%" class="table">
+        <tr>
+            <td><button class="btn btn-success" onclick="UpdateFromModal(@Model.VisitorId,2)">Approved</button></td>
+            <td><button class="btn btn-danger" onclick="UpdateFromModal(@Model.VisitorId,3)">Rejected</button></td>
+        </tr>
+    </table>
+}*@
+
+<br />
+<br />
+
+<div class="panel panel-primary" style="padding:10px;">
+    <div class="row">
+        <div class="col-md-12" style="margin-bottom:10px;">
+            <div class="form-inline">
+                <div class="form-group col-md-3">
+                    <label for="" class="col-md-6">Visitor ID</label>
+                    <input type="text" class="form-control col-md-6" id="visitor_card_Id" value="@Model.VisitorCardNo" name="visitor_card_Id" placeholder="Visitor ID" />
+                </div>
+
+                <div class="form-group col-md-3" style="">
+                    @*<label class="col-md-6" for="exampleCheck1">Check IN</label>
+                    <input type="checkbox" class="col-md-6" id="checkIN">*@
+
+
+                    <label for="" class="col-md-7">Check In</label>
+                    <div>
+                        @if (Model.CheckIn == "Yes")
+                        {
+                            <input type="checkbox" class="col-md-6" value="yes" checked id="checkIn">
+                        }
+                        else
+                        {
+                            <input type="checkbox" class="col-md-6" value="yes" id="checkIn">
+                        }
+                        @*<input type="text" class="form-control col-md-6" id="visitorId" name="visitorId" placeholder="Visitor ID" />*@
+                    </div>
+                </div>
+
+
+
+
+                <div class="form-group col-md-3" style="">
+                    @* <label class="col-md-6" for="exampleCheck1">Check OUT</label>
+        <input type="checkbox" class="col-md-6" id="checkOUT">*@
+
+                    <label for="" class="col-md-7">Check Out</label>
+                    <div>
+                        @if (Model.CheckOut == "Yes")
+                        {
+                            <input type="checkbox" class="col-md-6" value="yes" checked id="checkOut">
+                        }
+                        else
+                        {
+                            <input type="checkbox" class="col-md-6" value="yes" id="checkOut">
+                        }
+                        
+                        @*<input type="checkbox" class="form-control col-md-6" id="checkOUT" name="checkOUT" placeholder="Check OUT" />*@
+                        @*<input type="text" class="form-control col-md-6" id="visitorId" name="visitorId" placeholder="Visitor ID" />*@
+                    </div>
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label for="" class="col-md-6">Remarks</label>
+                    <input type="text" class="form-control col-md-6" id="remarks" value="@Model.GateRemarks" name="remarks" placeholder="Remarks" />
+                </div>
+
+            </div>
+        </div>
+        <br />
+        <div class="text-center">
+            <input class="btn btn-success" value="Submit" id="submitUserInfo" type="button" />
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    
+
+    $('#submitUserInfo').click(function () {
+
+        var visitorId = $('#visitorId').val();
+        var visitorCardNo = $('#visitor_card_Id').val();
+        var remarks = $('#remarks').val();
+
+        var checkin = "";
+
+        if ($('#checkIn').prop("checked")) {
+            checkin = 'Yes';
+        } else {
+            checkin = 'No';
+        }
+
+        var checkout = "";
+
+        if ($('#checkOut').prop("checked")) {
+            checkout = 'Yes';
+        } else {
+            checkout = 'No';
+        }
+
+            var urlpath = '@Url.Action("GateInfoUpdate", "Visitor")';
+        $.ajax({
+            data: { visitorId: visitorId, visitorCardNo: visitorCardNo, remarks: remarks, checkin: checkin, checkout: checkout },
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function(data) {
+                    if (data == 'Updated Data Successfully') {
+                               $('#showmodal').modal('toggle');
+                               swal({
+                                  title: 'Successfully Done',
+                                  type: 'success',
+                                   closeOnCancel: true
+                               }, function () {
+                                   getAllVisitorApproval(1);
+                               });
+                            }
+                        }
+                });
+    })
+
+    function UpdateFromModal(primarykey,isApproved) {
+         var urlpath = '@Url.Action("UpdateOrReject", "Visitor")';
+            $.ajax({
+                data: { PrimaryKey: primarykey, Status: isApproved },
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function(data) {
+                    if (data.isSuccess) {
+                               $('#showmodal').modal('toggle');
+                               swal({
+                                  title: 'Successfully Done',
+                                  type: 'success',
+                                   closeOnCancel: true
+                               }, function () {
+                                   getAllVisitorApproval(1);
+                               });
+                            }
+                        }
+                });
+    }
+
+</script>
