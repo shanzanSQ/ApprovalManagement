@@ -25,7 +25,9 @@
                         <th>Location</th>
                         <th>Category</th>
                         <th>SubCategroy</th>
+                        <th>Meeting With</th>
                         <th>Visiting Date</th>
+                        <th>VehicleNo</th>
                         <th>Total Visitor</th>
                         <th>Action(Comments)</th>
                     </tr>
@@ -43,20 +45,23 @@
                         <td>@item.LocationName</td>
                         <td>@item.CategoryName</td>
                         <td>@item.SubCategroyName</td>
+                        <td>@item.MeetingWith</td>
                         <td>@item.VisitDate.ToString("dd MMM yyyy")</td>
+                        <td>@item.VehicleNo</td>
                         <td>@item.TotalVisitor</td>
                         @if (item.IsApproved == 3)
                         {
-                            <td> <button type="button" class="btn  btn-block btn-primary btn-sm" data-toggle="modal" data-target="#myModal" onclick="VisitorRequestDetails(@item.RequestorId,0,'_visitorModalRequestView')" data-idkey="@item.RequestorId">Pending(@item.Pending)</button></td>
+                            @*@item.Pending*@
+                            <td> <button type="button" class="btn  btn-block btn-primary btn-sm" data-toggle="modal" data-target="#myModal" onclick="VisitorRequestDetails(@item.RequestorId,0,'_visitorModalRequestView')" data-idkey="@item.RequestorId">Pending</button></td>
                         }
                         else if (item.IsApproved == 1)
                         {
-                            <td><button type="button" class="btn  btn-block btn-success btn-sm" data-toggle="modal" data-target="#myModal" onclick="VisitorRequestDetails(@item.RequestorId,0,'_visitorModalRequestView')" data-idkey="@item.RequestorId">Approved(@item.Pending)</button></td>
+                            <td><button type="button" class="btn  btn-block btn-success btn-sm" data-toggle="modal" data-target="#myModal" onclick="VisitorRequestDetails(@item.RequestorId,0,'_visitorModalRequestView')" data-idkey="@item.RequestorId">Approved</button></td>
 
                         }
                         else if (item.IsApproved == 2)
                         {
-                            <td> <button type="button" class="btn  btn-block btn-danger btn-sm" onclick="UpdateRejectedRequest(@item.RequestorId,0)">Update(@item.Pending)</button></td>
+                            <td> <button type="button" class="btn  btn-block btn-danger btn-sm" onclick="UpdateRejectedRequest(@item.RequestorId,0)">Update</button></td>
                         }
                     </tr>
                         count++;

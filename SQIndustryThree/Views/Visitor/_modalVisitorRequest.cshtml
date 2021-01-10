@@ -9,7 +9,7 @@
     <caption>Requestor Information</caption>
     <tr>
         <td>Request ID </td>
-        <td>@Model.VisitorId</td>
+        <td>@Model.RequestorId</td>
     </tr>
     <tr>
         <td>Business Unit</td>
@@ -97,13 +97,17 @@
         <div class="col-md-12" style="margin-bottom:10px;">
             <div class="form-inline">
                 <div class="form-group col-md-3">
-                    <label for="" class="col-md-6">Visitor ID</label>
+                    <label for="" class="col-md-6">Card No</label>
                     <input type="text" class="form-control col-md-6" id="visitor_card_Id" value="@Model.VisitorCardNo" name="visitor_card_Id" placeholder="Visitor ID" />
                 </div>
+                @*<div class="form-group col-md-2">
+                    <label for="" class="col-md-6">Vehicle</label>
+                    <input type="text" class="form-control col-md-6" id="vehicle_no" value="@Model.VehicleNo" name="vehicle_no" placeholder="Vehicle No" style="width:100px;" />
+                </div>*@
 
-                <div class="form-group col-md-3" style="">
+                <div class="form-group col-md-2" style="">
                     @*<label class="col-md-6" for="exampleCheck1">Check IN</label>
-                    <input type="checkbox" class="col-md-6" id="checkIN">*@
+            <input type="checkbox" class="col-md-6" id="checkIN">*@
 
 
                     <label for="" class="col-md-7">Check In</label>
@@ -123,9 +127,9 @@
 
 
 
-                <div class="form-group col-md-3" style="">
+                <div class="form-group col-md-2" style="">
                     @* <label class="col-md-6" for="exampleCheck1">Check OUT</label>
-        <input type="checkbox" class="col-md-6" id="checkOUT">*@
+            <input type="checkbox" class="col-md-6" id="checkOUT">*@
 
                     <label for="" class="col-md-7">Check Out</label>
                     <div>
@@ -137,7 +141,7 @@
                         {
                             <input type="checkbox" class="col-md-6" value="yes" id="checkOut">
                         }
-                        
+
                         @*<input type="checkbox" class="form-control col-md-6" id="checkOUT" name="checkOUT" placeholder="Check OUT" />*@
                         @*<input type="text" class="form-control col-md-6" id="visitorId" name="visitorId" placeholder="Visitor ID" />*@
                     </div>
@@ -165,7 +169,26 @@
 
         var visitorId = $('#visitorId').val();
         var visitorCardNo = $('#visitor_card_Id').val();
+        var vehicleNo = "";//$('#vehicle_no').val();
         var remarks = $('#remarks').val();
+
+        if (visitorCardNo  == "") {
+            swal({
+                title: 'Please Enter Visitor Card No',
+                type: 'warning',
+                closeOnCancel: true
+            });
+            return true;
+        }
+
+        if ($('#checkIn').prop("checked") == false) {
+            swal({
+                title: 'Please Select CheckIn Box',
+                type: 'warning',
+                closeOnCancel: true
+            });
+            return true;
+        }
 
         var checkin = "";
 
@@ -185,21 +208,23 @@
 
             var urlpath = '@Url.Action("GateInfoUpdate", "Visitor")';
         $.ajax({
-            data: { visitorId: visitorId, visitorCardNo: visitorCardNo, remarks: remarks, checkin: checkin, checkout: checkout },
+            data: { visitorId: visitorId, visitorCardNo: visitorCardNo, vehicleNo: vehicleNo, remarks: remarks, checkin: checkin, checkout: checkout },
                 url: urlpath,
                 type: "Post",
                 async: true,
                 success: function(data) {
                     if (data == 'Updated Data Successfully') {
                                $('#showmodal').modal('toggle');
-                               swal({
-                                  title: 'Successfully Done',
-                                  type: 'success',
-                                   closeOnCancel: true
-                               }, function () {
-                                   getAllVisitorApproval(1);
-                               });
-                            }
+                            swal({
+                                title: 'Successfully Done',
+                                type: 'success',
+                                closeOnCancel: true
+                            }, function () {
+                                $('#showmodal').hide();
+                                location.reload();
+                                //getAllVisitorApproval(1);
+                            });
+                           }
                         }
                 });
     })

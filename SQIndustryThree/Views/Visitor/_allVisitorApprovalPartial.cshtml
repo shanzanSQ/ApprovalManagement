@@ -49,15 +49,15 @@
                         <td>@item.TotalVisitor</td>
                         @if (item.IsApproved == 3)
                         {
-                            <td> <button type="button" class="btn  btn-block btn-primary btn-sm" data-toggle="modal" data-target="#myModal" onclick="VisitorDetailsApprover(@item.RequestorId,1)" data-idkey="@item.RequestorId">Pending(@item.Pending)</button></td>
+                            <td> <button type="button" class="btn  btn-block btn-primary btn-sm" data-toggle="modal" data-target="#myModal" onclick="VisitorDetailsApprover(@item.RequestorId,1)" data-idkey="@item.RequestorId">Pending</button></td>
                         }
                         else if (item.IsApproved == 1)
                         {
-                            <td> <button type="button" class="btn  btn-block btn-success btn-sm" data-toggle="modal" data-target="#showmodal" onclick="VisitorDetailsApprover(@item.RequestorId,0)" data-idkey="@item.RequestorId">Approved(@item.Pending)</button></td>
+                            <td> <button type="button" class="btn  btn-block btn-success btn-sm" data-toggle="modal" data-target="#showmodal" onclick="VisitorDetailsApprover(@item.RequestorId,0)" data-idkey="@item.RequestorId">Approved</button></td>
                         }
                         else if (item.IsApproved == 2)
                         {
-                            <td> <button type="button" class="btn  btn-block btn-danger btn-sm" data-toggle="modal" data-target="#showmodal" onclick="VisitorDetailsApprover(@item.RequestorId,0)" data-idkey="@item.RequestorId">Rejected(@item.Pending)</button></td>
+                            <td> <button type="button" class="btn  btn-block btn-danger btn-sm" data-toggle="modal" data-target="#showmodal" onclick="VisitorDetailsApprover(@item.RequestorId,0)" data-idkey="@item.RequestorId">Rejected</button></td>
                         }
                     </tr>
                         count++;

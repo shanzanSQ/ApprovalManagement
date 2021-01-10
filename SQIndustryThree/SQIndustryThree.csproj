@@ -509,7 +509,6 @@
     <Content Include="Assets\bower_components\bootstrap\js\transition.js" />
     <Content Include="Assets\bower_components\bootstrap\package.js" />
     <Content Include="Assets\bower_components\chart.js\Chart.js" />
-    <Content Include="Assets\bower_components\ckeditor\.npm\assets\ckeditor4.png" />
     <Content Include="Assets\bower_components\ckeditor\adapters\jquery.js" />
     <Content Include="Assets\bower_components\ckeditor\ckeditor.js" />
     <Content Include="Assets\bower_components\ckeditor\config.js" />
@@ -6485,6 +6484,7 @@
     <Content Include="Images\slogan.png" />
     <Content Include="Images\sqbackgraound.jpg" />
     <Content Include="Images\SQ_STATION_BANNER.jpg" />
+    <Content Include="Images\user.png" />
     <Content Include="Images\Velocity.gif" />
     <Content Include="LICENSE.txt" />
     <Content Include="Scripts\bootstrap.js" />
@@ -6678,7 +6678,6 @@
     <Content Include="Assets\bower_components\chart.js\bower.json" />
     <Content Include="Assets\bower_components\ckeditor\.bower.json" />
     <Content Include="Assets\bower_components\ckeditor\.github\ISSUE_TEMPLATE" />
-    <Content Include="Assets\bower_components\ckeditor\.npm\README.md" />
     <Content Include="Assets\bower_components\ckeditor\bower.json" />
     <Content Include="Assets\bower_components\ckeditor\CHANGES.md" />
     <Content Include="Assets\bower_components\ckeditor\composer.json" />
@@ -7110,7 +7109,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Assets\bower_components\ckeditor\.npm\assets\" />
     <Folder Include="ExceptionFileUpload\" />
+    <Folder Include="Images\Visitors\" />
     <Folder Include="IOUFileUpload\" />
     <Folder Include="Uploads\" />
   </ItemGroup>

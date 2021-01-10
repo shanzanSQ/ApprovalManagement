@@ -75,6 +75,7 @@ namespace SQIndustryThree.DAL
         });
                 while (sqlDataReader.Read())
                 {
+                    visitorRequestModel.RequestorId = (int)sqlDataReader["RequestorId"];
                     visitorRequestModel.VisitorId = (int)sqlDataReader["VisitorId"];
                     visitorRequestModel.RequestorName = sqlDataReader["RequestorName"].ToString();
                     visitorRequestModel.RequestorDepartment = sqlDataReader["RequestorDepartment"].ToString();
@@ -86,9 +87,33 @@ namespace SQIndustryThree.DAL
                     visitorRequestModel.VisitDate = (DateTime)sqlDataReader["VisitDate"];
                     visitorRequestModel.PurposeOfVisitSQ = sqlDataReader["PurposeOfVisitSQ"].ToString();
                     visitorRequestModel.VisitorCardNo = sqlDataReader["VisitorCardNo"].ToString();
-                    visitorRequestModel.GateRemarks = sqlDataReader["GateRemarks"].ToString();
-                    visitorRequestModel.CheckIn = sqlDataReader["CheckIn"].ToString();
-                    visitorRequestModel.CheckOut = sqlDataReader["CheckOut"].ToString();
+                    if (sqlDataReader["VisitorCardNo"] != null )
+                    {
+                        visitorRequestModel.VisitorCardNo = sqlDataReader["VisitorCardNo"].ToString();
+                    }
+
+                    if (sqlDataReader["VehicleNo"] != null)
+                    {
+                        visitorRequestModel.VehicleNo = sqlDataReader["VehicleNo"].ToString();
+                    }
+
+                    if (sqlDataReader["GateRemarks"] != null)
+                    {
+                        visitorRequestModel.GateRemarks = sqlDataReader["GateRemarks"].ToString();
+                    }
+                    if (sqlDataReader["CheckIn"] != null)
+                    {
+                        visitorRequestModel.CheckIn = sqlDataReader["CheckIn"].ToString();
+                    }
+                    if (sqlDataReader["CheckOut"] != null)
+                    {
+                        visitorRequestModel.CheckOut = sqlDataReader["CheckOut"].ToString();
+                    }
+
+                    //visitorRequestModel.VehicleNo = sqlDataReader["VehicleNo"].ToString();
+                    //visitorRequestModel.GateRemarks = sqlDataReader["GateRemarks"].ToString();
+                    //visitorRequestModel.CheckIn = sqlDataReader["CheckIn"].ToString();
+                    //visitorRequestModel.CheckOut = sqlDataReader["CheckOut"].ToString();
                     visitorRequestModel.NIDorPassport = sqlDataReader["NIDorPassport"].ToString();
                     visitorRequestModel.VisitorCompany = sqlDataReader["VisitorCompany"].ToString();
                     visitorRequestModel.VisitorDesignation = sqlDataReader["VisitorDesignation"].ToString();
@@ -183,18 +208,27 @@ namespace SQIndustryThree.DAL
                     visitorRequestModelList.Add(new VisitorRequestModel()
                     {
                         VisitorId = (int)sqlDataReader["VisitorId"],
+                        RequestorId = (int)sqlDataReader["RequestorId"],
+                        BusinessUnitName = sqlDataReader["BusinessUnitName"].ToString(),
+                        SQUnitName = sqlDataReader["SQUnitName"].ToString(),
+                        SQDepartmentId = sqlDataReader["SQDepartmentId"].ToString(),
+                        SQID = sqlDataReader["SQID"].ToString(),
                         RequestorName = sqlDataReader["RequestorName"].ToString(),
                         RequestorDepartment = sqlDataReader["RequestorDepartment"].ToString(),
                         RequestorDesignation = sqlDataReader["RequestorDesignation"].ToString(),
                         RequerstorMobile = sqlDataReader["RequerstorMobile"].ToString(),
                         VisitorName = sqlDataReader["VisitorName"].ToString(),
                         VisitDate = (DateTime)sqlDataReader["VisitDate"],
+                        VehicleNo = sqlDataReader["VisitorVehicleNo"].ToString(),
                         PurposeOfVisitSQ = sqlDataReader["PurposeOfVisitSQ"].ToString(),
                         Chainavisit = sqlDataReader["Chainavisit"].ToString(),
                         VisitorMobile = sqlDataReader["VisitorMobile"].ToString(),
+                        VisitorCompany = sqlDataReader["VisitorCompany"].ToString(),
                         ApprovedStatus = sqlDataReader["PendingStatus"].ToString(),
-                        IsApproved = (int)sqlDataReader["Approved"]
-                    });
+                        IsApproved = (int)sqlDataReader["Approved"],
+                        CheckIn = sqlDataReader["CheckIn"].ToString(),
+                        CheckOut = sqlDataReader["CheckOut"].ToString()
+                    }) ;
                 return visitorRequestModelList;
             }
             catch (Exception ex)
@@ -223,19 +257,27 @@ namespace SQIndustryThree.DAL
                     {
                         RequestorId = (int)sqlDataReader["RequestorId"],
                         VisitorId = (int)sqlDataReader["VisitorId"],
+                        SQUnitName = sqlDataReader["SQUnitName"].ToString(),
+                        SQDepartmentId = sqlDataReader["SQDepartmentId"].ToString(),
+                        SQID = sqlDataReader["SQID"].ToString(),
                         RequestorName = sqlDataReader["RequestorName"].ToString(),
                         RequestorDepartment = sqlDataReader["RequestorDepartment"].ToString(),
                         RequestorDesignation = sqlDataReader["RequestorDesignation"].ToString(),
                         RequerstorMobile = sqlDataReader["RequerstorMobile"].ToString(),
+                        BusinessUnitName = sqlDataReader["BusinessUnitName"].ToString(),
                         VisitorName = sqlDataReader["VisitorName"].ToString(),
+                        VisitorCompany = sqlDataReader["VisitorCompany"].ToString(),
                         VisitDate = (DateTime)sqlDataReader["VisitDate"],
                         PurposeOfVisitSQ = sqlDataReader["PurposeOfVisitSQ"].ToString(),
+                        VehicleNo = sqlDataReader["VisitorVehicleNo"].ToString(),
                         Chainavisit = sqlDataReader["Chainavisit"].ToString(),
                         NIDorPassport = sqlDataReader["NIDorPassport"].ToString(),
                         Image = sqlDataReader["Image"].ToString(),
                         VisitorMobile = sqlDataReader["VisitorMobile"].ToString(),
                         ApprovedStatus = sqlDataReader["PendingStatus"].ToString(),
-                        IsApproved = (int)sqlDataReader["Approved"]
+                        IsApproved = (int)sqlDataReader["Approved"],
+                        CheckIn = sqlDataReader["CheckIn"].ToString(),
+                        CheckOut = sqlDataReader["CheckOut"].ToString()
                     });
                 return visitorRequestModelList;
             }
@@ -317,12 +359,12 @@ namespace SQIndustryThree.DAL
                     if (visitor.ModeOfVisit == 1)
                     {
                         dynamicParameters.Add("@visitDate", (object)visitor.VisitDate);
-                        dynamicParameters.Add("@StartDate", (object)"");
-                        dynamicParameters.Add("@EndDate", (object)"");
+                        dynamicParameters.Add("@StartDate", (object)visitor.VisitDate);
+                        dynamicParameters.Add("@EndDate", (object)visitor.VisitDate);
                     }
                     else
                     {
-                        dynamicParameters.Add("@visitDate", (object)"");
+                        dynamicParameters.Add("@visitDate", (object)visitor.StartDate);
                         dynamicParameters.Add("@StartDate", (object)visitor.StartDate);
                         dynamicParameters.Add("@EndDate", (object)visitor.EndDate);
                     }
@@ -487,6 +529,7 @@ namespace SQIndustryThree.DAL
         public object UpadteVisitorCheckinAndCheckOut(
           int visitorId,
           string visitorCardNo,
+          string vehicleNo,
           string remarks,
           string checkin,
           string checkout)
@@ -500,7 +543,8 @@ namespace SQIndustryThree.DAL
                         cnn.Open();
                     DynamicParameters dynamicParameters = new DynamicParameters();
                     dynamicParameters.Add("@VisitorId", (object)visitorId);
-                    dynamicParameters.Add("@VisitorCardNo", (object)visitorCardNo);
+                    dynamicParameters.Add("@VisitorCardNo", (object)visitorCardNo); 
+                    dynamicParameters.Add("@vehicleNo", (object)vehicleNo);
                     dynamicParameters.Add("@GateRemarks", (object)remarks);
                     dynamicParameters.Add("@CheckIn", (object)checkin);
                     dynamicParameters.Add("@CheckOut", (object)checkout);
@@ -541,10 +585,11 @@ namespace SQIndustryThree.DAL
                         CategoryName = sqlDataReader["CategoryName"].ToString(),
                         SubCategroyName = sqlDataReader["SubCategoryName"].ToString(),
                         MeetingWith = sqlDataReader["MeetingWith"].ToString(),
+                        //VehicleNo = sqlDataReader["VisitorVehicleNo"].ToString(),
                         TotalVisitor = (int)sqlDataReader["TotalVisitor"],
                         IsApproved = (int)sqlDataReader["IsApproved"],
                         Pending = (int)sqlDataReader["Pending"]
-                    }); ;
+                    }); 
                 return visitorRequestModelList;
             }
             catch (Exception ex)
@@ -571,6 +616,7 @@ namespace SQIndustryThree.DAL
                 while (sqlDataReader.Read())
                 {
                     requestorModel.RequestorId = (int)sqlDataReader["RequestorId"];
+                    requestorModel.VisitMode = (int)sqlDataReader["VisitMode"];
                     requestorModel.RivisionNo = (int)sqlDataReader["RevisionNo"];
                     requestorModel.BusinessUnitId = (int)sqlDataReader["BusinessUnitId"];
                     requestorModel.BusinessUnitName = sqlDataReader["BusinessUnitName"].ToString();
@@ -679,9 +725,11 @@ namespace SQIndustryThree.DAL
         }
 
         public List<VisitorApprover> GetApproverCategoryBased(
-  int category,
-  int subcategory,
-  int unit)
+          int category,
+          int subcategory,
+          int unit,
+          int DepartmentHeadId
+  )
         {
             List<VisitorApprover> visitorApproverList = new List<VisitorApprover>();
             try
@@ -694,6 +742,7 @@ namespace SQIndustryThree.DAL
                     dynamicParameters.Add("@CategoryID", (object)category);
                     dynamicParameters.Add("@SubCategoryID", (object)subcategory);
                     dynamicParameters.Add("@UnitId", (object)unit);
+                    dynamicParameters.Add("@DepartmentHeadId", (object)DepartmentHeadId);
                     visitorApproverList = cnn.Query<VisitorApprover>("sp_VisitorRoleWiseApproverLast", (object)dynamicParameters, commandType: new CommandType?(CommandType.StoredProcedure)).ToList<VisitorApprover>();
                 }
                 return visitorApproverList;

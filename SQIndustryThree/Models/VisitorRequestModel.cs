@@ -19,7 +19,8 @@ namespace SQIndustryThree.Models
         public string BusinessUnitName { get; set; }
         public string SQID { get; set; }
         public int SQUnitId { get; set; }
-        public int SQDepartmentId { get; set; }
+        public string SQUnitName { get; set; }
+        public string SQDepartmentId { get; set; }
 
         public int LocationId { get; set; }
 
@@ -83,6 +84,7 @@ namespace SQIndustryThree.Models
         public int Pending { get; set; }
 
         public string VisitorCardNo { get; set; }
+        public string VehicleNo { get; set; }
 
         public string GateRemarks { get; set; }
 

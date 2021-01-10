@@ -18,6 +18,14 @@ namespace SQIndustryThree.Models
 
         public string BusinessUnitName { get; set; }
 
+        public string SQID { get; set; }
+        public int SQUnitId { get; set; }
+        public int SQUnitName { get; set; }
+        public int SQDepartmentId { get; set; }
+        public int SQDepartmentName { get; set; }
+
+
+
         public int VisitMode { get; set; }
 
         public int LocationId { get; set; }

@@ -11,9 +11,9 @@ namespace SQIndustryThree.Models
 
         public string SQID { get; set; }
         public int SQUnitId { get; set; }
-        public int SQUnitName { get; set; }
-        public int SQDepartmentId { get; set; }
-        public int SQDepartmentName { get; set; }
+        public string SQUnitName { get; set; }
+        public string SQDepartmentId { get; set; }
+        public string SQDepartmentName { get; set; }
 
         public string VisitorName { get; set; }
 
@@ -26,6 +26,8 @@ namespace SQIndustryThree.Models
         public string VisitorCompany { get; set; }
 
         public string VisitorNationality { get; set; }
+
+        public string VisitorVehicleNo { get; set; }
 
         public string NIDorPassport { get; set; }
         public string MeetingWith { get; set; }

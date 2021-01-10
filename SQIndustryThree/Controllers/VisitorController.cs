@@ -29,13 +29,13 @@ namespace SQIndustryThree.Controllers
             List<VisitorApprover> list = this.visitorDAL.GetApprovers(category, subcategory, unit);
             return base.Json(list, JsonRequestBehavior.AllowGet);
         }
-        public ActionResult ApproverListCategoryBased(int category,int subcategory, int unit)
+        public ActionResult ApproverListCategoryBased(int category,int subcategory, int unit, int DepartmentHeadId)
         {
             if (base.Session["SQuserId"] == null)
             {
                 return base.RedirectToAction("Index", "Account");
             }
-            List<VisitorApprover> list = this.visitorDAL.GetApproverCategoryBased(category,subcategory, unit);
+            List<VisitorApprover> list = this.visitorDAL.GetApproverCategoryBased(category,subcategory, unit, DepartmentHeadId);
             return base.Json(list, JsonRequestBehavior.AllowGet);
         }
 
@@ -81,14 +81,14 @@ namespace SQIndustryThree.Controllers
             return base.RedirectToAction("Index", "Account");
         }
 
-        public ActionResult GateInfoUpdate(int visitorId, string visitorCardNo, string remarks, string checkin, string checkout)
+        public ActionResult GateInfoUpdate(int visitorId, string visitorCardNo, string vehicleNo, string remarks, string checkin, string checkout)
         {
             if (base.Session["SQuserId"] == null)
             {
                 return base.RedirectToAction("Index", "Account");
             }
             string data = "";
-            dynamic result = this.visitorDAL.UpadteVisitorCheckinAndCheckOut(visitorId, visitorCardNo, remarks, checkin, checkout);
+            dynamic result = this.visitorDAL.UpadteVisitorCheckinAndCheckOut(visitorId, visitorCardNo, vehicleNo, remarks, checkin, checkout);
             if (result != 0)
             {
                 data = "Updated Data Successfully";
@@ -121,7 +121,8 @@ namespace SQIndustryThree.Controllers
                 return base.RedirectToAction("Index", "Account");
             }
             int userID = Convert.ToInt32(base.Session["SQuserId"].ToString());
-            return this.PartialView(ViewName, this.visitorDAL.GetAllVisitorRequest(userID, Status, Progrss));
+            var approval = this.visitorDAL.GetAllVisitorRequest(userID, Status, Progrss);
+            return this.PartialView(ViewName, approval);
         }
 
         [HttpPost]
@@ -247,11 +248,78 @@ namespace SQIndustryThree.Controllers
 
         public ActionResult ModalBeforeVisitorSubmit(RequestorModel visitor)
         {
+            var result = string.Empty;
+
             if (base.Session["SQuserId"] == null)
             {
                 return base.RedirectToAction("Index", "Account");
             }
             int userID = Convert.ToInt32(base.Session["SQuserId"].ToString());
+
+
+            //if (visitor.LocationId == 1)
+            //{
+            //    if (visitor.VisitMode == 0)
+            //    {
+            //        result = "Please Select Visit Mode";
+            //    }
+            //    else if (visitor.VisitMode == 1)
+            //    {
+            //        if (visitor.CategoryId == 0)
+            //        {
+            //            result = "Please Select Category";
+            //        }
+            //        else if (visitor.SubCategoryId == 0)
+            //        {
+            //            result = "Please Select Sub Category";
+            //        }
+            //        else if (string.IsNullOrEmpty(visitor.RequestorDepartment))
+            //        {
+            //            result = "Please Select Department";
+            //        }
+
+            //    }
+            //    else
+            //    {
+            //        if (visitor.CategoryId == 0)
+            //        {
+            //            result = "Please Select Category";
+            //        }
+            //        else if (visitor.SubCategoryId == 0)
+            //        {
+            //            result = "Please Select Sub Category";
+            //        }
+            //        else if (string.IsNullOrEmpty(visitor.RequestorDepartment))
+            //        {
+            //            result = "Please Select Department";
+            //        }
+            //    }
+            //}
+            //else if (visitor.LocationId == 2)
+            //{
+            //    if (visitor.BusinessUnitId == 0)
+            //    {
+            //        result = "Please Select Bussiness Unit";
+            //    }
+            //    else if (visitor.CategoryId == 0)
+            //    {
+            //        result = "Please Select Category";
+            //    }
+            //    else if (visitor.SubCategoryId == 0)
+            //    {
+            //        result = "Please Select Sub Category";
+            //    }
+            //    else if (string.IsNullOrEmpty(visitor.RequestorDepartment))
+            //    {
+            //        result = "Please Select Department";
+            //    }
+            //}
+            //else
+            //{
+            //    result = visitor.ToString();
+            //}
+
+
             dynamic user = this.visitorDAL.UserDetails(userID);
             visitor.RequestorName = (string)user.UserName;
             visitor.RequestorEmail = (string)user.UserEmail;
@@ -263,6 +331,8 @@ namespace SQIndustryThree.Controllers
 
         public ActionResult ModalBeforeVisitorUpdate(RequestorModel visitor)
         {
+
+            var result = string.Empty;
             if (base.Session["SQuserId"] == null)
             {
                 return base.RedirectToAction("Index", "Account");
@@ -274,7 +344,70 @@ namespace SQIndustryThree.Controllers
             visitor.RequestorDesignation = (string)user.DesignationName;
             visitor.RequerstorMobile = (string)user.UserPhone;
             visitor.Created_By = (int)user.UserId;
-            return this.PartialView("_visitorModalRequestView", visitor);
+
+            if (visitor.LocationId == 1)
+            {
+                if (visitor.VisitMode == 0)
+                {
+                    result = "Please Select Visit Mode";
+                }else if(visitor.VisitMode == 1)
+                {
+                    if (visitor.CategoryId == 0)
+                    {
+                        result = "Please Select Category";
+                    }
+                    else if(visitor.SubCategoryId == 0)
+                    {
+                        result = "Please Select Sub Category";
+                    }
+                    else if (string.IsNullOrEmpty(visitor.RequestorDepartment))
+                    {
+                        result = "Please Select Department";
+                    }
+
+                }
+                else
+                {
+                    if (visitor.CategoryId == 0)
+                    {
+                        result = "Please Select Category";
+                    }
+                    else if (visitor.SubCategoryId == 0)
+                    {
+                        result = "Please Select Sub Category";
+                    }
+                    else if (string.IsNullOrEmpty(visitor.RequestorDepartment))
+                    {
+                        result = "Please Select Department";
+                    }
+                }
+            }
+            else if (visitor.LocationId == 2)
+            {
+                if (visitor.BusinessUnitId == 0)
+                {
+                    result = "Please Select Bussiness Unit";
+                }
+                else if(visitor.CategoryId == 0)
+                {
+                    result = "Please Select Category";
+                }
+                else if (visitor.SubCategoryId == 0)
+                {
+                    result = "Please Select Sub Category";
+                }
+                else if (string.IsNullOrEmpty(visitor.RequestorDepartment))
+                {
+                    result = "Please Select Department";
+                }
+            }
+            else
+            {
+                result = visitor.ToString();
+            }
+            
+
+                return this.PartialView("_visitorModalRequestView", result);
         }
 
         [HttpPost]

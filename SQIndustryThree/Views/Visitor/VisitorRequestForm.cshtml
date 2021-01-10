@@ -48,63 +48,117 @@
         left: 0;
         opacity: 0.5;
     }
+
+    .table > thead > tr > th {
+        vertical-align: top;
+        border-bottom: 2px solid #ddd;
+    }
 </style>
 <h3 style="text-align:center">Visitor Request Form</h3>
 <div class="row">
     <div class="col-md-6">
         <h4 style="text-align: center; background-color: #9bb08e; padding: 5px"><strong>Requestor Information</strong></h4>
         <div class="row">
-            <div class="col-md-6">
-                <label for="location">Location : <span style="color:red">*</span></label>
-                <select id="location" onchange="colorChange('#location')" class="form-control cke_required">
-                    <option value="0">--Select loction--</option>
-                    <option value="1">Central</option>
-                    <option value="2">Factory</option>
-                </select>
-                @*<label for="department_head">Department Head :</label>
-        <select id="department_head" onchange="colorChange('#department_head')" class="form-control"></select>*@
-                <label for="category" class="hello">Category : <span style="color:red">*</span></label>
-                <select id="category" onchange="colorChange('#category')" class="form-control"></select>
+            <div class="col-md-12">
+                <div class="col-md-6">
+                    <label for="location">Location : <span style="color:red">*</span></label>
+                    <select id="location" onchange="colorChange('#location')" class="form-control cke_required">
+                        <option value="0">--Select loction--</option>
+                        <option value="1">Central</option>
+                        <option value="2">Factory</option>
+                    </select>
+                </div>
+                <div class="col-md-6 business_unit">
+                    <label for="business_unit" class="business_unit">Business Unit: <span style="color:red">*</span></label>
+                    <select id="business_unit" onchange="colorChange('#business_unit')" class="form-control business_unit"></select>
+                </div>
+                <div class="col-md-6 visit_mode">
+                    <label for="visit_mode" class="visit_mode">Visit Mode: <span style="color:red">*</span></label>
+                    <select id="visit_mode" onchange="colorChange('#visit_mode')" class="form-control visit_mode">
+                        <option value="0">--Select Visit Mode--</option>
+                        <option value="1">Internal</option>
+                        <option value="2">External</option>
 
-                <label for="requestorDepartment">Requestor Department:<span style="color:red">*</span></label>
-                <select type="text" id="requestorDepartment" data-departmentId="" onchange="colorChange('#requestorDepartment')" class="form-control"></select>
-
-                <label for="dateVisit" class="date12hide">Date Of Visit :</label>
-                <input type="date" id="dateVisit" onchange="colorChange('#dateVisit')" min="2020-12-12" class="form-control DateFrom" />
-
-                <label for="endVisit" class="date123hide">Start Date:</label>
-                <input type="date" id="startVisit" onchange="colorChange('#startVisit')" min="2020-12-12" class="form-control DateFrom" />
-
-            </div>
-            <div class="col-md-6">
-                <div class="row">
-                    <div class="col-md-6 expandvisitmode">
-                        <label for="visit_mode" class="visit_mode">Visit Mode: <span style="color:red">*</span></label>
-                        <select id="visit_mode" onchange="colorChange('#visit_mode')" class="form-control visit_mode">
-                            <option value="0">Select Visit Mode</option>
-                            <option value="1">Internal</option>
-                            <option value="2">External</option>
-
-                        </select>
-                    </div>
-                    <div class="col-md-6 expandunit">
-                        <label for="business_unit" class="business_unit">Business Unit: <span style="color:red">*</span></label>
-                        <select id="business_unit" onchange="colorChange('#business_unit')" class="form-control business_unit"></select>
-                    </div>
-
-
+                    </select>
+                </div>
+                <div class="col-md-6 department_head">
+                    <label for="department_head" class="department_head">Department Head : <span style="color:red">*</span></label>
+                    <select id="department_head" onchange="colorChange('#department_head')" class="form-control department_head"></select>
                 </div>
 
+                <div class="col-md-6">
+                    <label for="category" class="hello">Category : <span style="color:red">*</span></label>
+                    <select id="category" onchange="colorChange('#category')" class="form-control"></select>
+                </div>
 
-                <label for="subcategory" class="hidedata">SubCategory :</label>
-                <select id="subcategory" onchange="colorChange('#subcategory')" class="form-control"></select>
+                <div class="col-md-6">
+                    <label for="subcategory" class="hidedata">SubCategory :</label>
+                    <select id="subcategory" onchange="colorChange('#subcategory')" class="form-control"></select>
+                </div>
+                <div class="col-md-6">
+                    <label for="requestorDepartment">Requestor Department:<span style="color:red">*</span></label>
+                    <select type="text" id="requestorDepartment" data-departmentId="" onchange="colorChange('#requestorDepartment')" class="form-control"></select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="permission">Mode Of Visit : <span style="color:red">*</span></label>
+                    <select id="permission" onchange="colorChange('#permission')" class="form-control">
+                        @*<option value="0">--Select Purpose--</option>*@
+                        <option value="1">Single Day</option>
+                        <option value="2">Multiple Days</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="dateVisit" class="date12hide">Date Of Visit :</label>
+                    <input type="date" id="dateVisit" onchange="colorChange('#dateVisit')" min="2020-12-12" class="form-control DateFrom" />
+                </div>
+                <div class="col-md-6">
+                    <label for="endVisit" class="date123hide">Start Date:</label>
+                    <input type="date" id="startVisit" onchange="colorChange('#startVisit')" min="2020-12-12" class="form-control DateFrom" />
+                </div>
+                <div class="col-md-6">
+                    <label for="endVisit" class="date123hide">End Date:</label>
+                    <input type="date" id="endVisit" onchange="colorChange('#endVisit')" min="2020-12-12" class="form-control DateFrom" />
+                </div>
+
+            </div>
 
 
-                @*<label for="approver">Approver:</label>
+
+
+
+
+
+    <!--<div class="col-md-6">
+        <div class="row">
+            <div class="col-md-6 expandvisitmode">
+                <label for="visit_mode" class="visit_mode">Visit Mode: <span style="color:red">*</span></label>
+                <select id="visit_mode" onchange="colorChange('#visit_mode')" class="form-control visit_mode">
+                    <option value="0">Select Visit Mode</option>
+                    <option value="1">Internal</option>
+                    <option value="2">External</option>
+
+                </select>
+            </div>
+            <div class="col-md-6 expandunit">
+                <label for="business_unit" class="business_unit">Business Unit: <span style="color:red">*</span></label>
+                <select id="business_unit" onchange="colorChange('#business_unit')" class="form-control business_unit"></select>
+            </div>
+
+
+        </div>
+
+        <label for="subcategory" class="hidedata hidden">abc :</label>
+        <input type="date" id="abc" onchange="colorChange('#abc')" class="form-control hidden" />
+
+        <label for="subcategory" class="hidedata">SubCategory :</label>
+        <select id="subcategory" onchange="colorChange('#subcategory')" class="form-control"></select>
+                    @*<label for="approver">Approver:</label>
         <select id="approver" onchange="colorChange('#approver')" class="form-control"></select>*@
 
-                @*<input id="dateVisit" type="date" min="2014-01-01" disabled />*@
-                @*<div class="row">
+                    @*<input id="dateVisit" type="date" min="2014-01-01" disabled />*@
+                    @*<div class="row">
             <div class="col-md-6">
                 <input type="checkbox" value="1" id="single" /> Single
             </div>
@@ -112,22 +166,22 @@
                 <input type="checkbox" value="1" id="multiple" /> Multiple
             </div>
         </div>*@
-                @*<input type="checkbox" id="single" value="1" /> Single*@
-                <label for="permission">Mode Of Visit : <span style="color:red">*</span></label>
-                <select id="permission" onchange="colorChange('#permission')" class="form-control">
+                    @*<input type="checkbox" id="single" value="1" /> Single*@
+                    <!--<label for="permission">Mode Of Visit : <span style="color:red">*</span></label>
+    <select id="permission" onchange="colorChange('#permission')" class="form-control">-->
                     @*<option value="0">--Select Purpose--</option>*@
-                    <option value="1">Single Day</option>
-                    <option value="2">Multiple Days</option>
-                </select>
-                
+                    <!--<option value="1">Single Day</option>
+            <option value="2">Multiple Days</option>
+        </select>
 
-                
 
-                <label for="endVisit" class="date123hide">End Date:</label>
-                <input type="date" id="endVisit" onchange="colorChange('#endVisit')" min="2020-12-12" class="form-control DateFrom" />
 
-            </div>
-        </div>
+
+        <label for="endVisit" class="date123hide">End Date:</label>
+        <input type="date" id="endVisit" onchange="colorChange('#endVisit')" min="2020-12-12" class="form-control DateFrom" />
+
+    </div>-->
+                </div>
 
         @*To develope and review business activities
             To check the product quality
@@ -152,7 +206,8 @@
 
         <div class="row">
             <div class="col-md-12">
-                <h4 style="text-align: center; background-color: #9bb08e; padding: 5px"><strong>Add Visitor</strong></h4>
+                <h4 style="text-align: center;background-color: #5AA3E6;
+        padding: 5px"><strong>Visitor Information</strong></h4>
                 <table width="100%" id="visitorinputtable">
 
                     @*<caption>Add Visitor</caption>*@
@@ -230,8 +285,8 @@
                         <td>
                             <label for="nid" class="nid">NID / Passport </label>
                             <input type="text" class="form-control nid" onchange="colorChange('#nid')" id="nid" />
-                            <label for="sqid" class="sqid">SQ ID </label>
-                            <input type="text" class="form-control sqid" onchange="colorChange('#sqid')" id="sqid"/>
+                            <label for="sqid" class="sqid">SQ ID  <span style="color:red">*</span></label>
+                            <input type="text" class="form-control sqid"  onchange="colorChange('#sqid')" id="sqid" onkeypress="return isNumberKey(event)" placeholder="Only Number"/>
                             @*<label for="remarksText">Remarks: </label>
         <input type="text" class="form-control" onchange="colorChange('#remarksText')" id="remarksText" />*@
                         </td>
@@ -310,9 +365,16 @@
                     </tr>
                     <tr>
                         <td>
+                            <label for="visitorVehicleNo">Vehicle No: (If Any)</label>
+                            <input type="text" class="form-control" onchange="colorChange('#visitorVehicleNo')" id="visitorVehicleNo" />
+                        </td>
+                        <td>
                             <label for="remarksText">Remarks: </label>
                             <input type="text" class="form-control" onchange="colorChange('#remarksText')" id="remarksText" />
                         </td>
+
+                    </tr>
+                    <tr>
                         <td>
                             <label for="">Action</label>
                             <input type="button" class="btn btn-info btn-sm" value="Add Visitor" id="addVisitor" />
@@ -342,6 +404,7 @@
                             <th>Visitor Designation</th>
                             <th>NID/SQID</th>
                             <th>Visitor Nationality/ SQ Department</th>
+                            <th>Vehicle No</th>
                             <th>Abroad Visit</th>
                             <th>Action</th>
                         </tr>
@@ -460,6 +523,7 @@
     $('.date123hide').hide();
 
 
+    $('.department_head').hide();
     $('#business_unit').prop('disabled', true);
     $('#category').prop('disabled', true);
     $('#subcategory').prop('disabled', true);
@@ -474,6 +538,14 @@
 
     $('.expandunit').removeClass('col-md-6');
     $('.expandunit').addClass('col-md-12');
+
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : evt.keyCode
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
 
     //if ($('input#single').is(':checked')) {
 
@@ -709,6 +781,7 @@
             col += '<td><input type="text" name="visitorEmail"  value="'+$("#visitorEmail").val()+'"/></td>';
             col += '<td><input type="text" name="visitorMobile"  value="' + $("#visitorMobile").val() + '"/></td>'; //$("#myselect option:selected").text();
             if ($("#visitorCompany").val() == "") {
+                //alert($("#visitorCompanySQ").val())
                 col += '<td><input type="hidden" name="visitorCompanySQ"  value="' + $("#visitorCompanySQ").val() + '"/><input type="text" name="squnit"  value="' + $("#visitorCompanySQ option:selected").text() + '"/></td>';
             }
             else {
@@ -723,12 +796,13 @@
             
 
             if ($("#visitorNationality").val() == "") {
+                //alert($("#requestorDepartmentSQ").val())
                 col += '<td><input type="text" name="requestorDepartmentSQ"  value="' + $("#requestorDepartmentSQ").val() + '"/></td>';
             } else {
                 col += '<td><input type="text" name="visitorNationality"  value="' + $("#visitorNationality").val() + '"/></td>';
             }
             
-            
+            col += '<td><input type="text" name="visitorVehicleNo"  value="' + $("#visitorVehicleNo").val() + '"/></td>';
             
             col += '<td><input type="text" name="travlechainaOrNot"  value="' + $("#travlechainaOrNot").val() +'"/></td>';
             col += '<td><input type="button" value="X" onclick="deleterow('+trrowNo+')" class="btn btn-danger" /></td></tr>';
@@ -736,11 +810,11 @@
 
             $('#blah').attr('src', '/Images/user.png');
         }
-        $("#visitorName").val("");
-        $("#visitorEmail").val("");
-        $("#visitorMobile").val("");
-        $("#visitorNationality").val("");
-        $("#travlechainaOrNot").val("");
+        //$("#visitorName").val("");
+        //$("#visitorEmail").val("");
+        //$("#visitorMobile").val("");
+        //$("#visitorNationality").val("");
+        //$("#travlechainaOrNot").val("");
     })
 
     $("#purposeVisit").change(function () {
@@ -822,7 +896,7 @@
         var subCatId = $('#subcategory').val();
         var unitId = $('#business_unit').val();
         //approverlist(catId, subCatId, unitId);
-        approverlistnew(catId, subCatId, unitId);
+        approverlistnew(catId, subCatId, unitId, 0);
         VisitorCategoryList(unitId,0);
 
     })
@@ -878,46 +952,48 @@
         
         var subCatId = $('#subcategory').val();
         var unitId = $('#business_unit').val();
+        var department_head = $('#department_head').val();
         //approverlistnew(catId, subCatId, unitId);
-
+        
         if (catId == 1) {
-            approverlistnew(catId, 16, unitId);
+            approverlistnew(catId, 16, unitId, 0);
             VisitorSubCategoryList(catId);
         }
         else if (catId == 2) {
-            approverlistnew(catId, 17, unitId);
+            approverlistnew(catId, 17, unitId, 0);
             VisitorSubCategoryList(catId);
         }
         else if (catId == 7) {
-            approverlistnew(catId, 21, unitId);
+            approverlistnew(catId, 21, unitId, 0);
             VisitorSubCategoryList(catId);
         }
         else if (catId == 8) {
-            approverlistnew(catId, 22, unitId);
+            approverlistnew(catId, 22, unitId, 0);
             VisitorSubCategoryList(catId);
         }
         else if (catId == 9) {
-            approverlistnew(catId, 23, unitId);
+            approverlistnew(catId, 23, unitId, 0);
             VisitorSubCategoryList(catId);
         }
         else if (catId == 20) {
-            approverlistnew(catId, 24, unitId);
+            approverlistnew(catId, 24, unitId, 0);
             VisitorSubCategoryList(catId);
         }
         else if (catId == 21) {
-            approverlistnew(catId, 25, unitId);
+            approverlistnew(catId, 25, unitId, 0);
             VisitorSubCategoryList(catId);
         }
         else if (catId == 22) {
-            approverlistnew(catId, 26, unitId);
+            approverlistnew(catId, 26, unitId,);
             VisitorSubCategoryList(catId);
         }
         else if (catId == 24) {
-            approverlistnew(catId, 27, unitId);
+            //alert(department_head);
+            approverlistnew(catId, 27, unitId, department_head);
             VisitorSubCategoryList(catId);
         }
         else {
-            approverlistnew(catId, subCatId, unitId);
+            approverlistnew(catId, subCatId, unitId, 0);
             VisitorSubCategoryList(catId);
         }
 
@@ -927,8 +1003,9 @@
         var catId = $('#category').val();
         var subCatId = $('#subcategory').val();
         var unitId = $('#business_unit').val();
+        var department_head = $('#department_head').val();
         //approverlist(catId, subCatId, unitId);
-        approverlistnew(catId, subCatId, unitId);
+        approverlistnew(catId, subCatId, unitId, department_head);
     })
 
     $('#requestorDepartment').change(function () {
@@ -981,15 +1058,15 @@
         });
     }
 
-    function approverlistnew(category, subcategory, unit) {
-
+    function approverlistnew(category, subcategory, unit, departmentHead) {
+        //alert(departmentHead);
         $('#ListOfApprover').show();
          var urlpath = '@Url.Action("ApproverListCategoryBased", "Visitor")';
         $.ajax({
             url: urlpath,
             dataType: 'json',
             type: "Post",
-            data: { category: category, subcategory: subcategory, unit: unit },
+            data: { category: category, subcategory: subcategory, unit: unit, DepartmentHeadId: departmentHead },
             async: true,
             success: function (data) {
                 console.log(data)
@@ -1143,7 +1220,7 @@
             //$("#business_unit").append($("<option></option>").val("0")
             //    .html("SQ Central"));
 
-
+            $('.department_head').hide();
             $(".visit_mode").show();
             $(".business_unit").hide();
             $("#business_unit").hide();
@@ -1166,7 +1243,7 @@
 
             //approverList(0);
             //approverlist(0, 0, 0);
-            approverlistnew(0, 0, 0);
+            approverlistnew(0, 0, 0, 0);
             //$('.hidedata').hide();
             //$('#category').hide();
            // $('#subcategory').hide();
@@ -1176,6 +1253,9 @@
             VisitorCategoryList(0,0);
             LoadDepartment(1)
         } else if ($("#location").val() == 2) {
+
+            $('.department_head').hide();
+
             $(this).attr("selected","selected");
             $('#business_unit').prop('disabled', false);
             $('#category').prop('disabled', true);
@@ -1232,7 +1312,7 @@
             $(".visitorNationality").hide();
             //$(".business_unit").hide();
             //$("#business_unit").hide();
-
+            $('.department_head').show();
             //$('.expandunit').removeClass('col-md-6');
             //$('.expandvisitmode').removeClass('col-md-6');
 
@@ -1243,7 +1323,7 @@
             LoadDepartment(1);
         } else {
             //alert("2")
-
+            $('.department_head').hide();
             $(".sqid").hide();
             $(".visitorCompanySQ").hide();
             $(".requestorDepartmentSQ").hide();
@@ -1264,6 +1344,9 @@
 
             LoadBusinessUnit();
             VisitorCategoryList(0, 2)
+
+            $('#department_head').val('0');
+            approverlistnew(0, 0, 0, 0);
         }
     })
 
@@ -1375,10 +1458,12 @@
                 myData["MeetingWith"] = $(this).find('input[name="meetingWith"]').val();
                 myData["NIDorPassport"] = $(this).find('input[name="nid"]').val();
                 myData["SQID"] = $(this).find('input[name="sqid"]').val();
-                myData["SQUnitId"] = $(this).find('input[name="visitorCompanySQ"]').val();
-                myData["SQUnitName"] = $("#visitorCompanySQ option:selected").text();
+            myData["SQUnitId"] = $(this).find('input[name="visitorCompanySQ"]').val();
+            myData["SQUnitName"] = $(this).find('input[name="squnit"]').val();;
                 myData["SQDepartmentId"] = $(this).find('input[name="requestorDepartmentSQ"]').val();
-                myData["SQDepartmentName"] = $("#requestorDepartmentSQ option:selected").text();
+            myData["SQDepartmentName"] = $(this).find('input[name="requestorDepartmentSQ"]').val();
+            myData["VisitorVehicleNo"] = $(this).find('input[name="visitorVehicleNo"]').val();
+            
             //SQDepartmentName
             //SQID,SQUnitId,SQDepartmentId
                 myData["Image"] = $(this).attr('data-image'); //document.getElementById('blah').src;
@@ -1788,7 +1873,14 @@
         $('#requestorDepartment').data('departmentId', departmentId);
         //alert($('#requestorDepartment').data('departmentId'));
         var departmentUser = $(this).find(':selected').text();
-        $("#requestorDepartment").val(department);
+        //$("#requestorDepartment").val(department);
+        var catId = $('#category').val();
+        var subCatId = $('#subcategory').val();
+        var unitId = $('#business_unit').val();
+        var department_head = $('#department_head').val();
+        //alert(department_head);
+        //approverlist(catId, subCatId, unitId);
+        approverlistnew(0, 0, 0, department_head);
 
         //$('#approverlist').show();
 

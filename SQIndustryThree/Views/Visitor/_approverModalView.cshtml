@@ -55,7 +55,7 @@
                         else
                         {
                             <td>
-                               Second Approver
+                                Second Approver
                             </td>
                             //item.ApproverStatusName = "Approver";
                         }
@@ -138,11 +138,11 @@
                         <td>@Model.RequerstorMobile</td>
                         <td>@Model.RequestorEmail</td>
                         @*<td>*@
-                            @if (Model.ModeOfVisit == 1)
-                            // var datetime = Model.VisitDate;
-                            // datetime.Date.ToString();
+                        @if (Model.ModeOfVisit == 1)
+                        // var datetime = Model.VisitDate;
+                        // datetime.Date.ToString();
 
-                            {
+                        {
                             <td>
                                 @Model.VisitDate.Date.ToString("d/M/yyyy")
                             </td>
@@ -156,11 +156,11 @@
                                 @Model.EndDate.Date.ToString("d/M/yyyy")
                             </td>
                         }
-                            @*@if (Model.VisitDate != null)
-            {@DateTime.Parse(Model.VisitDate.ToString("dd MMM yyyy"))}*@
-                            @*@DateTime.Parse(Model.VisitDate.ToString()).ToString("dd MMM yyyy")*@
-                            @*</td>*@
-                        </tr>
+                        @*@if (Model.VisitDate != null)
+                            {@DateTime.Parse(Model.VisitDate.ToString("dd MMM yyyy"))}*@
+                        @*@DateTime.Parse(Model.VisitDate.ToString()).ToString("dd MMM yyyy")*@
+                        @*</td>*@
+                    </tr>
                     <tr>
                     </tr>
                 </table>
@@ -173,14 +173,26 @@
             <caption>Visitor info</caption>
             <thead>
                 <tr>
+                    <th>Meeting With</th>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Mobile</th>
                     <th>Designation</th>
-                    <th>Company</th>
-                    <th>Nationality</th>
-                    <th>China Visit</th>
-                    <th>Purpose Of VisitSQ</th>
+                    @if (Model.VisitMode == 1)
+                    {
+                        <th>SBU</th>
+                        <th>Department</th>
+                        <th>ID</th>
+                    }
+                    else
+                    {
+                        <th>Company</th>
+                        <th>Nationality</th>
+                        <th>NID or Passport</th>
+                    }
+
+                    <th>Visited Abroad </th>
+                    <th>Purpose Of Visit at SQ</th>
                     <th>Remarks</th>
 
                 </tr>
@@ -189,13 +201,40 @@
                 @foreach (var item in Model.VisitorList)
                 {
                     <tr>
+                        <td>@item.MeetingWith</td>
                         <td>@item.VisitorName</td>
                         <td>@item.VisitorEmail</td>
                         <td>@item.VisitorMobile</td>
                         <td>@item.VisitorDesignation</td>
-                        <td>@item.VisitorCompany</td>
-                        <td>@item.VisitorNationality</td>
+                        @if (string.IsNullOrEmpty(item.VisitorCompany))
+                        {
+                            <td>@item.SQUnitName</td>
+                        }
+                        else
+                        {
+                            <td>@item.VisitorCompany</td>
+                        }
+
+                        @if (string.IsNullOrEmpty(item.VisitorNationality))
+                        {
+                            <td>@item.SQDepartmentId</td>
+                        }
+                        else
+                        {
+                            <td>@item.VisitorNationality</td>
+                        }
+
+                        @if (string.IsNullOrEmpty(item.NIDorPassport))
+                        {
+                            <td>@item.SQID</td>
+                        }
+                        else
+                        {
+                            <td>@item.NIDorPassport</td>
+                        }
+
                         <td>@item.Chainavisit</td>
+
                         <td>@item.PurposeOfVisitSQ</td>
                         <td>@item.Remarks</td>
                     </tr>
