@@ -911,6 +911,9 @@
             type: "Post",
             data: { unit: unitId },
             async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
             success: function (data) {
                 console.log(data)
                 $('#category').empty();
@@ -942,6 +945,9 @@
                     //}
 
                 }
+            },
+            complete: function () {
+                $('.overlay').hide();
             }
         });
     }
@@ -1030,6 +1036,9 @@
             type: "Post",
             data: { catId: catId },
             async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
             success: function (data) {
                 console.log(data)
                 $('#subcategory').empty();
@@ -1044,16 +1053,40 @@
                         if (i == 0) {
                             $('#subcategory').append("<option value='0'>--Select SubCategory--</option>");
                         }
+
+                        if ($('#business_unit').val() == '6') {
+
+                            $("#subcategory").attr('disabled', false);
+
+                            if ($('#category').val() == '10') {
+                                if (data[i].SubCategoryID != 7 && data[i].SubCategoryID != 6 && data[i].SubCategoryID != 5) {
+                                    $("#subcategory").append($("<option></option>").val(data[i].SubCategoryID)
+                                        .html(data[i].SubCategoryName));
+                                }
+                            }
+                            else if ($('#category').val() == '18') {
+                               
+
+                                if (data[i].SubCategoryID != 14) {
+                                    $("#subcategory").append($("<option></option>").val(data[i].SubCategoryID)
+                                        .html(data[i].SubCategoryName));
+                                }
+                            }
+                        }
+                        else{ 
                         //$('#subcategory').append("<option value='0'>--Select SubCategory--</option>");
                         $("#subcategory").attr('disabled', false);
                         $("#subcategory").append($("<option></option>").val(data[i].SubCategoryID)
                             .html(data[i].SubCategoryName));
-
+                        }
                     }
 
                 }
 
 
+            },
+            complete: function () {
+                $('.overlay').hide();
             }
         });
     }
@@ -1588,9 +1621,10 @@
                         closeOnCancel: true
                     },function () {
                             $("#myModal").modal("hide");
-                            //$("#iousubmenu").find('li').removeClass();
-                            //$("#iousubmenu").find('li:nth-child(2)').addClass("active");
+                            $("#iousubmenu").find('li').removeClass();
+                            $("#iousubmenu").find('li:nth-child(2)').addClass("active");
                            // GetAllIOURequest(1, 0);
+                            GetAllVisitorRequest(1, 0);
                     });
                 },
                 error: function () {
@@ -1680,6 +1714,21 @@
             //alert('ok');
             //$('#categroy').css({ "border-color": "#FF0000" });
             toastr.error("Please Select Category", " Category ",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+        }
+        else if ($('#subcategory').val() == "0") {
+            //alert('ok');
+            //$('#categroy').css({ "border-color": "#FF0000" });
+            toastr.error("Please Select SubCategory", " SubCategory ",
                 {
                     "progressBar": true,
                     "positionClass": "toast-top-right",
