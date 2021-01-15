@@ -353,6 +353,7 @@ namespace SQIndustryThree.DAL
                     dynamicParameters.Add("@LocationId", (object)visitor.LocationId);
                     dynamicParameters.Add("@CategoryId", (object)visitor.CategoryId);
                     dynamicParameters.Add("@SubCategoryId", (object)visitor.SubCategoryId);
+                    dynamicParameters.Add("@DepartmentHeadId", (object)visitor.DepartmentHeadId);
                     dynamicParameters.Add("@RequestorDepartment", (object)visitor.RequestorDepartment);
                     dynamicParameters.Add("@NIDorPassport", (object)visitor.NIDorPassport);
                     dynamicParameters.Add("@ModeOfVisit", (object)visitor.ModeOfVisit);

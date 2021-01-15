@@ -248,85 +248,133 @@ namespace SQIndustryThree.Controllers
 
         public ActionResult ModalBeforeVisitorSubmit(RequestorModel visitor)
         {
-            var result = string.Empty;
+            RequestorModel requestor = new RequestorModel();
+            dynamic result = null;
 
             if (base.Session["SQuserId"] == null)
             {
                 return base.RedirectToAction("Index", "Account");
             }
+
+
             int userID = Convert.ToInt32(base.Session["SQuserId"].ToString());
 
 
-            //if (visitor.LocationId == 1)
-            //{
-            //    if (visitor.VisitMode == 0)
-            //    {
-            //        result = "Please Select Visit Mode";
-            //    }
-            //    else if (visitor.VisitMode == 1)
-            //    {
-            //        if (visitor.CategoryId == 0)
-            //        {
-            //            result = "Please Select Category";
-            //        }
-            //        else if (visitor.SubCategoryId == 0)
-            //        {
-            //            result = "Please Select Sub Category";
-            //        }
-            //        else if (string.IsNullOrEmpty(visitor.RequestorDepartment))
-            //        {
-            //            result = "Please Select Department";
-            //        }
+            if (visitor.LocationId == 1)
+            {
+                if (visitor.VisitMode == 0 || string.IsNullOrEmpty(visitor.VisitMode.ToString()))
+                {
+                    result = "Please Select Visit Mode";
+                    requestor = null;
+                }
+                else if (visitor.VisitMode == 1)
+                {
+                    if (visitor.CategoryId == 0 || string.IsNullOrEmpty(visitor.CategoryId.ToString()))
+                    {
+                        result = "Please Select Category";
+                        requestor = null;
+                    }
+                    else if (visitor.SubCategoryId == 0 || string.IsNullOrEmpty(visitor.SubCategoryId.ToString()))
+                    {
+                        result = "Please Select Sub Category";
+                        requestor = null;
+                    }
+                    else if (visitor.DepartmentHeadId == 0 || string.IsNullOrEmpty(visitor.DepartmentHeadId.ToString()))
+                    {
+                        result = "Please Select Department Head";
+                        requestor = null;
+                    }
+                    
+                    else
+                    {
+                        dynamic user = this.visitorDAL.UserDetails(userID);
+                        visitor.RequestorName = (string)user.UserName;
+                        visitor.RequestorEmail = (string)user.UserEmail;
+                        visitor.RequestorDesignation = (string)user.DesignationName;
+                        visitor.RequerstorMobile = (string)user.UserPhone;
+                        visitor.Created_By = userID;
+                        result = 0;
+                        requestor = visitor;
+                    }
 
-            //    }
-            //    else
-            //    {
-            //        if (visitor.CategoryId == 0)
-            //        {
-            //            result = "Please Select Category";
-            //        }
-            //        else if (visitor.SubCategoryId == 0)
-            //        {
-            //            result = "Please Select Sub Category";
-            //        }
-            //        else if (string.IsNullOrEmpty(visitor.RequestorDepartment))
-            //        {
-            //            result = "Please Select Department";
-            //        }
-            //    }
-            //}
-            //else if (visitor.LocationId == 2)
-            //{
-            //    if (visitor.BusinessUnitId == 0)
-            //    {
-            //        result = "Please Select Bussiness Unit";
-            //    }
-            //    else if (visitor.CategoryId == 0)
-            //    {
-            //        result = "Please Select Category";
-            //    }
-            //    else if (visitor.SubCategoryId == 0)
-            //    {
-            //        result = "Please Select Sub Category";
-            //    }
-            //    else if (string.IsNullOrEmpty(visitor.RequestorDepartment))
-            //    {
-            //        result = "Please Select Department";
-            //    }
-            //}
-            //else
-            //{
-            //    result = visitor.ToString();
-            //}
+                }
+                else
+                {
+                    if (visitor.CategoryId == 0 || string.IsNullOrEmpty(visitor.CategoryId.ToString()))
+                    {
+                        result = "Please Select Category";
+                        requestor = null;
+                    }
+                    else if (visitor.SubCategoryId == 0 || string.IsNullOrEmpty(visitor.SubCategoryId.ToString()))
+                    {
+                        result = "Please Select Sub Category";
+                        requestor = null;
+                    }
+                    else if (string.IsNullOrEmpty(visitor.RequestorDepartment))
+                    {
+                        result = "Please Select Department";
+                        requestor = null;
+                    }
+                    else
+                    {
+                        dynamic user = this.visitorDAL.UserDetails(userID);
+                        visitor.RequestorName = (string)user.UserName;
+                        visitor.RequestorEmail = (string)user.UserEmail;
+                        visitor.RequestorDesignation = (string)user.DesignationName;
+                        visitor.RequerstorMobile = (string)user.UserPhone;
+                        visitor.Created_By = userID;
+                        result = 0;
+                        requestor  = visitor;
+                    }
+                }
+            }
+            else if (visitor.LocationId == 2)
+            {
+                if (visitor.BusinessUnitId == 0 || string.IsNullOrEmpty(visitor.BusinessUnitId.ToString()))
+                {
+                    result = "Please Select Bussiness Unit";
+                    requestor = null;
+                }
+                else if (visitor.CategoryId == 0 || string.IsNullOrEmpty(visitor.CategoryId.ToString()))
+                {
+                    result = "Please Select Category";
+                    requestor = null;
+                }
+                else if (visitor.SubCategoryId == 0 || string.IsNullOrEmpty(visitor.SubCategoryId.ToString()))
+                {
+                    result = "Please Select Sub Category";
+                    requestor = null;
+                }
+                else if (string.IsNullOrEmpty(visitor.RequestorDepartment))
+                {
+                    result = "Please Select Department";
+                    requestor = null;
+                }
+                else
+                {
+                    dynamic user = this.visitorDAL.UserDetails(userID);
+                    visitor.RequestorName = (string)user.UserName;
+                    visitor.RequestorEmail = (string)user.UserEmail;
+                    visitor.RequestorDesignation = (string)user.DesignationName;
+                    visitor.RequerstorMobile = (string)user.UserPhone;
+                    visitor.Created_By = userID;
 
+                    result = 0;
+                    requestor = visitor;
+                }
+            }
+            else
+            {
+                requestor = visitor;
+            }
 
-            dynamic user = this.visitorDAL.UserDetails(userID);
-            visitor.RequestorName = (string)user.UserName;
-            visitor.RequestorEmail = (string)user.UserEmail;
-            visitor.RequestorDesignation = (string)user.DesignationName;
-            visitor.RequerstorMobile = (string)user.UserPhone;
-            visitor.Created_By = userID;
-            return this.PartialView("_visitorModalRequestView", visitor);
+            if (requestor == null)
+            {
+                return Json(new { result = result, requestor = requestor });
+            }
+            else { 
+            return this.PartialView("_visitorModalRequestView", requestor);
+            }
         }
 
         public ActionResult ModalBeforeVisitorUpdate(RequestorModel visitor)

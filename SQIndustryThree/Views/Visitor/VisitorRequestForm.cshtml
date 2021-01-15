@@ -618,6 +618,9 @@
     });
 
     $("#addVisitor").click(function () {
+
+        var cheval = true;
+
         if ($("#purposeVisit").val()=="0") {
             //$('#purposeVisit').css({ "border-color": "#FF0000" });
             toastr.error("Please Select Purpose Of Visit ", " Purpose Of Visit ",
@@ -666,63 +669,54 @@
         //else if ($("#visitorNationality").val().length < 1) {
         //    $('#visitorNationality').css({ "border-color": "#FF0000" });
         //}
-        //else if ($('#location').val() == '1') {
-        //    //$("#visitorCompany").val().length < 1
-            
+        else if ($('#sqid').is(':visible') && $('#sqid').val() == '') {
+            toastr.error("Please Enter SQID ", " SQID ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
 
-        //    if ($('#visit_mode').val() == '1') {
-        //        if ($("#sqid").val().length < 1) {
-        //            toastr.error("Please Enter SQID ", " SQID ",
-        //                {
-        //                    "positionClass": "toast-top-right",
-        //                    "showDuration": "300",
-        //                    "hideDuration": "1000",
-        //                    "timeOut": "5000",
-        //                    "closeButton": true
-        //                });
+            return false;
+        }
+        else if ($('#visitorCompanySQ').is(':visible') && $('#visitorCompanySQ').val() == '') {
+            toastr.error("Please Select Business Unit ", " Business Unit ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
 
-        //            return false;
-        //        } else if ($("#visitorCompanySQ").val() == '') {
-        //            toastr.error("Please Select Company ", " Company ",
-        //                {
-        //                    "positionClass": "toast-top-right",
-        //                    "showDuration": "300",
-        //                    "hideDuration": "1000",
-        //                    "timeOut": "5000",
-        //                    "closeButton": true
-        //                });
+            return false;
+        }
+        else if ($('#requestorDepartmentSQ').is(':visible') && $('#requestorDepartmentSQ').val() == '0') {
+            toastr.error("Please Select Department ", " Department",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
 
-        //            return false;
-        //        }
-        //        else if ($("#requestorDepartmentSQ").val() == '0') {
-        //            toastr.error("Please Select Department ", " Department ",
-        //                {
-        //                    "positionClass": "toast-top-right",
-        //                    "showDuration": "300",
-        //                    "hideDuration": "1000",
-        //                    "timeOut": "5000",
-        //                    "closeButton": true
-        //                });
+            return false;
+        }
+        else if ($('#visitorCompany').is(':visible') && $('#visitorCompany').val() == '') {
+            toastr.error("Please Enter Company ", " Company ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
 
-        //            return false;
-        //        }
-        //    } else {
-        //        if ($("#visitorCompany").val().length < 1) {
-        //            toastr.error("Please Enter VisitorCompany ", " Visitor Company ",
-        //                {
-        //                    "positionClass": "toast-top-right",
-        //                    "showDuration": "300",
-        //                    "hideDuration": "1000",
-        //                    "timeOut": "5000",
-        //                    "closeButton": true
-        //                });
-
-        //            return false;
-        //        }
-        //    }
-
-        //   // $('#visitorCompany').css({ "border-color": "#FF0000" });
-        //}
+            return false;
+        }
         else if ($("#visitorDesignation").val().length < 1) {
             toastr.error("Please Enter Designation ", " Designation ",
                 {
@@ -763,52 +757,66 @@
             //$('#meetingWith').css({ "border-color": "#FF0000" });
         }
         else {
-            var remarks = "";
-            if ($("#remarksText").val().length < 1) {
-                remarks = "N/A";
-            } else {
-                remarks = $("#remarksText").val();
-            }
-
-            var pic = document.getElementById('blah').src;
-            trrowNo++;
-            var col = '<tr id="' + trrowNo + '" data-image ="' + $('#filename').val() + '" data-filepath="' + $('#filepath').val() +'">'
-            col += '<td><img id="image" src="'+ pic +'" alt="your image" height="50" width="50" /></td>';
-            col += '<td><input type="text"  name="visitpurpose"  value="' + $("#purposeVisit").children("option:selected").html() + '"/></td>';
-            col += '<td><input type="text" name="meetingWith"  value="' + $("#meetingWith").val() + '"/></td>';
-            col += '<td><input type="text"  name="visitRemarks"  value="'+remarks+'"/></td>';
-            col += '<td><input type="text"  name="visitorName"  value="'+$("#visitorName").val()+'"/></td>';
-            col += '<td><input type="text" name="visitorEmail"  value="'+$("#visitorEmail").val()+'"/></td>';
-            col += '<td><input type="text" name="visitorMobile"  value="' + $("#visitorMobile").val() + '"/></td>'; //$("#myselect option:selected").text();
-            if ($("#visitorCompany").val() == "") {
-                //alert($("#visitorCompanySQ").val())
-                col += '<td><input type="hidden" name="visitorCompanySQ"  value="' + $("#visitorCompanySQ").val() + '"/><input type="text" name="squnit"  value="' + $("#visitorCompanySQ option:selected").text() + '"/></td>';
+            
+            if (cheval == false) {
+                toastr.error("Please Insert the input value Correctly", " Information ",
+                    {
+                        "positionClass": "toast-top-right",
+                        "showDuration": "300",
+                        "hideDuration": "1000",
+                        "timeOut": "5000",
+                        "closeButton": true
+                    });
             }
             else {
-                col += '<td><input type="text" name="visitorCompany"  value="' + $("#visitorCompany").val() + '"/></td>';
-            }
-            col += '<td><input type="text" name="visitorDesignation"  value="' + $("#visitorDesignation").val() + '"/></td>';
-            if ($("#nid").val() == "") {
-                col += '<td><input type="text" name="sqid"  value="' + $("#sqid").val() + '"/></td>';
-            } else {
-                col += '<td><input type="text" name="nid"  value="' + $("#nid").val() + '"/></td>';
-            }
-            
+                var remarks = "";
+                if ($("#remarksText").val().length < 1) {
+                    remarks = "N/A";
+                } else {
+                    remarks = $("#remarksText").val();
+                }
 
-            if ($("#visitorNationality").val() == "") {
-                //alert($("#requestorDepartmentSQ").val())
-                col += '<td><input type="text" name="requestorDepartmentSQ"  value="' + $("#requestorDepartmentSQ").val() + '"/></td>';
-            } else {
-                col += '<td><input type="text" name="visitorNationality"  value="' + $("#visitorNationality").val() + '"/></td>';
-            }
-            
-            col += '<td><input type="text" name="visitorVehicleNo"  value="' + $("#visitorVehicleNo").val() + '"/></td>';
-            
-            col += '<td><input type="text" name="travlechainaOrNot"  value="' + $("#travlechainaOrNot").val() +'"/></td>';
-            col += '<td><input type="button" value="X" onclick="deleterow('+trrowNo+')" class="btn btn-danger" /></td></tr>';
-            $("#visitorTableBody").append(col);
+                var pic = document.getElementById('blah').src;
+                trrowNo++;
+                var col = '<tr id="' + trrowNo + '" data-image ="' + $('#filename').val() + '" data-filepath="' + $('#filepath').val() + '">'
+                col += '<td><img id="image" src="' + pic + '" alt="your image" height="50" width="50" /></td>';
+                col += '<td><input type="text"  name="visitpurpose"  value="' + $("#purposeVisit").children("option:selected").html() + '"/></td>';
+                col += '<td><input type="text" name="meetingWith"  value="' + $("#meetingWith").val() + '"/></td>';
+                col += '<td><input type="text"  name="visitRemarks"  value="' + remarks + '"/></td>';
+                col += '<td><input type="text"  name="visitorName"  value="' + $("#visitorName").val() + '"/></td>';
+                col += '<td><input type="text" name="visitorEmail"  value="' + $("#visitorEmail").val() + '"/></td>';
+                col += '<td><input type="text" name="visitorMobile"  value="' + $("#visitorMobile").val() + '"/></td>'; //$("#myselect option:selected").text();
+                if ($("#visitorCompany").val() == "") {
+                    //alert($("#visitorCompanySQ").val())
+                    col += '<td><input type="hidden" name="visitorCompanySQ"  value="' + $("#visitorCompanySQ").val() + '"/><input type="text" name="squnit"  value="' + $("#visitorCompanySQ option:selected").text() + '"/></td>';
+                }
+                else {
+                    col += '<td><input type="text" name="visitorCompany"  value="' + $("#visitorCompany").val() + '"/></td>';
+                }
+                col += '<td><input type="text" name="visitorDesignation"  value="' + $("#visitorDesignation").val() + '"/></td>';
+                if ($("#nid").val() == "") {
+                    col += '<td><input type="text" name="sqid"  value="' + $("#sqid").val() + '"/></td>';
+                } else {
+                    col += '<td><input type="text" name="nid"  value="' + $("#nid").val() + '"/></td>';
+                }
 
-            $('#blah').attr('src', '/Images/user.png');
+
+                if ($("#visitorNationality").val() == "") {
+                    //alert($("#requestorDepartmentSQ").val())
+                    col += '<td><input type="text" name="requestorDepartmentSQ"  value="' + $("#requestorDepartmentSQ").val() + '"/></td>';
+                } else {
+                    col += '<td><input type="text" name="visitorNationality"  value="' + $("#visitorNationality").val() + '"/></td>';
+                }
+
+                col += '<td><input type="text" name="visitorVehicleNo"  value="' + $("#visitorVehicleNo").val() + '"/></td>';
+
+                col += '<td><input type="text" name="travlechainaOrNot"  value="' + $("#travlechainaOrNot").val() + '"/></td>';
+                col += '<td><input type="button" value="X" onclick="deleterow(' + trrowNo + ')" class="btn btn-danger" /></td></tr>';
+                $("#visitorTableBody").append(col);
+
+                $('#blah').attr('src', '/Images/user.png');
+            }
+
         }
         //$("#visitorName").val("");
         //$("#visitorEmail").val("");
@@ -989,8 +997,12 @@
             approverlistnew(catId, 25, unitId, 0);
             VisitorSubCategoryList(catId);
         }
+        else if (catId == 23) {
+            approverlistnew(catId, 15, unitId, 0);
+            VisitorSubCategoryList(catId);
+        }
         else if (catId == 22) {
-            approverlistnew(catId, 26, unitId,);
+            approverlistnew(catId, 26, unitId,0);
             VisitorSubCategoryList(catId);
         }
         else if (catId == 24) {
@@ -1450,9 +1462,11 @@
             if (jsonObj["VisitMode"] == 1) {
                 jsonObj["BusinessUnitId"] = "0";
                 jsonObj["BusinessUnitName"] = "SQ Central";
+                jsonObj["DepartmentHeadId"] = $('#department_head').val();
             } else {
                 jsonObj["BusinessUnitId"] = $("#business_unit").val();
                 jsonObj["BusinessUnitName"] = $("#business_unit").find('option:selected').text();
+                jsonObj["DepartmentHeadId"] = 0;
             }
         } else {
             jsonObj["VisitMode"] = 0;
@@ -1460,7 +1474,7 @@
             jsonObj["BusinessUnitName"] = $("#business_unit").find('option:selected').text();
             jsonObj["CategoryId"] = $('#category').val();
             jsonObj["SubCategoryId"] = $('#subcategory').val();
-
+            jsonObj["DepartmentHeadId"] = 0;
         }
 
         jsonObj["RequestorDepartment"] = $("#requestorDepartment").val();
@@ -1657,59 +1671,45 @@
                 
             //$('#meetingWith').css({ "border-color": "#FF0000" });       
         }
-        //else if ($("#location").val() == "1") {
-        //    if ($("#visit_mode").val() == "0") {
-        //        toastr.error("Please Select Visit Mode", " Visit Mode ",
-        //            {
-        //                "progressBar": true,
-        //                "positionClass": "toast-top-right",
-        //                "showDuration": "300",
-        //                "hideDuration": "1000",
-        //                "timeOut": "5000",
-        //                "closeButton": true
-        //            });
+        else if ($('#visit_mode').is(':visible') && $('#visit_mode').val() == "0") {
+            toastr.error("Please Select Visitor Mode", " Category ",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
 
-        //        return false;
-        //    }
-        //    else if ($("#visit_mode").val() == "2") {
+            return false;
+        }
+        else if ($('#business_unit').is(':visible') && $('#business_unit').val() == "") {
+            toastr.error("Please Select Business Unit", " Business Unit ",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
 
-        //        if ($("#business_unit").val() == "") {
+            return false;
+        }
+        else if ($('#department_head').is(':visible') && $('#department_head').val() == "0") {
+            toastr.error("Please Select Department Head", " Department Head",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
 
-        //            toastr.error("Please Select Business Unit", " Business Unit ",
-        //                {
-        //                    "progressBar": true,
-        //                    "positionClass": "toast-top-right",
-        //                    "showDuration": "300",
-        //                    "hideDuration": "1000",
-        //                    "timeOut": "5000",
-        //                    "closeButton": true
-        //                });
-
-        //            return false;
-
-        //        }
-
-                
-        //    }
-        //}
-        //else if ($("#location").val() == "2") {
-        //    if ($("#business_unit").val() == "") {
-        //        //check = false;
-        //        //$('#business_unit').css({ "border-color": "#FF0000" });
-        //        toastr.error("Please Select Business Unit", " Business Unit ",
-        //            {
-        //                "progressBar": true,
-        //                "positionClass": "toast-top-right",
-        //                "showDuration": "300",
-        //                "hideDuration": "1000",
-        //                "timeOut": "5000",
-        //                "closeButton": true
-        //            });
-
-        //        return false;
-        //    }
-        //    return false;
-        //}
+            return false;
+        }
         else if ($('#category').val() == "0") {
             //alert('ok');
             //$('#categroy').css({ "border-color": "#FF0000" });
@@ -1829,6 +1829,22 @@
                 type: "POST",
                 async: true,
                 success: function (data) {
+                    //alert(data)
+                    if (data.requestor == null) {
+                        toastr.error(data.result, " Result ",
+                            {
+                                "progressBar": true,
+                                "positionClass": "toast-top-right",
+                                "showDuration": "300",
+                                "hideDuration": "1000",
+                                "timeOut": "5000",
+                                "closeButton": true
+                            });
+                    }
+                    //else {
+                        
+                    //}
+
                     $("#modalbody").html("");
                     $("#modalbody").append(data);
                     $("#myModal").modal("show");
