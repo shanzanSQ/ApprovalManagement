@@ -81,14 +81,14 @@ namespace SQIndustryThree.Controllers
             return base.RedirectToAction("Index", "Account");
         }
 
-        public ActionResult GateInfoUpdate(int visitorId, string visitorCardNo, string vehicleNo, string remarks, string checkin, string checkout)
+        public ActionResult GateInfoUpdate(int requestorId, int visitorId, string visitorCardNo, string vehicleNo, string remarks, string checkin, string checkout)
         {
             if (base.Session["SQuserId"] == null)
             {
                 return base.RedirectToAction("Index", "Account");
             }
             string data = "";
-            dynamic result = this.visitorDAL.UpadteVisitorCheckinAndCheckOut(visitorId, visitorCardNo, vehicleNo, remarks, checkin, checkout);
+            dynamic result = this.visitorDAL.UpadteVisitorCheckinAndCheckOut(requestorId, visitorId, visitorCardNo, vehicleNo, remarks, checkin, checkout);
             if (result != 0)
             {
                 data = "Updated Data Successfully";
@@ -586,6 +586,27 @@ namespace SQIndustryThree.Controllers
                 return base.View();
             }
             return base.RedirectToAction("Index", "Account");
+        }
+
+        public ActionResult VisitorReportView()
+        {
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult GetVisitorReportList(string FromDate, string ToDate)
+        {
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+            int userID = Convert.ToInt32(Session["SQuserId"].ToString());
+            var reportList = visitorDAL.AllApproveReport(FromDate, ToDate);
+            return PartialView("_visitorReportAllList", reportList);
         }
     }
 }

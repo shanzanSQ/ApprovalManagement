@@ -528,6 +528,7 @@ namespace SQIndustryThree.DAL
         }
 
         public object UpadteVisitorCheckinAndCheckOut(
+          int requestorId,
           int visitorId,
           string visitorCardNo,
           string vehicleNo,
@@ -543,6 +544,7 @@ namespace SQIndustryThree.DAL
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
                     DynamicParameters dynamicParameters = new DynamicParameters();
+                    dynamicParameters.Add("@@RequestorId", (int)requestorId);
                     dynamicParameters.Add("@VisitorId", (object)visitorId);
                     dynamicParameters.Add("@VisitorCardNo", (object)visitorCardNo); 
                     dynamicParameters.Add("@vehicleNo", (object)vehicleNo);
@@ -586,7 +588,7 @@ namespace SQIndustryThree.DAL
                         CategoryName = sqlDataReader["CategoryName"].ToString(),
                         SubCategroyName = sqlDataReader["SubCategoryName"].ToString(),
                         MeetingWith = sqlDataReader["MeetingWith"].ToString(),
-                        //VehicleNo = sqlDataReader["VisitorVehicleNo"].ToString(),
+                        VehicleNo = sqlDataReader["VisitorVehicleNo"].ToString(),
                         TotalVisitor = (int)sqlDataReader["TotalVisitor"],
                         IsApproved = (int)sqlDataReader["IsApproved"],
                         Pending = (int)sqlDataReader["Pending"]
@@ -805,6 +807,32 @@ namespace SQIndustryThree.DAL
                 this.accessManager.SqlConnectionClose();
             }
         }
+
+        public List<VisitorRequestModel> AllApproveReport(
+              string FromDate,
+              string ToDate
+           )
+        {
+            List<VisitorRequestModel> visitorApproverList = new List<VisitorRequestModel>();
+            try
+            {
+                using (IDbConnection cnn = (IDbConnection)new SqlConnection(this.connStr))
+                {
+                    if (cnn.State == ConnectionState.Closed)
+                        cnn.Open();
+                    DynamicParameters dynamicParameters = new DynamicParameters();
+                    dynamicParameters.Add("@FromDate", (object)FromDate);
+                    dynamicParameters.Add("@Todate", (object)ToDate);              
+                    visitorApproverList = cnn.Query<VisitorRequestModel>("sp_AllApproveReport", (object)dynamicParameters, commandType: new CommandType?(CommandType.StoredProcedure)).ToList<VisitorRequestModel>();
+                }
+                return visitorApproverList;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
 
     }
 }

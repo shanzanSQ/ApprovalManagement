@@ -7106,6 +7106,8 @@
     <Content Include="Views\Visitor\_myVisitorRequestor.cshtml" />
     <Content Include="Views\Visitor\_visitorModalRequestView.cshtml" />
     <Content Include="Views\Visitor\_VisitorRequestUpdateModal.cshtml" />
+    <Content Include="Views\Visitor\VisitorReportView.cshtml" />
+    <Content Include="Views\Visitor\_visitorReportAllList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

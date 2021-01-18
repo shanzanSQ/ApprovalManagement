@@ -1,0 +1,134 @@
+﻿
+@{
+    ViewBag.Title = "VisitorReportView";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+ <link href="~/Assets/bower_components/select2/dist/css/select2.min.css" rel="stylesheet" />
+<style type="text/css">
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    #inputTable tr td {
+        padding: 2px;
+    }
+</style>
+<div class="container-fluid">
+    <h3 style="text-align: center;">
+        <b>Visitor Report View</b>
+    </h3>
+    <hr style="margin:0px" />
+    <div class="row">
+        <div class="col-md-12">
+            <div id="inputTable" style="margin:0 auto; width:50%">
+                <div class="row">
+                    <div class="col-md-6" >
+                        <label for="fromDate">From Date</label>
+                        <input type="date" id="fromDate" onchange="ChangeColor('#fromDate')" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="toDate">To Date</label>
+                        <input type="date" id="toDate" onchange="ChangeColor('#toDate')" class="form-control" />
+                    </div>
+                </div>
+            </div>
+            <div style="text-align:center">
+                <br />
+                <input type="button" class="btn  btn-success" value="Get Report" onclick="GetAllExceptioNReport()" />
+            </div>
+        </div>
+        <div id="exceptionReportDashboard" style="overflow:scroll; width:100%">
+
+        </div>
+    </div>
+    <div class="modal" id="myModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Visitor Request Preview</h4>
+                </div>
+                <div id="modalbody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+<script src="~/Assets/bower_components/select2/dist/js/select2.min.js"></script>
+<script type="text/javascript">
+    $('.select2').select2();
+   
+    function ChangeColor(id) {
+        $(id).css({ "border-color": "#d3d3d3" });
+    }
+    function GetAllExceptioNReport() {
+        var formDate = $("#fromDate").val();
+        var toDate = $("#toDate").val();
+        if (formDate == "") {
+            $('#fromDate').css({ "border-color": "#FF0000" });
+        } else if (toDate=="") {
+            $('#toDate').css({ "border-color": "#FF0000" });
+        } else {
+        var businessunit = $("#business_unit").val();
+        var exptype = $("#excepTionType").val();
+        var expreason = $("#exceptionReasons").val();
+        var buyerid = $("#loadbuyer").val();
+
+        var urlpath = '@Url.Action("GetVisitorReportList", "Visitor")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: { FromDate: formDate, ToDate: toDate },
+            async: true,
+            success: function (data) {
+                console.log(data)
+                if (data) {
+                    $('#exceptionReportDashboard').empty();
+                    $('#exceptionReportDashboard').append(data);
+                    $('#visitorTable').DataTable({
+                        "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
+                    });
+                }
+            }
+        });
+        }
+    }
+    function ExceptionReportDetails(masterID) {
+        var urlpath = '@Url.Action("IndividualExceptionRequest", "Exception")';
+        $.ajax({
+            data: { MasterID: masterID,ViewName:"_excpReportDetailsById",UserType:0},
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    $("#modalbody").html("");
+                    $("#modalbody").append(data);
+                    $("#myModal").modal("show");
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+    }
+    function PrintModal() {
+            var print_div = document.getElementById("printablearea");
+            var print_area = window.open();
+            print_area.document.write("<style>table{border-collapse:collapse;}</style><img width='20' height='20' src='../../Images/logo.png' /><img style='width:80px;' src='../../Images/logo.png' />");
+            print_area.document.write("<h1 style='text-align:center'>Exception Request Preview</h1>");
+            print_area.document.write(print_div.innerHTML);
+            print_area.document.close();
+            print_area.focus();
+            print_area.print();
+            print_area.close();
+    }
+</script>

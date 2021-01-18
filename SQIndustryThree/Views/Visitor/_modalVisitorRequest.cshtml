@@ -97,6 +97,7 @@
         <div class="col-md-12" style="margin-bottom:10px;">
             <div class="form-inline">
                 <div class="form-group col-md-3">
+                    <input type="hidden" class="form-control col-md-6" id="requestorId" value="@Model.RequestorId" name="visitor_card_Id" placeholder="Requestor ID" />
                     <label for="" class="col-md-6">Card No</label>
                     <input type="text" class="form-control col-md-6" id="visitor_card_Id" value="@Model.VisitorCardNo" name="visitor_card_Id" placeholder="Visitor ID" />
                 </div>
@@ -208,7 +209,7 @@
 
             var urlpath = '@Url.Action("GateInfoUpdate", "Visitor")';
         $.ajax({
-            data: { visitorId: visitorId, visitorCardNo: visitorCardNo, vehicleNo: vehicleNo, remarks: remarks, checkin: checkin, checkout: checkout },
+            data: { requestorId: @Model.RequestorId, visitorId: visitorId, visitorCardNo: visitorCardNo, vehicleNo: vehicleNo, remarks: remarks, checkin: checkin, checkout: checkout },
                 url: urlpath,
                 type: "Post",
                 async: true,

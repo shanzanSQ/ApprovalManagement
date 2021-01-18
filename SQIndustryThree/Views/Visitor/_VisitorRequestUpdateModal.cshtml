@@ -166,34 +166,26 @@
                         <td style="text-align:center"><input style="text-align:center" type="text" class="form-control" value="@item.Chainavisit" id="chainavisit" /></td>
                         <td style="text-align:center">
                             <select type="text" class="form-control" id="purpose_visit" style="width:160px">
-                                @if (item.PurposeOfVisitSQ == "Interview")
-                                    {
-                                        <option value="0">--Select Purpose--</option>
-                                        <option value="Interview" selected>Interview</option>
-                                        <option value="Business Meeting">Business Meeting</option>
-                                        <option value="Others">Others</option>
-                                    }
-                                    else if (item.PurposeOfVisitSQ == "Business Meeting")
-                                    {
-                                        <option value="0">--Select Purpose--</option>
-                                        <option value="Interview">Interview</option>
-                                        <option value="Business Meeting" selected>Business Meeting</option>
-                                        <option value="Others">Others</option>
-                                    }
-                                    else if (item.PurposeOfVisitSQ == "Others")
-                                    {
-                                        <option value="0">--Select Purpose--</option>
-                                        <option value="Interview">Interview</option>
-                                        <option value="Business Meeting">Business Meeting</option>
-                                        <option value="Others" selected>Others</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="0" selected>--Select Purpose--</option>
-                                        <option value="Interview">Interview</option>
-                                        <option value="Business Meeting">Business Meeting</option>
-                                        <option value="Others">Others</option>
-                                    }
+
+                                    <option value="0">--Select Purpose--</option>
+                                    <option value="1">To develope and review business activities</option>
+                                    <option value="2">To check the product quality</option>
+                                    <option value="3">To advise on product technical issues</option>
+                                    <option value="4">To assess the quantity of disposed items</option>
+                                    <option value="5">To take out the disposed items</option>
+                                    <option value="6">To conduct audit</option>
+                                    <option value="7">To conduct awareness and training</option>
+                                    <option value="8">To align with local regulation</option>
+                                    <option value="9">To review and evaluate production facilities</option>
+                                    <option value="10">To supply products or services</option>
+                                    <option value="11">To do project consultancy</option>
+                                    <option value="12">To service and repair</option>
+                                    <option value="13">To provide out sourcing services</option>
+                                    <option value="14">To assist in materials movement</option>
+                                    <option value="15">To attend the interview</option>
+                                    <option value="16">To collect finished goods for shipment</option>
+                                
+                                
 
                             </select>
                         </td>
