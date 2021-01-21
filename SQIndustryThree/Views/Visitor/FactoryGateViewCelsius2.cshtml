@@ -108,6 +108,12 @@
         // $("#spmenuid").html($(this).html());
     });
 
+    load();
+
+    function load() {
+        setTimeout("window.open(self.location, '_self');", 300000);
+    }
+
     GetVisitorByFactoryDesk(3);
     function GetVisitorByFactoryDesk(variable) {
         var urlpath = '@Url.Action("GetFactoryVisitor", "Visitor")';

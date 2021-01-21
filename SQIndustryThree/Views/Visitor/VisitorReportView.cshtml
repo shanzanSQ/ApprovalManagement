@@ -24,11 +24,11 @@
                 <div class="row">
                     <div class="col-md-6" >
                         <label for="fromDate">From Date</label>
-                        <input type="date" id="fromDate" onchange="ChangeColor('#fromDate')" class="form-control" />
+                        <input type="date" id="fromDate" value="" onchange="ChangeColor('#fromDate')" class="form-control" />
                     </div>
                     <div class="col-md-6">
                         <label for="toDate">To Date</label>
-                        <input type="date" id="toDate" onchange="ChangeColor('#toDate')" class="form-control" />
+                        <input type="date" id="toDate" value="" onchange="ChangeColor('#toDate')" class="form-control" />
                     </div>
                 </div>
             </div>
@@ -67,11 +67,22 @@
 <script src="~/Assets/bower_components/select2/dist/js/select2.min.js"></script>
 <script type="text/javascript">
     $('.select2').select2();
+
+    $(function () {
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+
+        today = mm + '/' + dd + '/' + yyyy;
+        $("#fromDate").val(today);
+        $("#toDate").val(today);
+    })
    
     function ChangeColor(id) {
         $(id).css({ "border-color": "#d3d3d3" });
     }
-    function GetAllExceptioNReport() {
+    function GetAllVisitorReport() {
         var formDate = $("#fromDate").val();
         var toDate = $("#toDate").val();
         if (formDate == "") {
