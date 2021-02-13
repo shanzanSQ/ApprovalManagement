@@ -1,0 +1,86 @@
+﻿@model IEnumerable<SQIndustryThree.Models.BillApproval.BillQuality>
+
+<style>
+    th {
+        text-align: left;
+    }
+
+    td {
+        text-align: left;
+    }
+
+    #genaralInfodt tr th, #genaralInfodt tr td, #approverlist tr td, #approverlist tr th {
+        text-align: center;
+    }
+</style>
+
+<div class="">
+    <div id="printablearea">
+        <div>
+            <span style="float:left;font-weight:bold;font-size:20px">@Model.FirstOrDefault().InvoiceNo</span>
+            <span style="float:right;font-weight:bold;font-size:20px"> InvoiceKey: @Model.FirstOrDefault().InvoiceKey</span>
+        </div>
+
+
+
+        <table border="1" width="100%" id="genaralInfodt">
+            @{float countFob = 1;}
+            <caption>Quality Details</caption>
+            <thead>
+                <tr>
+                    <th>SL</th>
+                    <th>QualityID</th>
+                    <th>Item</th>
+                    <th>Result</th>
+                    <th>Comment</th>
+                    <th>FileName</th>
+                    <th>Action</th>
+                    <th>Created By</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                @foreach (var item in Model)
+                {
+                <tr>
+                    <td>@countFob</td>
+                    <td>@item.QualityID</td>
+                    <td>@item.QualityParam</td>
+                    <td>@item.QualityResult</td>
+                    <td>@item.QualityComment</td>
+                    <td>@item.FileName</td>
+                    @if (!string.IsNullOrEmpty(item.FileName))
+                    {
+                        <td>@Html.ActionLink("Download", "QualityDownloadFile", "BillApproval", new { filepath = item.FilPath.ToString(), filename = item.FileName.ToString() }, new { @target = "_blank" })</td>
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
+
+                    <td>@item.UserName</td>
+                </tr>
+
+                    countFob++;
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    
+                </tr>
+            </tfoot>
+        </table>
+
+
+    </div>
+
+    
+</div>
+
+
+
+
+
+
+
+

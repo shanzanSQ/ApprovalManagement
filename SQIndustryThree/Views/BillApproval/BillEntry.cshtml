@@ -1,0 +1,1128 @@
+﻿
+@{
+    ViewBag.Title = "BillEntry";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/Assets/bower_components/select2/dist/css/select2.min.css" rel="stylesheet" />
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script src="~/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+<h3 style="text-align:center;background-color: #37474F;color:white;padding:15px;">Bill Entry</h3>
+
+@*<div class="panel panel-primary" style="background-color: #9bb18d;color:white;">
+        <div class="panel-body"><h3 style="text-align:center;">Bill Entry</h3></div>
+    </div>*@
+
+<style type="text/css">
+    .modal-lg {
+        max-width: 80% !important;
+    }
+</style>
+
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">Invoice Detail</div>
+                <div class="panel-body">
+                    <label for="invoiceType" class="invoiceType">Invoice Type: <span style="color:red">*</span></label>
+                    <select id="invoiceType" class="form-control invoiceType">
+                        <option value="0">---Select Type---</option>
+                        <option value="1">Project</option>
+                    </select>
+                    <label for="supplier" class="supplier">Supplier: <span style="color:red">*</span></label>
+                    <select id="supplier" class="form-control supplier"></select>
+
+                    <label for="invoice_no" class="invoice_no">Invoice No: <span style="color:red">*</span></label>
+                    <input type="text" id="invoice_no" class="form-control invoice_no" value="" />
+                    <label for="invoice_date" class="invoice_date">Invoice Date: <span style="color:red">*</span></label>
+                    <input type="date" id="invoice_date" class="form-control invoice_date" value="" />
+                </div>
+                <div class="panel-footer text-right">
+                    <button class="btn btn-info btn-sm" id="POAdd" onclick="POAdd()">Add PO</button> &nbsp;&nbsp;
+                    <button type='button' id='addQuality' class='btn btn-primary btn-sm' onclick="addQuality()">Add Quality</button>
+                </div>
+            </div>
+
+        </div>
+        @*<div class="col-md-4">
+
+            </div>*@
+        <div class="col-md-6">
+
+            <div class="row">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <strong>Approver List</strong>
+                    </div>
+                    <div class="panel-body">
+                        <div class="">
+                            <table width="100%" id="ListOfApprover" class="table table-bordered table-responsive table-condensed table-hover">
+                                @*<caption>Approver List</caption>*@
+                                <thead>
+                                    <tr>
+
+                                        <th>SL</th>
+                                        <th>Approver Name</th>
+                                        <th>Approver Designation</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="approverTable">
+                                </tbody>
+                                @*<tr data-approver="">
+                                        <td class="countApprover"></td>
+                                        <td class="approverName"></td>
+                                        <td class="approverDesignation"></td>
+                                    </tr>
+                                    <tr data-approver="">
+                                        <td class="countApprover"></td>
+                                        <td class="approverName"></td>
+                                        <td class="approverDesignation"></td>
+                                    </tr>*@
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <strong> Attach File </strong>
+                    </div>
+
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table width="100%">
+                                    <caption>Attach File</caption>
+                                    <tr>
+                                        <td style="padding-right:2PX;"><input type="file" multiple class="form-control" id="billFileUpload" onchange="FileUploadOnChange()" /></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table style="width:98%" class="table table-bordered table-responsive table-condensed table-hover" border="1" id="billFileTable">
+                                    <caption>Attached File</caption>
+                                    <thead>
+                                        <tr>
+                                            <th>File Name</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="attachedFileTable">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    @*<div class="panel-footer text-right">
+                            <button class="btn btn-info btn-sm" id="POAdd" onclick="POAdd()">Add PO</button>
+                        </div>*@
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    @*<br />
+        <div class="row text-right">
+            <div class="col-md-4">
+                <button class="btn btn-info btn-sm" id="POAdd" onclick="POAdd()">Add PO</button>
+            </div>
+            <div class="col-md-4">
+
+            </div>
+            <div class="col-md-4 ">
+                <button type='button' id='addQuality' class='btn btn-primary btn-sm' onclick="addQuality()">Add Quality</button>
+            </div>
+
+        </div>
+
+        <br />*@
+
+    <div id="masterdetails">
+
+        @*<table id='tbl_MasterDetails' style='width:100%;border: 1px solid black;' class='table table-striped'>
+                <thead style='font-weight: bold;text-align:center;'>
+                    <tr><td>PO NO</td><td>Supplier</td><td>Article</td><td>Color</td><td>Size</td><td>Qty</td><td>InvoiceQty</td><td>Balance to Invoice</td></tr>
+                </thead>
+                <tbody style='text-align:center;' id='main'>
+                </tbody>
+            </table>
+            <div class='text-right'>
+                <button type='button' id='addPO' class='btn btn-success btn-sm' onclick='POSubmit()'>PO Submit</button> &nbsp;
+                <button type='button' id='remove_button' class='btn btn-danger btn-sm' data-dismiss='modal'>Close</button>
+            </div>*@
+
+
+    </div>
+
+
+
+    <div class="modal" id="myModal">
+        <div class="modal-dialog modal-lg">
+            <div class="col-md-12 modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">List Of PO Numbers</h4>
+                </div>
+                <div id="modalbody" class="modal-body">
+                </div>
+                @*<div class="modal-footer">
+
+                    </div>*@
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+    <div class="modal" id="myPreview">
+        <div class="modal-dialog modal-lg">
+            <div class="col-md-12 modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Bill Request Preview</h4>
+                </div>
+                <div id="previewmodalbody" class="previewmodal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div>
+
+ </div>
+
+    <script>
+    $(function () {
+        supplierList();
+        //$('#supplier').select2();
+    })
+
+    $('#invoiceType').change(function () {
+        var invoiceType = $(this).val();
+
+        approverlist(invoiceType);
+    })
+
+
+    const supplierList = () => {
+        $.ajax({
+            url: '/BillApproval/SupplierList',
+            type: 'POST',
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                $('#supplier').empty();
+                $('#supplier').append("<option value='0'>-- Select Supplier --</option>");
+
+                if (response.length > 0) {
+
+                    for (let i = 0; response.length > i; i++) {
+
+                        $("#supplier").append($("<option></option>").val(response[i].SupplierID)
+                            .html(response[i].Supplier));
+                    }
+                    //$('select#supplier').append(result);
+                }
+            }
+        });
+    }
+
+    function approverlist(invoiceType) {
+        //alert(departmentHead);
+        $('#ListOfApprover').show();
+         var urlpath = '@Url.Action("ApproverList", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { invoiceType: invoiceType},
+            async: true,
+            success: function (data) {
+                console.log(data)
+                //$('#ListOfApprover').empty();
+                var result = "";
+                var count = 1;
+                $('#ListOfApprover tr').not(function () { return !!$(this).has('th').length; }).remove();
+               // $('#subcategory').append("<option value='0'>--Select Business Unit--</option>");
+                for (var i = 0; i < data.length; i++) {
+
+                    result += "<tr data-approverid=" + data[i].UserId + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].DesignationName + "\">"
+                    //result += "<td>" + count + "<td>"Designation
+
+                    result += '<td><p name="approverNo">' + count + '</p></td>';
+                    result += '<td><p name="userName">' + data[i].UserName + '</p></td>';
+                    result += '<td><p name="designation">' + data[i].DesignationName + '</p></td>';
+                    result += "</tr>"
+                    count++;
+                }
+
+                $('#ListOfApprover').append(result);
+            }
+        });
+    }
+
+    const POAdd = () => {
+        let supplier = $('#supplier').val();
+        let invoice_no = $('#invoice_no').val();
+        let invoice_date = $('#invoice_date').val();
+
+        if (supplier == '0') {
+            toastr.error("Please Select Supplier", " Supplier ",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+        }
+        else if (invoice_no == '') {
+            toastr.error("Please Enter Invoice Number", " Invoice ",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+        }
+        else if ($("#invoice_date").val().length < 1) {
+            toastr.error("Please Enter Invoice Date", " Invoice Date ",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+        }
+        else {
+            $.ajax({
+                url: '/BillApproval/POList',
+                type: 'POST',
+                contentType: "application/json;charset=utf-8",
+                data: JSON.stringify({ supplierId: supplier }),
+                dataType: "json",
+                success: function (response) {
+                    $("#myModal").modal('show');
+                    //$('#myModal').show();
+                    $("#modalbody").empty();
+                    var result = "";
+                    result += "<div class='row col-md-offset-2'>";
+                    result += "<div class='col-md-8' style='text-align:center;'>";
+                    result += "<input type='text' class='form-control' id='search' aria-describedby='search' placeholder='Search'>";
+                    result += "</div>";
+                    result += "<div class='col-md-4'>";
+                    result += "<button type='button' class='btn btn-success'>S E A R C H</button>";
+                    result += "</div>";
+                    result += "</div>";
+                    result += "<hr />";
+                    result += "<table id='tbl_PODetails' style='width:100%;border: 1px solid black;' class='table table-striped'>";
+                    result += "<thead style='font-weight: bold;text-align:center;'>";
+                    result += "<tr><th style='text-align:center'> <input type='checkbox' id='selectAll'></th><th style='text-align:center'>PO NO</th><th style='text-align:center'>Supplier</th><th style='text-align:center'>Article</th><th style='text-align:center'>Color</th>";
+                    result += "<th style='text-align:center'>Size</th><th style='text-align:center'>UOM</th><th style='text-align:center'>Qty</th><th style='text-align:center'>Rate</th><th style='text-align:center'>Value</th><th style='text-align:center'>InvoiceQty</th><th style='text-align:center'>Balance to Invoice</th></tr>";
+                    result += "</thead>";
+                    result += "<tbody style='text-align:center;'>";
+                    if (response.length > 0) {
+                        var countRow = 1;
+                        for (var i = 0; i < response.length; i++) {
+
+                            result += "<tr data-key=" + response[i].POKey + " id='' data-detail=" + response[i].PODetailsKey +"  data-storage='' data-organization=''>";
+                            result += "<td style='text-align:center;'><input type='checkbox' class='approval' id='enableCheck' value=" + response[i].PONo + " data-external=" + countRow + " data-pokey=" + response[i].POKey + " data-detail=" + response[i].PODetailsKey +"> </td>";
+                            result += "<td class='td_pono_" + response[i].PODetailsKey + "'>" + response[i].PONo + "</td>";
+                            result += "<td class='td_supplier_" + response[i].PODetailsKey + "'>" + response[i].Supplier + "</td>";
+                            result += "<td class='td_article_" + response[i].PODetailsKey + "'>" + response[i].Article + "</td>";
+                            result += "<td class='td_color_" + response[i].PODetailsKey + "'>" + response[i].Color + "</td>";
+                            result += "<td class='td_size_" + response[i].PODetailsKey + "'>" + response[i].Size + "</td>";
+                            result += "<td class='td_unit_" + response[i].PODetailsKey + "'><span id='span_unit_" + response[i].PODetailsKey + "'>" + response[i].UnitName + "</span><input type='hidden' class='form-control unitId' id='unitId_" + response[i].PODetailsKey + "' value=" + response[i].UnitID +" /></td>";
+                            //result += "<td class='td_unit_" + countRow + "'>" + response[i].UnitName + " </td>";
+                            result += "<td class='td_poqty_" + response[i].PODetailsKey + "'>" + response[i].POQty + "</td>";
+                            result += "<td class='td_rate_" + response[i].PODetailsKey + "'>" + response[i].Rate + "</td>";
+                            result += "<td class='td_povalue_" + response[i].PODetailsKey + "'>" + response[i].POValue + "</td>";
+                            result += "<td class='td_uptodateqty_" + response[i].PODetailsKey + "'>" + response[i].UptodatePIQty + "</td>";
+                            //let PIQty = response[i].POQty - response[i].UptodatePIQty
+
+                            result += "<td class='td_piqty_" + response[i].PODetailsKey + "'>" + response[i].BalancePIQty + "</td>";
+                            result += "</tr>";
+
+                            countRow++;
+                        }
+
+                    }
+                    result += "</tbody>";
+                    result += "</table>";
+                    result += "<div class='text-right'>";
+                    result += "<button type='button' id='addPO' class='btn btn-success btn-sm' onclick='POSubmit()'>A D D</button> &nbsp;";
+                    result += "<button type='button' id='remove_button' class='btn btn-danger btn-sm' data-dismiss='modal'>Close</button>";
+                    result += "</div>";
+                    $('#modalbody').append(result);
+
+                    $('#selectAll').click(function (e) {
+                        //alert("a");
+                        var table = $(e.target).closest('table');
+                        $('td input:checkbox', table).prop('checked', this.checked);
+
+                        //var count = $('input[type="checkbox"]:checked').not(":eq(0)").length;
+
+
+                    });
+                }
+            });
+        }
+
+
+
+
+
+    }
+
+    const POSubmit = () => {
+
+        if ($("#tbl_PODetails tr td input[type='checkbox']:checked").length == 0) {
+            toastr.error("Please checked the checkbox", "Checkbox", {
+                "positionClass": "toast-top-right",
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "closeButton": true
+            });
+            return false;
+        }
+
+        $("#masterdetails").show();
+
+
+        var vEXTARNAL = "";
+        var vDetailKey = "";
+
+        $("#myModal").modal('hide');
+        var result = "";
+
+        var totalAmt = 0;
+
+        $('#masterdetails').empty();
+
+        result += "<table id='tbl_MasterDetails' style='width:100%;border: 1px solid black;' class='table table-striped'>";
+        result += "<thead style='font-weight: bold;text-align:center;'>";
+        result += "<tr><th>PO NO</th><th>Supplier</th><th>Article</th><th>Color</th><th>Size</th><th>UOM</th>";
+        result += "<th>Qty</th><th>Rate</th><th>PO Value</th><th>Already Invoiced Qty</th><th>Balance to Invoice</th>";
+        result += "<th>InvoiceQty</th><th>InvoiceValue</th><th>Discount</th><th>Total Paid</th><th>Delete</th>"
+        result += "</tr>";
+        result += "</thead>";
+        result += "<tbody style='text-align:center;' id='main'>";
+
+        //alert($("#tbl_PODetails tr td input[type='checkbox']:checked").length);
+        var countRow = 1;
+        $("#tbl_PODetails tr td input[type='checkbox']:checked").each(function () {
+
+            vEXTARNAL = $(this).attr('data-external');
+            vDetailKey = $(this).attr('data-detail');
+            //alert(vDetailKey);
+
+
+
+
+            //vEXTARNAL += $(this).val() + ',';
+
+
+            //alert($(this).attr('data-external'));
+            //alert(vEXTARNAL);
+
+
+            if (vDetailKey.length > 0) {
+
+
+               // for (var i = 0; i < vEXTARNAL.length; i++) {
+                result += "<tr data-external=" + $(this).attr('data-external') + " data-detail=" + $(this).attr('data-detail') + " id=" + vDetailKey + " data-pokey=" + $(this).attr('data-pokey')+"  data-storage='' data-organization=''>";
+                    //result += "<td style='text-align:center;'><input type='checkbox' class='approval' id='enableCheck' value=" + response[i].PONo + " data-external=" + countRow + "> </td>";
+                result += "<td><span id='pono_" + vDetailKey + "'>" + $('.td_pono_' + vDetailKey).html() + "</span></td>";
+                result += "<td><span id='supplier_" + vDetailKey + "'>" + $('.td_supplier_' + vDetailKey).html() + "</span></td>";
+                result += "<td><span id='article_" + vDetailKey + "'>" + $('.td_article_' + vDetailKey).html() + "</span></td>";
+                result += "<td><span id='color_" + vDetailKey + "'>" + $('.td_color_' + vDetailKey).html() + "</span></td>";
+                result += "<td><span id='size_" + vDetailKey + "'>" + $('.td_size_' + vDetailKey).html() + "</span></td>";
+                result += "<td><span id='master_unit_" + vDetailKey + "'>" + $('#span_unit_' + vDetailKey).html() + "</span><span hidden id='span_unitId_" + vDetailKey + "'>" + $('#unitId_' + vDetailKey).val() + "</span></td>";
+                result += "<td><span id='poqty_" + vDetailKey + "'>" + $('.td_poqty_' + vDetailKey).html() + "</span></td>";
+                result += "<td><span id='rate_" + vDetailKey + "'>" + $('.td_rate_' + vDetailKey).html() + "</span></td>";
+                result += "<td><span id='povalue_" + vDetailKey + "'>" + $('.td_povalue_' + vDetailKey).html() + "</span></td>";
+                result += "<td><span id='uptodateqty_" + vDetailKey + "'>" + $('.td_uptodateqty_' + vDetailKey).html() + "</span></td>";
+                //let PIQty = parseInt($('.td_piqty_' + vEXTARNAL).html()) - parseInt($('.td_uptodateqty_' + vEXTARNAL).html())
+                    //
+                result += "<td><span id='piqty_" + vDetailKey + "'>" + $('.td_piqty_' + vDetailKey).html() + "</span></td>";
+                result += "<td><input type='text' class='form-control invoiceQty' id='invoiceQty_" + vDetailKey + "' onkeyup='invoiceQty(" + vDetailKey +")' value='0' /></td>";
+                result += "<td><input type='text' class='form-control invoiceValue' id='invoiceValue_" + vDetailKey + "' value='0' readonly /></td>";
+                result += "<td><input type='text' class='form-control discount' id='discount_" + vDetailKey + "' onkeyup='discount(" + vDetailKey +")' value='0' /></td>";
+                result += "<td><input type='text' class='form-control total' data-size=" + vDetailKey + " id='total_" + vDetailKey + "' value='0' readonly /></td>";
+                result += "<td><button type='button' class='btn btn-danger' aria-label='true' onclick='deleterow(" + vDetailKey +")'><span class='glyphicon glyphicon-floppy-remove' aria-hidden='true'></span></button></td>";
+                    // result += "<td>" + $('.td_povalue').html() + "</td>";
+                result += "</tr>";
+
+
+                //}
+
+                countRow++;
+
+
+            }
+
+            //totalAmt += parseInt($('.total').val());
+            //alert(totalAmt);
+
+
+        });
+
+        result += "<tr>";
+        result += "<td></td><td></td> <td></td> <td></td> <td></td> <td></td> <td><label for='Qty' id='Qty'> Qty </label></td> <td><label for='Rate' id='Rate'> Rate </label></td> <td><label for='value' id='Value'> Value </label></td> <td><label for='alreadyQty' id='alreadyQty'> AlreadyQty </label></td> <td><label for='balanceQty' id='balanceQty'> BalanceQty </label></td> <td><label for='invoiceQty' id='invoiceQty'> InvoiceQty </label></td> <td><label for='invoiceValue' id='invoiceValue'> InvoiceValue </label></td> <td><label for='discount' id='Discount'> Discount </label></td> <td><label for='totalPaid' id='TotalPaid'> TotalPaid </label></td> <td><label for='total' id=''> </label></td>";
+        result += "</tr>";
+
+            //$('#main').empty();
+            //$('#masterdetails').append('#tbl_PODetails tr');
+
+
+
+            //var row = $(this).closest('tr:has(td)').html();//.find("Table").find("TR:has(td)").clone();
+            //var tr = $("#tbl_PODetails").find("TR:has(td:not(:first-child))").clone();
+            //alert(tr);
+            //$("#main").append(tr);
+
+
+            //var row = $(this).closest('tr').html();
+            //$('#masterdetails').append('<tr>' + row + '</tr>');
+
+            result += "</tbody>";
+        result += "</table>";
+        result += "<div class='row'>";
+            result += "<div class='col-md-4'>";
+                result += "<div class=''>";
+        result += "<input type='checkbox' id='finalInvoice' name='finalInvoice' value=''>";
+        result += "<label for='vehicle1'> &nbsp;&nbsp;Is Final Invoice</label>";
+                result += "</div>";
+                result += "</div>";
+            result += "<div class='col-md-4'>";
+                result += "<div class=''style=''>";
+                result += "<label for='total' id=''>Remarks: &nbsp;&nbsp;</label>";
+        result += '<textarea id="remarks" name="remarks" rows="2" cols="50"></textarea>';
+                result += "</div>";
+            result += "</div>";
+            result += "<div class='col-md-4'>";
+                result += "<div class=''style=''>";
+                result += "<label for='total' id=''>Notes: &nbsp;&nbsp;</label>";
+        result += '<textarea id="note" name="note" rows="2" cols="50"></textarea>';
+                result += "</div>";
+            result += "</div>";
+        result += "</div>";
+            result += "<div class='text-center' style='padding-top:20px;'>";
+        result += "<button type='button' id='poSubmit' class='btn btn-success btn-sm' onclick='varifyInputElement()'>S U B M I T</button> &nbsp;";
+        result += "<button type='button' id='' class='btn btn-info btn-sm' onclick='Swal()'>Preview</button>";
+            result += "</div>";
+
+
+        $('#masterdetails').append(result);
+
+       // $("#totalAmt").html(totalAmt);
+
+        //alert(vEXTARNAL);
+        $("#note").attr("disabled", true);
+
+        $('#finalInvoice').change(function () {
+
+            //alert('abc');
+            if ($(this).is(':checked')) {
+                $("#note").attr("disabled", false);
+            }
+            else {
+                $("#note").attr("disabled", true);
+            }
+
+        })
+
+        CalCulate();
+    }
+
+
+
+
+    function Swal() {
+
+        swal({
+            title: "Bill Request Submit Successfully!",
+            type: 'success',
+            closeOnConfirm: false,
+            closeOnCancel: true
+        }, function () {
+            $("#myPreview").modal("hide");
+
+            swal({
+                title: "Do you want to add Quality?",
+                text: "You clicked the button!",
+                type: "info",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                cancelButtonText: "No, I don't!",
+                confirmButtonText: "Yes, I want!",
+                closeOnConfirm: false,
+                closeOnCancel: false
+            },
+                function (isConfirm) {
+                    if (isConfirm) {
+
+                        location.replace('/BillApproval/AddQuality');
+
+                       // swal("Deleted!", "Your imaginary file has been deleted.", "success");
+                    } else {
+                        //swal("Cancelled", "Your imaginary file is safe :)", "error");
+                        closeOnCancel: true
+                    }
+                }
+            );
+
+            // $("#exceptionSubmrnu").find('li').removeClass();
+            //$("#exceptionSubmrnu").find('li:nth-child(2)').addClass("active");
+            //        GetAllExceptionRequest(1,0);
+            //    });
+            // ExceptionFileUpload(data.pk);
+        })
+        //swal({
+        //    title: "Are you sure?",
+        //    text: "You will not be able to recover this imaginary file!",
+        //    type: "warning",
+        //    showCancelButton: true,
+        //    confirmButtonColor: "#DD6B55",
+        //    confirmButtonText: "Yes, delete it!",
+        //    cancelButtonText: "No, cancel plx!",
+        //    closeOnConfirm: false,
+        //    closeOnCancel: false
+        //},
+        //function (isConfirm) {
+        //        if (isConfirm) {
+        //            swal("Deleted!", "Your imaginary file has been deleted.", "success");
+        //        } else {
+        //            swal("Cancelled", "Your imaginary file is safe :)", "error");
+        //        }
+        //    }
+        //);
+    }
+
+
+    function GetInputData() {
+
+        var jsonData = {}
+
+        jsonData["CreateDate"] = new Date();
+        jsonData["InvoiceKey"] = 0;
+        jsonData["InvoiceTypeName"] = $("#invoiceType").children("option:selected").html();
+        jsonData["InvoiceTypeID"] = $("#invoiceType").children("option:selected").val();
+        jsonData["SupplierName"] = $("#supplier").children("option:selected").html();
+        jsonData["SupplierID"] = $("#supplier").children("option:selected").val();
+        jsonData["InvoiceNo"] = $("#invoice_no").val();
+        jsonData["InvoiceDate"] = $("#invoice_date").val();
+
+        var finalInvoice = 0;
+        if ($('#finalInvoice').is(':checked')) {
+            finalInvoice = 1
+        }
+        else {
+            finalInvoice = 0
+        }
+
+        jsonData["FinalInvoice"] = finalInvoice;
+        jsonData["Remarks"] = $('textarea#remarks').val();
+        jsonData["Notes"] = $('textarea#note').val();
+
+
+        var approverList = [];
+        //var approverObj = []
+        var count = 1;
+        $('#approverTable tr').each(function () {
+            var approver = {};
+            approver["ApproverId"] = $(this).attr('data-approverid');
+            approver["UserID"] = $(this).attr('data-approverid');
+            approver["ApproverNo"] = count //$(this).find('p[name^="approverNo"]').html();
+            approver["UserName"] = $(this).attr('data-username');//$(this).find('p[name^="userName"]').html();
+            approver["DesignationName"] = $(this).attr('data-designation');
+
+            if (approver["ApproverNo"] == 1) {
+                approver["ApproverStatus"] = 1;
+                approver["ApproverStatusName"] = "First Approver"
+            } else {
+                approver["ApproverStatus"] = 2;
+                approver["ApproverStatusName"] = "Second Approver"
+            }
+           // alert($(this).attr('data-approverid'));
+            approverList.push(approver);
+            count++;
+        });
+        jsonData["ApproverList"] = approverList;
+
+
+
+        var fileUpload = [];
+        $('#attachedFileTable tr').each(function () {
+            var filedate = {};
+            filedate["BillFileName"] = $(this).find('td[name^="fileName"]').html();
+            filedate["BillFilePath"] = $(this).find('td[name^="filePath"]').html();
+            fileUpload.push(filedate);
+        });
+        jsonData["BillFilesList"] = fileUpload;
+
+        var billInfo = [];
+
+        var alreadyQty = 0;
+        var blanceQty = 0;
+        var poKey = 0;
+
+        $("#main tr:not(:last-child)").each(function () {
+            var aQty = 0;
+            var bQty = 0;
+            var invoice = {};
+            var vEXTARNAL = $(this).attr('data-external');
+            var vDetailKey = $(this).attr('data-detail');
+            var vID = $(this).attr('id');
+            //alert(vDetailKey);
+            poKey = $(this).attr('data-pokey');
+
+            invoice["PODetailsKey"] = vDetailKey;
+            invoice["PO"] = $('#pono_' + vDetailKey).html();
+            invoice["Article"] = $('#article_' + vDetailKey).html();
+            invoice["Color"] = $('#color_' + vDetailKey).html();
+            invoice["Size"] = $('#size_' + vDetailKey).html();
+            invoice["Unit"] = $('span#master_unit_' + vDetailKey).html();
+            invoice["UnitID"] = $('span#span_unitId_' + vDetailKey).html();
+            invoice["POQty"] = $('#poqty_' + vDetailKey).html();
+            invoice["Rate"] = $('#rate_' + vDetailKey).html();
+            invoice["POValue"] = $('#povalue_' + vDetailKey).html();
+            invoice["InvoiceQty"] = $('#invoiceQty_' + vDetailKey).val();
+            invoice["InitialQty"] = parseInt($('#uptodateqty_' + vDetailKey).html()) + parseInt($('#invoiceQty_' + vDetailKey).val());
+            invoice["InvoiceBalance"] = parseInt($('#piqty_' + vDetailKey).html()) - parseInt($('#invoiceQty_' + vDetailKey).val());
+            invoice["InvoiceValue"] = $('#invoiceValue_' + vDetailKey).val();
+            invoice["Discount"] = $('#discount_' + vDetailKey).val();
+            invoice["Total"] = $('#total_' + vDetailKey).val();
+            aQty = parseInt($('#uptodateqty_' + vDetailKey).html()) + parseInt($('#invoiceQty_' + vDetailKey).val());
+            bQty = parseInt($('#piqty_' + vDetailKey).html()) - parseInt($('#invoiceQty_' + vDetailKey).val());
+            alreadyQty += aQty;
+            blanceQty += bQty;
+            billInfo.push(invoice);
+
+            //alert($('span#span_unitId_' + vEXTARNAL).html());
+        });
+
+        console.log(billInfo);
+
+        jsonData["POKey"] = poKey;
+        jsonData["BillInfoList"] = billInfo;
+        jsonData["TotalQty"] = $("#Qty").html();
+        jsonData["TotalRate"] = $("#Rate").html();
+        jsonData["TotalValue"] = $("#Value").html();
+        jsonData["AlreadyQty"] = alreadyQty;//$("#alreadyQty").html();
+        jsonData["TotalBalanceQty"] = blanceQty; //$("#balanceQty").html();
+        jsonData["TotalInvoiceQty"] = $("#invoiceQty").html();
+        jsonData["TotalInvoiceValue"] = $("#invoiceValue").html();
+        jsonData["TotalDiscount"] = $("#Discount").html();
+        jsonData["TotalPaid"] = $("#TotalPaid").html();
+
+        return jsonData;
+    }
+
+    function varifyInputElement() {
+        var jsondate = GetInputData();
+        var urlpath = '@Url.Action("ModalShowBeforeSubmit", "BillApproval")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsondate),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    $("#previewmodalbody").html("");
+                    $("#previewmodalbody").append(data);
+                    $("#myPreview").modal("show");
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+    }
+
+    function SubmitToDatabase() {
+         var jsondate = GetInputData();
+         var urlpath = '@Url.Action("SaveBillRequest", "BillApproval")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsondate),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    swal({
+                        title: "Bill Request Submit Successfully!",
+                        type: 'success',
+                        closeOnConfirm: false,
+                        closeOnCancel: true
+                    }, function () {
+                            $("#myPreview").modal("hide");
+
+                            swal({
+                                title: "Do you want to add Quality?",
+                                text: "You clicked the button!",
+                                type: "info",
+                                showCancelButton: true,
+                                confirmButtonColor: "#DD6B55",
+                                cancelButtonText: "No, I don't!",
+                                confirmButtonText: "Yes, I want!",
+                                closeOnConfirm: false,
+                                closeOnCancel: false
+                            },
+                                function (isConfirm) {
+                                    if (isConfirm) {
+
+                                        location.replace('/BillApproval/AddQuality');
+
+                                        // swal("Deleted!", "Your imaginary file has been deleted.", "success");
+                                    } else {
+                                        //swal("Cancelled", "Your imaginary file is safe :)", "error");
+                                    }
+                                }
+                            );
+
+                        // $("#exceptionSubmrnu").find('li').removeClass();
+                        //$("#exceptionSubmrnu").find('li:nth-child(2)').addClass("active");
+                        //        GetAllExceptionRequest(1,0);
+                        //    });
+                        // ExceptionFileUpload(data.pk);
+                    })
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+    }
+
+
+    function InvoiceSubmit() {
+
+        var pono = "";
+        var article = "";
+        var color = "";
+        var size = "";
+        var unit = 0;
+        var invoiceQty = 0;
+        var invoiceValue = 0;
+        var rate = 0;
+        var discount = 0;
+        var paidValue = 0;
+
+        $("#main tr:not(:last-child)").each(function () {
+            vEXTARNAL = $(this).attr('data-external');
+            //alert(vEXTARNAL);
+
+            var PO = $('#pono_' + vEXTARNAL).html();
+            var Art = $('#article_' + vEXTARNAL).html();
+            var c = $('#color_' + vEXTARNAL).html();
+            var s = $('#size_' + vEXTARNAL).html();
+            var u = $('#unitId_' + vEXTARNAL).val();
+            var r = $('#rate_' + vEXTARNAL).html()
+            var iqty = $('#invoiceQty_' + vEXTARNAL).val();
+            var ivalue = $('#invoiceValue_' + vEXTARNAL).val();
+            var dis = $('#discount_' + vEXTARNAL).val();
+            var t = $('#total_' + vEXTARNAL).val();
+            pono += PO + ',';
+            article += Art + ',';
+            color += c + ',';
+            size += s + ',';
+            unit += u + ','
+            rate += r + ',';
+            invoiceQty += iqty + ',';
+            invoiceValue += ivalue + ',';
+            discount = dis + ',';
+            paidValue = t + ',';
+
+           // alert(invoiceQty);
+
+            //alert($('#pono_' + vEXTARNAL).html());
+            //alert($('#poqty_' + vEXTARNAL).html());
+
+        })
+    }
+
+
+    $("#uptodateqty").keyup(function () {
+        alert()
+    })
+
+    function invoiceQty(col) {
+        //alert($("#invoiceQty_" + col).val());
+        //alert($('.td_rate_' + col).html());
+        //parseInt($("#invoiceQty_" + col).val()) * parseInt($('.td_rate_' + col).html())
+
+
+        var _value = $('#invoiceQty_' + col).val();
+        //alert(_value);
+        //var poqty = $('#poqty_' + col).html();
+        var _stock = $('#piqty_' + col).html();
+
+        //var upqty = parseInt(_stock) - parseInt(_value);
+        //alert(poqty);
+        //alert(_stock);
+        //alert(upqty);
+        //upqty = Math.abs(upqty);
+
+       // $('#uptodateqty_'+ col).html(upqty);
+
+        //alert(_stock);
+
+        if (!$.isNumeric(_value)) {
+            $('#invoiceQty_' + col).val("0");
+            _value = $('#invoiceQty_' + col).val();
+        }
+
+        _stock = Math.abs(_stock);
+        _value = Math.abs(_value);
+        // _value = Math.round(_value);
+
+
+        if (_value < 0) {
+            $('#invoiceQty_' + col).val("0");
+        }
+        $('#invoiceQty_' + col).val(_value);
+
+        if (_value > _stock) {
+            //PlaySound();
+            toastr.error("Item Quantity Exceeded,Please Try again", "Item Quantity Exceeded", {
+                "positionClass": "toast-top-right",
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "closeButton": true
+            });
+            $('#invoiceQty_' + col).val("0");
+            $('#uptodateqty_' + col).html("0");
+            //calculation();
+            //$("#TotalSize").val("0");
+        }
+
+
+        var invoiceVal = parseInt($("#invoiceQty_" + col).val()) * parseInt($('.td_rate_' + col).html())
+        //alert(invoiceVal);
+        $("#invoiceValue_" + col).val(invoiceVal);
+        $("#total_" + col).val(invoiceVal);
+
+        //calculation();
+
+        CalCulate();
+
+        }
+
+    function discount(col) {
+        var _value = $("#discount_" + col).val();
+        if (!$.isNumeric(_value)) {
+            $('#discount_' + col).val("0");
+            _value = $('#discount_' + col).val();
+        }
+
+        var dis = parseInt($("#invoiceValue_" + col).val()) - parseInt($("#discount_" + col).val());
+        $("#total_" + col).val(dis);
+
+        //calculation();
+        CalCulate();
+    }
+
+    //    function total(col) {
+    //       // $("#total_" + col).val();
+    //       // var total +=
+
+    //            $("#totalAmt").html();
+    //}
+
+
+
+    function CalCulate() {
+        var Qty = 0;
+        var Rate = 0;
+        var Value = 0;
+        var AlreadyQty = 0;
+        var BalanceQty = 0;
+        var InvoiceQty = 0;
+        var InvoiceValue = 0;
+        var Discount = 0;
+        var Total = 0;
+
+        var count = 0;
+        var vDetailKey = "";
+
+        $("#main tr").each(function () {
+
+             vDetailKey = $(this).attr('data-detail');
+
+            if ($('#poqty_' + vDetailKey).html() != 'NaN') { }
+                //Qty += $('#poqty_' + count).html();
+            var s = $('#poqty_' + vDetailKey).html();
+            var ra = $('#rate_' + vDetailKey).html();
+            var va = $('#povalue_' + vDetailKey).html();
+            var aqty = $('#uptodateqty_' + vDetailKey).html();
+            var bqty = $('#piqty_' + vDetailKey).html();
+            var iQty = $('#invoiceQty_' + vDetailKey).val();
+            var iValue = $('#invoiceValue_' + vDetailKey).val();
+            var dis = $('#discount_' + vDetailKey).val();
+            var tot = $('#total_' + vDetailKey).val();
+            var q = isNaN(parseInt(s)) ? 0 : parseInt(s);
+            var r = isNaN(parseInt(ra)) ? 0 : parseInt(ra);
+            var v = isNaN(parseInt(va)) ? 0 : parseInt(va);
+            var aq = isNaN(parseInt(aqty)) ? 0 : parseInt(aqty);
+            var vq = isNaN(parseInt(bqty)) ? 0 : parseInt(bqty);
+            var iQ = isNaN(parseInt(iQty)) ? 0 : parseInt(iQty);
+            var iV = isNaN(parseInt(iValue)) ? 0 : parseInt(iValue);
+            var d = isNaN(parseInt(dis)) ? 0 : parseInt(dis);
+            var t = isNaN(parseInt(tot)) ? 0 : parseInt(tot);
+
+            Qty += q;
+            Rate += r;
+            Value += v;
+            AlreadyQty += aq;
+            BalanceQty += vq;
+            InvoiceQty += iQ;
+            InvoiceValue += iV;
+            Discount += d
+            Total += t;
+            //alert($(this).val());
+            //var Qty = 0;
+            //var a1 = new Array();
+            //a1 = $(this).attr("data-size").split(".");
+            //var columnName = a1.join("_");
+            //alert(columnName);
+            //// Qty += parseInt($('#total_' + columnName).val());//+ ',';
+            //Qty += parseInt($(this).val());
+            //Total_Qty += Qty;
+
+            //alert(Qty);
+            //alert($("#main tr").not(':last').length);
+
+            count++;
+        });
+
+        $("#Qty").html(Qty);
+        $("#Rate").html(Rate);
+        $("#Value").html(Value);
+        $("#alreadyQty").html(AlreadyQty);
+        $("#balanceQty").html(BalanceQty);
+        $("#invoiceQty").html(InvoiceQty);
+        $("#invoiceValue").html(InvoiceValue);
+        $("#Discount").html(Discount);
+        $("#TotalPaid").html(Total);
+    }
+
+    function calculation() {
+
+            var Total_Qty = 0;
+
+            $("#tbl_MasterDetails td input.total").each(function () {
+                //  vSize += $(this).attr("data-size") + ',';
+                //alert($(this).val());
+                var Qty = 0;
+                var a1 = new Array();
+                a1 = $(this).attr("data-size").split(".");
+                var columnName = a1.join("_");
+                // alert(columnName);
+               // Qty += parseInt($('#total_' + columnName).val());//+ ',';
+                Qty += parseInt($(this).val());
+                Total_Qty += Qty;
+
+            });
+            //alert(Total_Qty)
+            $("#totalAmt").html(Total_Qty);
+
+    }
+
+    function deleterow(rowval) {
+        $('tr#' + rowval + '').remove();
+        var table = document.getElementById('tbl_MasterDetails');
+        var lastRow = table.rows.length - 1;
+        if (table.rows.length < 3) {
+            $("#masterdetails").hide();
+        }
+        //alert(lastRow);
+        CalCulate();
+    }
+
+    function addQuality() {
+        location.replace("/BillApproval/AddQuality");
+    }
+
+    function FileUploadOnChange() {
+        var fileData = new FormData();
+        var fileUpload = $("#billFileUpload").prop('files');
+            if (fileUpload.length>0) {
+                 for (var i = 0; i < fileUpload.length; i++) {
+                     fileData.append(fileUpload[i].name, fileUpload[i]);
+                 }
+        }
+        var urlpath = '@Url.Action("BillFileUpload", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            type: "post",
+            processData: false,
+            contentType: false,
+            data: fileData  ,
+            success: function (result) {
+                for (var i = 0; i < result.length; i++) {
+                   var newRow = $('<tr>');
+                   var cols = "";
+                   cols += '<td name="fileName">' + result[i].BillFileName + '</td>';
+                   cols += '<td style="display:none" name="filePath">' + result[i].BillFilePath + '</td>';
+                   cols += '<td><input type="button" style="margin:2px" class="btn btn-danger btn-sm" onclick="DeleteFile(this,\''+result[i].ServerFileName+'\')"   value="X"></td></tr>';
+                   newRow.append(cols);
+                   $("#attachedFileTable").append(newRow);
+                }
+                $("#billFileUpload").val('');
+            },
+            error: function (err) {
+                alert(err.responseText);
+            }
+        });
+    }
+    function DeleteFile(r, filePath) {
+       var urlpath = '@Url.Action("BillDeleteFiles", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { FilePath: filePath },
+            async: true,
+            success: function (data) {
+               var i = r.parentNode.parentNode.rowIndex;
+                document.getElementById("billFileTable").deleteRow(i);
+            }
+        });
+
+    }
+
+    function PrintModal() {
+        var print_div = document.getElementById("printablearea");
+        var print_area = window.open();
+        print_area.document.write("<style>table{border-collapse:collapse;}</style><img width='20' height='20' src='../../Images/logo.png' /><img style='width:80px;' src='../../Images/logo.png' />");
+        print_area.document.write("<h1 style='text-align:center'>Exception Request Preview</h1>");
+        print_area.document.write(print_div.innerHTML);
+        print_area.document.close();
+        print_area.focus();
+        print_area.print();
+        print_area.close();
+    }
+
+    </script>

@@ -168,11 +168,17 @@
     <Compile Include="Models\ApproverModelClass.cs" />
     <Compile Include="Models\BillApproval\BillApprovalPOMasterTable.cs" />
     <Compile Include="Models\BillApproval\BillAprrovalPoDetails.cs" />
+    <Compile Include="Models\BillApproval\BillComments.cs" />
+    <Compile Include="Models\BillApproval\BillQuality.cs" />
+    <Compile Include="Models\BillApproval\BillRequestMaster.cs" />
+    <Compile Include="Models\BillApproval\BillRequestModel.cs" />
     <Compile Include="Models\BillApproval\BillSubmitModel.cs" />
     <Compile Include="Models\BillApproval\BillTransactionTable.cs" />
+    <Compile Include="Models\BillApproval\InvoiceInformation.cs" />
     <Compile Include="Models\BusinessUnit.cs" />
     <Compile Include="Models\BuyerListModel.cs" />
     <Compile Include="Models\CapexCatagory.cs" />
+    <Compile Include="Models\BillApproval\BillFileUploadDetails.cs" />
     <Compile Include="Models\CapexFileUploadDetails.cs" />
     <Compile Include="Models\CapexInformationDetails.cs" />
     <Compile Include="Models\CapexInformationMaster.cs" />
@@ -189,6 +195,7 @@
     <Compile Include="Models\LocationModel.cs" />
     <Compile Include="Models\LogSection.cs" />
     <Compile Include="Models\ModuleModel.cs" />
+    <Compile Include="Models\QualityFileUploadDetails.cs" />
     <Compile Include="Models\QueryModel.cs" />
     <Compile Include="Models\RequestorModel.cs" />
     <Compile Include="Models\ResultResponse.cs" />
@@ -199,6 +206,9 @@
     <Compile Include="Models\VisitorModel.cs" />
     <Compile Include="Models\VisitorRequestModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\AMSSession.cs" />
+    <Compile Include="Utilities\BasicUtilities.cs" />
+    <Compile Include="Utilities\DBConnection.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\bower_components\bootstrap-colorpicker\dist\css\bootstrap-colorpicker.css" />
@@ -7108,13 +7118,25 @@
     <Content Include="Views\Visitor\_VisitorRequestUpdateModal.cshtml" />
     <Content Include="Views\Visitor\VisitorReportView.cshtml" />
     <Content Include="Views\Visitor\_visitorReportAllList.cshtml" />
+    <Content Include="Views\BillApproval\BillEntry.cshtml" />
+    <Content Include="Views\BillApproval\AddQuality.cshtml" />
+    <Content Include="Views\BillApproval\_MyBillPreview.cshtml" />
+    <Content Include="Views\BillApproval\InvoiceList.cshtml" />
+    <Content Include="Views\BillApproval\_myBillRequest.cshtml" />
+    <Content Include="Views\BillApproval\_billModalRequestView.cshtml" />
+    <Content Include="Views\BillApproval\BillApproval.cshtml" />
+    <Content Include="Views\BillApproval\_allBillApprovalPartial.cshtml" />
+    <Content Include="Views\BillApproval\_billApproverModalView.cshtml" />
+    <Content Include="Views\BillApproval\_billQualityModalView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Assets\bower_components\ckeditor\.npm\assets\" />
+    <Folder Include="BillFileUpload\" />
     <Folder Include="ExceptionFileUpload\" />
     <Folder Include="Images\Visitors\" />
     <Folder Include="IOUFileUpload\" />
+    <Folder Include="QualityFileUpload\" />
     <Folder Include="Uploads\" />
   </ItemGroup>
   <ItemGroup>

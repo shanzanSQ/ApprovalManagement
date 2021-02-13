@@ -1,0 +1,404 @@
+﻿
+@{
+    ViewBag.Title = "BillApproval";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+
+<style type="text/css">
+    .modal-lg {
+        max-width: 80% !important;
+    }
+
+    .sweet-alert {
+        background-color: #DAF7A6;
+    }
+
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    #billmenu {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #billSubmrnu li a {
+        color: white;
+    }
+
+    #billNavigaton {
+        background-color: #37474F;
+    }
+    /*#exceptionNavigaton{
+        padding:0px;
+        margin:0px;
+    }*/
+</style>
+<div class="container-fluid">
+    <h3 style="text-align: center;"><b>Bill Request Approval </b></h3>
+    <hr style="margin:0px" />
+    <div class="row">
+        <div id="billNavigaton" class="navbar navbar-default navbar-static-top">
+            <div id="billmenu">
+                <div class="navbar-collapse collapse">
+                    <ul id="billSubmrnu" class="nav navbar-nav">
+                        <li onclick="GetApproverRequestList(2,3)"><a href="#">Pending Request</a></li>
+                        <li onclick="GetApproverRequestList(2,1)"><a href="#">Approved Request</a></li>
+                        <li onclick="GetApproverRequestList(2,2)"><a href="#">Rejected Request</a></li>
+                        @*<li onclick="GetApproverRequestList(4,0)"><a href="#">HR Interaction</a></li>*@
+                    </ul>
+                </div>
+            </div>
+        </div>
+        @*  style="height:400px;width:100%;overflow:scroll"*@
+        <div id="billApprovalDashboard">
+
+        </div>
+    </div>
+    <div class="modal" id="myModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Visitor Request Preview</h4>
+                </div>
+                <div id="modalbody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <div class="modal" id="myQuality">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Bill Quality Preview</h4>
+                </div>
+                <div id="qualitybody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+</div>
+@*@Scripts.Render("~/bundles/jquery")*@
+<script type="text/javascript">
+    $("#billsubmenu").find('li:nth-child(1)').addClass("active");
+    GetApproverRequestList(2, 3);
+    $('#billsubmenu > li > a').click(function() {
+        $('li').removeClass();
+        $(this).parent().addClass('active');
+       // $("#spmenuid").html($(this).html());
+    });
+    var ExceptionRequestId = 0;
+    function GetApproverRequestList(status,progrss) {
+        var urlpath = '@Url.Action("GetAllBillRequest", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: {Status: status,ViewName: '_allBillApprovalPartial',Progrss:progrss},
+            async: true,
+            success: function (data) {
+                if (data) {
+                    console.log(data);
+                    $('#billApprovalDashboard').empty();
+                    $('#billApprovalDashboard').append(data);
+                    $('#BillRequestTable').DataTable();
+                }
+            }
+        });
+    }
+    function BillDetailsApprover(masterID,status) {
+         var urlpath = '@Url.Action("BillRequestDetails", "BillApproval")';
+        $.ajax({
+            data: { MasterID: masterID, ViewName:"_billApproverModalView",Status:status},
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $("#modalbody").html("");
+                $("#modalbody").append(data);
+                $("#myModal").modal("show");
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+
+    function LoadQuality(invoice) {
+
+        var urlpath = '@Url.Action("QualityExist", "BillApproval")';
+        $.ajax({
+            data: { InvoiceKey: invoice},
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                if (data == 0) {
+                    $("#myQuality").modal("hide");
+                    toastr.error("Invoice Quality Not Exist", "Not Exist ",
+                        {
+                            "progressBar": true,
+                            "positionClass": "toast-top-right",
+                            "showDuration": "300",
+                            "hideDuration": "1000",
+                            "timeOut": "5000",
+                            "closeButton": true
+                        });
+                } else {
+                    QualityPreview(invoice);
+                }
+
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+
+        //alert(invoice);
+    }
+
+    function QualityPreview(invoice) {
+        var urlpath = '@Url.Action("QualityPreview", "BillApproval")';
+        $.ajax({
+            data: { InvoiceKey: invoice, ViewName: "_billQualityModalView"},
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+
+
+                    $("#qualitybody").html("");
+                    $("#qualitybody").append(data);
+                    $("#myQuality").modal("show");
+                
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+
+    @*function ExceptionDetails(masterID,usertype) {
+        var urlpath = '@Url.Action("IndividualExceptionRequest", "Exception")';
+        $.ajax({
+            data: { MasterID: masterID,ViewName:"_approveOrRejectmodal",UserType:usertype},
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    $("#modalbody").html("");
+                    $("#modalbody").append(data);
+                    $("#myModal").modal("show");
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+    }*@
+    function showComments() {
+        $("#comments_section").toggle();
+    }
+
+    function BillApproveOrReject(progress, masterId, commentText) {
+        if (progress == 2 && commentText == "") {
+            swal({
+                title: 'Please Add comment Before Reject',
+                type: 'error',
+                closeOnCancel: true
+            });
+        } else {
+            var urlpath = '@Url.Action("BillApproveOrReject", "BillApproval")';
+        $.ajax({
+            data: { CommentText: commentText, Progress: progress, RequestorId: masterId },
+            dataType: 'json',
+            url: urlpath,
+            type: "Post",
+            async: true,
+            success: function (result) {
+                if (result) {
+                    swal({
+                        title: 'Done Successfully',
+                        type: 'success',
+                        closeOnCancel: true
+                    },function () {
+                            $("#myModal").modal("hide");
+                            GetApproverRequestList(2, 3);
+                    });
+                }
+            }, error: function (xhr, status, error) {
+                swal({
+                    title: 'Error Occoured',
+                    type: 'error',
+                    closeOnCancel: true
+                });
+            }
+        });
+        }
+
+    }
+
+    function ReviewComment(masterID) {
+        var reviewTo = $("#reviewComment").val();
+        var reviewMessage = $("#reviewMessage").val();
+        if ($("#reviewMessage").val()=="") {
+            $("#reviewMessage").css({ "border-color": "#FF0000" });
+        } else {
+            var urlpath = '@Url.Action("SendBillComments", "BillApproval")';
+            $.ajax({
+                    data: { MasterID: masterID, ReviewTo: reviewTo, ReviewMessage: reviewMessage },
+                    dataType: 'json',
+                    url: urlpath,
+                    type: "Post",
+                    async: true,
+                    success: function (result) {
+                        if (result) {
+                            swal({
+                                            title: 'Comment Added Successfully',
+                                            type: 'success',
+                                            closeOnCancel: true
+                                        },
+                                function () {
+                                    $("#myModal").modal("hide");
+                                    GetApproverRequestList(2,3);
+                                });
+                        }
+                    }
+                });
+        }
+
+    }
+    function hideModal() {
+        $("#exampleModalCenter").modal("hide");
+        $("#myModal").modal("hide");
+         GetApproverRequestList(2, 3);
+    }
+    function ApprovalSection(progress, masterId, commentText) {
+        var urlpath = '@Url.Action("ApproveOrReject", "Exception")';
+            $.ajax({
+                data: { CommentText: commentText, Progress: progress, ExceptionMasterId: masterId },
+                dataType: 'json',
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function (result) {
+                    if (result) {
+
+                        swal({
+                            title: 'Done Successfully',
+                            type: 'success',
+                            closeOnCancel: true
+                        },function () {
+                               $("#myModal").modal("hide");
+                                GetApproverRequestList(2, 3);
+                            });
+                    }
+                }, error: function (xhr, status, error) {
+                    swal({
+                        title: 'Error Occoured',
+                        type: 'error',
+                        closeOnCancel: true
+                    });
+                }
+                    });
+    }
+    function CEApprovalOrReject(progress, masterId, commentText) {
+        if (progress == 2 && commentText == "") {
+            swal({
+                    title: 'Please Enter The Comment First',
+                    type: 'error',
+                    closeOnCancel: true
+                });
+        }
+        else {
+            var urlpath = '@Url.Action("ApproveOrReject", "Exception")';
+            $.ajax({
+                data: { CommentText: commentText, Progress: progress, ExceptionMasterId: masterId },
+                dataType: 'json',
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function (result) {
+                    if (result) {
+                        swal({
+                            title: 'Done Successfully',
+                            type: 'success',
+                            closeOnCancel: false
+                        }, function () {
+                                $("#exampleModalCenter").modal("show");
+                                ExceptionRequestId = masterId;
+                        });
+                    }
+                }, error: function (xhr, status, error) {
+                    swal({
+                        title: 'Error Occoured',
+                        type: 'error',
+                        closeOnCancel: true
+                    });
+                }
+                    });
+        }
+    }
+
+    function ChangeColor(id) {
+        $(id).css({ "border-color": "#d3d3d3" });
+    }
+    function ApproveOrreject(progress, masterId, commentText) {
+        if (progress == 2) {
+            if (commentText == "") {
+                swal({
+                    title: 'Please Enter The Comment First',
+                    type: 'error',
+                    closeOnCancel: true
+                });
+            } else {
+                ApprovalSection(progress, masterId, commentText);
+            }
+        } else {
+            ApprovalSection(progress, masterId, commentText);
+        }
+        //swal({
+        //        title: 'Are you sure?',
+        //        text: "You won't be able to revert this!",
+        //        type: 'warning',
+        //    showCancelButton: true,
+        //        closeOnConfirm: true,
+        //        confirmButtonText: 'Yes'
+        //    },function () {
+        //        finalApproverProceed(progress, masterId, commentText);
+        //    });
+
+
+    }
+
+    function PrintModal() {
+            var print_div = document.getElementById("printablearea");
+            var print_area = window.open();
+            print_area.document.write("<style>table{border-collapse:collapse;}</style><img width='20' height='20' src='../../Images/logo.png' /><img style='width:80px;' src='../../Images/logo.png' />");
+            print_area.document.write("<h1 style='text-align:center'>Exception Request Preview</h1>");
+            print_area.document.write(print_div.innerHTML);
+            print_area.document.close();
+            print_area.focus();
+            print_area.print();
+            print_area.close();
+    }
+</script>
+
+
