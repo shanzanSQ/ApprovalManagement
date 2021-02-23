@@ -21,18 +21,31 @@
                     <tr>
                         <th style="text-align:center">SL</th>
                         <th style="text-align:center">InvoiceKey</th>
-                        <th style="text-align:center">InvoiceNo</th>
+                        <th style="text-align:center; width:100px;">InvoiceNo</th>
                         <th style="text-align:center">PO No</th>
                         <th style="text-align:center">InvoiceDate</th>
                         <th style="text-align:center">InvoiceType</th>
-                        <th style="text-align:center">Supplier</th>
-                        <th style="text-align:center">IsFinalInvoice</th>
+                        <th style="text-align:center; width:200px;">Supplier</th>
+                        <th style="text-align:center">IsFinal Invoice</th>
                         <th style="text-align:center">Total Invoice Qty</th>
                         <th style="text-align:center">Total Invoice Value</th>
                         <th style="text-align:center">Total Discount</th>
                         <th style="text-align:center">Total Paid</th>
                         <th style="text-align:center">Remarks</th>
-                        <th style="text-align:center">Quality</th>
+
+
+                        @if (ViewBag.ApproverNo == 1)
+                        {
+                            <th style="text-align:center">Add Quality</th>
+                            <th style="text-align:center">View Quality</th>
+
+                        }
+                        else
+                        {
+                            <th style="text-align:center">View Quality</th>
+                        }
+
+
                         <th style="text-align:center">Action(Comments)</th>
                     </tr>
                 </thead>
@@ -61,20 +74,30 @@
                         <td>@item["Total_Discount"]</td>
                         <td>@item["Total_Paid"]</td>
                         <td>@item["Remarks"]</td>
-                        <td> <button type="button" class="btn  btn-block btn-info btn-sm" data-toggle="modal" data-target="#myQuality" onclick="LoadQuality(@item["InvoiceKey"])" data-idkey="@item["InvoiceKey"]">Quality</button></td>
-                        @if (item["IsApproved"] == 3)
-                        {
-                            <td> <button type="button" class="btn  btn-block btn-primary btn-sm" data-toggle="modal" data-target="#myModal" onclick="BillDetailsApprover(@item["InvoiceKey"],1)" data-idkey="@item["InvoiceKey"]">Pending</button></td>
-                        }
-                        else if (item["IsApproved"] == 1)
-                        {
-                            <td> <button type="button" class="btn  btn-block btn-success btn-sm" data-toggle="modal" data-target="#showmodal" onclick="BillDetailsApprover(@item["InvoiceKey"],0)" data-idkey="@item["InvoiceKey"]">Approved</button></td>
-                        }
-                        else if (item["IsApproved"] == 2)
-                        {
-                            <td> <button type="button" class="btn  btn-block btn-danger btn-sm" data-toggle="modal" data-target="#showmodal" onclick="BillDetailsApprover(@item["InvoiceKey"],0)" data-idkey="@item["InvoiceKey"]">Rejected</button></td>
-                        }
-                    </tr>
+                        
+
+                            @if (ViewBag.ApproverNo == 1)
+                            {<td> <button type="button" class="btn  btn-block btn-info btn-sm" onclick="LoadQuality(@item["InvoiceKey"],'@item["InvoiceNo"]')" data-idkey="@item["InvoiceKey"]">Add Quality</button></td>
+                             <td> <button type="button" class="btn  btn-block btn-info btn-sm" data-toggle="modal" data-target="#myQuality" onclick="CheckQuality(@item["InvoiceKey"])" data-idkey="@item["InvoiceKey"]">View Quality</button></td>
+                            }
+                            else
+                            {
+                                <td> <button type="button" class="btn  btn-block btn-info btn-sm" data-toggle="modal" data-target="#myQuality" onclick="CheckQuality(@item["InvoiceKey"])" data-idkey="@item["InvoiceKey"]">View Quality</button></td>
+                            }
+
+                            @if (item["IsApproved"] == 3)
+                            {
+                                <td> <button type="button" class="btn  btn-block btn-primary btn-sm" data-toggle="modal" data-target="#myModal" onclick="BillDetailsApprover(@item["InvoiceKey"],1)" data-idkey="@item["InvoiceKey"]">Pending</button></td>
+                            }
+                            else if (item["IsApproved"] == 1)
+                            {
+                                <td> <button type="button" class="btn  btn-block btn-success btn-sm" data-toggle="modal" data-target="#showmodal" onclick="BillDetailsApprover(@item["InvoiceKey"],0)" data-idkey="@item["InvoiceKey"]">Approved</button></td>
+                            }
+                            else if (item["IsApproved"] == 2)
+                            {
+                                <td> <button type="button" class="btn  btn-block btn-danger btn-sm" data-toggle="modal" data-target="#showmodal" onclick="BillDetailsApprover(@item["InvoiceKey"],0)" data-idkey="@item["InvoiceKey"]">Rejected</button></td>
+                            }
+                        </tr>
                         count++;
 
                     }

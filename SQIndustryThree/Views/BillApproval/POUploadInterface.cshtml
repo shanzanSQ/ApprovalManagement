@@ -8,6 +8,15 @@
         </div>
     </div>
 </div>
+
+<br/>
+
+<div id="excelReport">
+
+</div>
+
+@*@Html.Partial("_ExcelPartialView");*@
+
 <script src="~/Scripts/jszip.js"></script>
 <script src="~/Scripts/xlsx.full.min.js"></script>
 <script type="text/javascript">
@@ -71,17 +80,22 @@
                 if (excelRows[i].POQty != 0) {
                     BillDetailsList.push(PoDetails);
                 }
+                console.log(PoDetails);
             }
             var urlpath = '@Url.Action("UploadExcelData", "BillApproval")';
             $.ajax({
                 contentType: "application/json;charset=utf-8",
                 data: JSON.stringify(BillDetailsList),
-                dataType: 'json',
+                //dataType: 'json',
                 url: urlpath,
                 type: "post",
                 async: true,
                 success: function (result) {
-                    swal("Data Uploaded Successfully");
+                    //alert(result);
+                    //swal("Data Uploaded Successfully");
+                    $('#excelReport').empty();
+                    $('#excelReport').html(result);
+                    $("#POUploadTable").DataTable();
                 },
                 error: function (xhr, status, error) {
                     alert(xhr.responseText);

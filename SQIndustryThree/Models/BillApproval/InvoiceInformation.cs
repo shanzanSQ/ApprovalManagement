@@ -9,6 +9,7 @@ namespace SQIndustryThree.Models.BillApproval
     {
         public int PODetailsKey { get; set; }
         public string PO { get; set; }
+        public int PONo { get; set; }
         public string Article { get; set; }
         public string Color { get; set; }
         public string Size { get; set; }
@@ -19,6 +20,7 @@ namespace SQIndustryThree.Models.BillApproval
         public decimal POValue { get; set; }
         public decimal InvoiceQty { get; set; }
         public decimal InitialQty { get; set; }
+        public decimal CheckedQty { get; set; }
         public decimal InvoiceBalance { get; set; }
         public decimal InvoiceValue { get; set; }
         public decimal Discount { get; set; }

@@ -101,6 +101,8 @@
         // $("#spmenuid").html($(this).html());
     });
 
+    GetAllBillRequest(1, 0);
+
     function GetAllBillRequest(status, progress) {
 
        // alert(status + "  " + progress);
@@ -141,6 +143,31 @@
                 alert("Error");
             }
         });
+    }
+
+    function LoadQuality(invoice, invoiceNo) {
+
+        var urlpath = '@Url.Action("QualityExist", "BillApproval")';
+        $.ajax({
+            data: { InvoiceKey: invoice},
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                if (data == 0) {
+                    //$("#myQuality").modal("hide");
+                    location.replace('/BillApproval/UpdateQuality?InvoiceKey=' + invoice + '&InvoiceNo=' + invoiceNo );
+                } else {
+                    location.replace('/BillApproval/UpdateQuality?InvoiceKey=' + invoice + '&InvoiceNo=' + invoiceNo);
+                }
+
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+
+        //alert(invoice);
     }
 
 

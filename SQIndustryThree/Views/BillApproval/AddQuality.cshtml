@@ -10,9 +10,9 @@
             <div class="panel-heading">Transaction Info</div>
             <div class="panel-body">
                 <label for="transaction" class="transaction">Transaction: <span style="color:red">*</span></label>
-                <input type="text" id="invoice_key" class="form-control invoice_key" value="@ViewBag.InvoiceKey" />
+                <input type="text" id="invoice_key" readonly class="form-control invoice_key" value="@ViewBag.InvoiceKey" />
                 <label for="invoice_no" class="invoice_no">Invoice No: <span style="color:red">*</span></label>
-                <input type="text" id="invoice_no" class="form-control invoice_no" value="@ViewBag.InvoiceNo" />
+                <input type="text" id="invoice_no" readonly class="form-control invoice_no" value="@ViewBag.InvoiceNo" />
             </div>
         </div>
     </div>
@@ -20,7 +20,8 @@
 <div class="row">
     <div class="col-md-12">
         <div class="text-right">
-            <input type="button" class="btn btn-success btn-sm add-row" value="Add Row">
+            <input type="button" class="btn btn-success btn-sm add-row" value="Add Row">&nbsp;&nbsp;
+            <a href="/BillApproval/BillEntry" class="btn btn-info btn-sm">Back</a>
         </div>
         <table class="table table-responsive">
             <thead>
@@ -40,8 +41,8 @@
                     <td><input class="form-control parameter" id="parameter_0" type="text" placeholder="Item"></td>
                     <td>
                         <select class="form-control result" id="result_0" placeholder="Result">
-                            <option value="pass">Pass</option>
-                            <option value="fail">Fail</option>
+                            @*<option value="pass">Pass</option>
+                            <option value="fail">Fail</option>*@
                         </select>
                     </td>
                     <td><input class="form-control comment" id="comment_0" type="text" placeholder="Comment"></td>
@@ -62,8 +63,32 @@
 
 <script>
     $(function () {
-
+        QualityResultList();
     })
+
+    const QualityResultList = () => {
+        $.ajax({
+            url: '/BillApproval/QualityResultList',
+            type: 'POST',
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                $('.result').empty();
+                //$('#supplier').append("<option value='0'>-- Select Qua --</option>");
+
+                if (response.length > 0) {
+
+                    for (let i = 0; response.length > i; i++) {
+
+                        $(".result").append($("<option></option>").val(response[i].QualityResultID)
+                            .html(response[i].QualityResultName));
+                    }
+                    //$('select#supplier').append(result);
+                }
+            }
+        });
+    }
+
 
     var i = 0;
     $(".add-row").click(function () {
@@ -71,7 +96,7 @@
          i++;
         var markup = "<tr id='" + i + "'><td><input class='form-control parameter' id='parameter_"+i+"' type='text' placeholder='Item' ></td>";
         markup += "<td><select class='form-control result' id='result_" + i + "' placeholder='Result'>";
-        markup += "<option value='pass'>Pass</option><option value='fail'>Fail</option>"
+        //markup += "<option value='pass'>Pass</option><option value='fail'>Fail</option>"
         markup += "</select></td>";
         markup += "<td><input class='form-control comment' id='comment_" + i + "' type='text' placeholder='Comment' ></td>";
 
@@ -80,6 +105,8 @@
         markup +="<td><button class='btn btn-danger ibtnDel' onclick='deleterow(" + i + ")' type='button'> <span class='glyphicon glyphicon-minus' aria-hidden='true'></span> </button></td>";
         markup += "</tr>";
         $("table tbody").append(markup);
+
+        QualityResultList();
     });
 
     function deleterow(rowval) {
@@ -140,8 +167,34 @@
 
     function submitQuality() {
 
+        var checkVal = false;
+
         var invoiceKey = $('#invoice_key').val();
         var invoiceNo = $('#invoice_no').val();
+
+        if (invoiceKey == '') {
+            toastr.error("Transaction Number Not Found", "Transaction Number", {
+                "positionClass": "toast-top-right",
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "closeButton": true
+            });
+
+            return false;
+        }
+
+        if (invoiceNo == '') {
+            toastr.error("Invoice Number Not Found", "Invoice Number", {
+                "positionClass": "toast-top-right",
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "closeButton": true
+            });
+
+            return false;
+        }
 
         var vItem = "";
         var vResult = "";
@@ -158,6 +211,23 @@
             var fileName = $('#fileName_' + Id).html();
             var filePath = $('#filePath_' + Id).html();
 
+            if (result == 4) {
+
+                //toastr.error("Seleted Item result Below Average thats why Quality not submited", "Quality not submited", {
+                //    "positionClass": "toast-top-right",
+                //    "showDuration": "300",
+                //    "hideDuration": "1000",
+                //    "timeOut": "5000",
+                //    "closeButton": true
+                //});
+
+                checkVal = false
+
+                return false;
+            } else {
+                checkVal = true;
+            }
+
             vItem += item + ',';
             vResult += result + ',';
             vComment += comment + ',';
@@ -165,8 +235,19 @@
             vFilePath += filePath + ',';
         })
 
-        //alert(invoiceKey + "  " + invoiceNo + "  " + vItem + "  " + vResult + "  " + vComment + "  " + vFileName + "  " + vFilePath);
-        var urlpath = '@Url.Action("EntryQuality", "BillApproval")';
+        //alert(result);
+
+        if (checkVal == false) {
+            toastr.error("Seleted Item result Below Average thats why Quality not submited", "Quality not submited", {
+                "positionClass": "toast-top-right",
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "closeButton": true
+            });
+            return false;
+        } else {
+            var urlpath = '@Url.Action("EntryQuality", "BillApproval")';
             $.ajax({
                 contentType: "application/json; charset=utf-8",
                 data: JSON.stringify({ invoiceKey: invoiceKey, invoiceNo: invoiceNo, item: vItem, result: vResult, comment: vComment, fileName: vFileName, filePath: vFilePath }),
@@ -176,12 +257,13 @@
                 success: function (data) {
                     if (data == true) {
                         swal({
-                            title: "Item Quality Submit Successfully!",
+                            title: "Item Quality Submited Successfully!",
                             type: 'success',
                             closeOnConfirm: false,
                             closeOnCancel: true
                         }, function () {
-                            location.reload();
+                                //location.reload();
+                                location.replace('/BillApproval/InvoiceList');
                         });
 
                     }
@@ -200,6 +282,12 @@
                     alert("Error");
                 }
             });
+
+           // alert(result);
+        }
+
+        //alert(invoiceKey + "  " + invoiceNo + "  " + vItem + "  " + vResult + "  " + vComment + "  " + vFileName + "  " + vFilePath);
+
     }
 
 

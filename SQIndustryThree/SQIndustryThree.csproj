@@ -6478,6 +6478,7 @@
     <Content Include="Content\capexform.css" />
     <Content Include="Content\customcss.css" />
     <Content Include="Content\LoadingModal.css" />
+    <Content Include="Content\star-rating.css" />
     <Content Include="Content\sweetalert.css" />
     <Content Include="Content\toastr.css" />
     <Content Include="css\style.css" />
@@ -7017,6 +7018,7 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\jszip.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Scripts\star-rating.js" />
     <Content Include="Scripts\sweetalert.min.js" />
     <Content Include="Scripts\toastr.js" />
     <Content Include="Scripts\xlsx.full.min.js" />
@@ -7128,6 +7130,8 @@
     <Content Include="Views\BillApproval\_allBillApprovalPartial.cshtml" />
     <Content Include="Views\BillApproval\_billApproverModalView.cshtml" />
     <Content Include="Views\BillApproval\_billQualityModalView.cshtml" />
+    <Content Include="Views\BillApproval\UpdateQuality.cshtml" />
+    <Content Include="Views\BillApproval\_ExcelPartialView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

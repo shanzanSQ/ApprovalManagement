@@ -11,6 +11,8 @@ namespace SQIndustryThree.Models.BillApproval
         public string QualityParam { get; set; }
         public string QualityResult { get; set; }
         public string QualityComment { get; set; }
+        public int Rate { get; set; }
+        public string RateName { get; set; }
         public string FileName { get; set; }
         public string FilPath { get; set; }
         public int InvoiceKey { get; set; }

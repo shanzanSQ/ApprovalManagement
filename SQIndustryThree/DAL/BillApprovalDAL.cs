@@ -205,6 +205,34 @@ namespace SQIndustryThree.DAL
             return dt;
         }
 
+        public DataTable InvoiceTypeList()
+        {
+            DataTable dt = new DataTable();
+            if (conn.State == 0)
+            {
+                conn.Open();
+            }
+            SqlCommand cmd = new SqlCommand("sp_InvoiceTypeList", conn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+            adpt.Fill(dt);
+            return dt;
+        }
+
+        public DataTable QualityResultList()
+        {
+            DataTable dt = new DataTable();
+            if (conn.State == 0)
+            {
+                conn.Open();
+            }
+            SqlCommand cmd = new SqlCommand("sp_QualityResultList", conn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+            adpt.Fill(dt);
+            return dt;
+        }
+
         public DataTable POList(int supplierId)
         {
             DataTable dt = new DataTable();
@@ -340,6 +368,22 @@ namespace SQIndustryThree.DAL
             }
         }
 
+        public DataTable QualityList(int InvoiceKey)
+        {
+            DataTable dt = new DataTable();
+            if (conn.State == 0)
+            {
+                conn.Open();
+            }
+
+            SqlCommand cmd = new SqlCommand("sp_QualityList", conn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.Add("@InvoiceKey", SqlDbType.Int).Value = InvoiceKey;            
+            SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+            adpt.Fill(dt);
+            return dt;
+        }
+
 
         public bool UpdatePODetails(double InitialQty, double InvoiceBalance, long PODetailsKey)
         {
@@ -379,6 +423,22 @@ namespace SQIndustryThree.DAL
             cmd.Parameters.Add("@UserId", SqlDbType.Int).Value = UserId;
             cmd.Parameters.Add("@Status", SqlDbType.Int).Value = Status;
             cmd.Parameters.Add("@Progress", SqlDbType.Int).Value = Pgress;
+            SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+            adpt.Fill(dt);
+            return dt;
+        }
+
+        public DataTable GetApproverListByInvoiceKey(int invoicekey)
+        {
+            DataTable dt = new DataTable();
+            if (conn.State == 0)
+            {
+                conn.Open();
+            }
+
+            SqlCommand cmd = new SqlCommand("sp_GetApproverListByInvoiceKey", conn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.Add("@invoicekey", SqlDbType.Int).Value = invoicekey;
             SqlDataAdapter adpt = new SqlDataAdapter(cmd);
             adpt.Fill(dt);
             return dt;
@@ -563,6 +623,7 @@ namespace SQIndustryThree.DAL
                 accessManager.SqlConnectionOpen(DataBase.SQQeye);
                 List<SqlParameter> aList = new List<SqlParameter>();
                 aList.Add(new SqlParameter("@InvoiceKey", invoiceKey));
+                //aList.Add(new SqlParameter("@userId", userID));
                 SqlDataReader dr = accessManager.GetSqlDataReader("sp_QualityInfo", aList);
                 while (dr.Read())
                 {
@@ -573,12 +634,147 @@ namespace SQIndustryThree.DAL
                     billQuality.QualityParam = dr["QualityParam"].ToString();
                     billQuality.QualityResult = dr["QualityResult"].ToString();
                     billQuality.QualityComment = dr["QualityComment"].ToString();
+                    billQuality.Rate = (int)dr["Rate"];
+                    billQuality.RateName = dr["RateName"].ToString();
                     billQuality.FileName = dr["FileName"].ToString();
                     billQuality.FilPath = dr["FilePath"].ToString();
                     billQuality.UserName = dr["UserName"].ToString();
                     billQualityList.Add(billQuality);
                 }
                 return billQualityList;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw e;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+        public List<BillQuality> GetUploadedFilesByID(int pmkey, int userid)
+        {
+            List<BillQuality> filedetails = new List<BillQuality>();
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<SqlParameter> aParameters = new List<SqlParameter>();
+                List<SqlParameter> aList = new List<SqlParameter>();
+                aList.Add(new SqlParameter("@invoiceKey", pmkey));
+                aList.Add(new SqlParameter("@userId", userid));
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_GetQualityFilesByID", aList);
+                while (dr.Read())
+                {
+                    BillQuality bfileup = new BillQuality();
+                    bfileup.InvoiceKey = (int)dr["InvoiceKey"];
+                    bfileup.FileName = dr["FileName"].ToString();
+                    bfileup.FilPath = dr["FilePath"].ToString();
+                    filedetails.Add(bfileup);
+                }
+                return filedetails;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw e;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+        public bool DeleteFileFromDatabase(int capexInfo, string FileName, string FilePath,  int userId)
+        {
+            bool result = true;
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<SqlParameter> aParameters = new List<SqlParameter>();
+                List<SqlParameter> aList = new List<SqlParameter>();
+                aList.Add(new SqlParameter("@invoicekey", capexInfo));
+                aList.Add(new SqlParameter("@filename", FileName));
+                aList.Add(new SqlParameter("@filepath", FilePath));
+                aList.Add(new SqlParameter("@userId", userId));
+                result = accessManager.UpdateData("sp_updateFilesFromQualityTables", aList);
+                return result;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw e;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+        public bool DeleteQualityFromDatabase(int invoicekey, int userID)
+        {
+            bool result = true;
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<SqlParameter> aParameters = new List<SqlParameter>();
+                List<SqlParameter> aList = new List<SqlParameter>();
+                aList.Add(new SqlParameter("@invoicekey", invoicekey));
+                //aList.Add(new SqlParameter("@userId", userID));
+                result = accessManager.DeleteData("sp_deleteQualityData", aList);
+                return result;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw e;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+        public bool UpdateBillQuality(int qualityId, int rate, string rate_name, int userId)
+        {
+            bool result = true;
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<SqlParameter> aParameters = new List<SqlParameter>();
+                List<SqlParameter> aList = new List<SqlParameter>();
+                aList.Add(new SqlParameter("@qualityId", qualityId));
+                aList.Add(new SqlParameter("@rate", rate));
+                aList.Add(new SqlParameter("@rate_name", rate_name));
+                aList.Add(new SqlParameter("@userId", userId));
+                result = accessManager.UpdateData("sp_UpdateBillQuality", aList);
+                return result;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw e;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+        public bool UpdateInvoiceBill(int InvoiceDetailsKey, decimal checkQty,  int userId)
+        {
+            bool result = true;
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<SqlParameter> aParameters = new List<SqlParameter>();
+                List<SqlParameter> aList = new List<SqlParameter>();
+                aList.Add(new SqlParameter("@InvoiceDetailsKey", InvoiceDetailsKey));
+                aList.Add(new SqlParameter("@checkQty", checkQty));
+                aList.Add(new SqlParameter("@userId", userId));
+                result = accessManager.UpdateData("sp_UpdateInvoiceBill", aList);
+                return result;
             }
             catch (Exception e)
             {

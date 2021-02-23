@@ -31,6 +31,7 @@
                         <th style="text-align:center">Total Discount</th>
                         <th style="text-align:center">Total Paid</th>
                         <th style="text-align:center">Remarks</th>
+                        <th style="text-align:center">Add Quality</th>
                         <th style="text-align:center">Action(Comments)</th>
                     </tr>
                 </thead>
@@ -60,6 +61,7 @@
                         <td>@item["Total_Discount"]</td>
                         <td>@item["Total_Paid"]</td>
                         <td>@item["Remarks"]</td>
+                        <td> <button type="button" class="btn  btn-block btn-info btn-sm" onclick="LoadQuality(@item["InvoiceKey"],'@item["InvoiceNo"]')" data-idkey="@item["InvoiceKey"]">Add Quality</button></td>
                         @if (item["IsApproved"] == 3)
                         {
                             @*@item.Pending*@

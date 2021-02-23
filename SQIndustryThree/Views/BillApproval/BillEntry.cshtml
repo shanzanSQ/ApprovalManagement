@@ -27,8 +27,8 @@
                 <div class="panel-body">
                     <label for="invoiceType" class="invoiceType">Invoice Type: <span style="color:red">*</span></label>
                     <select id="invoiceType" class="form-control invoiceType">
-                        <option value="0">---Select Type---</option>
-                        <option value="1">Project</option>
+                        @*<option value="0">---Select Type---</option>
+                        <option value="1">Project</option>*@
                     </select>
                     <label for="supplier" class="supplier">Supplier: <span style="color:red">*</span></label>
                     <select id="supplier" class="form-control supplier"></select>
@@ -40,7 +40,7 @@
                 </div>
                 <div class="panel-footer text-right">
                     <button class="btn btn-info btn-sm" id="POAdd" onclick="POAdd()">Add PO</button> &nbsp;&nbsp;
-                    <button type='button' id='addQuality' class='btn btn-primary btn-sm' onclick="addQuality()">Add Quality</button>
+                    @*<button type='button' id='addQuality' class='btn btn-primary btn-sm' onclick="addQuality()">Add Quality</button>*@
                 </div>
             </div>
 
@@ -96,7 +96,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <table width="100%">
-                                    <caption>Attach File</caption>
+                                    <caption>Attach File <span style="color:red">*</span></caption>
                                     <tr>
                                         <td style="padding-right:2PX;"><input type="file" multiple class="form-control" id="billFileUpload" onchange="FileUploadOnChange()" /></td>
                                     </tr>
@@ -211,6 +211,7 @@
     $(function () {
         supplierList();
         //$('#supplier').select2();
+        InvoiceList();
     })
 
     $('#invoiceType').change(function () {
@@ -241,7 +242,32 @@
                 }
             }
         });
-    }
+        }
+
+        const InvoiceList = () => {
+            $.ajax({
+                url: '/BillApproval/InvoiceTypeList',
+                type: 'POST',
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    $('#invoiceType').empty();
+                    $('#invoiceType').append("<option value='0'>-- Select Type --</option>");
+
+                    if (response.length > 0) {
+
+                        for (let i = 0; response.length > i; i++) {
+
+                            $("#invoiceType").append($("<option></option>").val(response[i].InvoiceTypeID)
+                                .html(response[i].InvoiceType));
+                        }
+                        //$('select#supplier').append(result);
+                    }
+                }
+            });
+        }
+
+
 
     function approverlist(invoiceType) {
         //alert(departmentHead);
@@ -339,7 +365,7 @@
                     result += "<table id='tbl_PODetails' style='width:100%;border: 1px solid black;' class='table table-striped'>";
                     result += "<thead style='font-weight: bold;text-align:center;'>";
                     result += "<tr><th style='text-align:center'> <input type='checkbox' id='selectAll'></th><th style='text-align:center'>PO NO</th><th style='text-align:center'>Supplier</th><th style='text-align:center'>Article</th><th style='text-align:center'>Color</th>";
-                    result += "<th style='text-align:center'>Size</th><th style='text-align:center'>UOM</th><th style='text-align:center'>Qty</th><th style='text-align:center'>Rate</th><th style='text-align:center'>Value</th><th style='text-align:center'>InvoiceQty</th><th style='text-align:center'>Balance to Invoice</th></tr>";
+                    result += "<th style='text-align:center'>Size</th><th style='text-align:center'>UOM</th><th style='text-align:center'>Qty</th><th style='text-align:center'>Rate</th><th style='text-align:center'>Value</th><th style='text-align:center'>InvoiceQty</th><th style='text-align:center'>Invoice Balance Qty</th></tr>";
                     result += "</thead>";
                     result += "<tbody style='text-align:center;'>";
                     if (response.length > 0) {
@@ -424,8 +450,8 @@
         result += "<table id='tbl_MasterDetails' style='width:100%;border: 1px solid black;' class='table table-striped'>";
         result += "<thead style='font-weight: bold;text-align:center;'>";
         result += "<tr><th>PO NO</th><th>Supplier</th><th>Article</th><th>Color</th><th>Size</th><th>UOM</th>";
-        result += "<th>Qty</th><th>Rate</th><th>PO Value</th><th>Already Invoiced Qty</th><th>Balance to Invoice</th>";
-        result += "<th>InvoiceQty</th><th>InvoiceValue</th><th>Discount</th><th>Total Paid</th><th>Delete</th>"
+        result += "<th>Qty</th><th>Rate</th><th>PO Value</th><th>Already Invoiced Qty</th><th>Invoice Balance Qty</th>";
+        result += "<th>InvoiceQty</th><th>InvoiceValue</th><th>Discount</th><th>Total Payable</th><th>Delete</th>"
         result += "</tr>";
         result += "</thead>";
         result += "<tbody style='text-align:center;' id='main'>";
@@ -516,22 +542,23 @@
         result += "<label for='vehicle1'> &nbsp;&nbsp;Is Final Invoice</label>";
                 result += "</div>";
                 result += "</div>";
+
             result += "<div class='col-md-4'>";
                 result += "<div class=''style=''>";
-                result += "<label for='total' id=''>Remarks: &nbsp;&nbsp;</label>";
-        result += '<textarea id="remarks" name="remarks" rows="2" cols="50"></textarea>';
-                result += "</div>";
-            result += "</div>";
-            result += "<div class='col-md-4'>";
-                result += "<div class=''style=''>";
-                result += "<label for='total' id=''>Notes: &nbsp;&nbsp;</label>";
+        result += "<label for='total' id=''>Completion Note: &nbsp;&nbsp;</label>";
         result += '<textarea id="note" name="note" rows="2" cols="50"></textarea>';
                 result += "</div>";
-            result += "</div>";
+        result += "</div>";
+        result += "<div class='col-md-4'>";
+        result += "<div class=''style=''>";
+        result += "<label for='total' id=''>Remarks: &nbsp;&nbsp;</label>";
+        result += '<textarea id="remarks" name="remarks" rows="2" cols="50"></textarea>';
+        result += "</div>";
+        result += "</div>";
         result += "</div>";
             result += "<div class='text-center' style='padding-top:20px;'>";
         result += "<button type='button' id='poSubmit' class='btn btn-success btn-sm' onclick='varifyInputElement()'>S U B M I T</button> &nbsp;";
-        result += "<button type='button' id='' class='btn btn-info btn-sm' onclick='Swal()'>Preview</button>";
+        //result += "<button type='button' id='' class='btn btn-info btn-sm' onclick='Swal()'>Preview</button>";
             result += "</div>";
 
 
@@ -571,8 +598,8 @@
             $("#myPreview").modal("hide");
 
             swal({
-                title: "Do you want to add Quality?",
-                text: "You clicked the button!",
+                title: "Do You Want To Add Quality Info?",
+                text: "",
                 type: "info",
                 showCancelButton: true,
                 confirmButtonColor: "#DD6B55",
@@ -588,8 +615,11 @@
 
                        // swal("Deleted!", "Your imaginary file has been deleted.", "success");
                     } else {
-                        //swal("Cancelled", "Your imaginary file is safe :)", "error");
-                        closeOnCancel: true
+                        swal("Cancelled", "", "info");
+                        //swal({
+                        //    showCloseButton: true,
+                        //    closeOnCancel: true
+                        //});
                     }
                 }
             );
@@ -662,9 +692,21 @@
             if (approver["ApproverNo"] == 1) {
                 approver["ApproverStatus"] = 1;
                 approver["ApproverStatusName"] = "First Approver"
-            } else {
+            } else if (approver["ApproverNo"] == 2) {
                 approver["ApproverStatus"] = 2;
                 approver["ApproverStatusName"] = "Second Approver"
+            }
+            else if (approver["ApproverNo"] == 3) {
+                approver["ApproverStatus"] = 3;
+                approver["ApproverStatusName"] = "Third Approver"
+            }
+            else if (approver["ApproverNo"] == 4) {
+                approver["ApproverStatus"] = 4;
+                approver["ApproverStatusName"] = "Fourth Approver"
+            }
+            else if (approver["ApproverNo"] == 5) {
+                approver["ApproverStatus"] = 5;
+                approver["ApproverStatusName"] = "Fifth Approver"
             }
            // alert($(this).attr('data-approverid'));
             approverList.push(approver);
@@ -690,6 +732,8 @@
         var poKey = 0;
 
         $("#main tr:not(:last-child)").each(function () {
+            if ($('#invoiceQty_' + vDetailKey).val() != '0') {
+
             var aQty = 0;
             var bQty = 0;
             var invoice = {};
@@ -698,33 +742,41 @@
             var vID = $(this).attr('id');
             //alert(vDetailKey);
             poKey = $(this).attr('data-pokey');
+            
+                invoice["PODetailsKey"] = vDetailKey;
+                invoice["PO"] = $('#pono_' + vDetailKey).html();
+                invoice["Article"] = $('#article_' + vDetailKey).html();
+                invoice["Color"] = $('#color_' + vDetailKey).html();
+                invoice["Size"] = $('#size_' + vDetailKey).html();
+                invoice["Unit"] = $('span#master_unit_' + vDetailKey).html();
+                invoice["UnitID"] = $('span#span_unitId_' + vDetailKey).html();
+                invoice["POQty"] = $('#poqty_' + vDetailKey).html();
+                invoice["Rate"] = $('#rate_' + vDetailKey).html();
+                invoice["POValue"] = $('#povalue_' + vDetailKey).html();
+                invoice["InvoiceQty"] = $('#invoiceQty_' + vDetailKey).val();
+                invoice["InitialQty"] = parseInt($('#uptodateqty_' + vDetailKey).html()) + parseInt($('#invoiceQty_' + vDetailKey).val());
+                invoice["InvoiceBalance"] = parseInt($('#piqty_' + vDetailKey).html()) - parseInt($('#invoiceQty_' + vDetailKey).val());
+                invoice["InvoiceValue"] = $('#invoiceValue_' + vDetailKey).val();
+                invoice["Discount"] = $('#discount_' + vDetailKey).val();
+                invoice["Total"] = $('#total_' + vDetailKey).val();
 
-            invoice["PODetailsKey"] = vDetailKey;
-            invoice["PO"] = $('#pono_' + vDetailKey).html();
-            invoice["Article"] = $('#article_' + vDetailKey).html();
-            invoice["Color"] = $('#color_' + vDetailKey).html();
-            invoice["Size"] = $('#size_' + vDetailKey).html();
-            invoice["Unit"] = $('span#master_unit_' + vDetailKey).html();
-            invoice["UnitID"] = $('span#span_unitId_' + vDetailKey).html();
-            invoice["POQty"] = $('#poqty_' + vDetailKey).html();
-            invoice["Rate"] = $('#rate_' + vDetailKey).html();
-            invoice["POValue"] = $('#povalue_' + vDetailKey).html();
-            invoice["InvoiceQty"] = $('#invoiceQty_' + vDetailKey).val();
-            invoice["InitialQty"] = parseInt($('#uptodateqty_' + vDetailKey).html()) + parseInt($('#invoiceQty_' + vDetailKey).val());
-            invoice["InvoiceBalance"] = parseInt($('#piqty_' + vDetailKey).html()) - parseInt($('#invoiceQty_' + vDetailKey).val());
-            invoice["InvoiceValue"] = $('#invoiceValue_' + vDetailKey).val();
-            invoice["Discount"] = $('#discount_' + vDetailKey).val();
-            invoice["Total"] = $('#total_' + vDetailKey).val();
-            aQty = parseInt($('#uptodateqty_' + vDetailKey).html()) + parseInt($('#invoiceQty_' + vDetailKey).val());
-            bQty = parseInt($('#piqty_' + vDetailKey).html()) - parseInt($('#invoiceQty_' + vDetailKey).val());
-            alreadyQty += aQty;
-            blanceQty += bQty;
-            billInfo.push(invoice);
+                aQty = parseInt($('#uptodateqty_' + vDetailKey).html()) + parseInt($('#invoiceQty_' + vDetailKey).val());
+                bQty = parseInt($('#piqty_' + vDetailKey).html()) - parseInt($('#invoiceQty_' + vDetailKey).val());
+                alreadyQty += aQty;
+                blanceQty += bQty;
+                if (invoice["InvoiceQty"] != '0') {
+                    billInfo.push(invoice);
+                   // console.log(billInfo);
+                }
+                
+            }
+
+           
 
             //alert($('span#span_unitId_' + vEXTARNAL).html());
         });
 
-        console.log(billInfo);
+       // console.log(billInfo);
 
         jsonData["POKey"] = poKey;
         jsonData["BillInfoList"] = billInfo;
@@ -738,11 +790,44 @@
         jsonData["TotalDiscount"] = $("#Discount").html();
         jsonData["TotalPaid"] = $("#TotalPaid").html();
 
+        //console.log(jsonData);
+
+       
+
         return jsonData;
     }
 
-    function varifyInputElement() {
-        var jsondate = GetInputData();
+        function varifyInputElement() {
+
+           // alert($('#billFileUpload').val().length);
+
+           // alert($('#attachedFileTable tr').length);
+            var jsondate = GetInputData();
+
+            if ($('#attachedFileTable tr').length < 1) {
+                toastr.error("Please Upload Bill Invoice", "Bill Invoice", {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+                return false;
+            }
+
+            if (jsondate.BillInfoList.length == 0) {
+
+                toastr.error("Please Enter Invoice Qty", "Invoice Qty", {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+                return false;
+            }
+
+        
         var urlpath = '@Url.Action("ModalShowBeforeSubmit", "BillApproval")';
             $.ajax({
                 contentType: "application/json; charset=utf-8",
@@ -780,13 +865,13 @@
                             $("#myPreview").modal("hide");
 
                             swal({
-                                title: "Do you want to add Quality?",
-                                text: "You clicked the button!",
+                                title: "Do you want to add QC Report?",
+                                text: "",
                                 type: "info",
                                 showCancelButton: true,
                                 confirmButtonColor: "#DD6B55",
-                                cancelButtonText: "No, I don't!",
-                                confirmButtonText: "Yes, I want!",
+                                cancelButtonText: "No",
+                                confirmButtonText: "Yes",
                                 closeOnConfirm: false,
                                 closeOnCancel: false
                             },
@@ -797,6 +882,8 @@
 
                                         // swal("Deleted!", "Your imaginary file has been deleted.", "success");
                                     } else {
+                                        //swal("Cancelled", "", "info");
+                                        location.reload();
                                         //swal("Cancelled", "Your imaginary file is safe :)", "error");
                                     }
                                 }

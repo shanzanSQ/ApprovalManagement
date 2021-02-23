@@ -164,37 +164,46 @@
                     <th>Color</th>
                     <th>Size</th>
                     <th>UoM</th>
-
                     <th>Rate</th>
-
                     <th>Invoice Qty</th>
+                    @*@if (Model.ApproverList.Where(s => s.ApproverNo == 1).Single().UserID == (int)Session["SQuserId"])
+                    {*@
+                        <th>Verified Qty</th>
+                    @*}*@
                     <th>Invoice Value</th>
                     <th>Discount</th>
                     <th>Total Paid</th>
                 </tr>
             </thead>
-            <tbody>
-                @{ decimal r = 0; }
+            <tbody id="invoiceDetails">
+                @{ decimal r = 0; decimal checkQty = 0; decimal inputQty = 0; }
                 @foreach (var item in Model.BillInfoList)
                 {
-                    <tr>
-                        <td>@countFob</td>
-                        <td>@item.PO</td>
-                        <td>@item.Article</td>
-                        <td>@item.Color</td>
-                        <td>@item.Size</td>
-                        <td>@item.Unit</td>
-
-                        <td>@item.Rate.ToString()</td>
-
-
-                        <td>@item.InvoiceQty.ToString()</td>
-                        <td>@item.InvoiceValue.ToString()</td>
-                        <td>@item.Discount.ToString()</td>
-                        <td>@item.Total.ToString()</td>
-                    </tr>
+                <tr id='@item.PODetailsKey'>
+                    <td>@countFob</td>
+                    <td>@item.PONo</td>
+                    <td>@item.Article</td>
+                    <td>@item.Color</td>
+                    <td>@item.Size</td>
+                    <td>@item.Unit</td>
+                    <td>@item.Rate.ToString()</td>
+                    <td>@item.InvoiceQty.ToString()</td>
+                    @if (Model.ApproverList.Where(s => s.ApproverNo == 1).Single().UserID == (int)Session["SQuserId"])
+                    {
+                        <td><input class="checked_qty" id="checked_qty_@item.PODetailsKey" value="@item.InvoiceQty" onchange="chengeVerifyQty()" /></td>
+                    }
+                    else
+                    {
+                        <td>@item.CheckedQty</td>
+                    }
+                    <td>@item.InvoiceValue.ToString()</td>
+                    <td>@item.Discount.ToString()</td>
+                    <td>@item.Total.ToString()</td>
+                </tr>
 
                     r += @item.Rate;
+                    checkQty += item.CheckedQty;
+                    inputQty += item.InvoiceQty;
                     countFob++;
                 }
             </tbody>
@@ -203,6 +212,14 @@
                     <th colspan="6">Total </th>
                     <th>@r</th>
                     <th>@Model.TotalInvoiceQty.ToString()</th>
+                    @if (Model.ApproverList.Where(s => s.ApproverNo == 1).Single().UserID == (int)Session["SQuserId"])
+                    {
+                        <th><span id="input_Qty"> @inputQty </span></th>
+                    }
+                    else
+                    {
+                        <th>@checkQty</th>
+                    }
                     <th>@Model.TotalInvoiceValue.ToString()</th>
                     <th>@Model.TotalDiscount.ToString()</th>
                     <th>@Model.TotalPaid.ToString()</th>
@@ -330,4 +347,46 @@
     </div>
 </div>
 
+<script>
+    $('.checked_qty').keypress(function (event) {
+        return isNumber(event, this)
+    });
 
+    //function checkNumeric(podetails) {
+    //    return isNumber(event, this);
+    //}
+
+    // THE SCRIPT THAT CHECKS IF THE KEY PRESSED IS A NUMERIC OR DECIMAL VALUE.
+    function isNumber(evt, element) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+        if (
+            (charCode != 46 || $(element).val().indexOf('.') != -1) &&      // “.” CHECK DOT, AND ONLY ONE.
+            (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+
+    $('#invoiceDetails tr').each(function () {
+        var PODetails = $(this).attr('id');
+
+        var checkQty = $('#checked_qty_' + PODetails).val();
+
+    })
+
+    function chengeVerifyQty() {
+        var qty = 0;
+        $('#invoiceDetails tr').each(function () {
+            var PODetails = $(this).attr('id');
+            var abc = $('#checked_qty_' + PODetails).val();
+            //alert(parseInt(abc))
+            var q = parseInt(abc);
+            var checkQty = parseFloat(abc).toFixed(2);
+            //alert(checkQty);
+            //qty += checkQty;
+            qty += q;
+        })
+        //alert(qty);
+        $("#input_Qty").html(qty);
+    }
+
+</script>

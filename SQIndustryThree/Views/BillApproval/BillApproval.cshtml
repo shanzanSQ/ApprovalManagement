@@ -54,7 +54,7 @@
             </div>
         </div>
         @*  style="height:400px;width:100%;overflow:scroll"*@
-        <div id="billApprovalDashboard">
+        <div id="billApprovalDashboard" style="width:100%;overflow:scroll">
 
         </div>
     </div>
@@ -66,7 +66,7 @@
                             data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title" style="text-align: center">Visitor Request Preview</h4>
+                    <h4 class="modal-title" style="text-align: center">Bill Approval Preview</h4>
                 </div>
                 <div id="modalbody" class="modal-body">
                 </div>
@@ -90,7 +90,7 @@
                 <div id="qualitybody" class="modal-body">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="UpdateQuality" onclick="UpdateQuality()">Submit</button>
                     <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
                 </div>
             </div><!-- /.modal-content -->
@@ -107,6 +107,106 @@
        // $("#spmenuid").html($(this).html());
     });
     var ExceptionRequestId = 0;
+
+    function UpdateQuality() {
+        var rating = "";
+        var qualityId = "";
+        var rating_name = "";
+        var check = false;
+
+        //if ($("#genaralInfodt>tbody>tr ").length == 0) {
+        //    toastr.error("Please checked the checkbox", "Checkbox", {
+        //        "positionClass": "toast-top-right",
+        //        "showDuration": "300",
+        //        "hideDuration": "1000",
+        //        "timeOut": "5000",
+        //        "closeButton": true
+        //    });
+        //    return false;
+        //}
+
+        $('#genaralInfodt>tbody>tr').each(function () {
+            //alert($(this).attr('id'));
+            var id = $(this).attr('id');
+
+
+            var rate = $('#start_rating_' + id).val();
+           // alert(rate);
+            if (rate == "") {
+                check = false;
+                return false;
+            }
+            else {
+                check = true;
+
+                var rate_name = $('#start_rating_' + id + ' option:selected').text();
+
+                qualityId += id + ",";
+                rating += rate + ",";
+                rating_name += rate_name + ",";
+            }
+
+
+            //alert(rating);
+        })
+
+       // alert(rating_name);
+
+        if (check == false) {
+
+            toastr.error("Please Rating All The Item", "Rating", {
+                "positionClass": "toast-top-right",
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "closeButton": true
+            });
+            return false;
+
+        } else {
+            var urlpath = '@Url.Action("UpdateQualityRating", "BillApproval")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({ qualityId: qualityId, rate: rating, rate_name: rating_name }),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    if (data == true) {
+                        //swal({
+                        //    title: "Quality Rating Updated Successfully!",
+                        //    type: 'success',
+                        //    closeOnConfirm: false,
+                        //    closeOnCancel: true
+                        //}, function () {
+                        //        $("#myQuality").modal("hide");
+                        //})
+
+
+                        swal({
+                            title: "Quality Rating Updated Successfully!",
+                            type: 'success',
+                            closeOnCancel: true
+                        }, function () {
+                            $("#myQuality").modal("hide");
+                            //GetAllVisitorRequest(1, 0);
+                        });
+                    }
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+        }
+
+
+
+
+
+    }
+
     function GetApproverRequestList(status,progrss) {
         var urlpath = '@Url.Action("GetAllBillRequest", "BillApproval")';
         $.ajax({
@@ -119,7 +219,24 @@
                     console.log(data);
                     $('#billApprovalDashboard').empty();
                     $('#billApprovalDashboard').append(data);
-                    $('#BillRequestTable').DataTable();
+                    $('#BillRequestTable').DataTable({
+                        "columns": [
+                            null,
+                            { "width": "100%" },
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ]
+                    });
                 }
             }
         });
@@ -142,7 +259,33 @@
         });
     }
 
-    function LoadQuality(invoice) {
+
+    function LoadQuality(invoice, invoiceNo) {
+
+        var urlpath = '@Url.Action("QualityExist", "BillApproval")';
+        $.ajax({
+            data: { InvoiceKey: invoice},
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                if (data == 0) {
+                    //$("#myQuality").modal("hide");
+                    location.replace('/BillApproval/UpdateQuality?InvoiceKey=' + invoice + '&InvoiceNo=' + invoiceNo );
+                } else {
+                    location.replace('/BillApproval/UpdateQuality?InvoiceKey=' + invoice + '&InvoiceNo=' + invoiceNo);
+                }
+
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+
+        //alert(invoice);
+    }
+
+    function CheckQuality(invoice) {
 
         var urlpath = '@Url.Action("QualityExist", "BillApproval")';
         $.ajax({
@@ -188,7 +331,7 @@
                     $("#qualitybody").html("");
                     $("#qualitybody").append(data);
                     $("#myQuality").modal("show");
-                
+
             },
             error: function () {
                 alert("Error");
@@ -225,32 +368,49 @@
                 closeOnCancel: true
             });
         } else {
+
+            var verify = "";
+            var invoiceDetailKey = "";
+
+            $('#invoiceDetails tr').each(function () {
+
+                var id = $(this).attr('id');
+                //alert($(this).attr('id'));
+                invoiceDetailKey += id + ",";
+                var checkQty = $('#checked_qty_' + id).val();
+                verify += checkQty + ",";
+                
+
+            })
+
+            //alert(verify);
+
             var urlpath = '@Url.Action("BillApproveOrReject", "BillApproval")';
-        $.ajax({
-            data: { CommentText: commentText, Progress: progress, RequestorId: masterId },
-            dataType: 'json',
-            url: urlpath,
-            type: "Post",
-            async: true,
-            success: function (result) {
-                if (result) {
+            $.ajax({
+                data: { CommentText: commentText, Progress: progress, RequestorId: masterId, invoiceDetailKey: invoiceDetailKey, verifyQty: verify },
+                dataType: 'json',
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function (result) {
+                    if (result) {
+                        swal({
+                            title: 'Done Successfully',
+                            type: 'success',
+                            closeOnCancel: true
+                        },function () {
+                                $("#myModal").modal("hide");
+                                GetApproverRequestList(2, 3);
+                        });
+                    }
+                }, error: function (xhr, status, error) {
                     swal({
-                        title: 'Done Successfully',
-                        type: 'success',
+                        title: 'Error Occoured',
+                        type: 'error',
                         closeOnCancel: true
-                    },function () {
-                            $("#myModal").modal("hide");
-                            GetApproverRequestList(2, 3);
                     });
                 }
-            }, error: function (xhr, status, error) {
-                swal({
-                    title: 'Error Occoured',
-                    type: 'error',
-                    closeOnCancel: true
-                });
-            }
-        });
+            });
         }
 
     }
