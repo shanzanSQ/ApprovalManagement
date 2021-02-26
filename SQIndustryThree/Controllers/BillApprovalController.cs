@@ -680,7 +680,7 @@ namespace SQIndustryThree.Controllers
         }
 
 
-        public ActionResult BillApproveOrReject(string CommentText, int Progress, int RequestorId, string invoiceDetailKey, string verifyQty)
+        public ActionResult BillApproveOrReject(string CommentText, int Progress, int RequestorId, string invoiceDetailKey, string verifyQty, string verifyValue)
         {
             if (base.Session["SQuserId"] == null)
             {
@@ -690,8 +690,10 @@ namespace SQIndustryThree.Controllers
 
             string invoiceDetailKeyTrim = invoiceDetailKey.TrimEnd(',');
             string verifyQtyTrim = verifyQty.TrimEnd(',');
+            string verifyValueTrim = verifyValue.TrimEnd(',');
             List<string> invoiceDetailKeyList = invoiceDetailKeyTrim.Split(',').ToList();
             List<string> verifyQtyList = verifyQtyTrim.Split(',').ToList();
+            List<string> verifyValueList = verifyValueTrim.Split(',').ToList();
 
             var approvalInfo = this.billDal.BillApproveOrReject(Progress, CommentText, userID, RequestorId);
             if (invoiceDetailKeyList != null)
@@ -702,7 +704,7 @@ namespace SQIndustryThree.Controllers
                     {
                         if (verifyQtyList[i] != "undefined")
                         {
-                            billDal.UpdateInvoiceBill(Convert.ToInt32(invoiceDetailKeyList[i]), Convert.ToDecimal(verifyQtyList[i]), userID);
+                            billDal.UpdateInvoiceBill(Convert.ToInt32(invoiceDetailKeyList[i]), Convert.ToDecimal(verifyValueList[i]), Convert.ToDecimal(verifyQtyList[i]), userID);
                         }
 
                         

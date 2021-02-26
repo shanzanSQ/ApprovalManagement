@@ -5,7 +5,7 @@
         text-align: left;
     }
 
-    td { 
+    td {
         text-align: left;
     }
 
@@ -164,7 +164,7 @@
                     <th>Rate</th>
                     <th>PO Value</th>
                     @*<th>Already Invoiced Qty</th>
-        <th>Invoice Balance Qty</th>*@
+                        <th>Invoice Balance Qty</th>*@
                     <th>Current Invoice Qty</th>
                     <th>Verify Qty</th>
                     <th>Invoice Value</th>
@@ -181,25 +181,25 @@
                 {
                     if (@item.InvoiceQty != 0)
                     {
-                <tr>
-                    <td>@countFob</td>
-                    <td>@item.PONo</td>
-                    <td>@item.Article</td>
-                    <td>@item.Color</td>
-                    <td>@item.Size</td>
-                    <td>@item.Unit</td>
-                    <td>@item.POQty.ToString()</td>
-                    <td>@item.Rate.ToString()</td>
-                    <td>@item.POValue.ToString()</td>
-                    @*<td>@item.InitialQty.ToString()</td>
-        <td>@item.InvoiceBalance.ToString()</td>*@
-                    <td>@item.InvoiceQty.ToString()</td>
-                    <td>@item.CheckedQty.ToString()</td>
-                    <td>@item.InvoiceValue.ToString()</td>
-                    <td>@item.CheckedValue.ToString()</td>
-                    <td>@item.Discount.ToString()</td>
-                    <td>@item.Total.ToString()</td>
-                </tr>
+                        <tr>
+                            <td>@countFob</td>
+                            <td>@item.PONo</td>
+                            <td>@item.Article</td>
+                            <td>@item.Color</td>
+                            <td>@item.Size</td>
+                            <td>@item.Unit</td>
+                            <td>@item.POQty.ToString()</td>
+                            <td>@item.Rate.ToString()</td>
+                            <td>@item.POValue.ToString()</td>
+                            @*<td>@item.InitialQty.ToString()</td>
+                                <td>@item.InvoiceBalance.ToString()</td>*@
+                            <td>@item.InvoiceQty.ToString()</td>
+                            <td>@item.CheckedQty.ToString()</td>
+                            <td>@item.InvoiceValue.ToString()</td>
+                            <td>@item.CheckedValue.ToString()</td>
+                            <td>@item.Discount.ToString()</td>
+                            <td>@item.Total.ToString()</td>
+                        </tr>
                         countFob++;
                     }
 
@@ -215,7 +215,7 @@
                     <th>@Model.TotalRate.ToString()</th>
                     <th>@Model.TotalValue.ToString()</th>
                     @*<th>@Model.AlreadyQty.ToString()</th>
-        <th>@Model.TotalBalanceQty.ToString()</th>*@
+                        <th>@Model.TotalBalanceQty.ToString()</th>*@
                     <th>@Model.TotalInvoiceQty.ToString()</th>
                     <th>@TotalCheckQty</th>
                     <th>@Model.TotalInvoiceValue.ToString()</th>

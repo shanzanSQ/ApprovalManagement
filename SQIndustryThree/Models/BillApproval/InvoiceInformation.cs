@@ -23,6 +23,7 @@ namespace SQIndustryThree.Models.BillApproval
         public decimal CheckedQty { get; set; }
         public decimal InvoiceBalance { get; set; }
         public decimal InvoiceValue { get; set; }
+        public decimal CheckedValue { get; set; }
         public decimal Discount { get; set; }
         public decimal Total { get; set; }
     }

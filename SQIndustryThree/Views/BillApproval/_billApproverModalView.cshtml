@@ -171,6 +171,7 @@
                         <th>Verified Qty</th>
                     @*}*@
                     <th>Invoice Value</th>
+                    <th>Verified Value</th>
                     <th>Discount</th>
                     <th>Total Paid</th>
                 </tr>
@@ -186,17 +187,18 @@
                     <td>@item.Color</td>
                     <td>@item.Size</td>
                     <td>@item.Unit</td>
-                    <td>@item.Rate.ToString()</td>
-                    <td>@item.InvoiceQty.ToString()</td>
+                    <td><span id="apporver_Rate_@item.PODetailsKey">@item.Rate.ToString()</span></td>
+                    <td><span id="apporver_InvoiceQty_@item.PODetailsKey"> @item.InvoiceQty.ToString() </span></td>
                     @if (Model.ApproverList.Where(s => s.ApproverNo == 1).Single().UserID == (int)Session["SQuserId"])
                     {
-                        <td><input class="checked_qty" id="checked_qty_@item.PODetailsKey" value="@item.InvoiceQty" onchange="chengeVerifyQty()" /></td>
+                        <td><input class="checked_qty" id="checked_qty_@item.PODetailsKey" value="@item.InvoiceQty" onkeyup="chengeVerifyQty()" /></td>
                     }
                     else
                     {
                         <td>@item.CheckedQty</td>
                     }
-                    <td>@item.InvoiceValue.ToString()</td>
+                    <td><span id="apporver_invoiceValue_@item.PODetailsKey">@item.InvoiceValue.ToString()</span></td>
+                    <td><span id="apporver_verifyValue_@item.PODetailsKey">@item.InvoiceValue.ToString()</span></td>
                     <td>@item.Discount.ToString()</td>
                     <td>@item.Total.ToString()</td>
                 </tr>
@@ -221,6 +223,7 @@
                         <th>@checkQty</th>
                     }
                     <th>@Model.TotalInvoiceValue.ToString()</th>
+                    <th><span id="verify_value"></span></th>
                     <th>@Model.TotalDiscount.ToString()</th>
                     <th>@Model.TotalPaid.ToString()</th>
                 </tr>
@@ -375,18 +378,27 @@
 
     function chengeVerifyQty() {
         var qty = 0;
+        var value = 0;
         $('#invoiceDetails tr').each(function () {
             var PODetails = $(this).attr('id');
             var abc = $('#checked_qty_' + PODetails).val();
-            //alert(parseInt(abc))
+            var IValue = $('#apporver_Rate_' + PODetails).html();
+            var checkValue = parseFloat(abc) * parseFloat(IValue)
+            //alert(parseInt(abc))apporver_InvoiceValue_  apporver_verifyValue_
+           // alert(checkValue);
             var q = parseInt(abc);
-            var checkQty = parseFloat(abc).toFixed(2);
+            var checkQty = parseFloat(abc);
             //alert(checkQty);
             //qty += checkQty;
-            qty += q;
+
+            $('#apporver_verifyValue_' + PODetails).html(checkValue);
+
+            qty += checkQty;
+            value += checkValue;
         })
         //alert(qty);
         $("#input_Qty").html(qty);
+        $("#verify_value").html(value);
     }
 
 </script>

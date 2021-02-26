@@ -127,6 +127,24 @@
         });
     }
 
+     function UpdateRejectedRequest(InvoiceKey,status) {
+        var urlpath = '@Url.Action("BillRequestDetails", "BillApproval")';
+        $.ajax({
+            data: { MasterID: InvoiceKey, ViewName: "_billRequestUpdateModal", Status:status },
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $("#previewmodalbody").html("");
+                $("#previewmodalbody").append(data);
+                $("#myPreview").modal("show");
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+
     function BillRequestDetails(masterID,status,viewName) {
         var urlpath = '@Url.Action("BillRequestDetails", "BillApproval")';
         $.ajax({

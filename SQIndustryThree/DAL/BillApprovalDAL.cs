@@ -762,7 +762,7 @@ namespace SQIndustryThree.DAL
             }
         }
 
-        public bool UpdateInvoiceBill(int InvoiceDetailsKey, decimal checkQty,  int userId)
+        public bool UpdateInvoiceBill(int InvoiceDetailsKey, decimal checkValue, decimal checkQty,  int userId)
         {
             bool result = true;
             try
@@ -771,6 +771,7 @@ namespace SQIndustryThree.DAL
                 List<SqlParameter> aParameters = new List<SqlParameter>();
                 List<SqlParameter> aList = new List<SqlParameter>();
                 aList.Add(new SqlParameter("@InvoiceDetailsKey", InvoiceDetailsKey));
+                aList.Add(new SqlParameter("@checkValue", checkValue));
                 aList.Add(new SqlParameter("@checkQty", checkQty));
                 aList.Add(new SqlParameter("@userId", userId));
                 result = accessManager.UpdateData("sp_UpdateInvoiceBill", aList);

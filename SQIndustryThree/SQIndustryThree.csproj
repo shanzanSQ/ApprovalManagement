@@ -7132,6 +7132,7 @@
     <Content Include="Views\BillApproval\_billQualityModalView.cshtml" />
     <Content Include="Views\BillApproval\UpdateQuality.cshtml" />
     <Content Include="Views\BillApproval\_ExcelPartialView.cshtml" />
+    <Content Include="Views\BillApproval\_billRequestUpdateModal.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
