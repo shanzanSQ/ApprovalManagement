@@ -226,8 +226,11 @@ namespace SQIndustryThree.DAL
                         VisitorCompany = sqlDataReader["VisitorCompany"].ToString(),
                         ApprovedStatus = sqlDataReader["PendingStatus"].ToString(),
                         IsApproved = (int)sqlDataReader["Approved"],
-                        CheckIn = sqlDataReader["CheckIn"].ToString(),
-                        CheckOut = sqlDataReader["CheckOut"].ToString()
+                        Image = sqlDataReader["Image"].ToString(),
+                        //CheckIn = sqlDataReader["CheckIn"].ToString(),
+                        //CheckOut = sqlDataReader["CheckOut"].ToString()
+                        Checked = sqlDataReader["Checked"].ToString()
+
                     }) ;
                 return visitorRequestModelList;
             }
@@ -276,8 +279,9 @@ namespace SQIndustryThree.DAL
                         VisitorMobile = sqlDataReader["VisitorMobile"].ToString(),
                         ApprovedStatus = sqlDataReader["PendingStatus"].ToString(),
                         IsApproved = (int)sqlDataReader["Approved"],
-                        CheckIn = sqlDataReader["CheckIn"].ToString(),
-                        CheckOut = sqlDataReader["CheckOut"].ToString()
+                        Checked = sqlDataReader["Checked"].ToString()
+                        //CheckIn = sqlDataReader["CheckIn"].ToString(),
+                        //CheckOut = sqlDataReader["CheckOut"].ToString()
                     });
                 return visitorRequestModelList;
             }
@@ -528,9 +532,12 @@ namespace SQIndustryThree.DAL
         }
 
         public object UpadteVisitorCheckinAndCheckOut(
-          int requestorId,
-          int visitorId,
+          string requestorId,
+          string visitorId,
+          string rowId,
           string visitorCardNo,
+          string imageName,
+          string imagePath,
           string vehicleNo,
           string remarks,
           string checkin,
@@ -544,9 +551,12 @@ namespace SQIndustryThree.DAL
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
                     DynamicParameters dynamicParameters = new DynamicParameters();
-                    dynamicParameters.Add("@@RequestorId", (int)requestorId);
+                    dynamicParameters.Add("@RequestorId", (object)requestorId);
                     dynamicParameters.Add("@VisitorId", (object)visitorId);
-                    dynamicParameters.Add("@VisitorCardNo", (object)visitorCardNo); 
+                    dynamicParameters.Add("@RowId", (object)rowId);
+                    dynamicParameters.Add("@VisitorCardNo", (object)visitorCardNo);
+                    dynamicParameters.Add("@ImageName", (object)imageName);
+                    dynamicParameters.Add("@ImagePath", (object)imagePath);
                     dynamicParameters.Add("@vehicleNo", (object)vehicleNo);
                     dynamicParameters.Add("@GateRemarks", (object)remarks);
                     dynamicParameters.Add("@CheckIn", (object)checkin);
@@ -826,6 +836,27 @@ namespace SQIndustryThree.DAL
                     visitorApproverList = cnn.Query<VisitorRequestModel>("sp_AllApproveReport", (object)dynamicParameters, commandType: new CommandType?(CommandType.StoredProcedure)).ToList<VisitorRequestModel>();
                 }
                 return visitorApproverList;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public List<ArrivedVisitor> ArrivedVisitorList(int VisitorID)
+        {
+            List<ArrivedVisitor> arrivedVisitorList = new List<ArrivedVisitor>();
+            try
+            {
+                using (IDbConnection cnn = (IDbConnection)new SqlConnection(this.connStr))
+                {
+                    if (cnn.State == ConnectionState.Closed)
+                        cnn.Open();
+                    DynamicParameters dynamicParameters = new DynamicParameters();
+                    dynamicParameters.Add("@VisitorId", (object)VisitorID);
+                    arrivedVisitorList = cnn.Query<ArrivedVisitor>("sp_ArrivedVisitorList", (object)dynamicParameters, commandType: new CommandType?(CommandType.StoredProcedure)).ToList();
+                }
+                return arrivedVisitorList;
             }
             catch (Exception ex)
             {

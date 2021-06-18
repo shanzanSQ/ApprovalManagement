@@ -5,6 +5,7 @@
 // Assembly location: C:\Users\ashiqurrahman\Desktop\AMSTest2Last\AMSTest2\bin\SQIndustryThree.dll
 
 using System;
+using System.Collections.Generic;
 
 namespace SQIndustryThree.Models
 {
@@ -97,5 +98,8 @@ namespace SQIndustryThree.Models
         public string CheckOut { get; set; }
 
         public DateTime OutTime { get; set; }
+        public string Checked { get; set; }
+
+        public List<ArrivedVisitor> arrivedVisitors { get; set; }
     }
 }

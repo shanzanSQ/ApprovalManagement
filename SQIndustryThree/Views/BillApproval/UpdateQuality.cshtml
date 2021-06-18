@@ -39,7 +39,7 @@
                 @{ int count = 0; }
                 @foreach (var item in ViewBag.QList)
                 {
-                    <tr id="@count">
+                    <tr id="@count" data-qualityId="@item["QualityID"]">
 
                         <td><input class="form-control parameter" id="parameter_@count" type="text" value="@item["QualityParam"]" placeholder="Item"></td>
                         <td>
@@ -73,7 +73,7 @@
                             {
                                 <span id="deleteFile" style="color:red" onclick="deleteQualityFile(@item["InvoiceKey"], @item["QualityID"])">X</span>
                             }
-                            <span style="display:none" name="filePath" id="filePath_' + count + '">' + @item["FilePath"] + '</span>
+                            <span style="display:none" name="filePath" id="filePath_@count">' + @item["FilePath"] + '</span>
 
                         </td>
                         <td><input type="file" multiple class="form-control qualityFileUpload" id="qualityFileUpload_@count" onchange="FileUploadOnChange(@count)" /></td>
@@ -88,7 +88,7 @@
         </table>
 
         <div class="text-center">
-            <button class="btn btn-info btn-block" id="POAdd" onclick="submitQuality()">S U B M I T</button> &nbsp;&nbsp;
+            <button class="btn btn-info" id="POAdd" onclick="submitQuality()">S U B M I T</button> &nbsp;&nbsp;
         </div>
 
     </div>
@@ -124,8 +124,20 @@
         });
     }
 
-
     var i = 0;
+
+    $('#tableBodyQuality tr').each(function () {
+        i = $(this).attr('id');
+    })
+
+    //if (typeof $('#tableBodyQuality tr').attr('id') === "undefined") {
+    //    i = 0;
+    //} else {
+    //    i = $('#tableBodyQuality tr').attr('id');
+    //}
+
+    //alert(i);
+
     $(".add-row").click(function () {
 
          i++;
@@ -236,14 +248,25 @@
         var vComment = "";
         var vFileName = "";
         var vFilePath = "";
+        var vQualityId = "";
 
         $('#tableBodyQuality tr').each(function () {
 
             var Id = $(this).attr('id');
+            var qualityId = $(this).attr('data-qualityId');
             var item = $('#parameter_' + Id).val();
             var result = $('#result_' + Id).val();
             var comment = $('#comment_' + Id).val();
             var fileName = $('#fileName_' + Id).html();
+            var attatchfile = "";
+            if (typeof fileName === "undefined") {
+                attatchfile = $('#attachedFileTable_' + Id).html();
+
+            } else {
+                attatchfile = $('#fileName_' + Id).html();
+            }
+
+           // var fileName = ; //$('#fileName_' + Id).html();
             var filePath = $('#filePath_' + Id).html();
 
             if (result == 4) {
@@ -263,11 +286,13 @@
                 checkVal = true;
             }
 
+            vQualityId += qualityId + ','
             vItem += item + ',';
             vResult += result + ',';
             vComment += comment + ',';
-            vFileName += fileName + ',';
+            vFileName += attatchfile + ',';
             vFilePath += filePath + ',';
+
         })
 
         //alert(invoiceKey + "  " + invoiceNo + "  " + vItem + "  " + vResult + "  " + vComment + "  " + vFileName + "  " + vFilePath);
@@ -281,10 +306,10 @@
             });
             return false;
         } else {
-            var urlpath = '@Url.Action("EntryQuality", "BillApproval")';
+            var urlpath = '@Url.Action("QualityForUpdate", "BillApproval")';
             $.ajax({
                 contentType: "application/json; charset=utf-8",
-                data: JSON.stringify({ invoiceKey: invoiceKey, invoiceNo: invoiceNo, item: vItem, result: vResult, comment: vComment, fileName: vFileName, filePath: vFilePath }),
+                data: JSON.stringify({ qualityId: vQualityId, invoiceKey: invoiceKey, invoiceNo: invoiceNo, item: vItem, result: vResult, comment: vComment, fileName: vFileName, filePath: vFilePath }),
                 url: urlpath,
                 type: "POST",
                 async: true,

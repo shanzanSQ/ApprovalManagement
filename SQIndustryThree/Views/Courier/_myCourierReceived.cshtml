@@ -1,0 +1,57 @@
+﻿@model IEnumerable<SQIndustryThree.Models.CourierRequestModel>
+<style>
+    #IourequestTable tr th, #IourequestTable tr td {
+        text-align: center;
+        padding: 5px;
+    }
+
+    button {
+        padding: 0;
+    }
+</style>
+<div class="box">
+    <h3 style="text-align:center"> Courier Received List</h3>
+    <!-- /.box-header -->
+    <div class="box-body">
+        <div class="col-xs-12" id="personlocdiv" style="overflow:scroll;">
+            <table id="VisitorRequestTable" class="table-bordered table table-striped" width="100%" style="overflow:scroll">
+                <thead>
+                    <tr>
+                        <th>SL</th>
+                        <th>Courier Request Id #</th>
+                        <th>Courier No #</th>
+                        <th>Airway Bill no</th>
+                        <th>Received Date</th>
+                        <th>Received Weight</th>
+                        <th>Hand Over To</th>
+                        <th>Reference No</th>
+                        <th>Remarks</th>
+                        @*<th>Action</th>*@
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ int count = 1;}
+                    @foreach (var item in Model)
+                    {
+                    <tr>
+                        <td>@count</td>
+                        <td>@item.CourierRequestId</td>
+                        <td>@item.CourierNumber</td>
+                        <td>@item.AirwayBillno</td>
+                        <td>@item.ReceivedDate</td>
+                        <td>@item.ReceivedWeight</td>
+                        <td>@item.HandOverTo</td>
+                        <td>@item.ReferenceNo</td>
+                        <td>@item.Remarks</td>
+                        @*<td> <button type="button" class="btn  btn-block btn-primary btn-sm" data-toggle="modal" data-target="#myModal" onclick="CourierDispatchDetails(@item.CourierDispatchNo,'_modalDispatchDetailsView',0)" data-idkey="@item.CourierDispatchNo">Details(@item.Pending)</button></td>*@
+                    </tr>
+                        count++;
+
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <!-- /.box-body -->
+</div>

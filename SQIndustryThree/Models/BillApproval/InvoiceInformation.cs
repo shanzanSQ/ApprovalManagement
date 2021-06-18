@@ -18,6 +18,7 @@ namespace SQIndustryThree.Models.BillApproval
         public decimal POQty { get; set; }
         public decimal Rate { get; set; }
         public decimal POValue { get; set; }
+        public decimal FirstEntryQty { get; set; }
         public decimal InvoiceQty { get; set; }
         public decimal InitialQty { get; set; }
         public decimal CheckedQty { get; set; }
@@ -26,5 +27,8 @@ namespace SQIndustryThree.Models.BillApproval
         public decimal CheckedValue { get; set; }
         public decimal Discount { get; set; }
         public decimal Total { get; set; }
+
+
+        public decimal AllocatedValue { get; set; }
     }
 }

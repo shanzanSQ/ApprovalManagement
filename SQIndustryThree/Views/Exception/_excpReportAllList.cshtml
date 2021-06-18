@@ -28,6 +28,7 @@
                             <th>Exception Reason</th>
                             <th>Request By</th>
                             <th>Create Date</th>
+                            <th>Update Date</th>
                             <th>Action(Comments)</th>
                         </tr>
                     </thead>
@@ -35,30 +36,31 @@
                         @{ int count = 1;}
                         @foreach (var item in Model)
                         {
-                            <tr>
-                                <td>@count</td>
-                                <td>@item.ExceptionMasterId</td>
-                                <td>@item.ExceptionTypeName</td>
-                                <td>@item.BusinessUnitName</td>
-                                <td>@item.BuyerName</td>
-                                <td>@item.ExceptionReasonName</td>
-                                <td>@item.RequestBy</td>
-                                <td>@DateTime.Parse(@item.CreateDate).ToString("dd MMM yyyy")</td>
-                                <td>
-                                    @if (item.IsApproved == 1)
-                                    {
-                                        <button type="button" class="btn  btn-block btn-success btn-sm" data-toggle="modal" data-target="#myModal" onclick="ExceptionReportDetails(@item.ExceptionMasterId,1)" data-idkey="@item.ExceptionMasterId">Approved</button>
-                                    }
-                                    else if (item.IsApproved == 2)
-                                    {
-                                        <button type="button" class="btn  btn-block btn-danger btn-sm" data-toggle="modal" data-target="#myModal" onclick="ExceptionReportDetails(@item.ExceptionMasterId,1)" data-idkey="@item.ExceptionMasterId">Rejected</button>
-                                    }
-                                    else
-                                    {
-                                        <button type="button" class="btn  btn-block btn-primary btn-sm" data-toggle="modal" data-target="#myModal" onclick="ExceptionReportDetails(@item.ExceptionMasterId,1)" data-idkey="@item.ExceptionMasterId">Pending</button>
-                                    }
-                                </td>
-                            </tr>
+                        <tr>
+                            <td>@count</td>
+                            <td>@item.ExceptionMasterId</td>
+                            <td>@item.ExceptionTypeName</td>
+                            <td>@item.BusinessUnitName</td>
+                            <td>@item.BuyerName</td>
+                            <td>@item.ExceptionReasonName</td>
+                            <td>@item.RequestBy</td>
+                            <td>@DateTime.Parse(@item.CreateDate).ToString("dd MMM yyyy")</td>
+                            <td>@DateTime.Parse(@item.UpdateDate).ToString("dd MMM yyyy")</td>
+                            <td>
+                                @if (item.IsApproved == 1)
+                                {
+                                    <button type="button" class="btn  btn-block btn-success btn-sm" data-toggle="modal" data-target="#myModal" onclick="ExceptionReportDetails(@item.ExceptionMasterId,1)" data-idkey="@item.ExceptionMasterId">Approved</button>
+                                }
+                                else if (item.IsApproved == 2)
+                                {
+                                    <button type="button" class="btn  btn-block btn-danger btn-sm" data-toggle="modal" data-target="#myModal" onclick="ExceptionReportDetails(@item.ExceptionMasterId,1)" data-idkey="@item.ExceptionMasterId">Rejected</button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn  btn-block btn-primary btn-sm" data-toggle="modal" data-target="#myModal" onclick="ExceptionReportDetails(@item.ExceptionMasterId,1)" data-idkey="@item.ExceptionMasterId">Pending</button>
+                                }
+                            </td>
+                        </tr>
                             count++;
 
                         }

@@ -21,6 +21,7 @@ namespace SQIndustryThree.Models
         public int ApproverNo { get; set; }
         public String DesignationName { get; set; }
         public String DepartmentName { get; set; }
+        public int IsSupplier { get; set; }
         public bool Empty
         {
             get

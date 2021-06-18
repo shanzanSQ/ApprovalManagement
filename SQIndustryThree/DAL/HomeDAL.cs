@@ -60,7 +60,7 @@ namespace SQIndustryThree.DAL
                     user.UserInformationName = dr["UserName"].ToString();
                     user.UserInformationEmail = dr["UserEmail"].ToString();
                     user.DesignationId = (int)dr["DesignationID"];
-                    //user.UserInformationPhoneNumber = (int)dr["UserPhone"];
+                    user.IsSupplier = Convert.ToInt32(dr["IsSupplier"]);
                 }
 
                 return user;

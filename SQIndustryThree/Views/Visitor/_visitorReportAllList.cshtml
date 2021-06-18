@@ -39,7 +39,7 @@
             {
                 <tr id="@item.VisitorId">
                     <td>@count</td>
-                    @if (string.IsNullOrEmpty(item.Image))
+                    @if (string.IsNullOrEmpty(@item.Image))
                     {
                         <th><img src="~/Images/user.png" height="50" width="50" /></th>
                     }
@@ -59,14 +59,10 @@
                         {
                             <td>Single Days</td>
                         }
-                    @if (@item.VisitDate != DateTime.Today)
-                    {
-                        <td>@DateTime.Today.ToString("dd MMM yyyy")</td>
-                    }
-                    else
-                    {
+
+                    
                         <td>@item.VisitDate.ToString("dd MMM yyyy")</td>
-                    }
+                    
 
                     <td>@item.PurposeOfVisitSQ</td>
                     <td>@item.BusinessUnitName</td>

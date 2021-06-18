@@ -1,0 +1,93 @@
+﻿@model SQIndustryThree.Models.CourierTypeDetails
+
+@{
+    ViewBag.Title = "_updateCourierTypepertialView";
+}
+<div id="myprintmodal">
+    <h3 style="color: black;
+        text-align: center;
+        font-weight: bold">
+       
+    </h3>
+    <div>
+        <span style="float:right;">
+            @if (Model.Revision > 0)
+            {
+                <p style="text-align:center;font-weight:bold">
+                    No. of Revision: @Model.Revision
+                </p>
+            }
+        </span>
+    </div>
+
+    <div class="row">
+        <div>
+
+        </div>
+        <div>
+            <input id="primarykey" type="hidden" value="@Model.CourierTypeId" />
+            <table border="1" width="90%" align="center" style="overflow-wrap:initial" class="">
+                <caption>Courier Type Information</caption>
+                <tbody>
+                    <tr>
+                        <td width="20%">Type</td>
+                        <td>
+                            <select id="uptype">
+                                <option value="@Model.Type">@Model.Type</option>
+                                <option value="I">Inbound</option>
+                                <option value="O">Outbound</option>
+                            </select>
+                            
+                        </td>
+                            
+                    </tr>
+                    <tr>
+                        <td width="20%">Country</td>
+                        <td>
+                            <select id="country">
+                                <option value="@Model.Country">@Model.CountryName</option>
+                            </select>
+                            <i style="width:20%;color:green;padding-left:2px;cursor:pointer" onclick="LoadCountry('#country');" class="fa fa-refresh">Change</i>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="20%">Service Provider</td>
+                        <td>
+                            <select id="service_provider">
+                                <option value="@Model.ServiceProviderId">@Model.ServiceProvider</option>
+                            </select>
+                            <i style="width:20%;color:green;padding-left:2px;cursor:pointer"onclick="LoadCourier('#service_provider');" class="fa fa-refresh">Change</i>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Weight</td>
+                        <td><input id="weight" style="width:100%;overflow-wrap:break-word" type="text" value="@Model.WeightRange" /> </td>
+                    </tr>
+                    <tr>
+                        <td>Lead Time From</td>
+                        <td><input id="leadTimeFrom" style="width:100%;overflow-wrap:break-word" type="text" value="@Model.LeadTimeFrom" /> </td>
+
+                    </tr>
+                    <tr>
+                        <td>Lead Time To</td>
+                        <td><input id="leadTimeTo" style="width:100%;overflow-wrap:break-word" type="text" value="@Model.LeadTimeTo" /> </td>
+                        
+                    </tr>
+                    <tr>
+                        <td>Rate</td>
+                        <td><input id="rate" style="width:100%;overflow-wrap:break-word" type="text" value="@Model.Rate" /> </td>
+                    </tr>
+                    <tr>
+                        <td>Currency</td>
+                        <td><input id="currency" style="width:100%;overflow-wrap:break-word" type="text" value="@Model.Currency" /> </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="text-align:center">
+            <br />
+            <button type="button" style="width:30%" class="btn btn-primary btn-sm" onclick="UpdateCourierType(@Model.CourierTypeId)">Update </button>
+        </div>
+    </div>
+</div>

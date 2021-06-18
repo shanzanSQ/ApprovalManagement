@@ -72,10 +72,10 @@
                         <option value="0">--Select Exception Type--</option>
                         <option value="1">Air Freight</option>
                         <option value="2">Discount </option>
-                        <option value="3">Claim </option>
-                        <option value="4">Order Cancel</option>
+                        <option value="3">Claimed </option>
+                        <option value="4">Order Canceled</option>
                         <option value="5">Others</option>
-                        <option value="6">Over Purchase </option>
+                        <option value="6">Over Purchased </option>
                     </select>
                 </div>
                 <div class="col-md-2">
@@ -816,6 +816,7 @@
         });
     }
     function formValidate() {
+        debugger;
         if ($("#exception_type").val() == "0") {
             $('#exception_type').css({ "border-color": "#FF0000" });
         } else if ($("#exceptionReasons").val() == "0") {

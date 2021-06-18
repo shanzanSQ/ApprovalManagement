@@ -96,6 +96,39 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
+
+
+    <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h5 class="modal-title" id="myModalLabel">Capex Information</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12 modal_body_map">
+                            <div class="location-map" id="location-map">
+                                <div style="text-align:left" id="showcanvas">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 modal_body_end">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="text-align:center">
+                    <button style="text-align:right" class="btn btn-success" id="printCapex">Print This Capex</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 @*@Scripts.Render("~/bundles/jquery")*@
 <script type="text/javascript">
@@ -106,6 +139,30 @@
         $(this).parent().addClass('active');
        // $("#spmenuid").html($(this).html());
     });
+
+
+    //$('.bd-example-modal-lg').on('show.bs.modal', function (event) {
+    //    var modalmap = $(event.relatedTarget);
+    //    ShowSelectedCapex(modalmap.data('idkey'));
+    //});
+
+        function ShowSelectedCapex(primarykey) {
+            var urlpath = '@Url.Action("IndividualCapexShow", "CapexApproval")';
+            $.ajax({
+                data: {primarykey:primarykey},
+                url: urlpath,
+                type: "Post",
+                async: true,
+                        success: function(data) {
+                            if (data) {
+                                $('#showcanvas').empty();
+                                $('#showcanvas').append(data);
+                            }
+                        }
+                    });
+        }
+
+
     var ExceptionRequestId = 0;
 
     function UpdateQuality() {
@@ -355,15 +412,19 @@
             //alert($(this).attr('id'));
             var invoice = $('#apporver_InvoiceQty_' + id).html();
             var checkQty = $('#checked_qty_' + id).val();
-
-            if (parseInt(invoice) != parseInt(checkQty)) {
-
-                checkVal = false;
-
-                return false;
-            } else {
+            if (typeof checkQty === "undefined") {
                 checkVal = true;
+            } else {
+                if (parseInt(invoice) != parseInt(checkQty)) {
+
+                    checkVal = false;
+
+                    return false;
+                } else {
+                    checkVal = true;
+                }
             }
+
 
 
             //invoiceDetailKey += id;
@@ -382,7 +443,7 @@
         }
         else {
 
-            if (checkVal == false && progress == 1) {
+            if (checkVal == false  && progress == 1) {
                 toastr.error("Invoice Qty and Verified Qty Not Matched That's why You can not Approved", "Not Approved", {
                     "positionClass": "toast-top-right",
                     "showDuration": "300",
@@ -393,9 +454,22 @@
                 return false;
             }
             else {
+
                 var verify = "";
                 var invoiceDetailKey = "";
                 var verifyValue = "";
+
+                var general_procurement = $("#general_procurement").val() ? $("#general_procurement").val() : 0;
+                var capex_number = $("#capex_number").val() ? $("#capex_number").val() : 0;
+                var cost_center = $("#cost_center").val() ? $("#cost_center").val() : 0;
+
+                var certifying = 0;
+                if ($('#certifying').is(':checked')) {
+                    certifying = 1
+                }
+                else {
+                    certifying = 0
+                }
 
                 $('#invoiceDetails tr').each(function () {
 
@@ -410,11 +484,42 @@
 
                 })
 
+                var fileUpload = [];
+                $('#attachedFileTable tr').each(function () {
+                    var filedate = {};
+                    filedate["BillFileName"] = $(this).find('td[name^="fileName"]').html();
+                    filedate["BillFilePath"] = $(this).find('td[name^="filePath"]').html();
+                    fileUpload.push(filedate);
+                });
+               // jsonData["BillFilesList"] = fileUpload;
+
+                var poFileUpload = [];
+                $('#poAttachedFileTable tr').each(function () {
+                    var filedata = {};
+                    filedata["POFileName"] = $(this).find('td[name^="fileName"]').html();
+                    filedata["POFilePath"] = $(this).find('td[name^="filePath"]').html();
+                    poFileUpload.push(filedata);
+                });
+
+                var grnFileUpload = [];
+                $('#grnAttachedFileTable tr').each(function () {
+                    var filedata = {};
+                    filedata["GRNFileName"] = $(this).find('td[name^="fileName"]').html();
+                    filedata["GRNFilePath"] = $(this).find('td[name^="filePath"]').html();
+                    grnFileUpload.push(filedata);
+                });
+               // var grnFileUpload =  poFileUpload;
+
                 //alert(verify);
 
                 var urlpath = '@Url.Action("BillApproveOrReject", "BillApproval")';
                 $.ajax({
-                    data: { CommentText: commentText, Progress: progress, RequestorId: masterId, invoiceDetailKey: invoiceDetailKey, verifyQty: verify, verifyValue: verifyValue },
+                    data: {
+                        CommentText: commentText, Progress: progress, RequestorId: masterId,
+                        invoiceDetailKey: invoiceDetailKey, verifyQty: verify, verifyValue: verifyValue,
+                        gRNFiles: grnFileUpload, poFiles: poFileUpload, billFiles: fileUpload,
+                        ProcurementUserId: general_procurement, CapexInfoId: capex_number, CostCenterId: cost_center // Certifying: certifying
+                    },
                     dataType: 'json',
                     url: urlpath,
                     type: "Post",
@@ -440,11 +545,46 @@
                 });
             }
 
-            
+
 
 
         }
 
+    }
+
+
+    function DeletePOFileFromDatatbase(r, poId, filename, filepath) {
+
+       // alert(poId + filename + filepath.replace("\\", "\\"));
+
+         var urlpath = '@Url.Action("DeletePOFileFromDatatbase", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { POFileID: poId, FileName: filename, FilePath: filepath },
+            async: true,
+            success: function (data) {
+               var i = r.parentNode.parentNode.rowIndex;
+                document.getElementById("deletePOFileTable").deleteRow(i);
+            }
+        });
+    }
+
+    function DeleteBillFileFromDatatbase(r, billId, filename, filepath) {
+
+        var urlpath = '@Url.Action("DeleteBillFileFromDatatbase", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { BillFileID: billId, FileName: filename, FilePath: filepath },
+            async: true,
+            success: function (data) {
+               var i = r.parentNode.parentNode.rowIndex;
+                document.getElementById("deleteBillFileTable").deleteRow(i);
+            }
+        });
     }
 
     function ReviewComment(masterID) {

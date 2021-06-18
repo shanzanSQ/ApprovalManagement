@@ -47,6 +47,7 @@ namespace SQIndustryThree.Controllers
                     result.msg = Url.Action(moduleList[0].ModuleValue,moduleList[0].ModuleController);
                     Session["SQuserId"] = users.UserInformationId;
                     Session["SQuserName"] = users.UserInformationName;
+                    Session["IsSupplier"] = users.IsSupplier;
                     int permission = capexApproval.ModulePermission(1, users.UserInformationId);
                     if (permission != 1)
                     {

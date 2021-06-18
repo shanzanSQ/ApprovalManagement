@@ -211,6 +211,7 @@ namespace SQIndustryThree.DAL
                     exceptionList.ExceptionReasonName = dr["ExceptionReasonName"].ToString();
                     exceptionList.RequestBy = dr["UserName"].ToString();
                     exceptionList.CreateDate = dr["CreateDate"].ToString();
+                    exceptionList.UpdateDate = dr["UpdateDate"].ToString();
 
                     users.Add(exceptionList);
                 }

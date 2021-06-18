@@ -9,12 +9,14 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Web;
 using System.Web.Mvc;
+using System.Linq;
 
 namespace SQIndustryThree.Controllers
 {
     public class VisitorController : Controller
     {
         private VisitorDAL visitorDAL = new VisitorDAL();
+        private CameraDAL cameraDal = new CameraDAL();
 
         public VisitorController()
         {
@@ -81,14 +83,59 @@ namespace SQIndustryThree.Controllers
             return base.RedirectToAction("Index", "Account");
         }
 
-        public ActionResult GateInfoUpdate(int requestorId, int visitorId, string visitorCardNo, string vehicleNo, string remarks, string checkin, string checkout)
+        //public ActionResult GateInfoUpdate(int requestorId, int visitorId, string visitorCardNo, string vehicleNo, string remarks, string checkin, string checkout)
+        //{
+        //    if (base.Session["SQuserId"] == null)
+        //    {
+        //        return base.RedirectToAction("Index", "Account");
+        //    }
+        //    string data = "";
+        //    dynamic result = this.visitorDAL.UpadteVisitorCheckinAndCheckOut(requestorId, visitorId, visitorCardNo, vehicleNo, remarks, checkin, checkout);
+        //    if (result != 0)
+        //    {
+        //        data = "Updated Data Successfully";
+        //    }
+        //    return base.Json(data);
+        //}
+
+        public ActionResult GateVisitorInfo(string requestorId, string visitorId, string rowId, string cardNo, string imageName, string imagePath, string remarks,  string checkIn, string checkOut)
         {
             if (base.Session["SQuserId"] == null)
             {
                 return base.RedirectToAction("Index", "Account");
             }
+
+            dynamic result = 0;
+
+            string RowIdTrim = rowId.TrimEnd(',');
+            string CardNoTrim = cardNo.TrimEnd(',');
+            string ImageNameTrim = imageName.TrimEnd(',');
+            string ImagePathTrim = imagePath.TrimEnd(',');
+            string RemarksTrim = remarks.TrimEnd(',');
+            string CheckInTrim = checkIn.TrimEnd(',');
+            string CheckoutTrim = checkOut.TrimEnd(',');
+
+            List<string> RowIdList = RowIdTrim.Split(',').ToList();
+            List<string> CardNoList = CardNoTrim.Split(',').ToList();
+            List<string> ImageNameList = ImageNameTrim.Split(',').ToList();
+            List<string> ImagePathList = ImagePathTrim.Split(',').ToList();
+            List<string> RemarksList = RemarksTrim.Split(',').ToList();
+            List<string> CheckInList = CheckInTrim.Split(',').ToList();
+            List<string> CheckoutList = CheckoutTrim.Split(',').ToList();
+
             string data = "";
-            dynamic result = this.visitorDAL.UpadteVisitorCheckinAndCheckOut(requestorId, visitorId, visitorCardNo, vehicleNo, remarks, checkin, checkout);
+
+            if (CardNoList != null)
+            {
+                for (int i = 0; i < CardNoList.Count; i++)
+                {
+                    result = this.visitorDAL.UpadteVisitorCheckinAndCheckOut(requestorId, visitorId, RowIdList[i], CardNoList[i], ImageNameList[i], ImagePathList[i],"", RemarksList[i], CheckInList[i], CheckoutList[i]);
+                }
+                
+            }
+
+            
+            
             if (result != 0)
             {
                 data = "Updated Data Successfully";
@@ -225,7 +272,7 @@ namespace SQIndustryThree.Controllers
             return base.RedirectToAction("Index", "Account");
         }
 
-        [HttpPost]
+        [HttpGet]
         public ActionResult IndividualRequestShow(int PrimaryKey)
         {
             if (base.Session["SQuserId"] == null)
@@ -234,7 +281,141 @@ namespace SQIndustryThree.Controllers
             }
             int userID = Convert.ToInt32(base.Session["SQuserId"].ToString());
             VisitorRequestModel list = this.visitorDAL.IndividualRequestShow(PrimaryKey, userID);
+
+            var ArrivedVisitorList = visitorDAL.ArrivedVisitorList(PrimaryKey);
+
+            list.arrivedVisitors = ArrivedVisitorList;
+
+           // ViewBag.VisitorList = ArrivedVisitorList;
+            
+
             return this.PartialView("_modalVisitorRequest", list);
+        }
+
+        [HttpGet]
+        public ActionResult IndividualDetailsView(int PrimaryKey)
+        {
+            if (base.Session["SQuserId"] == null)
+            {
+                return base.RedirectToAction("Index", "Account");
+            }
+            
+            int userID = Convert.ToInt32(base.Session["SQuserId"].ToString());
+            VisitorRequestModel list = this.visitorDAL.IndividualRequestShow(PrimaryKey, userID);
+            return View(list);
+            //return this.PartialView("_modalVisitorRequest", list);
+        }
+
+        [HttpGet]
+        public ActionResult CameraCapture(int PrimaryKey)
+        {
+            if (base.Session["SQuserId"] == null)
+            {
+                return base.RedirectToAction("Index", "Account");
+            }
+            int userID = Convert.ToInt32(base.Session["SQuserId"].ToString());
+            Session["RowID"] = null;
+           // Session["Imagename"] = null;
+           // Session["ServerPath"] = null;
+
+            Session["RowID"] = PrimaryKey;
+
+            // VisitorRequestModel list = this.visitorDAL.IndividualRequestShow(PrimaryKey, userID);
+            return this.PartialView("_CameraCaptureView");
+        }
+
+        [HttpPost]
+        public ActionResult CameraCapture(string PrimaryKey)
+        {
+            if (base.Session["SQuserId"] == null)
+            {
+                return base.RedirectToAction("Index", "Account");
+            }
+            try
+            {
+
+                int rowId = Convert.ToInt32(Session["RowID"]);
+                var FullFileWithext = string.Empty;
+                var ServerSavePath = string.Empty;
+                var files = Request.Files;
+                if (files != null)
+                {
+                    foreach (string str in files)
+                    {
+                        HttpPostedFileBase file = Request.Files[str] as HttpPostedFileBase;
+
+                        if (file != null)
+                        {
+                            // Getting Filename
+                            var fileName = file.FileName;
+                            var currentmilse = DateTime.Now.Ticks;
+                            var InputFileName = Path.GetFileNameWithoutExtension(file.FileName);
+                            var InputFileExtention = Path.GetExtension(file.FileName);
+                            FullFileWithext = InputFileName + currentmilse + InputFileExtention;
+                            ServerSavePath = Path.Combine(Server.MapPath("~/Images/Visitors/") + FullFileWithext);
+                            //Save file to server folder  
+                            file.SaveAs(ServerSavePath);
+
+                            Session["Imagename"] = FullFileWithext;
+                            Session["ServerPath"] = ServerSavePath;
+
+                            if (!string.IsNullOrEmpty(ServerSavePath))
+                            {
+                                // Storing Image in Folder
+                                // StoreInFolder(file, ServerSavePath);
+
+                                var imageBytes = System.IO.File.ReadAllBytes(ServerSavePath);
+                                if (imageBytes != null)
+                                {
+                                    // Storing Image in Folder
+                                  //  StoreInDatabase(rowId, imageBytes, FullFileWithext, ServerSavePath);
+                                }
+                            }
+
+
+
+                        }
+                    }
+                    return Json(new { rowid = rowId, imagename = FullFileWithext, imagepath = ServerSavePath });
+                }
+                else
+                {
+                    return Json(false);
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        private void StoreInDatabase(int rowId, byte[] imageBytes, string ImageName, string ImagePath)
+        {
+            try
+            {
+                if (imageBytes != null)
+                {
+                    string base64String = Convert.ToBase64String(imageBytes, 0, imageBytes.Length);
+                    string imageUrl = string.Concat("data:image/jpg;base64,", base64String);
+
+                    ImageStore imageStore = new ImageStore()
+                    {
+                        RowId = rowId,
+                        CreateDate = DateTime.Now,
+                        ImageBase64String = imageUrl,
+                        ImageId = 0,
+                        ImageName = ImageName,
+                        ImagePath = ImagePath
+
+                    };
+                    cameraDal.ImageInsert(imageStore);
+
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public ActionResult LoadApprovers(int unitId)

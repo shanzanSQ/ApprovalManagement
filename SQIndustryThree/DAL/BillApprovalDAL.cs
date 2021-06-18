@@ -100,7 +100,7 @@ namespace SQIndustryThree.DAL
                     poinformation.AdvancedPayment = float.Parse(dr["AdvancedPayment"].ToString()); 
                     poinformation.SupplierName = dr["SupplierName"].ToString();
                     poinformation.Polist= JsonConvert.DeserializeObject<List<BillAprrovalPoDetails>>(dr["PoDetailsList"].ToString());
-                    poinformation.Approverlist = JsonConvert.DeserializeObject<List<IOUApproverModel>>(dr["Approverlist"].ToString());
+                    poinformation.Approverlist = JsonConvert.DeserializeObject<List<BillApproverModel>>(dr["Approverlist"].ToString());
                 }
                 return poinformation;
             }
@@ -191,7 +191,7 @@ namespace SQIndustryThree.DAL
 
         #region New Visitor
 
-        public DataTable SupplierList()
+        public DataTable SupplierList(int userid)
         {
             DataTable dt = new DataTable();
             if (conn.State == 0)
@@ -200,6 +200,7 @@ namespace SQIndustryThree.DAL
             }
             SqlCommand cmd = new SqlCommand("sp_supplierList", conn);
             cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.Add("@userId", SqlDbType.NVarChar).Value = userid;
             SqlDataAdapter adpt = new SqlDataAdapter(cmd);
             adpt.Fill(dt);
             return dt;
@@ -214,6 +215,21 @@ namespace SQIndustryThree.DAL
             }
             SqlCommand cmd = new SqlCommand("sp_InvoiceTypeList", conn);
             cmd.CommandType = CommandType.StoredProcedure;
+            SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+            adpt.Fill(dt);
+            return dt;
+        }
+
+        public DataTable InvoiceSubcategoryList(int InvoiceType)
+        {
+            DataTable dt = new DataTable();
+            if (conn.State == 0)
+            {
+                conn.Open();
+            }
+            SqlCommand cmd = new SqlCommand("sp_InvoiceSubCatList", conn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.Add("@InvoiceType", SqlDbType.Int).Value = InvoiceType;
             SqlDataAdapter adpt = new SqlDataAdapter(cmd);
             adpt.Fill(dt);
             return dt;
@@ -248,7 +264,7 @@ namespace SQIndustryThree.DAL
             return dt;
         }
 
-        public DataTable SupplierWisePOSearch(int supplierId, string serach)
+        public DataTable SupplierWisePOSearch(int supplierId, string search)
         {
             DataTable dt = new DataTable();
             if (conn.State == 0)
@@ -256,16 +272,16 @@ namespace SQIndustryThree.DAL
                 conn.Open();
             }
 
-            SqlCommand cmd = new SqlCommand("sp_POList", conn);
+            SqlCommand cmd = new SqlCommand("sp_SupplierWisePOList", conn);
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.Add("@supplierId", SqlDbType.Int).Value = supplierId;
-            cmd.Parameters.Add("@serach", SqlDbType.NVarChar).Value = serach;
+            cmd.Parameters.Add("@search", SqlDbType.NVarChar).Value = search;
             SqlDataAdapter adpt = new SqlDataAdapter(cmd);
             adpt.Fill(dt);
             return dt;
         }
 
-        public DataTable InvoiceTypeWiseApproverList(int invoiceType)
+        public DataTable InvoiceTypeWiseApproverList(int invoiceType, int subcategoryId)
         {
             DataTable dt = new DataTable();
             if (conn.State == 0)
@@ -276,7 +292,8 @@ namespace SQIndustryThree.DAL
             SqlCommand cmd = new SqlCommand("sp_InvoiceTypeWiseApproverList", conn);
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.Add("@invoiceType", SqlDbType.Int).Value = invoiceType;
-          
+            cmd.Parameters.Add("@subCategoryID", SqlDbType.Int).Value = subcategoryId;
+
             SqlDataAdapter adpt = new SqlDataAdapter(cmd);
             adpt.Fill(dt);
             return dt;
@@ -293,6 +310,7 @@ namespace SQIndustryThree.DAL
                 //var exceptionDetails = new JavaScriptSerializer().Serialize(billMasterInfo.);
                 var billDetails = new JavaScriptSerializer().Serialize(billMasterInfo.BillInfoList);
                 var billFilelist = new JavaScriptSerializer().Serialize(billMasterInfo.BillFilesList);
+                var poFilelist = new JavaScriptSerializer().Serialize(billMasterInfo.POFilesList);
                 var approverList = new JavaScriptSerializer().Serialize(billMasterInfo.ApproverList);
                 billMasterInfo.BillInfoList = null;
                 billMasterInfo.BillFilesList = null;                
@@ -302,23 +320,11 @@ namespace SQIndustryThree.DAL
                 aParameters.Add(new SqlParameter("@billDetails", billDetails));
                 //aParameters.Add(new SqlParameter("@ExpGenralList", exceptionGenaralInfo));
                 aParameters.Add(new SqlParameter("@FileUploadJSon", billFilelist));
+                aParameters.Add(new SqlParameter("@POFileUploadJson", poFilelist));
                 aParameters.Add(new SqlParameter("@ApproverJson", approverList));
                 aParameters.Add(new SqlParameter("@NoOfApprover", noOfApprover));
                 aParameters.Add(new SqlParameter("@UserID", userId));
 
-                //aParameters.Add(new SqlParameter("@InvoiceNo", billMasterInfo.InvoiceNo));
-                //aParameters.Add(new SqlParameter("@InvoiceDate", billMasterInfo.InvoiceDate));
-                //aParameters.Add(new SqlParameter("@InvoiceType", billMasterInfo.InvoiceTypeID));
-                //aParameters.Add(new SqlParameter("@SupplierId", billMasterInfo.SupplierID));
-                //aParameters.Add(new SqlParameter("@CreatedBy", userId));
-                //aParameters.Add(new SqlParameter("@IsFinalInvoice", billMasterInfo.FinalInvoice));
-                //aParameters.Add(new SqlParameter("@Remarks", billMasterInfo.Remarks));
-                //aParameters.Add(new SqlParameter("@Notes", billMasterInfo.Notes));
-                //aParameters.Add(new SqlParameter("@POKey", billMasterInfo.POKey));
-                //aParameters.Add(new SqlParameter("@Total_InvoiceQty", billMasterInfo.TotalInvoiceQty));
-                //aParameters.Add(new SqlParameter("@Total_InvoiceValue", billMasterInfo.TotalInvoiceValue));
-                //aParameters.Add(new SqlParameter("@Total_Discount", billMasterInfo.TotalDiscount));
-                //aParameters.Add(new SqlParameter("@Total_Paid", billMasterInfo.TotalPaid));
 
                 masterId = accessManager.SaveDataReturnPrimaryKey("sp_CreateBillRequest", aParameters);
                 ResultResponse result = new ResultResponse();
@@ -355,6 +361,36 @@ namespace SQIndustryThree.DAL
                 aParameters.Add(new SqlParameter("@createdBy", created_by));
 
                 flag = accessManager.SaveData("sp_CreateQuality", aParameters);
+                return flag;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw e;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+        public bool UpdateQuality(int qualityId, string item, string result,
+    string comment, string fileName, string filePath, int created_by)
+        {
+            try
+            {
+                bool flag = false;
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<SqlParameter> aParameters = new List<SqlParameter>();
+                aParameters.Add(new SqlParameter("@qualityId", qualityId));
+                aParameters.Add(new SqlParameter("@item", item));
+                aParameters.Add(new SqlParameter("@result", result));
+                aParameters.Add(new SqlParameter("@comment", comment));
+                aParameters.Add(new SqlParameter("@fileName", fileName));
+                aParameters.Add(new SqlParameter("@filePath", filePath));
+                aParameters.Add(new SqlParameter("@createdBy", created_by));
+
+                flag = accessManager.UpdateData("sp_UpdateQuality", aParameters);
                 return flag;
             }
             catch (Exception e)
@@ -503,8 +539,13 @@ namespace SQIndustryThree.DAL
                     billrequest.InvoiceKey = (int)dr["InvoiceKey"];
                     billrequest.Requestor = dr["Requestor"].ToString();
                     billrequest.InvoiceNo = dr["InvoiceNo"].ToString();
+                    billrequest.BusinessUnitId = (int)dr["BusinessUnitId"];
+                    billrequest.BusinessUnitName = dr["BusinessUnitName"].ToString();                    
                     billrequest.InvoiceDate = dr["InvoiceDate"].ToString();
+                    billrequest.InvoiceTypeID = Convert.ToInt32(dr["InvoiceTypeID"]);
                     billrequest.InvoiceTypeName = dr["InvoiceType"].ToString();
+                    billrequest.SubCategoryID = Convert.ToInt32(dr["SubCategoryID"]);
+                    billrequest.SubCategoryName = dr["SubCategoryName"].ToString();
                     billrequest.SupplierName = dr["Supplier"].ToString();
                     billrequest.CreatedBy = (int)dr["CreatedBy"];
                     billrequest.CreateDate = dr["CreatedDate"].ToString();
@@ -516,15 +557,40 @@ namespace SQIndustryThree.DAL
                     billrequest.TotalInvoiceQty = (decimal)dr["Total_InvoiceQty"];
                     billrequest.TotalInvoiceValue = (decimal)dr["Total_InvoiceValue"];
                     billrequest.IsApproved = (int)dr["IsApproved"];
-                    billrequest.TotalDiscount = (decimal)dr["Total_Discount"];
-                    billrequest.TotalPaid = (decimal)dr["Total_Paid"];
+                    billrequest.DiscountPercent = Convert.ToDouble(dr["Discount_Percent"]);
+                    billrequest.DiscountAmt = Convert.ToDecimal(dr["Total_DiscountAmt"]);
+                    //billrequest.TotalDiscount = (decimal)dr["Total_Discount"];
+                    billrequest.TotalPaid = Convert.ToDecimal(dr["Total_Paid"]);
+                    billrequest.TotalAmount = Convert.ToDecimal(dr["Total_Amount"]);
+                    billrequest.AdjustmentPercent = Convert.ToDouble(dr["Adv_Adjustment_Percent"]);
+                    billrequest.AdjustmentAmt = Convert.ToDecimal(dr["Adv_Adjustment_Amt"]);
+                    billrequest.RetaintionPercent = Convert.ToDouble(dr["Retaintion_Percent"]);
+                    billrequest.RetaintionAmt = Convert.ToDecimal(dr["Retaintion_Amt"]);
+                    billrequest.AdvTotal = Convert.ToDecimal(dr["Total_Adjustment_Amt"]);
+                    billrequest.VATPercent = Convert.ToDouble(dr["VAT_Percent"]);
+                    billrequest.VATAmt = Convert.ToDecimal(dr["VAT_Amt"]);
+                    billrequest.AITPercent = Convert.ToDouble(dr["TAX_Percent"]);
+                    billrequest.AITAmt = Convert.ToDecimal(dr["TAX_Amt"]);
+
+                    billrequest.NetValue = Convert.ToDecimal(dr["Net_Value"]);
+
+                    //billrequest.CCID = Convert.ToInt32(dr["CCID"]);
+                    billrequest.CostCenter = dr["CostCenter"].ToString();
+                    billrequest.CostCenterOwner = dr["CostCenterOwner"].ToString();
+                    billrequest.CostCenterDesignation = dr["Designation"].ToString();
+
+                    billrequest.CapexInfoId = Convert.ToInt32(dr["CapexInfoId"]);
 
                     billrequest.BillInfoList = JsonConvert.DeserializeObject<List<InvoiceInformation>>(dr["BillInfoList"].ToString());
 
-                    billrequest.BillFilesList = JsonConvert.DeserializeObject<List<BillFileUploadDetails>>(dr["BillFilesList"].ToString());                                    
-                    
-                    billrequest.ApproverList = JsonConvert.DeserializeObject<List<IOUApproverModel>>(dr["ApproverList"].ToString());
-                    
+                    billrequest.BillFilesList = JsonConvert.DeserializeObject<List<BillFileUploadDetails>>(dr["BillFilesList"].ToString());
+                    billrequest.POFilesList = JsonConvert.DeserializeObject<List<POFileUploadDetails>>(dr["POFilesList"].ToString());
+                    billrequest.GRNFilesList = JsonConvert.DeserializeObject<List<GRNFileUploadDetails>>(dr["GRNFilesList"].ToString());
+
+                    billrequest.ApproverList = JsonConvert.DeserializeObject<List<BillApproverModel>>(dr["ApproverList"].ToString());
+
+                    billrequest.ChequeInfoDetails = JsonConvert.DeserializeObject<List<ChequeInfoDetails>>(dr["ChequeInfoDetails"].ToString());
+
                     billrequest.BillComments = JsonConvert.DeserializeObject<List<BillComments>>(dr["BillComments"].ToString());
                     billrequest.BillLogSection = JsonConvert.DeserializeObject<List<LogSection>>(dr["BillLogSection"].ToString());
                 }
@@ -545,18 +611,36 @@ namespace SQIndustryThree.DAL
           int Progress,
           string CommentText,
           int UserID,
-          int VisitorRequestId)
+          int VisitorRequestId,
+          List<GRNFileUploadDetails> grnFilesList,
+          List<POFileUploadDetails> poFiles, 
+          List<BillFileUploadDetails> billFiles,
+          int ProcurementUserId,
+          int CapexInfoId,
+          int CostCenterId
+          )
         {
             try
-         {
+            {
+                var grnFileList = new JavaScriptSerializer().Serialize(grnFilesList);
+                var poFilesList = new JavaScriptSerializer().Serialize(poFiles);
+                var billFilesList = new JavaScriptSerializer().Serialize(billFiles);
                 this.accessManager.SqlConnectionOpen(DataBase.SQQeye);
+
+
                 return this.accessManager.SaveData("sp_billApproveOrreject", new List<SqlParameter>()
-        {
-          new SqlParameter("@Progress", (object) Progress),
-          new SqlParameter("@CommentText", (object) CommentText),
-          new SqlParameter("@UserID", (object) UserID),
-          new SqlParameter("@InvoiceKey", (object) VisitorRequestId)
-        });
+                {
+                  new SqlParameter("@Progress",  Progress),
+                  new SqlParameter("@CommentText",  CommentText),
+                  new SqlParameter("@UserID", UserID),
+                  new SqlParameter("@InvoiceKey", VisitorRequestId),
+                   new SqlParameter("@ProcurementUserId", ProcurementUserId),
+                  new SqlParameter("@CapexInfoId",  CapexInfoId),
+                  new SqlParameter("@CostCenterId", CostCenterId),
+                   new SqlParameter("@POFileUploadJson", poFilesList),
+                    new SqlParameter("@BillFileUploadJson", billFilesList),
+                  new SqlParameter("@GRNFileUploadJson", grnFileList)
+                });
             }
             catch (Exception ex)
             {
@@ -786,6 +870,271 @@ namespace SQIndustryThree.DAL
             {
                 accessManager.SqlConnectionClose();
             }
+        }
+
+
+        public bool UpdateBillDetails(int detailsId, decimal qty, decimal value, decimal total)
+        {
+            bool result = true;
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<SqlParameter> aParameters = new List<SqlParameter>();
+                List<SqlParameter> aList = new List<SqlParameter>();
+                aList.Add(new SqlParameter("@detailsId", detailsId));
+                aList.Add(new SqlParameter("@qty", qty));
+                aList.Add(new SqlParameter("@value", value));
+                aList.Add(new SqlParameter("@total", total));
+                result = accessManager.UpdateData("sp_UpdateBillDetails", aList);
+                return result;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw e;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+        public bool UpdateBillMaster(int invoiceKey, decimal totalQty,  decimal totalValue, decimal totalPaid, double discountPercent, 
+            decimal discountAmt, decimal totalAmount, double vat, decimal vatAmt, decimal netValue, double adjustmentPercent, decimal adjustmentAmt, double retaintionPercent, decimal retaintionAmt, decimal total_adjustment_amt,
+            string tax, string taxAmt, List<POFileUploadDetails> poFiles, List<BillFileUploadDetails> billFiles, int userID)
+        {
+            bool result = true;
+            try
+            {
+                var poFilelist = new JavaScriptSerializer().Serialize(poFiles);
+                var billFilelist = new JavaScriptSerializer().Serialize(billFiles);
+
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<SqlParameter> aParameters = new List<SqlParameter>();
+                List<SqlParameter> aList = new List<SqlParameter>();
+                aList.Add(new SqlParameter("@invoiceKey", invoiceKey));
+                aList.Add(new SqlParameter("@totalQty", totalQty));
+                aList.Add(new SqlParameter("@totalValue", totalValue));
+                aList.Add(new SqlParameter("@totalPaid", totalPaid));
+                aList.Add(new SqlParameter("@discountPercent", discountPercent));
+                aList.Add(new SqlParameter("@discountAmt", discountAmt));
+                aList.Add(new SqlParameter("@totalAmount", totalAmount));
+                aList.Add(new SqlParameter("@vat", vat));
+                aList.Add(new SqlParameter("@vatAmt", vatAmt));
+                aList.Add(new SqlParameter("@netValue", netValue));
+                aList.Add(new SqlParameter("@adjustmentPercent", adjustmentPercent));
+                aList.Add(new SqlParameter("@adjustmentAmt", adjustmentAmt));
+                aList.Add(new SqlParameter("@retaintionPercent", retaintionPercent));
+                aList.Add(new SqlParameter("@retaintionAmt", retaintionAmt));
+                aList.Add(new SqlParameter("@total_adjustment_amt", total_adjustment_amt));
+                aList.Add(new SqlParameter("@tax", tax));
+                aList.Add(new SqlParameter("@taxAmt", taxAmt));
+                aList.Add(new SqlParameter("@POFileUploadJson", poFilelist));
+                aList.Add(new SqlParameter("@BillFileUploadJson", billFilelist));
+                aList.Add(new SqlParameter("@createdBy", userID));
+                result = accessManager.UpdateData("sp_UpdateBillMaster", aList);
+                return result;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw e;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+
+
+        public DataTable ApprovedBillList(string Status)
+        {
+            DataTable dt = new DataTable();
+            if (conn.State == 0)
+            {
+                conn.Open();
+            }
+            SqlCommand cmd = new SqlCommand("sp_GetAllApprovedBillList", conn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.Add("@Status", SqlDbType.NVarChar).Value = Status;
+            SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+            adpt.Fill(dt);
+            return dt;
+        }
+
+        public ChequeInfo GetChequeInforamtion(int masterId)
+        {
+            ChequeInfo cheque = new ChequeInfo();
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<SqlParameter> aList = new List<SqlParameter>();
+                aList.Add(new SqlParameter("@InvoiceKey", masterId));
+               // aList.Add(new SqlParameter("@UserId", userId));
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_chequeInfoDetails", aList);
+                while (dr.Read())
+                {
+                    cheque.InvoiceKey = (int)dr["InvoiceKey"];
+                    cheque.InvoiceNo = dr["InvoiceNo"].ToString();
+                    cheque.TotalInvoiceQty = Convert.ToDecimal(dr["Total_InvoiceQty"]);
+                    cheque.TotalInvoiceValue = Convert.ToDecimal(dr["Total_InvoiceValue"]);
+                    cheque.NetValue = Convert.ToDecimal(dr["Net_Value"]);
+                    cheque.PaidAmount = Convert.ToDecimal(dr["PaidAmount"]);
+                    cheque.BalanceAmount = Convert.ToDecimal(dr["BalanceAmount"]);
+                    cheque.ApproverList = JsonConvert.DeserializeObject<List<BillApproverModel>>(dr["ApproverList"].ToString());
+                    cheque.BillInfoList = JsonConvert.DeserializeObject<List<InvoiceInformation>>(dr["BillInfoList"].ToString());
+                    cheque.ChequeInfoDetails = JsonConvert.DeserializeObject<List<ChequeInfoDetails>>(dr["ChequeInfoDetails"].ToString());
+                }
+                return cheque;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw e;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+        public DataTable ChequeStatusList()
+        {
+            DataTable dt = new DataTable();
+            if (conn.State == 0)
+            {
+                conn.Open();
+            }
+            SqlCommand cmd = new SqlCommand("sp_ChequeStatusList", conn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+            adpt.Fill(dt);
+            return dt;
+        }
+
+        public bool SaveCheckInfo(int invoiceKey, string cheque, string amount, string date, string status, int created_by)
+        {
+            try
+            {
+                bool flag = false;
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<SqlParameter> aParameters = new List<SqlParameter>();
+                aParameters.Add(new SqlParameter("@invoiceKey", invoiceKey));
+                aParameters.Add(new SqlParameter("@cheque", cheque));
+                aParameters.Add(new SqlParameter("@amount", amount));
+                aParameters.Add(new SqlParameter("@date", date));
+                aParameters.Add(new SqlParameter("@status", status));
+                aParameters.Add(new SqlParameter("@createdBy", created_by));
+
+                flag = accessManager.SaveData("sp_SaveCheckInfo", aParameters);
+                return flag;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw e;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+        public bool SaveAllocation(int invoiceKey, string invoiceNo, string poNo, string allocatedValue)
+        {
+            try
+            {
+                bool flag = false;
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<SqlParameter> aParameters = new List<SqlParameter>();
+                aParameters.Add(new SqlParameter("@invoiceKey", invoiceKey));
+                aParameters.Add(new SqlParameter("@invoiceNo", invoiceNo));
+                aParameters.Add(new SqlParameter("@poNo", poNo));
+                aParameters.Add(new SqlParameter("@allocatedValue", allocatedValue));
+
+                flag = accessManager.SaveData("sp_SaveAllocation", aParameters);
+                return flag;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw e;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+        public bool UpdateChequeInfo(int chequeInfoId, string chequeNo, decimal amount, string date)
+        {
+            try
+            {
+                bool flag = false;
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<SqlParameter> aParameters = new List<SqlParameter>();
+                aParameters.Add(new SqlParameter("@chequeInfoId", chequeInfoId));
+                aParameters.Add(new SqlParameter("@chequeNo", chequeNo));
+                aParameters.Add(new SqlParameter("@amount", amount));
+                aParameters.Add(new SqlParameter("@date", date));
+
+                flag = accessManager.UpdateData("sp_UpdateChequeInfo", aParameters);
+                return flag;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw e;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+        public DataTable ProcurementUserList()
+        {
+            DataTable dt = new DataTable();
+            if (conn.State == 0)
+            {
+                conn.Open();
+            }
+            SqlCommand cmd = new SqlCommand("sp_ProcurementUserList", conn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+            adpt.Fill(dt);
+            return dt;
+        }
+
+        public DataTable CostCenterList(int unitId)
+        {
+            DataTable dt = new DataTable();
+            if (conn.State == 0)
+            {
+                conn.Open();
+            }
+            SqlCommand cmd = new SqlCommand("sp_CostCenterList", conn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.Add("@unitId", SqlDbType.Int).Value = unitId;
+            SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+            adpt.Fill(dt);
+            return dt;
+        }
+
+        public int DeletePOFileFromDatatbase(int FileID, int type)
+        {
+            int i = 0;
+            if (conn.State == 0)
+            {
+                conn.Open();
+            }
+            SqlCommand cmd = new SqlCommand("sp_DeleteUploadedFile", conn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.Add("@FileId", SqlDbType.Int).Value = FileID;
+            cmd.Parameters.Add("@Type", SqlDbType.Int).Value = type;
+            i = cmd.ExecuteNonQuery();
+            return i;
         }
 
         #endregion

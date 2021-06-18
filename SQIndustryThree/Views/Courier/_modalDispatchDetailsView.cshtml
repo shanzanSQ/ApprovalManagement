@@ -1,0 +1,69 @@
+﻿@model IEnumerable<SQIndustryThree.Models.CourierRequestModel>
+<style>
+    #IourequestTable tr th, #IourequestTable tr td {
+        text-align: center;
+        padding: 5px;
+    }
+
+    button {
+        padding: 0;
+    }
+</style>
+<div class="box">
+    @*<h3 style="text-align:center">Dispatch Details List</h3>*@
+    <!-- /.box-header -->
+    <div class="box-body">
+        <div class="col-xs-12" id="personlocdiv" style="overflow:scroll;">
+            <table id="CourierDispatchTable" class="table-bordered table table-striped" style="overflow:scroll">
+                <thead>
+                    <tr>
+                        <th>SL</th>
+                        <th>Request #</th>
+                        <th>Customer</th>
+                        <th>Receiver</th>
+                        <th>Country</th>
+                        <th>Post Code</th>
+                        <th>Address</th>
+                        <th>Dispatch Date</th>
+                        <th>Delivery Date</th>
+                        <th>Product Description</th>
+                        <th>Weight</th>
+                        <th>Actual Weight</th>
+                        <th>Courier</th>
+                        <th>Proposed Date</th>
+                        <th>Cost</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ int count = 1;}
+                    @foreach (var item in Model)
+                    {
+                    <tr>
+                        <td>@count</td>
+                        <td>@item.CourierRequestId</td>
+                        <td>@item.BuyerName</td>
+                        <td>@item.Receiver</td>
+                        <td>@item.CountryName</td>
+                        <td>@item.PostCode</td>
+                        <td>@item.Address</td>
+                        <td>@item.DispatchDate</td>
+                        <td>@item.Deliverydate</td>
+                        <td>@item.ProductDescription</td>
+                        <td>@item.Weight</td>
+                        <td>@item.ActualWeight</td>
+                        <td>@item.ServiceProvider</td>
+                        <td>@item.ProposedDate</td>
+                        <td>@item.Cost</td>
+
+                    </tr>
+                        count++;
+
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <!-- /.box-body -->
+</div>

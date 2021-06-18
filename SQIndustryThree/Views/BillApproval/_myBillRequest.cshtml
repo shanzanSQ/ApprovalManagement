@@ -18,63 +18,69 @@
             <table id="BillRequestTable" class="table-bordered table table-striped" width="100%" style="overflow:scroll">
                 <thead>
                     <tr>
-                        <th style="text-align:center">SL</th>
-                        <th style="text-align:center">InvoiceKey</th>
-                        <th style="text-align:center">InvoiceNo</th>
-                        <th style="text-align:center">PO No</th>
-                        <th style="text-align:center">InvoiceDate</th>
-                        <th style="text-align:center">InvoiceType</th>
-                        <th style="text-align:center">Supplier</th>
-                        <th style="text-align:center">IsFinalInvoice</th>
-                        <th style="text-align:center">Total Invoice Qty</th>
-                        <th style="text-align:center">Total Invoice Value</th>
-                        <th style="text-align:center">Total Discount</th>
-                        <th style="text-align:center">Total Paid</th>
-                        <th style="text-align:center">Remarks</th>
-                        <th style="text-align:center">Add Quality</th>
-                        <th style="text-align:center">Action(Comments)</th>
-                    </tr>
+                        <th style="text-align:center;min-width:20px">SL</th>
+                        <th style="text-align:center;min-width:50px">InvoiceKey</th>
+                        <th style="text-align:center;min-width:60px">InvoiceNo</th>
+                        <th style="text-align:center;min-width:50px">PO No</th>
+                        <th style="text-align:center;min-width:80px">InvoiceDate</th>
+                        <th style="text-align:center;min-width:80px">InvoiceType</th>
+                        <th style="text-align:center;min-width:150px">Supplier</th>
+                        <th style="text-align:center;min-width:20px">IsFinalInvoice</th>
+                        <th style="text-align:center;min-width:50px">Total Invoice Qty</th>
+                        <th style="text-align:center;min-width:50px">Total Invoice Value</th>
+                        <th style="text-align:center;min-width:50px">Total Discount</th>
+                        <th style="text-align:center;min-width:50px">Total Paid</th>
+                        <th style="text-align:center;min-width:100px">Remarks</th>
+                        @if (Convert.ToInt32(Session["IsSupplier"]) != 1)
+                        {
+                            <th style="text-align:center;min-width:50px">Add Quality</th>
+                        }
+                            <th style="text-align:center;min-width:50px">Action(Comments)</th>
+                        </tr>
                 </thead>
                 <tbody>
                     @{ int count = 1;}
                     @foreach (var item in @ViewBag.BillList)
                     {
                     <tr id="@item["InvoiceKey"]">
-                        <td>@count</td>
-                        <td>@item["InvoiceKey"]</td>
-                        <td>@item["InvoiceNo"]</td>
-                        <td>@item["PONo"]</td>
-                        <td>@item["InvoiceDate"].ToString("dd MMM yyyy")</td>
-                        <td>@item["InvoiceType"]</td>
-                        <td>@item["Supplier"]</td>
+                        <td style="text-align:center">@count</td>
+                        <td style="text-align:center">@item["InvoiceKey"]</td>
+                        <td style="text-align:center">@item["InvoiceNo"]</td>
+                        <td style="text-align:center">@item["PONo"]</td>
+                        <td style="text-align:center">@item["InvoiceDate"].ToString("dd MMM yyyy")</td>
+                        <td style="text-align:center">@item["InvoiceType"]</td>
+                        <td style="text-align:center;">@item["Supplier"]</td>
                         @if (item["IsFinalInvoice"] == true)
                         {
-                            <td style="color:green;">Yes</td>
+                            <td style="color:green;text-align:center">Yes</td>
                         }
                         else
                         {
-                            <td style="color:red;">No</td>
+                            <td style="color:red;text-align:center">No</td>
                         }
 
-                        <td>@item["Total_InvoiceQty"]</td>
-                        <td>@item["Total_InvoiceValue"]</td>
-                        <td>@item["Total_Discount"]</td>
-                        <td>@item["Total_Paid"]</td>
-                        <td>@item["Remarks"]</td>
-                        <td> <button type="button" class="btn  btn-block btn-info btn-sm" onclick="LoadQuality(@item["InvoiceKey"],'@item["InvoiceNo"]')" data-idkey="@item["InvoiceKey"]">Add Quality</button></td>
+                        <td style="text-align:center">@item["Total_InvoiceQty"]</td>
+                        <td style="text-align:center">@item["Total_InvoiceValue"]</td>
+                        <td style="text-align:center">@item["Total_DiscountAmt"]</td>
+                        <td style="text-align:center">@item["Total_Paid"]</td>
+                        <td style="text-align:center">@item["Remarks"]</td>
+                        @if(Convert.ToInt32(Session["IsSupplier"]) != 1)
+                        { 
+                        <td style="text-align:center"> <button type="button" class="btn  btn-block btn-info btn-sm" onclick="LoadQuality(@item["InvoiceKey"],'@item["InvoiceNo"]')" data-idkey="@item["InvoiceKey"]">Add Quality</button></td>
+                        }
                         @if (item["IsApproved"] == 3)
                         {
                             @*@item.Pending*@
-                            <td> <button type="button" class="btn  btn-block btn-primary btn-sm" data-toggle="modal" data-target="#myModal" onclick="BillRequestDetails(@item["InvoiceKey"],0,'_billModalRequestView')" data-idkey="@item["InvoiceKey"]">Pending</button></td>
+                            <td style="text-align:center"> <button type="button" class="btn  btn-block btn-primary btn-sm" data-toggle="modal" data-target="#myModal" onclick="BillRequestDetails(@item["InvoiceKey"],0,'_billModalRequestView')" data-idkey="@item["InvoiceKey"]">Pending</button></td>
                         }
                         else if (item["IsApproved"] == 1)
                         {
-                            <td><button type="button" class="btn  btn-block btn-success btn-sm" data-toggle="modal" data-target="#myModal" onclick="BillRequestDetails(@item["InvoiceKey"],0,'_billModalRequestView')" data-idkey="@item["InvoiceKey"]">Approved</button></td>
+                            <td style="text-align:center"><button type="button" class="btn  btn-block btn-success btn-sm" data-toggle="modal" data-target="#myModal" onclick="BillRequestDetails(@item["InvoiceKey"],0,'_billModalRequestView')" data-idkey="@item["InvoiceKey"]">Approved</button></td>
 
                         }
                         else if (item["IsApproved"] == 2)
                         {
-                            <td> <button type="button" class="btn  btn-block btn-danger btn-sm" onclick="UpdateRejectedRequest(@item["InvoiceKey"],0)">Update</button></td>
+                            <td style="text-align:center"> <button type="button" class="btn  btn-block btn-danger btn-sm" onclick="UpdateRejectedRequest(@item["InvoiceKey"],0)">Update</button></td>
                         }
                     </tr>
                         count++;

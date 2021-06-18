@@ -7,6 +7,14 @@ namespace SQIndustryThree.Models
 {
     public class CommonModel
     {
+        public string Country { get; set; }
+        public string CountryName { get; set; }
+        public string ServiceProviderId { get; set; }
+        public string ServiceProvider { get; set; }
+        public string ServiceProviderName { get; set; }
+        public string WeightRange { get; set; }
+        public string LeadTimeFrom { get; set; }
+        public string LeadTimeTo { get; set; }
         public int BusinessUnitId { get; set; }
 
         public string BusinessUnitName { get; set; }

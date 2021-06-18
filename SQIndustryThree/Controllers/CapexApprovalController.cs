@@ -167,8 +167,9 @@ namespace SQIndustryThree.Controllers
                 return RedirectToAction("Index", "Account");
             }
             int userID = Convert.ToInt32(Session["SQuserId"].ToString());
+            var capexInfo = capexApproval.GetSavedCapex(userID, primarykey);
             //  int permission = capexApproval.ModulePermission(4, userID);
-            return PartialView("_ShowUploadedFiles", capexApproval.GetSavedCapex(userID, primarykey));
+            return PartialView("_ShowUploadedFiles", capexInfo);
             //if (permission != 1)
             //{
                

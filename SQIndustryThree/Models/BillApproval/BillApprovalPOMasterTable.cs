@@ -19,6 +19,6 @@ namespace SQIndustryThree.Models.BillApproval
         public DateTime? CreateDate { get; set; }
         public DateTime? UpdateDate { get; set; }
         public List<BillAprrovalPoDetails> Polist { get; set; }
-        public List<IOUApproverModel> Approverlist { get; set; }
+        public List<BillApproverModel> Approverlist { get; set; }
     }
 }

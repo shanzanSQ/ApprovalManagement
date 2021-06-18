@@ -86,13 +86,13 @@
                 <td>@item.RequestorName</td>
                 <td>@item.RequestorDepartment</td>
                 <td>@item.RequerstorMobile</td>
-                @if (item.CheckIn == "Yes" && item.CheckOut == "Yes")
+                @if (item.Checked == "Checked In")
                 {
-                    <td><span style="color:darkorange">Checked Out</span></td>
+                    <td><span style="color:darkorange">Checked In</span></td>
                 }
-                else if (item.CheckIn == "Yes")
+                else if (item.Checked == "Checked Out")
                 {
-                    <td><span style="color:red">Checked In</span></td>
+                    <td><span style="color:red">Checked Out</span></td>
                 }
                 else
                 {
@@ -111,9 +111,10 @@
             <td><span class="btn-primary btn-sm">@item.ApprovedStatus</span> </td>
         }*@
 
-                <td>
-                    <input type="button" value="Details" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#showmodal" onclick="getInvidualRequest(@item.VisitorId)" />
-                </td>
+            <td>
+                <input type="button" value="Details" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#showmodal" onclick="getInvidualRequest(@item.VisitorId)" />
+                @*<a href="/Visitor/IndividualDetailsView?PrimaryKey=@item.VisitorId" class="btn btn-primary btn-sm">Details</a>*@
+            </td>
                 @*@if (item.IsApproved == 2)
         {
             <td>
@@ -136,11 +137,12 @@
     //    getInvidualRequest(modalmap.data('idkey'));
     //});
     function getInvidualRequest(primarykey) {
-         var urlpath = '@Url.Action("IndividualRequestShow", "Visitor")';
+         //var urlpath = '@Url.Action("IndividualRequestShow", "Visitor")';
+        var urlpath = '/Visitor/IndividualRequestShow?PrimaryKey=' + primarykey + '';
             $.ajax({
-                data: { PrimaryKey: primarykey },
+               // data: { PrimaryKey: primarykey },
                 url: urlpath,
-                type: "Post",
+                type: "GET",
                 async: true,
                 success: function (data) {
 
