@@ -54,12 +54,12 @@
                             data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title" style="text-align: center;font-weight:bold ;">Courier Cost Consolidate View</h4>
+                    <h4 class="modal-title" style="text-align: center;font-weight:bold ;">Courier Cost Consolidated View</h4>
                 </div>
                 <div id="Dmodalbody" class="modal-body">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                    @*<button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>*@
                     <button type="button" class="btn btn-primary btn-sm" id="confirmCourierInfo" @*onclick="PrintModal()"*@>Confirm</button>
                     <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
                 </div>
@@ -235,9 +235,11 @@
             var tr = jQuery(this);
             var td = tr.find('td:nth-child(9)').text();
             var postcode = {};
-
+            //var abc = $(this).attr('data-PostCode');
+            //alert(abc);
 
             postcode["PostCode"] = $(this).attr('data-PostCode');//$(this).find('p[name^="userName"]').html();
+          //  alert($(this).attr('data-PostCode'));
             count++;
             postcodeObj.push(postcode);
 
@@ -270,7 +272,7 @@
 
     });
     function modalView() {
-        
+
            var jsonData = SaveCourieFontDeskrRequest();
            var urlpath = '@Url.Action("ShowPertialviewModalType", "Courier")';
             $.ajax({
@@ -280,7 +282,7 @@
                 type: "POST",
                 async: true,
                 success: function (data) {
-                  
+
                     $("#Dmodalbody").html("");
                     $("#Dmodalbody").append(data);
                     $("#myModalD").modal("show");
@@ -290,7 +292,7 @@
                     alert("Error");
                 }
             });
-       
+
     }
 
     function calculateGrandTotalWeight() {
@@ -301,8 +303,115 @@
             //grandTotalWeight = $(this).find('input[name^="weight"]').val();
             grandTotalWeight = parseFloat(grandTotalWeight) + parseFloat(myammount);
         });
-        $("#netWeight").val(grandTotalWeight);
-        courierWiseCostDate();
+        $("#netWeight").val(grandTotalWeight.toFixed(2));
+        courierWiseCostDateValidation();
+    }
+    function courierWiseCostDateValidation() {
+        debugger;
+        var jsonData = {};
+        var $checky = '';
+        if ($checky = $("input[type=checkbox].approval")) {
+            //  var $checky = $("input[type=checkbox].checky");
+            var CountryName ="";
+            var PostCode ="";
+            var Courier ="";
+            var total = 0;
+            var weight = 0;
+            $checky.filter(":checked").each(function () {
+                parseFloat($(this).val()) == parseFloat($(this).val())
+                // alert(parseFloat$(this).val());
+                total = parseFloat(total) + parseFloat($(this).val());
+                weight = parseFloat(weight) + parseFloat($(this).attr('data-Weight'));
+                //$("#total").val(total);
+                CountryName = $(this).attr('data-CountryName');
+                PostCode = $(this).attr('data-PostCode');
+                Courier = $(this).attr('data-ServiceProvider');
+
+            });
+        }
+
+        jsonData["Courier"] =(Courier);
+        jsonData["CountryName"] = CountryName
+        jsonData["Weight"] = Weight;
+        var Courier =(Courier);
+        var CountryName =(CountryName);
+        var Weight =$("#netWeight").val();
+
+
+          var urlpath = '@Url.Action("GetcourierWiseConsolidateCostDate", "Courier")';
+            $.ajax({
+                 url: urlpath,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                type: "Post",
+                data: JSON.stringify({
+                    Courier:Courier,
+                    CountryName:CountryName,
+                    Weight:Weight,
+                 }),
+                success: function (response) {
+                  // alert(response.data[0].Rate);
+                    if (!$.trim(response.data[0])) {
+                   swal({
+                            title: 'Cost not found for this weight ',
+                            type: 'error',
+                            closeOnCancel: true
+                        });
+                        $("#consolidate_value").val(" ");
+                    }
+                    else {
+                        $("#consolidate_value").val(response.data[0].Rate);
+                    }
+
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+
+    }
+    function getWeightByCourierDispatchId() {
+        debugger;
+            var urlpath = '@Url.Action("GetWeightByCourierDispatchId", "Courier")';
+
+        $.ajax({
+            url: urlpath,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            type: "Post",
+            data: JSON.stringify({
+                
+            }),
+            success: function (response) {
+                //alert(response.data[0].Weight);
+            /* console.log(response.data);*/
+                $("#ammountInformationbody tr").click(function () {
+                    var tr = jQuery(this);
+                   // var weight = tr.find('td:nth-child(5)').text();
+                    var weightt = $(this).attr('data-Weight');
+                   // alert(weight);
+                  //  alert(weightt);
+                    weight = (response.data[0].Weight);
+                    var myammount = $(this).find('input[name^="weight"]').val(response.data[0].Weight);
+                   // alert(myammount);
+                    ////grandTotalWeight = $(this).find('input[name^="weight"]').val();
+                    //grandTotalWeight = parseFloat(grandTotalWeight) + parseFloat(myammount);
+                });
+                var grandTotalWeight = 0;
+                $("#ammountInformationbody tr").each(function () {
+                   // document.getElementById("weight").value =(response.data[0].Weight);
+                   var myammount = $(this).find('input[name^="weight"]').val();
+                    //grandTotalWeight = $(this).find('input[name^="weight"]').val();
+                      grandTotalWeight = parseFloat(grandTotalWeight) + parseFloat(myammount);
+                });
+                $("#netWeight").val(grandTotalWeight.toFixed(2));
+                courierWiseCostDateValidation();
+            },
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+
     }
     function courierWiseCostDate() {
         debugger;
@@ -327,14 +436,14 @@
 
             });
         }
-      
+
         jsonData["Courier"] =(Courier);
         jsonData["CountryName"] = CountryName
         jsonData["Weight"] = Weight;
         var Courier =(Courier);
         var CountryName =(CountryName);
         var Weight =$("#netWeight").val();
-        
+
 
           var urlpath = '@Url.Action("GetcourierWiseConsolidateCostDate", "Courier")';
             $.ajax({
@@ -349,7 +458,7 @@
                  }),
                 success: function (response) {
                     $("#consolidate_value").val(response.data[0].Rate);
-                   
+
                 },
                 error: function () {
                     alert("Error");
@@ -430,7 +539,7 @@
             async: true,
             success: function (data) {
                 swal({
-                    title: 'Courier Consolidate data Submit Successfully',
+                    title: 'Courier Consolidated data Submited Successfully',
                     type: 'success',
                     closeOnCancel: true
                 }, function () {
@@ -551,9 +660,9 @@
             myData["ActualWeight"] = $(this).find('input[name^="weight"]').val();
             ammountList.push(myData);
         });
-        jsonData["CourierAmmountList"] = ammountList; 
-        
-      
+        jsonData["CourierAmmountList"] = ammountList;
+
+
         return jsonData;
 
         }

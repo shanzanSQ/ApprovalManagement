@@ -75,7 +75,7 @@
                     <select id="location" class="form-control cke_required">
                         <option value="0">Select Location</option>
                         <option value="1">Central</option>
-                        <option value="1">Factory</option>
+                        @*<option value="1">Factory</option>*@
                     </select>
 
                 </div>
@@ -144,11 +144,11 @@
                     <textarea type="text" id="address" placeholder="Address" class="form-control"></textarea>
                 </div>
                 <div class="col-md-6 dispatch_date">
-                    <label for="dispatch_date" class="dispatch_date">Dispatch Date : <span style="color:red">*</span></label>
-                    <input type="date" id="dispatch_date" class="form-control DateFrom" />
+                    <label for="dispatch_date" class="dispatch_date">Request Date : <span style="color:red">*</span></label>
+                    <input disabled type="date" id="dispatch_date" class="form-control DateFrom" />
                 </div>
                 <div class="col-md-6 delivery_date">
-                    <label for="delivery_date" class="delivery_date">Delivery Date : <span style="color:red">*</span></label>
+                    <label for="delivery_date" class="delivery_date">Dispatch Date : <span style="color:red">*</span></label>
                     <input type="date" id="delivery_date" class="form-control DateFrom" onblur="courierCheck()" />
                 </div>
 
@@ -193,26 +193,30 @@
             </div>
 
             <div class="col-md-6 proposed_date">
-                <label for="proposed_date" class="proposed_date">Proposed Date</label>
-                <input type="date" id="proposed_date" class="form-control DateFrom" onchange="proposedDateWisecourierCostDate()"/>
+                <label for="proposed_date" class="proposed_date">Proposed Delivery Date</label>
+                <input type="date" id="proposed_date" class="form-control DateFrom" onchange="proposedDateWisecourierCostDate()" />
                 <input type="hidden" class="form-control form-inline" id="change_proposed_date">
             </div>
 
             <div class="col-md-6 cost">
-                <label for="cost" class="cost">Cost</label>
+                <label for="cost" class="cost">Cost(USD)</label>
                 <input type="text" class="form-control form-inline" id="cost">
                 <input type="hidden" disabled class="form-control form-inline" id="change_cost">
             </div>
-            <div class="col-md-8 remarks">
+            <div class="col-md-7 remarks">
                 <label for="remarks" class="remarks">Remarks</label>
                 <textarea type="text" id="remarks" placeholder="Remarks" class="form-control remarks"></textarea>
             </div>
-            <div class="col-md-4" style=" margin-top:50px;">
-                <button id="save_button" class="btn btn-info">Submit</button>
+            <div class="col-md-3" style=" margin-top:50px;">
+                <button id="save_button" class="btn btn-info" style="margin-left:-27px;">Submit</button>
             </div>
-            <div class="col-md-4">
-                <button class="btn btn-success" style="float:left;margin-top:-35px;margin-left:75px;" id="showTable">SHOW RATE</button>
+            <div class="col-md-3">
+                <button class="btn btn-success" style="float:right;margin-top:-35px;margin-right:-18px;" id="showRate">SHOW RATE</button>
             </div>
+            <div class="col-md-3">
+                <button class="btn btn-success" style="float:left;margin-top:-37px; margin-left:140px;" id="showTable">RATE MATRIX </button>
+            </div>
+
         </div>
         <h4 style="text-align: center;  padding: 5px ;background-color: #9bb07e;"><strong>Approver List</strong></h4>
         <table width="100%" id="ListOfApprover" class="table table-bordered table-responsive table-condensed table-hover">
@@ -427,10 +431,26 @@
         //    LoadBusinessUnit();
         //    LoadDepartment(1)
         //}
+        var font_received_date = document.getElementById("dispatch_date");
+        var today = new Date();
+        // Set month and day to string to add leading 0
+        var day = new String(today.getDate());
+        var mon = new String(today.getMonth() + 1); //January is 0!
+        var yr = today.getFullYear();
+
+        if (day.length < 2) { day = "0" + day; }
+        if (mon.length < 2) { mon = "0" + mon; }
+
+        var date = new String(yr + '-' + mon + '-' + day);
+
+
+       // font_received_date.setAttribute('max', date);
+        $('#dispatch_date').val(date);
     }
 
 
     function LoadCustomer() {
+        debugger;
         $('#upCustomer').css({ "border-color": "#d3d3d3" });
         $('#customer').css({ "border-color": "#d3d3d3" });
         var urlpath = '@Url.Action("LoadCustomer", "Courier")';
@@ -450,10 +470,10 @@
                 $('#upCustomer').append("<option value='0'>--Select Customer --</option>");
                 $('#customer').append("<option value='0'>--Select Customer --</option>");
                 for (var i = 0; i < data.length; i++) {
-                    $("#customer").append($("<option></option>").val(data[i].BuyerId)
-                        .html(data[i].BuyerName));
-                    $("#upCustomer").append($("<option></option>").val(data[i].BuyerId)
-                        .html(data[i].BuyerName));
+                    $("#customer").append($("<option></option>").val(data[i].CustomerId)
+                        .html(data[i].CustomerName));
+                    $("#upCustomer").append($("<option></option>").val(data[i].CustomerId)
+                        .html(data[i].CustomerName));
                 }
             },
             complete: function () {
@@ -730,8 +750,18 @@
     $('#showTable').on('click', function () {
         debugger
         var type = $('#type').val();
-       // alert(type);
-         var urlpath = '@Url.Action("showCourierTypeInformationPreview", "Courier")';
+        if ($("#type").val() == "0") {
+            swal({
+                title: 'Please Select Type ',
+                type: 'error',
+                closeOnCancel: true
+            });
+       
+
+            return false;
+        }
+        else {
+            var urlpath = '@Url.Action("showCourierTypeInformationPreview", "Courier")';
             $.ajax({
                 url: urlpath,
                 type: "Post",
@@ -749,6 +779,68 @@
                         }
                     }
                 });
+        }
+       // alert(type);
+
+    });
+    $('#showRate').on('click', function () {
+        debugger
+        var type = $('#type').val();
+        var country = $('#country').val();
+        var weight = $('#weight').val();
+       // alert(type);
+        if ($("#type").val() == "0") {
+            swal({
+                title: 'Please Select Type ',
+                type: 'error',
+                closeOnCancel: true
+            });
+           
+
+            return false;
+        }
+        if ($("#country").val() == "0") {
+            swal({
+                title: 'Please Select Country ',
+                type: 'error',
+                closeOnCancel: true
+            });
+       
+            return false;
+        }
+        if ($("#weight").val() == '') {
+            swal({
+                title: 'Please Enter Product Weight ',
+                type: 'error',
+                closeOnCancel: true
+            });
+        
+            return false;
+        }
+
+        else {
+ var urlpath = '@Url.Action("showCourierTypeInformationPreviewByCountry", "Courier")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {
+                    status: '4',
+                    type: type,
+                    country: country,
+                    weight: weight
+                },
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $("#courierTypemodalbody").html("");
+                            $("#courierTypemodalbody").append(data);
+                            $("#courierTypeModal").modal("show");
+                            $("#courierTypeshowTable").DataTable();
+                        }
+                    }
+                });
+        }
+
     });
     $("#save_button").click(function () {
 
@@ -857,62 +949,50 @@
     function modalView() {
        // debugger;
         if ($("#location").val() == "0") {
-            toastr.error("Please Select Location ", " Location ",
-                {
-                    "positionClass": "toast-top-right",
-                    "showDuration": "300",
-                    "hideDuration": "1000",
-                    "timeOut": "5000",
-                    "closeButton": true
-                });
+            swal({
+                title: 'Please Select Location ',
+                type: 'error',
+                closeOnCancel: true
+            });
 
             return false;
         }
         if ($("#business_unit").val() == "0") {
-            toastr.error("Please Select Unit ", " Unit ",
-                {
-                    "positionClass": "toast-top-right",
-                    "showDuration": "300",
-                    "hideDuration": "1000",
-                    "timeOut": "5000",
-                    "closeButton": true
-                });
+            swal({
+                title: 'Please Select Unit ',
+                type: 'error',
+                closeOnCancel: true
+            });
+          
 
             return false;
         }
         if ($("#department").val() == "0") {
-            toastr.error("Please Select Department ", " Department ",
-                {
-                    "positionClass": "toast-top-right",
-                    "showDuration": "300",
-                    "hideDuration": "1000",
-                    "timeOut": "5000",
-                    "closeButton": true
-                });
+            swal({
+                title: 'Please Select Department ',
+                type: 'error',
+                closeOnCancel: true
+            });
+       
 
             return false;
         }
         if ($("#type").val() == "0") {
-            toastr.error("Please Select Type ", " Type ",
-                {
-                    "positionClass": "toast-top-right",
-                    "showDuration": "300",
-                    "hideDuration": "1000",
-                    "timeOut": "5000",
-                    "closeButton": true
-                });
-
+            swal({
+                title: 'Please Select Type ',
+                type: 'error',
+                closeOnCancel: true
+            });
+          
             return false;
         }
         if ($("#customer").val() == "0") {
-            toastr.error("Please Select Customer ", " Customer ",
-                {
-                    "positionClass": "toast-top-right",
-                    "showDuration": "300",
-                    "hideDuration": "1000",
-                    "timeOut": "5000",
-                    "closeButton": true
-                });
+            swal({
+                title: 'Please Select Customer ',
+                type: 'error',
+                closeOnCancel: true
+            });
+        
 
             return false;
         }
@@ -956,14 +1036,12 @@
 
         //}
         if ($("#country").val() == "0") {
-            toastr.error("Please Select Country ", " Country ",
-                {
-                    "positionClass": "toast-top-right",
-                    "showDuration": "300",
-                    "hideDuration": "1000",
-                    "timeOut": "5000",
-                    "closeButton": true
-                });
+            swal({
+                title: 'Please Select Country ',
+                type: 'error',
+                closeOnCancel: true
+            });
+         
 
             return false;
         }
@@ -980,92 +1058,82 @@
         //    return false;
 
         //}
-         else if ($("#address").val().length < 1) {
-            toastr.error("Please Enter Address ", " Address ",
-                {
-                    "positionClass": "toast-top-right",
-                    "showDuration": "300",
-                    "hideDuration": "1000",
-                    "timeOut": "5000",
-                    "closeButton": true
-                });
+        else if ($("#address").val().length < 1) {
+            swal({
+                title: 'Please Enter Address ',
+                type: 'error',
+                closeOnCancel: true
+            });
+          
 
             return false;
 
         }
-        if ($("#dispatch_date").val() == '') {
-            toastr.error("Please Select Dispatch Date ", " Dispatch Date ",
-                {
-                    "positionClass": "toast-top-right",
-                    "showDuration": "300",
-                    "hideDuration": "1000",
-                    "timeOut": "5000",
-                    "closeButton": true
-                });
+        //if ($("#dispatch_date").val() == '') {
+        //    swal({
+        //        title: 'Please Select Dispatch Date ',
+        //        type: 'error',
+        //        closeOnCancel: true
+        //    });
+          
 
-            return false;
-        }
+        //    return false;
+        //}
         if ($("#delivery_date").val() == '') {
-            toastr.error("Please Select Delivery Date ", " Delivery Date ",
-                {
-                    "positionClass": "toast-top-right",
-                    "showDuration": "300",
-                    "hideDuration": "1000",
-                    "timeOut": "5000",
-                    "closeButton": true
-                });
+            swal({
+                title: 'Please Select Dispatch Date ',
+                type: 'error',
+                closeOnCancel: true
+            });
+         
 
             return false;
         }
         if ($("#product_description").val() == '') {
-            toastr.error("Please Enter Product Description ", " Product Description ",
-                {
-                    "positionClass": "toast-top-right",
-                    "showDuration": "300",
-                    "hideDuration": "1000",
-                    "timeOut": "5000",
-                    "closeButton": true
-                });
+            swal({
+                title: 'Please Enter Product Description ',
+                type: 'error',
+                closeOnCancel: true
+            });
+           
 
             return false;
         }
         if ($("#weight").val() == '') {
-            toastr.error("Please Enter Product Weight ", " Weight ",
-                {
-                    "positionClass": "toast-top-right",
-                    "showDuration": "300",
-                    "hideDuration": "1000",
-                    "timeOut": "5000",
-                    "closeButton": true
-                });
+            swal({
+                title: 'Please Enter Product Weightt ',
+                type: 'error',
+                closeOnCancel: true
+            });
+      
 
             return false;
         }
         if ($("#courier").val() == '') {
-            toastr.error("Courier is empty ", " courier ",
-                {
-                    "positionClass": "toast-top-right",
-                    "showDuration": "300",
-                    "hideDuration": "1000",
-                    "timeOut": "5000",
-                    "closeButton": true
-                });
-
+            swal({
+                title: 'Courier is empty ',
+                type: 'error',
+                closeOnCancel: true
+            });
+            
             return false;
         }
         if ($("#proposed_date").val() == '') {
-            toastr.error("Proposed date is empty ", " Proposed date ",
-                {
-                    "positionClass": "toast-top-right",
-                    "showDuration": "300",
-                    "hideDuration": "1000",
-                    "timeOut": "5000",
-                    "closeButton": true
-                });
+            swal({
+                title: 'Proposed date is empty ',
+                type: 'error',
+                closeOnCancel: true
+            });
+        
 
             return false;
         }
         if ($("#cost").val() == '') {
+            swal({
+                title: 'Cost date is empty ',
+                type: 'error',
+                closeOnCancel: true
+            });
             toastr.error("Cost date is empty ", " Cost ",
                 {
                     "positionClass": "toast-top-right",
@@ -1241,6 +1309,7 @@
 
                 }),
                 success: function (response) {
+                    $('#save_button').prop('disabled', false);
                    $("#proposed_date").val(response.data[0].CourierProposedDate);
                     $("#cost").val(response.data[0].Rate);
                     $("#change_courier").val(response.data[0].CourierTypeId);
@@ -1296,7 +1365,7 @@
     }
 
 
-    
+
     function proposedDateWisecourierCostDate() {
         debugger;
      //  LoadCourier();
@@ -1319,22 +1388,29 @@
                     type: type,
                     proposed_date: proposed_date
                 }),
-               
+
                 success: function (response) {
                    // console.log(response);
                     if (!$.trim(response.data[0])) {
+                        $('#save_button').prop('disabled', true);
                        // alert("What follows is blank: " + response.data[0]);
-                        toastr.error("Courier not found of this date ", " Courier ",
-                            {
-                                "positionClass": "toast-top-right",
-                                "showDuration": "300",
-                                "hideDuration": "1000",
-                                "timeOut": "5000",
-                                "closeButton": true
-                            });
+                        swal({
+                            title: 'Courier not found in this date ',
+                            type: 'error',
+                            closeOnCancel: true
+                        });
+                        //toastr.error("Courier not found of this date ", " Courier ",
+                        //    {
+                        //        "positionClass": "toast-top-right",
+                        //        "showDuration": "300",
+                        //        "hideDuration": "1000",
+                        //        "timeOut": "5000",
+                        //        "closeButton": true
+                        //    });
 
                     }
                     else {
+                        $('#save_button').prop('disabled', false);
                         $("#courier option:selected").text(response.data[0].ServiceProvider);
                         $("#cost").val(response.data[0].Rate);
 

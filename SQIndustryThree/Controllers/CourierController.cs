@@ -24,11 +24,39 @@ namespace SQIndustryThree.Controllers
             }
             return base.RedirectToAction("Index", "Courier");
         }
+        public ActionResult CourierBudgetIndex()
+        {
+
+            if (base.Session["SQuserId"] != null)
+            {
+                return base.View();
+            }
+            return base.RedirectToAction("CourierBudgetIndex", "Courier");
+        }
+        public ActionResult CourierBudgetWindow()
+        {
+
+            if (base.Session["SQuserId"] != null)
+            {
+                return base.View();
+            }
+            return base.RedirectToAction("CourierBudgetWindow", "Courier");
+        }
         [HttpPost]
         public ActionResult LoadBusinessUnit()
         {
-            return Json(courierDAL.GetBusinessUnits(), JsonRequestBehavior.AllowGet);
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+            int userID = Convert.ToInt32(Session["SQuserId"].ToString());
+            return Json(courierDAL.GetBusinessUnits(userID), JsonRequestBehavior.AllowGet);
         }
+        //[HttpPost]
+        //public ActionResult LoadFiscalYear()
+        //{
+        //    return Json(courierDAL.GetBusinessUnits(), JsonRequestBehavior.AllowGet);
+        //}
         public ActionResult GetDepartmentList(int location)
         {
             if (base.Session["SQuserId"] == null)
@@ -121,6 +149,18 @@ namespace SQIndustryThree.Controllers
             result = courierDAL.SaveCourierRequest(courierRequestModel, userID);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
+        [HttpPost]
+        public ActionResult SaveCourierBudget(CourierRequestModel courierRequestModel)
+        {
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+            ResultResponse result = new ResultResponse();
+            int userID = Convert.ToInt32(Session["SQuserId"].ToString());
+            result = courierDAL.SaveCourierBudget(courierRequestModel, userID);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
         public ActionResult GetCourierProposedDate(string country, string delivery_date,string weight,string type)
         {
             Session["country"] = country;
@@ -147,9 +187,16 @@ namespace SQIndustryThree.Controllers
             return Json(new { data = dataGet });
 
         }
+      
         public ActionResult GetproposedDateWisecourierCostDate(string country, string delivery_date, string weight, string type,string proposed_date)
         {
             var dataGet = courierDAL.GetproposedDateWisecourierCostDate(country, delivery_date, weight, type, proposed_date);
+            return Json(new { data = dataGet });
+
+        }
+        public ActionResult LoadFiscalYear()
+        {
+            var dataGet = courierDAL.LoadFiscalYear();
             return Json(new { data = dataGet });
 
         }
@@ -235,6 +282,25 @@ namespace SQIndustryThree.Controllers
                 }
                 int userID = Convert.ToInt32(base.Session["SQuserId"].ToString());
                 return this.PartialView(ViewName, courierDAL.GetAllCourierRequest(userID, Status, Progrss));
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+            
+        }
+        [HttpPost]
+        public ActionResult GetAllCourierBudget(int Status, string ViewName, int Progrss)
+        {
+            try
+            {
+                if (base.Session["SQuserId"] == null)
+                {
+                    return base.RedirectToAction("Index", "Account");
+                }
+                int userID = Convert.ToInt32(base.Session["SQuserId"].ToString());
+                return this.PartialView(ViewName, courierDAL.GetAllCourierBudget(Status, Progrss));
             }
             catch (Exception ex)
             {
@@ -373,8 +439,25 @@ namespace SQIndustryThree.Controllers
         [HttpPost]
         public ActionResult LoadCustomer()
         {
-            return Json(courierDAL.GetCustomer(), JsonRequestBehavior.AllowGet);
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+            int userID = Convert.ToInt32(Session["SQuserId"].ToString());
+            return Json(courierDAL.GetCustomer(userID), JsonRequestBehavior.AllowGet);
         }
+        [HttpPost]
+        public ActionResult GetWeightByCourierDispatchId()
+        {
+            var dataGet = courierDAL.GetWeightByCourierDispatchId();
+            return Json(new { data = dataGet });
+            // return Json(courierDAL.GetWeightByCourierDispatchId(), JsonRequestBehavior.AllowGet);
+        }
+        //[HttpPost]
+        //public ActionResult GetWeightByCourierDispatchId()
+        //{
+        //    return Json(courierDAL.GetWeightByCourierDispatchId(), JsonRequestBehavior.AllowGet);
+        //}
         [HttpPost]
         public ActionResult SendCourieComments(int MasterID, int ReviewTo, string ReviewMessage)
         {
@@ -452,6 +535,17 @@ namespace SQIndustryThree.Controllers
             List<CourierTypeDetails> CourierTypeList = courierDAL.GetCourierTypeInfo( status, type);
             return PartialView("_courierTypePertialViewPreview", CourierTypeList);
         }
+        [HttpPost]
+        public ActionResult showCourierTypeInformationPreviewByCountry(int status, string type,string country,string weight)
+        {
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+            int userID = Convert.ToInt32(Session["SQuserId"].ToString());
+            List<CourierTypeDetails> CourierTypeList = courierDAL.GetCourierTypeInfoByCountry(status, type, country, weight);
+            return PartialView("_courierTypePertialViewPreview", CourierTypeList);
+        }
         public ActionResult EditcourierType(int courierTypeid)
         {
             try
@@ -473,6 +567,27 @@ namespace SQIndustryThree.Controllers
             }
           
         }
+        public ActionResult EditcourierBudget(int courierBudgetEntryId)
+        {
+            try
+            {
+                if (Session["SQuserId"] == null)
+                {
+                    return RedirectToAction("Index", "Account");
+                }
+                int userID = Convert.ToInt32(Session["SQuserId"].ToString());
+                CourierRequestModel courierRequestModel = this.courierDAL.GetcourierBudget(userID, courierBudgetEntryId);
+                ////courierRequestModel.Status = Status;
+                return this.PartialView("_updateCourierBudgetpertialView ", courierRequestModel);
+                //  return PartialView("_updateCourierTypepertialView", courierDAL.GetcourierType(userID, courierTypeid));
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
         [HttpPost]
         public ActionResult UpdateCourierType(CourierTypeDetails courierTypeDetails)
         {
@@ -483,6 +598,18 @@ namespace SQIndustryThree.Controllers
             ResultResponse result = new ResultResponse();
             int userID = Convert.ToInt32(Session["SQuserId"].ToString());
             result = courierDAL.UpdateCourierType(courierTypeDetails, userID);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+        [HttpPost]
+        public ActionResult UpdateCourierBudget(CourierRequestModel courierRequestModel)
+        {
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+            ResultResponse result = new ResultResponse();
+            int userID = Convert.ToInt32(Session["SQuserId"].ToString());
+            result = courierDAL.UpdateCourierBudget(courierRequestModel, userID);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
         public ActionResult GetFrontDeskCourier(int Status)
@@ -537,6 +664,13 @@ namespace SQIndustryThree.Controllers
             int userID = Convert.ToInt32(Session["SQuserId"].ToString());
             result = courierDAL.UpdateCourierRequest(courierRequestModel, userID);
             return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult GetCourierBudgetCheck(int business_unit, string financialYear, int month)
+        {
+            var dataGet = courierDAL.GetCourierBudgetCheck(business_unit, financialYear, month);
+            return Json(new { data = dataGet });
+
         }
     }
 }

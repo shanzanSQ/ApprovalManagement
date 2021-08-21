@@ -9,5 +9,7 @@ namespace SQIndustryThree.Models
     {
         public int BuyerId { get; set; }
         public string BuyerName { get; set; }
+        public int UnitId { get; set; }
+        public string BusinessUnitName { get; set; }
     }
 }

@@ -285,7 +285,7 @@
         SubCategoryList(invoiceType);
 
         if (invoiceType == 2) {
-            $('.general_procurement').show();
+            $('.general_procurement').hide();
         } else {
             $('.general_procurement').hide();
         }
@@ -299,13 +299,13 @@
          approverlist(invoiceType, subcategory);
      })
 
-    $('#general_procurement').change(function () {
-        var invoiceType = $('#invoiceType').val();
-        var subcategory = $("#subCategory").val();
-        var general_pro = $(this).val();
+    //$('#general_procurement').change(function () {
+    //    var invoiceType = $('#invoiceType').val();
+    //    var subcategory = $("#subCategory").val();
+    //    var general_pro = $(this).val();
 
-        approverlist(invoiceType, subcategory);
-    })
+    //    approverlist(invoiceType, subcategory);
+    //})
 
 
     ProcurementUserList();
@@ -375,7 +375,7 @@
             dataType: "json",
             success: function (response) {
                 $('#supplier').empty();
-                $('#supplier').append("<option value='0'>-- Select Supplier --</option>");
+                //$('#supplier').append("<option value='0'>-- Select Supplier --</option>");
 
                 if (response.length > 0) {
 
@@ -458,43 +458,56 @@
                 $('#ListOfApprover tr').not(function () { return !!$(this).has('th').length; }).remove();
                // $('#subcategory').append("<option value='0'>--Select Business Unit--</option>");
 
-                if (invoiceType == 2) {
-                    result += "<tr data-approverid=" + $("#general_procurement").val() + " data-username=\"" + $("#general_procurement").find(':selected').data('username') + "\" data-designation=\"" + $("#general_procurement").find(':selected').data('designation') + "\">"
+                //if (invoiceType == 2) {
+                //    result += "<tr data-approverid=" + $("#general_procurement").val() + " data-username=\"" + $("#general_procurement").find(':selected').data('username') + "\" data-designation=\"" + $("#general_procurement").find(':selected').data('designation') + "\">"
+                //    //result += "<td>" + count + "<td>"Designation
+
+                //    result += '<td><p name="approverNo">' + 1 + '</p></td>';
+                //    result += '<td><p name="userName">' + $("#general_procurement").find(':selected').data('username') +'</p></td>';
+                //    result += '<td><p name="designation">' + $("#general_procurement").find(':selected').data('designation')+'</p></td>';
+                //    result += "</tr>"
+                //    for (var i = 1; i < data.length; i++) {
+
+                //        result += "<tr data-approverid=" + data[i].UserId + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].DesignationName + "\">"
+                //        //result += "<td>" + count + "<td>"Designation
+
+                //        result += '<td><p name="approverNo">' + count1 + '</p></td>';
+                //        result += '<td><p name="userName">' + data[i].UserName + '</p></td>';
+                //        result += '<td><p name="designation">' + data[i].DesignationName + '</p></td>';
+                //        result += "</tr>"
+                //        count1++;
+                //    }
+
+                //    $('#ListOfApprover').append(result);
+                //} else {
+                //    for (var i = 0; i < data.length; i++) {
+
+                //        result += "<tr data-approverid=" + data[i].UserId + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].DesignationName + "\">"
+                //        //result += "<td>" + count + "<td>"Designation
+
+                //        result += '<td><p name="approverNo">' + count + '</p></td>';
+                //        result += '<td><p name="userName">' + data[i].UserName + '</p></td>';
+                //        result += '<td><p name="designation">' + data[i].DesignationName + '</p></td>';
+                //        result += "</tr>"
+                //        count++;
+                //    }
+
+                //    $('#ListOfApprover').append(result);
+                //}
+
+                for (var i = 0; i < data.length; i++) {
+
+                    result += "<tr data-approverid=" + data[i].UserId + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].DesignationName + "\">"
                     //result += "<td>" + count + "<td>"Designation
 
-                    result += '<td><p name="approverNo">' + 1 + '</p></td>';
-                    result += '<td><p name="userName">' + $("#general_procurement").find(':selected').data('username') +'</p></td>';
-                    result += '<td><p name="designation">' + $("#general_procurement").find(':selected').data('designation')+'</p></td>';
+                    result += '<td><p name="approverNo">' + count + '</p></td>';
+                    result += '<td><p name="userName">' + data[i].UserName + '</p></td>';
+                    result += '<td><p name="designation">' + data[i].DesignationName + '</p></td>';
                     result += "</tr>"
-                    for (var i = 1; i < data.length; i++) {
-
-                        result += "<tr data-approverid=" + data[i].UserId + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].DesignationName + "\">"
-                        //result += "<td>" + count + "<td>"Designation
-
-                        result += '<td><p name="approverNo">' + count1 + '</p></td>';
-                        result += '<td><p name="userName">' + data[i].UserName + '</p></td>';
-                        result += '<td><p name="designation">' + data[i].DesignationName + '</p></td>';
-                        result += "</tr>"
-                        count1++;
-                    }
-
-                    $('#ListOfApprover').append(result);
-                } else {
-                    for (var i = 0; i < data.length; i++) {
-
-                        result += "<tr data-approverid=" + data[i].UserId + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].DesignationName + "\">"
-                        //result += "<td>" + count + "<td>"Designation
-
-                        result += '<td><p name="approverNo">' + count + '</p></td>';
-                        result += '<td><p name="userName">' + data[i].UserName + '</p></td>';
-                        result += '<td><p name="designation">' + data[i].DesignationName + '</p></td>';
-                        result += "</tr>"
-                        count++;
-                    }
-
-                    $('#ListOfApprover').append(result);
+                    count++;
                 }
-                
+
+                $('#ListOfApprover').append(result);
             }
         });
     }
@@ -1572,7 +1585,7 @@
             count++;
         });
 
-        $("#Qty").html(numberWithCommas(Qty));
+        $("#Qty").html(Qty);
         $("#Rate").html(Rate.toFixed(2));
         $("#Value").html(Value.toFixed(2));
         $("#alreadyQty").html(AlreadyQty.toFixed(2));
@@ -1976,12 +1989,6 @@
         });
 
     }
-
-
-    function numberWithCommas(x) {
-        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-
 
     function PrintModal() {
         var print_div = document.getElementById("printablearea");

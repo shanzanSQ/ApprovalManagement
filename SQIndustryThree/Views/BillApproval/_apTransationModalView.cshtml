@@ -1,0 +1,719 @@
+﻿
+<style type="text/css">
+    .modal-lg {
+        max-width: 80% !important;
+    }
+
+    .modal {
+        overflow: auto !important;
+    }
+</style>
+
+<div class="">
+    <div id="printSection">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">Invoice Detail</div>
+                    <div class="panel-body">
+
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="payment_trans_no" class=" col-sm-5 control-label payment_trans_no">Payment Trans No: <span style="color:red">*</span></label>
+                                <div class="col-sm-7">
+                                    <input type="text" id="payment_trans_no" class="form-control payment_trans_no" value="@ViewBag.SerialNo" disabled/>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="business_unit" class=" col-sm-5 control-label payment_mode">Payment Mode: <span style="color:red">*</span></label>
+                                <div class="col-sm-7">
+                                    <select id="payment_mode" class="form-control payment_mode">
+                                        <option value="0">--Select Payment Mode--</option>
+                                        <option value="1">Cheque</option>
+                                        <option value="2">TT</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="cheque_no" class=" col-sm-5 control-label"><span class="cheque_no"> Cheque No:</span> <span style="color:red">*</span></label>
+                                <div class="col-sm-7">
+                                    <input type="text" id="cheque_no" class="form-control" value="" onkeyup="uniqueChequeNumber()" />
+                                    <input type="hidden" id="cheque_alert" class="form-control" value=""/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="check_amount" class=" col-sm-5 control-label"><span class="check_amount">Cheque Amount:</span> <span style="color:red">*</span></label>
+                                <div class="col-sm-7">
+                                    <input type="text" id="check_amount" class="form-control" value="" />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="business_unit" class=" col-sm-5 control-label"><span class="cheque_date">Cheque Date:</span> <span style="color:red">*</span></label>
+                                <div class="col-sm-7">
+                                    <input type="date" id="cheque_date" class="form-control" value="" />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="business_unit" class=" col-sm-5 control-label supplier">Supplier: <span style="color:red">*</span></label>
+                                <div class="col-sm-7">
+                                    <select id="supplier" class="form-control supplier"></select>
+                                </div>
+                            </div>
+
+
+                        </form>
+                    </div>
+                    <div class="panel-footer text-right">
+                        <button class="btn btn-info btn-sm" id="AddInvoice" onclick="AddInvoice()">Add Invoice</button> &nbsp;&nbsp;
+                        @*<button type='button' id='addQuality' class='btn btn-primary btn-sm' onclick="addQuality()">Add Quality</button>*@
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="TransationDiv">
+
+
+
+
+</div>
+
+<div class="modal apModal" id="apModal">
+    <div class="modal-dialog modal-lg">
+        <div class="col-md-12 modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" style="text-align: center">List Of Pending Invoice</h4>
+            </div>
+            <div id="apModalBody" class="modal-body apModalBody">
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<script>
+
+    // AddInvoice();
+
+
+    $(function () {
+        supplierList();
+
+
+        var today = new Date();
+        // Set month and day to string to add leading 0
+        var day = new String(today.getDate());
+        var mon = new String(today.getMonth() + 1); //January is 0!
+        var yr = today.getFullYear();
+
+        if (day.length < 2) { day = "0" + day; }
+        if (mon.length < 2) { mon = "0" + mon; }
+
+        var date = new String(yr + '-' + mon + '-' + day);
+
+        $('#cheque_date').val(date);
+
+    })
+
+    $('#payment_mode').on('change', function () {
+
+        if ($(this).val() === '1') {
+            $('.cheque_no').text('Cheque No:');
+            $('.check_amount').text('Cheque Amount:');
+            $('.cheque_date').text('Cheque Date:');
+        } else {
+            $('.cheque_no').text('TT No:');
+            $('.check_amount').text('TT Amount:');
+            $('.cheque_date').text('TT Date:');
+        }
+
+    });
+
+    const AddInvoice = () => {
+
+        let payment_mode = $('#payment_mode').val();
+        let supplier = $('#supplier').val();
+        let cheque_no = $('#cheque_no').val();
+        let cheque_status = $('#cheque_alert').val();
+        let check_amount = $('#check_amount').val();
+        let cheque_date = $('#cheque_date').val();
+
+        //alert(cheque_status);
+
+        if (payment_mode == '0') {
+            toastr.error("Please Select Payment Mode", " Payment Mode ",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+        }
+        else if (cheque_no == '' || cheque_no.length < 1) {
+            toastr.error("Please Enter Cheque No", " Cheque No ",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+        }
+        else if (cheque_status == "Cheque Number Already Exists!") {
+
+            //alert(uniqueChequeNumber());
+
+            toastr.error("Cheque Number Already Exists!", " Cheque No ",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+            
+        }
+        else if (check_amount == '') {
+            toastr.error("Please Enter Cheque Amount", " Cheque Amount ",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+        }
+        else if (cheque_date.length < 1) {
+            toastr.error("Please Enter Invoice Date", " Invoice Date ",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+        }
+        else if (supplier == '0') {
+            toastr.error("Please Select Supplier", " Supplier ",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+        }
+        else {
+            $.ajax({
+                url: '/BillApproval/ApprovedBillListJson',
+                type: 'POST',
+                contentType: "application/json;charset=utf-8",
+                data: JSON.stringify({ supplierId: supplier }),
+                dataType: "json",
+                success: function (response) {
+                    console.log(response);
+                    // $(".chequeInfo").modal('hide');
+                    $("#apModal").modal('show');
+                    //$('#myModal').show();
+                    $("#apModalBody").empty();
+                    var result = "";
+                    result += "<div class='row col-md-offset-2'>";
+                    result += "<div class='col-md-9' style='text-align:center;'>";
+                    result += "<input type='text' class='form-control' id='search' aria-describedby='search' placeholder='Search'>";
+                    result += "</div>";
+                    //result += "<div class='col-md-4'>";
+                    //result += "<button type='button' class='btn btn-success'>S E A R C H</button>";
+                    //result += "</div>";
+                    result += "</div>";
+                    result += "<hr />";
+                    result += "<label style='font-size:20px;'> Supplier: " + response[0].Supplier + "</label>";
+                    result += "<table id='tbl_PODetails' style='width:100%;border: 1px solid black;' class='table table-striped'>";
+                    result += "<thead style='font-weight: bold;text-align:center;'>";
+                    result += "<tr><th style='text-align:center'> <input type='checkbox' id='selectAll'></th><th style='text-align:center'>Transaction No</th><th style='text-align:center'>Invoice No</th><th style='text-align:center'>Invoice Date</th><th style='text-align:center'>Bill Amount</th>";
+                    result += "<th style='text-align:center'>Paid So Far</th><th style='text-align:center'>Balance Amount</th></tr>";
+                    result += "</thead>";
+                    result += "<tbody style='text-align:center;'>";
+                    if (response.length > 0) {
+                        var countRow = 1;
+                        for (var i = 0; i < response.length; i++) {
+
+                            result += "<tr data-key=" + response[i].InvoiceKey + " id='' data-detail=" + response[i].InvoiceKey + "  data-storage='' data-organization=''>";
+                            result += "<td style='text-align:center;'><input type='checkbox' class='approval' id='enableCheck' value=" + response[i].InvoiceKey + " data-external=" + countRow + " data-invoicekey=" + response[i].InvoiceKey + " data-detail=" + response[i].InvoiceKey + "> </td>";
+                            result += "<td class='td_pono_" + response[i].InvoiceKey + "'>" + response[i].InvoiceKey + "</td>";
+                            result += "<td class='td_supplier_" + response[i].InvoiceKey + "'>" + response[i].InvoiceNo + "</td>";
+                            result += "<td class='td_article_" + response[i].InvoiceKey + "'>" + getDateIfDate(response[i].InvoiceDate) + "</td>";
+                            result += "<td class='td_color_" + response[i].InvoiceKey + "'>" + numberWithCommas(response[i].Net_Value.toFixed(2)) + "</td>";
+                            result += "<td class='td_size_" + response[i].InvoiceKey + "'>" + numberWithCommas(response[i].PaidAmount.toFixed(2)) + "</td>";
+                            result += "<td class='td_unit_" + response[i].InvoiceKey + "'>" + numberWithCommas(response[i].OutstandingAmount.toFixed(2)) + "</td>";
+                            //result += "<td class='td_unit_" + countRow + "'>" + response[i].UnitName + " </td>";
+                            //result += "<td class='td_poqty_" + response[i].PODetailsKey + "'>" + response[i].POQty + "</td>";
+                            //result += "<td class='td_rate_" + response[i].PODetailsKey + "'>" + response[i].Rate + "</td>";
+                            //result += "<td class='td_povalue_" + response[i].PODetailsKey + "'>" + response[i].POValue + "</td>";
+                            //result += "<td class='td_uptodateqty_" + response[i].PODetailsKey + "'>" + response[i].UptodatePIQty + "</td>";
+                            //let PIQty = response[i].POQty - response[i].UptodatePIQty
+
+                            //result += "<td class='td_piqty_" + response[i].PODetailsKey + "'>" + response[i].BalancePIQty + "</td>";
+                            result += "</tr>";
+
+                            countRow++;
+                        }
+
+                    }
+                    result += "</tbody>";
+                    result += "</table>";
+                    result += "<div class='text-right'>";
+                    result += "<button type='button' id='addPO' class='btn btn-success btn-sm' onclick='InvoiceSubmit()'>A D D</button> &nbsp;";
+                    result += "<button type='button' id='remove_ap_modal' class='btn btn-danger btn-sm'>Close</button>";
+                    result += "</div>";
+                    $("#apModalBody").append(result);
+
+
+
+                    $('#selectAll').click(function (e) {
+                        //alert("a");
+                        var table = $(e.target).closest('table');
+                        $('td input:checkbox', table).prop('checked', this.checked);
+
+                        //var count = $('input[type="checkbox"]:checked').not(":eq(0)").length;
+
+                    });
+
+                    $('#search').keyup(function () {
+                        //alert($(this).val());
+                        var search = $(this).val();
+                        var supplier = $('#supplier').val();
+                        //alert(search + " " + supplier);
+                        searchfn(supplier, search);
+
+                    })
+
+                    $('#remove_ap_modal').on('click', function () {
+
+                        $("#apModal").modal('hide');
+
+                    })
+
+                }
+            });
+        }
+
+    }
+
+    function searchfn(supplier, search) {
+        $.ajax({
+            url: '/BillApproval/SupplierWiseInvoiceSearch',
+            type: 'POST',
+            contentType: "application/json;charset=utf-8",
+            data: JSON.stringify({ supplierId: supplier, search: search }),
+            dataType: "json",
+            success: function (response) {
+                //$("#myModal").modal('show');
+                //$('#myModal').show();
+                $("#tbl_PODetails").empty();
+                var result = "";
+                // result += "<table id='tbl_PODetails' style='width:100%;border: 1px solid black;' class='table table-striped'>";
+                //result += "<thead style='font-weight: bold;text-align:center;'>";
+                //result += "<tr><th style='text-align:center'> <input type='checkbox' id='selectAll'></th><th style='text-align:center'>Transaction No</th><th style='text-align:center'>Invoice No</th><th style='text-align:center'>Invoice Date</th><th style='text-align:center'>Bill Amount</th>";
+                //result += "<th style='text-align:center'>Paid So Far</th><th style='text-align:center'>Balance Amount</th></tr>";
+                //result += "</thead>";
+                //result += "<tbody style='text-align:center;'>";
+                //if (response.length > 0) {
+                //    var countRow = 1;
+                //    for (var i = 0; i < response.length; i++) {
+
+                //        result += "<tr data-key=" + response[i].InvoiceKey + " id='' data-detail=" + response[i].InvoiceKey + "  data-storage='' data-organization=''>";
+                //        result += "<td style='text-align:center;'><input type='checkbox' class='approval' id='enableCheck' value=" + response[i].InvoiceKey + " data-external=" + countRow + " data-pokey=" + response[i].InvoiceKey + " data-detail=" + response[i].InvoiceKey + "> </td>";
+                //        result += "<td class='td_pono_" + response[i].InvoiceKey + "'>" + response[i].InvoiceKey + "</td>";
+                //        result += "<td class='td_supplier_" + response[i].InvoiceKey + "'>" + response[i].InvoiceNo + "</td>";
+                //        result += "<td class='td_article_" + response[i].InvoiceKey + "'>" + getDateIfDate(response[i].InvoiceDate) + "</td>";
+                //        result += "<td class='td_color_" + response[i].InvoiceKey + "'>" + numberWithCommas(response[i].Net_Value.toFixed(2)) + "</td>";
+                //        result += "<td class='td_size_" + response[i].InvoiceKey + "'>" + numberWithCommas(response[i].PaidAmount.toFixed(2)) + "</td>";
+                //        result += "<td class='td_unit_" + response[i].InvoiceKey + "'>" + numberWithCommas(response[i].OutstandingAmount.toFixed(2)) + "</td>";
+                //        result += "</tr>";
+
+                //        countRow++;
+                //    }
+
+                //}
+                //result += "</tbody>";
+
+
+                result += "<thead style='font-weight: bold;text-align:center;'>";
+                result += "<tr><th style='text-align:center'> <input type='checkbox' id='selectAll'></th><th style='text-align:center'>Transaction No</th><th style='text-align:center'>Invoice No</th><th style='text-align:center'>Invoice Date</th><th style='text-align:center'>Bill Amount</th>";
+                result += "<th style='text-align:center'>Paid So Far</th><th style='text-align:center'>Balance Amount</th></tr>";
+                result += "</thead>";
+                result += "<tbody style='text-align:center;'>";
+                if (response.length > 0) {
+                    var countRow = 1;
+                    for (var i = 0; i < response.length; i++) {
+
+                        result += "<tr data-key=" + response[i].InvoiceKey + " id='' data-detail=" + response[i].InvoiceKey + "  data-storage='' data-organization=''>";
+                        result += "<td style='text-align:center;'><input type='checkbox' class='approval' id='enableCheck' value=" + response[i].InvoiceKey + " data-external=" + countRow + " data-invoicekey=" + response[i].InvoiceKey + " data-detail=" + response[i].InvoiceKey + "> </td>";
+                        result += "<td class='td_pono_" + response[i].InvoiceKey + "'>" + response[i].InvoiceKey + "</td>";
+                        result += "<td class='td_supplier_" + response[i].InvoiceKey + "'>" + response[i].InvoiceNo + "</td>";
+                        result += "<td class='td_article_" + response[i].InvoiceKey + "'>" + getDateIfDate(response[i].InvoiceDate) + "</td>";
+                        result += "<td class='td_color_" + response[i].InvoiceKey + "'>" + numberWithCommas(response[i].Net_Value.toFixed(2)) + "</td>";
+                        result += "<td class='td_size_" + response[i].InvoiceKey + "'>" + numberWithCommas(response[i].PaidAmount.toFixed(2)) + "</td>";
+                        result += "<td class='td_unit_" + response[i].InvoiceKey + "'>" + numberWithCommas(response[i].OutstandingAmount.toFixed(2)) + "</td>";
+                        //result += "<td class='td_unit_" + countRow + "'>" + response[i].UnitName + " </td>";
+                        //result += "<td class='td_poqty_" + response[i].PODetailsKey + "'>" + response[i].POQty + "</td>";
+                        //result += "<td class='td_rate_" + response[i].PODetailsKey + "'>" + response[i].Rate + "</td>";
+                        //result += "<td class='td_povalue_" + response[i].PODetailsKey + "'>" + response[i].POValue + "</td>";
+                        //result += "<td class='td_uptodateqty_" + response[i].PODetailsKey + "'>" + response[i].UptodatePIQty + "</td>";
+                        //let PIQty = response[i].POQty - response[i].UptodatePIQty
+
+                        //result += "<td class='td_piqty_" + response[i].PODetailsKey + "'>" + response[i].BalancePIQty + "</td>";
+                        result += "</tr>";
+
+                        countRow++;
+                    }
+
+                }
+                result += "</tbody>";
+
+
+                $('#tbl_PODetails').append(result);
+
+
+
+                $('#selectAll').click(function (e) {
+                    //alert("a");
+                    var table = $(e.target).closest('table');
+                    $('td input:checkbox', table).prop('checked', this.checked);
+
+                    //var count = $('input[type="checkbox"]:checked').not(":eq(0)").length;
+
+                });
+
+            }
+        });
+    }
+
+
+    const supplierList = () => {
+        $.ajax({
+            url: '/BillApproval/SupplierListForBill',
+            type: 'POST',
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                $('#supplier').empty();
+                $('#supplier').append("<option value='0'>-- Select Supplier --</option>");
+
+                if (response.length > 0) {
+
+                    for (let i = 0; response.length > i; i++) {
+
+                        $("#supplier").append($("<option></option>").val(response[i].SupplierID)
+                            .html(response[i].Supplier));
+                    }
+                    //$('select#supplier').append(result);
+                }
+            }
+        });
+    }
+
+    function getDateIfDate(d) {
+        var m = d.match(/\/Date\((\d+)\)\//);
+        return m ? (new Date(+m[1])).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : d;
+    }
+
+    const InvoiceSubmit = () => {
+
+        if ($("#tbl_PODetails tr td input[type='checkbox']:checked").length == 0) {
+            toastr.error("Please checked the checkbox", "Checkbox", {
+                "positionClass": "toast-top-right",
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "closeButton": true
+            });
+            return false;
+        }
+
+
+        var supplier = $("#supplier").val();
+
+        var invoice = "";
+        $("#tbl_PODetails tr td input[type='checkbox']:checked").each(function () {
+
+            var i = $(this).attr('data-invoicekey') + ',';
+            invoice += i;
+        });
+
+        //alert(invoice +" "+ supplier);
+
+        $.ajax({
+            url: '/BillApproval/GetApprovedPOFromInvoice',
+            type: 'POST',
+            contentType: "application/json;charset=utf-8",
+            data: JSON.stringify({ supplierId: supplier, invoiceKey: invoice }),
+            dataType: "json",
+            success: function (response) {
+                console.log(response);
+                $("#apModal").modal('hide');
+                $("#TransationDiv").empty();
+                var result = "";
+                result += "<table id='tbl_invoiceDetails' style='width:100%;border: 1px solid black;' class='table table-striped'>";
+                result += "<thead style='font-weight: bold;text-align:center;'>";
+                result += "<tr><th style='text-align:center'>Transaction No</th><th style='text-align:center'>Invoice No</th><th style='text-align:center'>Invoice Date</th><th style='text-align:center'>PO</th>";
+                result += "<th style='text-align:center'>Bill Amount</th><th style='text-align:center'>Paid So Far</th><th style='text-align:center'>Balance Amount</th><th style='text-align:center'>Paid Amount</th><th style='text-align:center'>Delete</th></tr>";
+                result += "</thead>";
+                result += "<tbody id='tbl_invoiceDetails_body' style='text-align:center;'>";
+                if (response.length > 0) {
+                    var countRow = 1;
+
+                    var amount = 0;
+
+                    for (var i = 0; i < response.length; i++) {
+
+                        result += "<tr data-key=" + response[i].InvoiceKey + " id=" + response[i].InvoiceKey + " data-invoice-no=" + response[i].InvoiceNo + " data-invoice-date=" + getDateIfDate(response[i].InvoiceDate) + " data-po=" + response[i].PONo +" data-bill-amount=" + response[i].Net_Value + "  data-paid=" + response[i].PaidAmount + " data-balance-amount=" + response[i].OutstandingAmount +">";
+                        result += "<td class='td_pono_" + response[i].InvoiceKey + "'>" + response[i].InvoiceKey + "</td>";
+                        result += "<td class='td_supplier_" + response[i].InvoiceKey + "'>" + response[i].InvoiceNo + "</td>";
+                        result += "<td class='td_article_" + response[i].InvoiceKey + "'>" + getDateIfDate(response[i].InvoiceDate) + "</td>";
+                        result += "<td class='td_article_" + response[i].InvoiceKey + "'>" + response[i].PONo + "</td>";
+                        result += "<td class='td_bill_amount_" + response[i].InvoiceKey + "'>" + numberWithCommas(response[i].Net_Value.toFixed(2)) + "</td>";
+                        result += "<td class='td_paid_" + response[i].InvoiceKey + "'>" + numberWithCommas(response[i].PaidAmount.toFixed(2)) + "</td>";
+                        result += "<td class='td_ourstanding_" + response[i].InvoiceKey + "'>" + numberWithCommas(response[i].OutstandingAmount.toFixed(2)) + "</td>";
+                        result += "<td class='td_input_" + response[i].InvoiceKey + "'><input class='input' id='input_" + response[i].InvoiceKey + "' onkeyup='inputAmount(" + response[i].InvoiceKey + ")' type='text' value='0' placeholder=''></td>";
+                        result += "<td class='td_unit_" + response[i].InvoiceKey + "'><button type='button' class='btn btn-danger' aria-label='true' onclick='deleterow(" + response[i].InvoiceKey +")'><span class='glyphicon glyphicon-floppy-remove' aria-hidden='true'></span></button></td>";
+                        //result += "<td class='td_unit_" + countRow + "'>" + response[i].UnitName + " </td>";
+                        //result += "<td class='td_poqty_" + response[i].PODetailsKey + "'>" + response[i].POQty + "</td>";
+                        //result += "<td class='td_rate_" + response[i].PODetailsKey + "'>" + response[i].Rate + "</td>";
+                        //result += "<td class='td_povalue_" + response[i].PODetailsKey + "'>" + response[i].POValue + "</td>";
+                        //result += "<td class='td_uptodateqty_" + response[i].PODetailsKey + "'>" + response[i].UptodatePIQty + "</td>";
+                        //let PIQty = response[i].POQty - response[i].UptodatePIQty
+
+                        //result += "<td class='td_piqty_" + response[i].PODetailsKey + "'>" + response[i].BalancePIQty + "</td>";
+                        result += "</tr>";
+
+                        countRow++;
+
+                        //amount += $('#input_' + response[i].InvoiceKey).val();
+                    }
+
+                   // $('#check_amount').val(numberWithCommas(amount));
+
+                }
+                result += "</tbody>";
+                result += "</table>";
+                result += "<div class='text-center'>";
+
+                result += "<button type='button' id='InvoiceConfirm' class='btn btn-success btn-sm' onclick='varifyInputElement()'>C O N F I R M</button> &nbsp;";
+                //result += "<button type='button' id='remove_ap_modal' class='btn btn-danger btn-sm'>Close</button>";
+                result += "</div>";
+                $("#TransationDiv").append(result);
+
+
+            }
+        });
+
+
+    }
+
+    function inputAmount(invoiceKey) {
+        var total = 0;
+           $('#tbl_invoiceDetails_body tr').each(function () {
+               var Id = $(this).attr('id');
+
+               var billamount = parseFloat($(this).attr('data-balance-amount'));
+              // alert(billamount);
+               var value = parseFloat($('#input_' + Id).val());
+
+               if (billamount < Math.abs(value)) {
+                   $('#input_' + Id).val("0");
+               }
+               if (value !== Math.abs(value)) {
+                   $('#input_' + Id).val("0");
+               }
+
+           // alert(value);
+            total += value;
+        })
+
+           // alert(total);
+           $('#check_amount').val(numberWithCommas(total));
+    }
+
+
+    function GetInputData() {
+
+        var jsonData = {}
+
+        //alert($('#check_amount').val().replace(/,/g, ''));
+
+        jsonData["CreatedDate"] = new Date();
+        jsonData["PaymentTransactionNo"] = $('#payment_trans_no').val();
+        jsonData["PaymentModeId"] = $('#payment_mode').val();
+        jsonData["PaymentModeName"] = $('#payment_mode option:selected').text();
+        jsonData["ChequeNo"] = $('#cheque_no').val();
+        jsonData["ChequeAmount"] = $('#check_amount').val().replace(/,/g, '');
+        jsonData["ChequeDate"] = $('#cheque_date').val();
+        jsonData["SupplierId"] = $('#supplier').val();
+        jsonData["SupplierName"] = $("#supplier option:selected").text();
+
+        var detailsList = [];
+
+        $('#tbl_invoiceDetails_body tr').each(function () {
+            var details = {};
+            var Id = $(this).attr('id');
+            details["PaymentTransactionNo"] = $('#payment_trans_no').val();
+            details["InvoiceKey"] = $(this).attr('data-key');
+            details["InvoiceNo"] = $(this).attr('data-invoice-no');
+            details["InvoiceDate"] = $(this).attr('data-invoice-date');
+            details["PONo"] = $(this).attr('data-po');
+            details["BillAmount"] = $(this).attr('data-bill-amount'); //PaidSoFar
+            details["PaidSoFar"] = $(this).attr('data-paid');
+            details["Paid"] = $('#input_' + Id).val();
+            details["BalanceAmount"] = $(this).attr('data-balance-amount');
+            //alert($('#input_' + Id).val());
+            detailsList.push(details);
+        });
+
+        jsonData["AllocationDetails"] = detailsList;
+
+        return jsonData;
+    }
+
+    function varifyInputElement() {
+
+        var jsondata = GetInputData();
+
+        console.log(jsondata);
+
+
+        var urlpath = '@Url.Action("AllocationModalBeforeSubmit", "BillApproval")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsondata),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    $("#previewmodalbody").html("");
+                    $("#previewmodalbody").append(data);
+                    $("#myPreview").modal("show");
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+    }
+
+
+    function SubmitToDatabase() {
+
+        var jsondate = GetInputData();
+         var urlpath = '@Url.Action("SaveBillAllocationRequest", "BillApproval")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsondate),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    //console.log(data);
+                    //alert(data.data.isSuccess);
+                    //alert(data.isSupplier);
+                    if (data.isSuccess == true) {
+
+                            swal({
+                                title: "Bill Request Submit Successfully!",
+                                type: 'success',
+                                closeOnConfirm: false,
+                                closeOnCancel: false
+                            })
+                            location.reload();
+
+                    }
+
+
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+
+    }
+
+    function deleterow(rowval) {
+        $('tr#' + rowval + '').remove();
+        var amount = 0;
+        $("#tbl_invoiceDetails_body tr").each(function () {
+
+            var Id = $(this).attr('id');
+            var value = parseFloat($('#input_' + Id).val());
+            amount += value;
+        });
+
+        $('#check_amount').val(numberWithCommas(amount));
+
+        //var table = document.getElementById('tbl_invoiceDetails');
+        //var lastRow = table.rows.length - 1;
+        //if (table.rows.length < 3) {
+        //    $("#masterdetails").hide();
+        //}
+        //alert(lastRow);
+       // CalCulate();
+    }
+
+    function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    function uniqueChequeNumber() {
+        //alert($("#cheque_no").val());
+        var cheque_no = $("#cheque_no").val();
+       // var jsondate = GetInputData();
+         var urlpath = '@Url.Action("ChequeUniqueNumber", "BillApproval")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({ cheque: cheque_no }),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                dataType: "json",
+                success: function (data) {
+                    //console.log(data);
+                    //alert(data.data.isSuccess);
+                    //alert(data.isSupplier);
+                    if (data == true) {
+
+                            swal({
+                                title: "Cheque Number Already Exists!",
+                                type: 'success',
+                                closeOnConfirm: false,
+                                closeOnCancel: false
+                            })
+                        // location.reload();
+                        $('#cheque_alert').val("Cheque Number Already Exists!");
+                    }
+                    else {
+                        $('#cheque_alert').val("0");
+                    }
+                    
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+    }
+
+</script>

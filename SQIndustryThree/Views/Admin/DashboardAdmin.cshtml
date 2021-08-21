@@ -19,6 +19,9 @@
                 <li><a href="#" onclick="changeDiv(6)">Set Approver List</a></li>
                 <li><a href="#" onclick="changeDiv(7)">IOU Approver List</a></li>
                 <li><a href="#" onclick="changeDiv(8)">Exception Approver List</a></li>
+                <li><a href="#" onclick="changeDiv(9)">Bill Supplier List</a></li>
+                <li><a href="#" onclick="changeDiv(10)">Bill Currency List</a></li>
+                <li><a href="#" onclick="changeDiv(11)">Bill Unit List</a></li>
             </ul>
         </div>
         <div style="text-align:center;width:80%;float:right">
@@ -42,6 +45,8 @@
                     }
                 });
     }
+
+
     function LoadBusinessUnit() {
         $('#business_unit').css({ "border-color": "#d3d3d3" });
         var urlpath = '@Url.Action("LoadBusinessUnit", "Admin")';

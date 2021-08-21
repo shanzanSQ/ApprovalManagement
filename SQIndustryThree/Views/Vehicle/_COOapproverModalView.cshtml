@@ -1,0 +1,357 @@
+﻿@model SQIndustryThree.Models.VehicleRequestModel
+<style>
+    th {
+        text-align: left;
+    }
+
+    td {
+        text-align: left;
+    }
+
+    #genaralInfodt tr th, #genaralInfodt tr td, #approverlist tr td, #approverlist tr th {
+        text-align: center;
+    }
+
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+</style>
+
+@*<br />*@
+<div id="printablearea">
+    @if (Model.RivisionNo > 0)
+    {
+        <p style="color:red;text-align:center;font-weight:bold">Revised  No:  @Model.RivisionNo</p>
+    }
+    <div>
+        <span style="float:left;font-weight:bold;font-size:20px">@Model.BusinessUnitName</span>
+        <span style="float:right;font-weight:bold;font-size:20px">Vehicle Request No: @Model.VehicleRequesMastertId</span>
+    </div>
+    @if (Model.VehicleApproverList != null)
+    {
+        <table border="1" width="100%" id="approverlist">
+            <caption>Approver List</caption>
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Approver Name</th>
+                    <th>Approver Designation</th>
+                    <th>Approver Role</th>
+                    <th>Update Date</th>
+                    <th>Status</th>
+                    <th>Comment</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.VehicleApproverList)
+                {
+                    <tr>
+                        <td>@item.ApproverNo</td>
+                        <td>@item.UserName</td>
+                        <td>@item.DesignationName</td>
+                        <td>@item.ApproverStatusName</td>
+                        <td>
+                            @if (@item.UpdateDate != null)
+                            {@DateTime.Parse(@item.UpdateDate).ToString("dd MMM yyyy")}
+                        </td>
+                        @{
+                            if (item.IsApprove == 3)
+                            {
+                                <td style="color:red">Pending</td>
+                            }
+                            else if (item.IsApprove == 1)
+                            {
+                                @*if (item.ApproverStatus == 3)
+                                    {
+                                        <td style="color:green">Disbursed</td>
+                                    }
+                                    else
+                                    {*@
+                                <td style="color:green">Approved</td>
+                                //}
+                            }
+                            else if (item.IsApprove == 2)
+                            {
+                                <td style="color:red">Rejected</td>
+                            }
+                            else
+                            {
+                                <td style="color:darkblue">Not Sent</td>
+                            }
+                        }
+                        <td>@item.Comments</td>
+                    </tr>
+
+                }
+            </tbody>
+        </table>
+    }
+    <div class="row">
+        <div class="col-md-12">
+            <table border="1" width="100%">
+                <caption>Vehicle Request</caption>
+                <tr>
+                    <th width="25%">Requestor Name</th>
+                    <td width="25%">@Model.UserName</td>
+                    <th width="25%">Request Date</th>
+                    <td width="25%">@DateTime.Parse(Model.DateOfRequest).ToString("dd MMM yyyy")</td>
+                </tr>
+                <tr>
+                    <th>Location Name</th>
+                    <td>@Model.LocationName</td>
+                    <th>Business Unit Name</th>
+                    <td>@Model.BusinessUnitName</td>
+                </tr>
+                <tr>
+                    <th>Travel Start Date</th>
+                    <td>
+                        @if (Model.TravelStratDate != null)
+                        {@DateTime.Parse(Model.TravelStratDate).ToString("dd MMM yyyy")}
+                    </td>
+                    <th>Travel Start Time</th>
+                    <td>@Model.StartTime</td>
+                </tr>
+                <tr>
+                    <th>Travel End Date</th>
+                    <td>
+                        @if (Model.TravelEndDate != null)
+                        {@DateTime.Parse(Model.TravelEndDate).ToString("dd MMM yyyy")}
+                    </td>
+                    <th>Travel End Time</th>
+                    <td>@Model.EndTime</td>
+                </tr>
+                <tr>
+                    <th>Purpose of Visit</th>
+                    <td>@Model.PurposeofTravelName</td>
+                    <th>Starting Point</th>
+                    <td>@Model.StartingPointName</td>
+                </tr>
+                <tr>
+                    <th>Route</th>
+                    <td>@Model.RouteTypeName</td>
+                    <th>Trip Type</th>
+                    <td>@Model.TripTypeName</td>
+                </tr>
+                <tr>
+                    <th>No of User</th>
+                    <td>@Model.NoofUser</td>
+                    <th>No of Days</th>
+                    <td>@Model.NoofDays</td>
+                </tr>
+                <tr>
+                    <th>Preferred Vehicle</th>
+                    <td>@Model.PreferredVehicleName</td>
+                    <th>Approximate Cost (BDT)</th>
+                    <td>@Model.VehicleRate</td>
+                </tr>
+                <tr>
+                    <th>Remarks</th>
+                    <td>@Model.Remarks</td>
+                    <th>Allocated Cost</th>
+                    <td>@Model.AllocatedCost</td>
+                 </tr>
+                @*<tr>
+                   
+                </tr>*@
+            </table>
+        </div>
+    </div>
+
+
+    <table border="1" width="100%" id="genaralInfodt">
+        @{float countFob = 0; int countNum = 0;}
+        <caption>Passenger List</caption>
+        <thead>
+            <tr>
+                <th>Sl</th>
+                @*<th>User Id</th>*@
+                <th>User Name</th>
+                <th>Email</th>
+                <th>Contact</th>
+                <th>Department</th>
+                <th>Designation</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model.UserDetailsList)
+            {
+                countNum++;
+            <tr>
+                <td>@countNum</td>
+                @*<td>@item.UserId</td>*@
+                <td>@item.UserName</td>
+                <td>@item.Email</td>
+                <td>@item.PhoneNo</td>
+                <td>@item.DeartmentName</td>
+                <td>@item.DesignationName</td>
+            </tr>
+                countFob = countFob + 1;
+            }
+        </tbody>
+        @*<tfoot>
+            <tr>
+                <th colspan="2">Total </th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th>@countFob.ToString("N")</th>
+            </tr>
+        </tfoot>*@
+    </table>
+    @*<div class="row">
+        <div class="col-md-12">
+           
+        </div>
+    </div>*@
+    @if (Model.Status == 1)
+    {
+<div style="text-align:center;width:100%">
+    <br />
+    <table border="1" style="float:left;" width="45%" id="approverlist">
+        <caption style="font-weight: bold; font-size: 20px;"><b>Budget Summary</b></caption>
+        <thead>
+            <tr>
+                <td><b>Monthly budget :</b></td>
+                <td>@Model.Budget_MTD</td>
+            </tr>
+            <tr>
+                <td><b>Budget Utilized :</b></td>
+                <td>@Model.MTDcost</td>
+
+
+            </tr>
+            <tr>
+                <td><b>Budget Balance :</b></td>
+                <td>@Model.ReaminsCost</td>
+
+            </tr>
+        </thead>
+
+    </table>
+    <table width="50%" style="float:right;margin-top:50px;margin-left:-0px;">
+        <tr>
+            @*@if (Model.VehicleApproverList.Last().UserID == Convert.ToInt32(Session["SQuserId"].ToString()))
+                {
+                    <td>
+                        <label>Settlement Date : </label>
+                    </td>
+                    <td><input type="date" id="settlementDate" value="" class="form-control" /></td>
+                    <td>
+                        <button type="button" class="approvalColumn btn btn-success" onclick="IouApproveOrReject(1,@Model.ve,'',$('#settlementDate').val())">Cash Disbursement</button>
+                    </td>
+                }
+                else
+                {*@
+            <td>
+                <input type="text" class="approvalColumn form-control" id="commentText" />
+            </td>
+            <td>
+                <button type="button" class="approvalColumn btn btn-success " onclick="VehicleApproveOrReject(1,@Model.VehicleRequesMastertId,$('#commentText').val(),0)">Approve</button>
+            </td>
+            <td>
+                <button type="button" class="approvalColumn btn btn-danger " onclick="VehicleApproveOrReject(2,@Model.VehicleRequesMastertId,$('#commentText').val(),0)">Reject</button>
+            </td>
+            @*}*@
+        </tr>
+    </table>
+</div>
+    }
+</div>
+
+
+@if (Model.IsApproved != 0)
+{
+    <div>
+        <br />
+        <table width="80%" align="center">
+            <tr>
+                <td>
+                    <button value="Comments" onclick="showComments()" class="btn btn-sm btn-primary">Comments</button>
+                </td>
+                <td style="padding:5px">
+                    <select id="reviewComment" class="approvalColumn form-control">
+                        <option value="@Model.UserId">@Model.UserName</option>
+                        @if (Model.VehicleApproverList != null)
+                        {
+                            foreach (var app in Model.VehicleApproverList)
+                            {
+
+                                if (app.IsApprove != 0)
+                                {
+                                    if (app.UserID != Convert.ToInt32(Session["SQuserId"].ToString()))
+                                    {
+                                        <option value="@app.UserID">@app.UserName</option>
+                                    }
+
+                                }
+
+                            }
+                        }
+
+                    </select>
+                </td>
+                <td style="padding:5px">
+                    <input type="text" id="reviewMessage" class="approvalColumn form-control" rows="3" style="resize:none" />
+                </td>
+                <td>
+                    <button style="text-align:center;align-content:center" class="btn btn-info btn-sm" onclick="ReviewComment(@Model.VehicleRequesMastertId)">Send Review</button>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+}
+
+
+@*else
+    {*@
+@*<br />*@
+@*<button value="Comments" onclick="showComments()" class="btn btn-sm btn-primary">Comments</button>*@
+<div id="comments_section" class="row" style="display:none">
+    <div class="col-md-6" style="overflow-wrap:inherit; overflow-y: auto;height:200px;">
+        <p>Comment Section</p>
+        @if (Model.VehicleComments != null)
+        {
+            foreach (var app in Model.VehicleComments)
+            {
+                <hr style="margin:unset;padding:unset;" />
+                <p style="margin:unset;padding:unset" class="media-heading user_name"><strong style="color:blue">@app.ReviewerByName</strong>  To <strong>@app.ReviewerToName</strong></p>
+                <p style="margin:unset;padding:unset">@app.UpdatedBY.ToString("MM/dd/yyyy hh:mm tt")</p>
+                <p style="margin:unset;padding:unset">@app.ReviewMessage</p>
+            }
+        }
+    </div>
+    <div id="log_section" class="col-md-6" style="overflow-wrap:inherit; overflow-y: auto;height:200px;">
+        <p>Log Section</p>
+
+        @if (Model.VehicleLogSection != null)
+        {
+            <table width="100%" border="1">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Description</th>
+                        <th>By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var app in Model.VehicleLogSection)
+                    {
+                        <tr>
+                            <td>@app.ActionDate</td>
+                            <td>@app.ActionStatus</td>
+                            <td>@app.Comments</td>
+                            <td>@app.ActionBy</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        }
+    </div>
+</div>
+@*}
+    </div>*@
+

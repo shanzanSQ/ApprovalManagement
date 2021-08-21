@@ -512,12 +512,44 @@
 
                 //alert(verify);
 
+                var dcFileUpload = [];
+                var dcCount = 1;
+                $('#tableDocument tr').each(function () {
+                    var filedata = {};
+                    var Id = $(this).attr('id');
+
+                    if (typeof $('#fileName_' + Id).html() !== 'undefined' && $('#filePath_' + Id).html() !== 'undefined') {
+
+                        filedata["FileName"] = $('#fileName_' + Id).html();
+                        filedata["FilePath"] = $('#filePath_' + Id).html();
+                        filedata["DocumentName"] = $("#document_" + Id).val();
+                        filedata["Remarks"] = $("#remarks_" + Id).val();
+                        
+
+                        dcFileUpload.push(filedata);
+                        //alert($(this).attr('id'));
+                        
+                        
+                        //alert($('#fileName_' + Id).html() + " " + $('#filePath_' + Id).html() + " " + $("#document_name_" + Id).val() + " " + $("#remarks_" + Id).val());
+                    }
+
+                    //alert($(this).attr('id'));
+                   // alert($('#fileName_' + Id).html());
+                    
+                   // console.log($('#filePath_' + Id).html());
+                    alert($("#document_"+Id).val());
+                    //alert($("#document_name_4").val());
+                    //alert($(this).find("#remarks_" + dcCount).val());
+                    dcCount++;
+                })
+
+
                 var urlpath = '@Url.Action("BillApproveOrReject", "BillApproval")';
                 $.ajax({
                     data: {
                         CommentText: commentText, Progress: progress, RequestorId: masterId,
                         invoiceDetailKey: invoiceDetailKey, verifyQty: verify, verifyValue: verifyValue,
-                        gRNFiles: grnFileUpload, poFiles: poFileUpload, billFiles: fileUpload,
+                        gRNFiles: grnFileUpload, poFiles: poFileUpload, billFiles: fileUpload, billDocList: dcFileUpload,
                         ProcurementUserId: general_procurement, CapexInfoId: capex_number, CostCenterId: cost_center // Certifying: certifying
                     },
                     dataType: 'json',
@@ -730,6 +762,42 @@
             print_area.focus();
             print_area.print();
             print_area.close();
+    }
+
+    function FileUpload(row) {
+        var fileData = new FormData();
+        var fileUpload = $("#qualityFileUpload_" + row).prop('files');
+        if (fileUpload.length > 0) {
+            for (var i = 0; i < fileUpload.length; i++) {
+                fileData.append(fileUpload[i].name, fileUpload[i]);
+            }
+        }
+
+        var urlpath = '@Url.Action("DcFileUpload", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            type: "post",
+            processData: false,
+            contentType: false,
+            data: fileData  ,
+            success: function (result) {
+                for (var i = 0; i < result.length; i++) {
+                   //var newRow = $('<tr>');
+                   var cols = "";
+                    cols += '<span style="display:none" name="fileName" style="color:white;background-color: black;" for="fileName" id="fileName_' + row + '">' + result[i].FileName + '</span>';
+                    cols += '<span style="display:none" name="filePath" id="filePath_' + row + '">' + result[i].FilePath + '</span>';
+                   //cols += '<input type="button" style="margin:2px" class="btn btn-danger btn-sm" id="deleteFile_'+row+'" onclick="DeleteFile('+i+',\''+result[i].ServerFileName+'\')"   value="X">';
+                    //newRow.append(cols);
+                    $("#attachedFileTable_" + row).html(cols);
+                }
+                //$("#qualityFileUpload_" + row).val('');
+
+                alert("File Uploaded");
+            },
+            error: function (err) {
+                alert(err.responseText);
+            }
+        });
     }
 </script>
 

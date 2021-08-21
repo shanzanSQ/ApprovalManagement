@@ -41,6 +41,7 @@ namespace SQIndustryThree.DAL
                 accessManager.SqlConnectionClose();
             }
         }
+
         public List<ExceptionRequestMaster> LoadExcpCategory(int userId)
         {
             try

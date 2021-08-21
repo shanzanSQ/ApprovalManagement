@@ -1,0 +1,56 @@
+﻿@model IEnumerable<SQIndustryThree.Models.VehicleRequestModel>
+<style>
+    #IourequestTable tr th, #IourequestTable tr td {
+        text-align: center;
+        padding: 5px;
+    }
+
+    button {
+        padding: 0;
+    }
+</style>
+<div class="box">
+    <h3 style="text-align:center">My Vehicle Budget List</h3>
+    <!-- /.box-header -->
+    <div class="box-body">
+        <div class="col-xs-12" id="personlocdiv" style="overflow:scroll;">
+            <table id="VisitorRequestTable" class="table-bordered table table-striped" width="100%" style="overflow:scroll">
+                <thead>
+                    <tr>
+                        <th>SL</th>
+                        <th>Request #</th>
+                        <th>Unit</th>
+                        @*<th>Department</th>*@
+                        <th>Budget Year</th>
+                        <th>Month of Year</th>
+                        <th>Amount</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ int count = 1;}
+                    @foreach (var item in Model)
+                    {
+                    <tr>
+                        <td>@count</td>
+                        <td>@item.VehicleBudgetEntryId</td>
+                        <td>@item.BusinessUnitName</td>
+                        @*<td>@item.DepartmentName</td>*@
+                        <td>@item.BudgetYear</td>
+                        <td>@item.MonthOfYear</td>
+                        <td>@item.Amount</td>
+                        <input id="update_primarykey" type="hidden" value="@item.VehicleBudgetEntryId" />
+                        <td> <button type="button" id="update_capex" onclick="updateCourierBudget(@item.VehicleBudgetEntryId)" class="btn  btn-block btn-danger">Update </button></td>
+
+
+                    </tr>
+                        count++;
+
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <!-- /.box-body -->
+</div>

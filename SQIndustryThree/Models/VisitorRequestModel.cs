@@ -99,7 +99,6 @@ namespace SQIndustryThree.Models
 
         public DateTime OutTime { get; set; }
         public string Checked { get; set; }
-
         public List<ArrivedVisitor> arrivedVisitors { get; set; }
     }
 }

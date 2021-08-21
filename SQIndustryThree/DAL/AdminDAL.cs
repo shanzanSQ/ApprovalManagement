@@ -1,5 +1,6 @@
 ﻿using SQIndustryThree.DataManager;
 using SQIndustryThree.Models;
+using SQIndustryThree.Models.BillApproval;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -224,6 +225,205 @@ namespace SQIndustryThree.DAL
                 accessManager.SqlConnectionClose();
             }
         }
+
+        public List<BillSupplier> GetAllBillSuppliers()
+        {
+            List<BillSupplier> suppliers = new List<BillSupplier>();
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_BillSupplierList");
+                while (dr.Read())
+                {
+                    BillSupplier supplier = new BillSupplier();
+                    supplier.SupplierID = (int)dr["SupplierID"];
+                    supplier.Supplier = dr["Supplier"].ToString();
+                    suppliers.Add(supplier);
+                }
+                return suppliers;
+            }
+            catch (Exception exception)
+            {
+
+                throw exception;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+        public List<BillCurrency> GetAllBillCurrency()
+        {
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                //List<SqlParameter> aList = new List<SqlParameter>();
+                //aList.Add(new SqlParameter("@userId", 0));
+                List<BillCurrency> currencies = new List<BillCurrency>();
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_CurrencyList");
+                while (dr.Read())
+                {
+                    BillCurrency currency = new BillCurrency();
+                    currency.CurrencyID = (int)dr["CurrencyID"];
+                    currency.CurrencyCode = dr["CurrencyCode"].ToString();
+                    currency.Currency = dr["Currency"].ToString();
+                    currencies.Add(currency);
+                }
+                return currencies;
+            }
+            catch (Exception exception)
+            {
+
+                throw exception;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+        public List<BillUnit> GetAllBillUnits()
+        {
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<SqlParameter> aList = new List<SqlParameter>();
+                aList.Add(new SqlParameter("@userId", 0));
+                List<BillUnit> billUnits = new List<BillUnit>();
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_UnitList");
+                while (dr.Read())
+                {
+                    BillUnit unit = new BillUnit();
+                    unit.UnitID = (int)dr["UnitID"];
+                    unit.UnitName = dr["UnitName"].ToString();
+                    billUnits.Add(unit);
+                }
+                return billUnits;
+            }
+            catch (Exception exception)
+            {
+
+                throw exception;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+
+        public List<BillSupplier> SupplierSorting(string order, string orderDir, List<BillSupplier> data)
+        {
+            // Initialization.
+            List<BillSupplier> lst = new List<BillSupplier>();
+
+            try
+            {
+                // Sorting
+                switch (order)
+                {
+                    case "0":
+                        lst = orderDir.Equals("DESC", StringComparison.CurrentCultureIgnoreCase) ? data.OrderByDescending(p => p.SupplierID).ToList()
+                                                                                                 : data.OrderBy(p => p.SupplierID).ToList();
+                        break;
+                    case "1":
+                        lst = orderDir.Equals("DESC", StringComparison.CurrentCultureIgnoreCase) ? data.OrderByDescending(p => p.Supplier).ToList()
+                                                                                                 : data.OrderBy(p => p.Supplier).ToList();
+                        break;
+
+                    default:
+                        lst = orderDir.Equals("DESC", StringComparison.CurrentCultureIgnoreCase) ? data.OrderByDescending(p => p.SupplierID).ToList()
+                                                                                                 : data.OrderBy(p => p.SupplierID).ToList();
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                // info.
+                Console.Write(ex);
+            }
+
+            // info.
+            return lst;
+        }
+
+        public List<BillCurrency> CurrencySorting(string order, string orderDir, List<BillCurrency> data)
+        {
+            // Initialization.
+            List<BillCurrency> lst = new List<BillCurrency>();
+
+            try
+            {
+                // Sorting
+                switch (order)
+                {
+                    case "0":
+                        lst = orderDir.Equals("DESC", StringComparison.CurrentCultureIgnoreCase) ? data.OrderByDescending(p => p.CurrencyID).ToList()
+                                                                                                 : data.OrderBy(p => p.CurrencyID).ToList();
+                        break;
+                    case "1":
+                        lst = orderDir.Equals("DESC", StringComparison.CurrentCultureIgnoreCase) ? data.OrderByDescending(p => p.CurrencyCode).ToList()
+                                                                                                 : data.OrderBy(p => p.CurrencyCode).ToList();
+                        break;
+
+                    case "2":
+                        lst = orderDir.Equals("DESC", StringComparison.CurrentCultureIgnoreCase) ? data.OrderByDescending(p => p.Currency).ToList()
+                                                                                                 : data.OrderBy(p => p.Currency).ToList();
+                        break;
+
+                    default:
+                        lst = orderDir.Equals("DESC", StringComparison.CurrentCultureIgnoreCase) ? data.OrderByDescending(p => p.CurrencyID).ToList()
+                                                                                                 : data.OrderBy(p => p.CurrencyID).ToList();
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                // info.
+                Console.Write(ex);
+            }
+
+            // info.
+            return lst;
+        }
+
+        public List<BillUnit> UnitSorting(string order, string orderDir, List<BillUnit> data)
+        {
+            // Initialization.
+            List<BillUnit> lst = new List<BillUnit>();
+
+            try
+            {
+                // Sorting
+                switch (order)
+                {
+                    case "0":
+                        lst = orderDir.Equals("DESC", StringComparison.CurrentCultureIgnoreCase) ? data.OrderByDescending(p => p.UnitID).ToList()
+                                                                                                 : data.OrderBy(p => p.UnitID).ToList();
+                        break;
+                    case "1":
+                        lst = orderDir.Equals("DESC", StringComparison.CurrentCultureIgnoreCase) ? data.OrderByDescending(p => p.UnitName).ToList()
+                                                                                                 : data.OrderBy(p => p.UnitName).ToList();
+                        break;
+
+                    default:
+                        lst = orderDir.Equals("DESC", StringComparison.CurrentCultureIgnoreCase) ? data.OrderByDescending(p => p.UnitID).ToList()
+                                                                                                 : data.OrderBy(p => p.UnitID).ToList();
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                // info.
+                Console.Write(ex);
+            }
+
+            // info.
+            return lst;
+        }
+
         public bool RecoveryPassword(string semail)
         {
             String password = "", name = "",email="";

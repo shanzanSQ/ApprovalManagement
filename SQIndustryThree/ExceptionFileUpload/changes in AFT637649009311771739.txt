@@ -1,0 +1,14 @@
+- Approved and final update date should be there and only approved ER
+- Option for final submission before submit button       --- Done
+- User log table where history will be shown
+- Currency rate input option               --- Done
+- Attachment can't be more than 2 mb       --- Done
+- Child PO button and new column parent PO --- Done
+- Confirm Submission modal before final submission   --- In Progress
+- freight rate per kg
+- Business unit user id remove
+- Quantity in pc (disabled and from ER details)
+
+New Request    ---  Saved List   ---   Final List
+
+Dashboard

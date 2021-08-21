@@ -8,6 +8,7 @@ namespace SQIndustryThree.Models
     public class CourierRequestModel
     {
         //public string weight { get; set; }
+        public int CourierBudgetEntryId { get; set; }
         public int CourierDispatchNo { get; set; }
         public string ReferenceNo { get; set; }
         public string CourierNumber { get; set; }
@@ -71,7 +72,11 @@ namespace SQIndustryThree.Models
         public string ServiceProvider { get; set; }
         public string Rate { get; set; }
         public int IsApproved { get; set; }
-      // public List<CourierApproverModel> CourierApproverList { get; set; }
+        public string BudgetYear { get; set; }
+        public string MonthOfYear { get; set; }
+        public string Amount { get; set; }
+        public string Current_Financial_Year { get; set; }
+        // public List<CourierApproverModel> CourierApproverList { get; set; }
         public List<CourierApproverModel> CourierApproverList { get; set; }
         public List<CourierFontDeskModel> CourierFontDeskModelList { get; set; }
         public List<CourierAmmountListModel> CourierAmmountList { get; set; }

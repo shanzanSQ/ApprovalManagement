@@ -15,7 +15,7 @@ namespace SQIndustryThree.Models
         public string OriginalDD { get; set; }
         public string RevisedDD { get; set; }
         public float FOB { get; set; }
-        public float Quantity { get; set; }
+        public int Quantity { get; set; }
         public float Discount { get; set; }
         public float Claim { get; set; }
         public float MaterialLiability { get; set; }

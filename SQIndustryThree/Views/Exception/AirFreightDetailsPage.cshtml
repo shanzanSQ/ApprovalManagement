@@ -1,0 +1,1269 @@
+﻿
+@{
+    ViewBag.Title = "Air Freight Statement";
+}
+
+<style type="text/css">
+    table {
+        /*min-height: 200px;*/
+        display: block;
+        overflow-x: auto;
+    }
+
+        table td:not(:first-child):not(:nth-child(27)) {
+            min-width: 140px;
+        }
+
+        table th {
+            text-align: center;
+        }
+
+        table td {
+            text-align: center;
+        }
+
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    input, select {
+        width: 100%;
+    }
+
+        input[type=text], input[type=button], select {
+            height: 30px;
+        }
+
+    .required:after {
+        content: "*";
+        color: red;
+    }
+
+    .overlay {
+        background: #463e3e;
+        display: none;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        opacity: 0.5;
+    }
+
+    .mt {
+        margin-top: 8px;
+    }
+
+    .mtt {
+        margin-top: 20px;
+    }
+
+    .poTableDiv {
+        margin-top: 50px;
+    }
+
+    #addNewButtonDefault, #deleteButton, #addNewChildPOButton {
+        float: right;
+        margin-left: 15px;
+    }
+
+    .custom-checkbox {
+        height: 22px;
+    }
+
+    #erInfoSection {
+        display: none;
+    }
+
+    a:hover {
+        cursor: pointer;
+    }
+
+    .attachmentRemoveButton:hover {
+        background-color: red;
+        color: white;
+    }
+
+    .attachmentRemoveButton {
+        color: red;
+    }
+
+    #ERDate, .disabled-but-background-white {
+        background-color: white;
+    }
+
+    .parentPO {
+        display: none;
+    }
+
+    .airFreightDetailsId {
+        display: none;
+    }
+</style>
+
+
+<div class="container-fluid">
+    <h3 style="text-align: center;">
+        <b>Air Freight Details Page</b>
+    </h3>
+    <hr style="margin: 0px" />
+    <div class="row" style="margin-top:20px;">
+        <div class="col-md-6">
+            <div class="row mt">
+                <label class="col-sm-4 required">Business Unit :</label>
+                <div class="col-sm-6">
+                    <select id="businessUnit" onchange="businessUnitSelected()" class="form-control">
+                        <option value="0">--Select Business Unit--</option>
+                        <option value="1">Celsius 1</option>
+                        <option value="2">Celsius 2</option>
+                        <option value="3">Birichina 1</option>
+                        <option value="4">Birichina 2</option>
+                        <option value="5">Hues</option>
+                        <option value="6">Station</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt">
+                <label class="col-sm-4 required">Buyer's Name :</label>
+                <div class="col-sm-6">
+                    <select id="buyersName" onchange="buyersNameSelected()" class="form-control">
+                        <option value="0">--Select Buyers Name--</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt">
+                <label class="col-sm-4 required">Forwarders Name :</label>
+                <div class="col-sm-6">
+                    <select id="forwaredrsName" onchange="forwardersNameSelected()" class="form-control">
+                        <option value="0">--Select Forwarders Name--</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt">
+                <label class="col-sm-4 required">Frieght Cost In A/C Of :</label>
+                <div class="col-sm-6 frieghtCostOnAcOfd">
+                    <select id="frieghtCostOnAcOf" onchange="frieghtCostOnAcOfSelected()" class="form-control">
+                        <option value="0">--Select Frieght Cost In A/C Of--</option>
+                        <option value="1">Buyer</option>
+                        <option value="2">SQ</option>
+                    </select>
+                </div>
+            </div>
+            <div id="erInfoSection">
+                <div class="row mtt">
+                    <label class="col-sm-4">ER :</label>
+                    <div class="col-sm-6">
+                        <select id="ER" onchange="loadERDetails()" class="form-control">
+                        </select>
+                    </div>
+                </div>
+                <div class="row mt">
+                    <label class="col-sm-4">ER Date :</label>
+                    <div class="col-sm-6">
+                        <input type="text" id="ERDate" class="form-control" disabled />
+                    </div>
+                </div>
+            </div>
+            <div class="row mt">
+                <label class="col-sm-4">USD to BDT rate :</label>
+                <div class="col-sm-6">
+                    <input type="text" id="USDToBDTRate" class="form-control" />
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+
+        </div>
+    </div>
+    <a href="#" id="deleteButton" class="btn btn-danger"><i class="fa fa-trash"></i> Delete</a>
+    <a href="#" id="addNewChildPOButton" style="display:none" class="btn btn-warning"><i class="fa fa-plus"></i> Add New Child PO</a>
+    <a href="#" id="addNewButtonDefault" class="btn btn-primary"><i class="fa fa-plus"></i> Add New</a>
+    <div class="poTableDiv">
+        <table width="100%" cellpadding="5" cellspacing="0" border="1" id="POListTable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>PO</th>
+                    <th class="parentPO">Parent PO</th>
+                    <th>Mode Of Shipment</th>
+                    <th>Port Of Destination</th>
+                    <th>Country Of Destination</th>
+                    <th>Incoterm</th>
+                    <th>Invoice No</th>
+                    <th>Invoice Value in USD</th>
+                    <th>QTY in pack</th>
+                    <th>QTY in PC</th>
+                    <th>Gross Weight In KG</th>
+                    <th>HAWBL No</th>
+                    <th>HAWBL Date</th>
+                    <th>Chargable Weight in KG (ER Approved)</th>
+                    <th>Freight Amount In USD (ER Approved)</th>
+                    <th>Chargable Weight in KG</th>
+                    <th>Freight Amount In USD</th>
+                    <th>Freight Rate Per KG (ER Approved)</th>
+                    <th>Freight Amount In BDT</th>
+                    <th>Freight Invoice No</th>
+                    <th>Freight Invoice Received Date</th>
+                    <th>Bill Submit Date for Payment</th>
+                    <th>CHQ/PO Submit Date to Forwarder</th>
+                    <th>AWAB Release Date</th>
+                    <th>Remarks</th>
+                    <th><i style="font-size: 22px;" class="fa fa-paperclip"></i></th>
+                    <th>Attachments</th>
+                    <th class="airFreightDetailsId">AirFreightDetailsId</th>
+                </tr>
+            </thead>
+            <tbody id="pOTableBody">
+            </tbody>
+        </table>
+    </div>
+    <div class="modal" id="submitConfirmModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Confirm Submitted Information</h4>
+                </div>
+                <div id="submitModalBody" class="modal-body">
+                    <div class="row">
+                        <div id="fgdhddjhdkf" class="col-md-4">
+
+                        </div>
+                        <div class="col-md-8">
+
+                        </div>
+                    </div>
+                    <div style="font-size: 10px;">
+                        <table id="POListTableModal" border="1" cellspacing="5" class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>PO</th>
+                                    <th class="parentPOOfModal">Parent PO</th>
+                                    <th>Mode Of Shipment</th>
+                                    <th>Port Of Destination</th>
+                                    <th>Country Of Destination</th>
+                                    <th>Incoterm</th>
+                                    <th>Invoice No</th>
+                                    <th>Invoice Value in USD</th>
+                                    <th>QTY in pack</th>
+                                    <th>QTY in PC</th>
+                                    <th>Gross Weight In KG</th>
+                                    <th>HAWBL No</th>
+                                    <th>HAWBL Date</th>
+                                    <th>Chargable Weight in KG (ER Approved)</th>
+                                    <th>Freight Amount In USD (ER Approved)</th>
+                                    <th>Chargable Weight in KG</th>
+                                    <th>Freight Amount In USD</th>
+                                    <th>Freight Rate Per KG (ER Approved)</th>
+                                    <th>Freight Amount In BDT</th>
+                                    <th>Freight Invoice No</th>
+                                    <th>Freight Invoice Received Date</th>
+                                    <th>Bill Submit Date for Payment</th>
+                                    <th>CHQ/PO Submit Date to Forwarder</th>
+                                    <th>AWAB Release Date</th>
+                                    <th>Remarks</th>
+                                    <th>Attachments</th>
+                                </tr>
+                            </thead>
+                            <tbody id="POTableBodyModal">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="/Exception/AirFreightList" type="button" id="submitConfirmButton" class="btn btn-success">Confirm Submission</a>
+                    <button type="button" id="modalCloseButton" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <p>Is this the final submission?</p>
+    <label>
+        <input type="radio" id="Yes" name="choice-radio">Yes
+    </label>
+    <label>
+        <input type="radio" id="No" name="choice-radio" checked="checked">No
+    </label>
+    <br />
+    <button id="submitButton" class="btn btn-primary">SUBMIT</button>
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+<script type="text/javascript">
+        var currentRow;
+        var AirFreightMasterId;
+        var ExceptionMasterId;
+    $(document).ready(function () {
+        LoadForwarders();
+        LoadBuyerList();
+
+        AirFreightMasterId = parseInt('@ViewBag.AirFreightMasterId');
+        if (AirFreightMasterId > 0) {
+            loadMasterDataForModification();
+        }
+    });
+
+    $('#addNewButtonDefault').click(function () {
+        let bn = $('#buyersName').val();
+        let bu = $('#businessUnit').val();
+        let fciaf = $('#frieghtCostOnAcOf').val();
+        if (bn > 0 && bu > 0 && fciaf > 0) {
+            if (fciaf == 1) {
+                addNewInputField();
+            }
+            else {
+            }
+        }
+        else {
+            swal({
+                title: "Caution!",
+                text: "You must select the required fields first",
+                type: "warning",
+                button: "OK"
+            });
+        }
+    });
+
+    $('#submitButton').click(function () {
+        let bn = $('#buyersName').val();
+        let bu = $('#businessUnit').val();
+        let fciaf = $('#frieghtCostOnAcOf').val();
+
+        if (!(bn > 0 && bu > 0 && fciaf > 0)) {
+            swal({
+                title: "Caution!",
+                text: "You must select the required fields first",
+                type: "warning",
+                button: "OK"
+            });
+
+            return;
+        }
+
+        let asfjdkshf = `<table id="modalBasiInfoTable" border="1" cellspacing="5" class="table table-striped">
+            <tr>
+                <th>Business Unit</th>
+                <td>` + $('#businessUnit option:selected').text() + `</td>
+            </tr>
+            <tr>
+                <th>Buyer's Name</th>
+                <td>`+ $('#buyersName option:selected').text() + `</td>
+            </tr>
+            <tr>
+                <th>Forwarders Name</th>
+                <td>` + $('#forwaredrsName option:selected').text() + `</td>
+            </tr>
+            <tr>
+                <th>Frieght Cost In A/C Of</th>
+                <td>` + $('#frieghtCostOnAcOf option:selected').text() + `</td>
+            </tr>
+        </table>`;
+
+        $('#fgdhddjhdkf').empty();
+        $('#fgdhddjhdkf').append(asfjdkshf);
+
+        let tableBody = $('#POTableBodyModal');
+        tableBody.empty();
+        $("#pOTableBody tr").each(function () {
+            let currentRow = $(this).closest("tr");
+            let TempAttachments = [];
+            let attachmentCol = currentRow.find("td:eq(26)");
+            for (i = 4; i <= attachmentCol.children().length; i += 4) {
+                TempAttachments.push(
+                    {
+                        FileName: attachmentCol.children("a:nth-child(" + i + ")").text(),
+                        FilePath: attachmentCol.children("a:nth-child(" + (++i) + ")").text(),
+                        ShortPath: attachmentCol.children("a:nth-child(" + (++i) + ")").text(),
+                        ServerFileName: attachmentCol.children("a:nth-child(" + (++i) + ")").text()
+                    }
+                );
+            }
+
+            if (fciaf == 1) {
+                let appendData = `<tr><td>` + currentRow.find("td:eq(1) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(2)").text() + `</td>
+                    <td>` + currentRow.find("td:eq(3) select").val() + `</td>
+                    <td>` + currentRow.find("td:eq(4) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(5) select option:selected").text() + `</td>
+                    <td>` + currentRow.find("td:eq(6) select").val() + `</td>
+                    <td>` + currentRow.find("td:eq(7) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(8) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(9) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(10) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(11) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(12) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(13) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(14) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(15) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(16) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(17) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(18) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(19) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(20) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(21) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(22) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(23) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(24) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(25) input").val() + `</td></tr>`;
+                    tableBody.append(appendData);
+
+            }
+            else if (fciaf == 2) {
+                let appendData = `<tr><td>` + currentRow.find("td:eq(1)").text() + `</td>
+                    <td>` + currentRow.find("td:eq(2)").text() + `</td>
+                    <td>` + currentRow.find("td:eq(3) select").val() + `</td>
+                    <td>` + currentRow.find("td:eq(4) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(5) select option:selected").text() + `</td>
+                    <td>` + currentRow.find("td:eq(6) select").val() + `</td>
+                    <td>` + currentRow.find("td:eq(7) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(8) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(9) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(10) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(11) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(12) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(13) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(14) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(15) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(16) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(17) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(18) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(19) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(20) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(21) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(22) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(23) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(24) input").val() + `</td>
+                    <td>` + currentRow.find("td:eq(25) input").val() + `</td></tr>`;
+                    tableBody.append(appendData);
+            }
+        });
+
+        $("#submitConfirmModal").modal("show");
+    });
+
+    $('#submitConfirmButton').click(function () {
+        let bn = $('#buyersName').val();
+        let bu = $('#businessUnit').val();
+        let fciaf = $('#frieghtCostOnAcOf').val();
+
+        if (!(bn > 0 && bu > 0 && fciaf > 0)) {
+            swal({
+                title: "Caution!",
+                text: "You must select the required fields first.",
+                type: "warning",
+                button: "OK"
+            });
+        }
+        else if (AirFreightMasterId > 0)
+        {
+            submitDataForMod();
+        }
+        else if (fciaf == 1) {
+            submitDataForBuyer();
+        }
+        else if (fciaf == 2) {
+            submitDataForSQ();
+        }
+    });
+
+    $('#addNewChildPOButton').click(function () {
+        let fciaf = $('#frieghtCostOnAcOf').val();
+        if ($("#POListTable tr td input[type='checkbox']:checked").length > 1) {
+            swal({
+                title: "Attention!",
+                text: "You must select at most one PO to create child PO of it.",
+                type: "warning",
+                button: "OK"
+            });
+        }
+        else {
+            $('.parentPO').show();
+            let parentPO;
+            let cRow = $("#POListTable tr td input[type='checkbox']:checked").closest("tr");
+            if (fciaf == 1) {
+                parentPO = cRow.find("td:eq(1) input").val();
+            }
+            else if (fciaf == 2) {
+                parentPO = cRow.find("td:eq(1)").text();
+            }
+
+            var trElement = `<tr id="">
+                    <td><input type="checkbox" class="custom-checkbox" onchange="rowSelected(this)" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td class="parentPOOfChild">` + parentPO + `</td>
+                    <td>
+                        <select class="form-control">
+                            <option value="0">--Select Mode Of Shipment--</option>
+                            <option value="1">Air</option>
+                            <option value="2">Sea & Air</option>
+                        </select>
+                    </td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td>
+                        <select class="form-control countryOfDestination">
+                            <option value="0">--Select Country Of Destination--</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control">
+                            <option value="0">--Select Incoterm--</option>
+                            <option value="1">EXW</option>
+                            <option value="2">FCA</option>
+                            <option value="3">CPT</option>
+                            <option value="4">CIP</option>
+                            <option value="5">DAT</option>
+                            <option value="6">DAP</option>
+                            <option value="7">DDP</option>
+                            <option value="8">FAS</option>
+                            <option value="9">FOB</option>
+                            <option value="10">CFT</option>
+                            <option value="11">CIF</option>
+                        </select>
+                    </td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="number" class="form-control" /></td>
+                    <td><input type="number" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="date" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="number" class="form-control" /></td>
+                    <td><input type="text" class="form-control" onchange="ConvertUsdToBDT(this)" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="date" class="form-control" /></td>
+                    <td><input type="date" class="form-control" /></td>
+                    <td><input type="date" class="form-control" /></td>
+                    <td><input type="date" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><button onclick="fileUploadBtnClick(this)" class="btn btn-primary"><i class="fa fa-file"></i></button><input type="file" multiple  style="display: none;" id="airFreightFileUpload" onchange="FileUploadOnChange()" /></td>
+                    <td style="white-space: nowrap;"></td>
+                </tr>`;
+
+            $(trElement).insertAfter(cRow);
+        }
+    });
+
+    $('#deleteButton').click(function () {
+        $("#POListTable tr td input[type='checkbox']:checked").each(function () {
+            var currentRow = $(this).closest("tr");
+            currentRow.remove();
+        });
+    });
+
+    function businessUnitSelected() {
+        loadERData();
+    }
+
+    function buyersNameSelected() {
+        loadERData();
+    }
+
+    function frieghtCostOnAcOfSelected() {
+        loadERData();
+    }
+
+    function LoadBusinessUnit() {
+        $('#businessUnit').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadBusinessUnit", "CapexApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "GET",
+            async: true,
+            success: function (data) {
+                $('#businessUnit').empty();
+                $('#businessUnit').append("<option value='0'>--Select Business Unit--</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#businessUnit").append($("<option></option>").val(data[i].BusinessUnitId)
+                        .html(data[i].BusinessUnitName));
+                }
+            }
+        });
+    }
+
+    function LoadBuyerList() {
+        $('#buyersName').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("AllBuyerList", "Exception")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "GET",
+            async: true,
+            success: function (data) {
+                $('#buyersName').empty();
+                $('#buyersName').append("<option value='0'>--Select A Buyer --</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#buyersName").append($("<option></option>").val(data[i].BuyerId)
+                        .html(data[i].BuyerName));
+                }
+            }
+        });
+    }
+
+    function LoadForwarders() {
+        $('#forwaredrsName').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadForwarders", "Exception")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "GET",
+            async: true,
+            success: function (data) {
+                $('#forwaredrsName').empty();
+                $('#forwaredrsName').append("<option value='0'>--Select A Forwarder --</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#forwaredrsName").append($("<option></option>").val(data[i].ForwarderId)
+                        .html(data[i].Name));
+                }
+            }
+        });
+    }
+
+    function addNewInputField() {
+
+        tBody = $('#pOTableBody');
+        tBody.append(`<tr id="">
+                    <td><input type="checkbox" class="custom-checkbox" onchange="rowSelected(this)" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td class="parentPO"></td>
+                    <td>
+                        <select class="form-control">
+                            <option value="0">--Select Mode Of Shipment--</option>
+                            <option value="1">Air</option>
+                            <option value="2">Sea & Air</option>
+                        </select>
+                    </td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td>
+                        <select class="form-control countryOfDestination">
+                            <option value="0">--Select Country Of Destination--</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control">
+                            <option value="0">--Select Incoterm--</option>
+                            <option value="1">EXW</option>
+                            <option value="2">FCA</option>
+                            <option value="3">CPT</option>
+                            <option value="4">CIP</option>
+                            <option value="5">DAT</option>
+                            <option value="6">DAP</option>
+                            <option value="7">DDP</option>
+                            <option value="8">FAS</option>
+                            <option value="9">FOB</option>
+                            <option value="10">CFT</option>
+                            <option value="11">CIF</option>
+                        </select>
+                    </td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="number" class="form-control" /></td>
+                    <td><input type="number" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="date" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="number" class="form-control" /></td>
+                    <td><input type="text" class="form-control" onchange="ConvertUsdToBDT(this)" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="date" class="form-control" /></td>
+                    <td><input type="date" class="form-control" /></td>
+                    <td><input type="date" class="form-control" /></td>
+                    <td><input type="date" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><button onclick="fileUploadBtnClick(this)" class="btn btn-primary"><i class="fa fa-file"></i></button><input type="file" multiple  style="display: none;" id="airFreightFileUpload" onchange="FileUploadOnChange()" /></td>
+                    <td style="white-space: nowrap;"></td>
+                </tr>`);
+        loadCountryDropdown();
+    }
+
+    function loadCountryDropdown() {
+        var urlPath = 'https://restcountries.eu/rest/v2/all';
+        $.ajax({
+            type: 'GET',
+            url: urlPath,
+            dataType: 'json',
+            success: function (datas) {
+                select = $('.countryOfDestination');
+                select.empty();
+                select.append('<option value="0">--Select Country Of Destination--</option>');
+                datas.forEach(function (data) {
+                    select.append(`<option value="` + data.callingCodes + `" >` + data.name + `</option>`);
+                });
+            }
+        });
+    }
+
+    function loadERData() {
+        let bn = $('#buyersName').val();
+        let bu = $('#businessUnit').val();
+        let fciaf = $('#frieghtCostOnAcOf').val();
+
+        if (bn > 0 && bu > 0 && fciaf == 2) {
+            var urlPath = '@Url.Action("loadERData", "Exception")';
+            $.ajax({
+                type: 'GET',
+                url: urlPath,
+                dataType: 'json',
+                data: {
+                    buyerId: bn,
+                    businessUnitId: bu
+                },
+                success: function (datas) {
+                    select = $('#ER');
+                    select.empty();
+                    select.append('<option value="0">--Select An ER--</option>');
+                    datas.forEach(function (data) {
+                        select.append(`<option value="` + data.ExceptionMasterId + `">` + data.ExceptionMasterId + `</option>`);
+                    });
+                }
+            });
+
+            $('#erInfoSection').show();
+        }
+
+        else if (bn > 0 && bu > 0 && fciaf == 1) {
+            $('#erInfoSection').hide();
+            $('#pOTableBody').empty();
+            addNewInputField();
+        }
+
+        else {
+            $('#erInfoSection').hide();
+            $('#pOTableBody').empty();
+        }
+    }
+
+    function loadERDetails() {
+        let ERId = $('#ER').val();
+        var urlPath = '@Url.Action("LoadDataAgainstERId", "Exception")';
+        $.ajax({
+            type: 'GET',
+            url: urlPath,
+            dataType: 'json',
+            data: {
+                id: ERId
+            },
+            success: function (datas) {
+                tBody = $('#pOTableBody');
+                tBody.empty();
+                $('#ERDate').val(datas.CreateDate);
+                datas.ExpgenaralInfoList.forEach(function (data) {
+                    tBody.append(`<tr>
+                    <td><input type="checkbox" class="custom-checkbox" onchange="rowSelected(this)" /></td>
+                    <td>` + data.PO + `</td>
+                    <td class="parentPO"></td>
+                    <td>
+                        <select class="form-control">
+                            <option value="0">--Select Mode Of Shipment--</option>
+                            <option value="1">Air</option>
+                            <option value="2">Sea & Air</option>
+                        </select>
+                    </td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td>
+                        <select class="form-control countryOfDestination">
+                            <option value="0">--Select Country Of Destination--</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control">
+                            <option value="0">--Select Incoterm--</option>
+                            <option value="1">EXW</option>
+                            <option value="2">FCA</option>
+                            <option value="3">CPT</option>
+                            <option value="4">CIP</option>
+                            <option value="5">DAT</option>
+                            <option value="6">DAP</option>
+                            <option value="7">DDP</option>
+                            <option value="8">FAS</option>
+                            <option value="9">FOB</option>
+                            <option value="10">CFT</option>
+                            <option value="11">CIF</option>
+                        </select>
+                    </td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="number" class="form-control" /></td>
+                    <td><input type="number" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="date" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="number" class="form-control" /></td>
+                    <td><input type="text" onchange="ConvertUsdToBDT(this)" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><input type="date" class="form-control" /></td>
+                    <td><input type="date" class="form-control" /></td>
+                    <td><input type="date" class="form-control" /></td>
+                    <td><input type="date" class="form-control" /></td>
+                    <td><input type="text" class="form-control" /></td>
+                    <td><button onclick="fileUploadBtnClick(this)" class="btn btn-primary"><i class="fa fa-file"></i></button><input type="file" multiple  style="display: none;" id="airFreightFileUpload" onchange="FileUploadOnChange()" /></td>
+                    <td style="white-space: nowrap;"></td>
+                </tr>`);
+                    loadCountryDropdown();
+                });
+            }
+        });
+    }
+
+    function submitDataForBuyer() {
+        let poList = [];
+        $("#pOTableBody tr").each(function () {
+            let currentRow = $(this).closest("tr");
+            let TempAttachments = [];
+            let attachmentCol = currentRow.find("td:eq(27)");
+            for (i = 4; i <= attachmentCol.children().length; i += 4) {
+                TempAttachments.push(
+                    {
+                        FileName: attachmentCol.children("a:nth-child(" + i + ")").text(),
+                        FilePath: attachmentCol.children("a:nth-child(" + (++i) + ")").text(),
+                        ShortPath: attachmentCol.children("a:nth-child(" + (++i) + ")").text(),
+                        ServerFileName: attachmentCol.children("a:nth-child(" + (++i) + ")").text()
+                    }
+                );
+            }
+
+            poList.push(
+                {
+                    PO: currentRow.find("td:eq(1) input").val(),
+                    ParentPO: currentRow.find("td:eq(2)").text(),
+                    ModeOfShipmentId: currentRow.find("td:eq(3) select").val(),
+                    PortOfDestination: currentRow.find("td:eq(4) input").val(),
+                    CountryOfDestination: currentRow.find("td:eq(5) select option:selected").text(),
+                    IncotermId: currentRow.find("td:eq(6) select").val(),
+                    InvoiceNo: currentRow.find("td:eq(7) input").val(),
+                    InvoiceValueInUSD: currentRow.find("td:eq(8) input").val(),
+                    QTYInPack: currentRow.find("td:eq(9) input").val(),
+                    QTYInPc: currentRow.find("td:eq(10) input").val(),
+                    GrossWeightInKg: currentRow.find("td:eq(11) input").val(),
+                    HAWBLNo: currentRow.find("td:eq(12) input").val(),
+                    HAWBLDate: currentRow.find("td:eq(13) input").val(),
+                    ChargeableWeightInKgERApproved: currentRow.find("td:eq(14) input").val(),
+                    FreightAmountInUSDErApproved: currentRow.find("td:eq(15) input").val(),
+                    ChargeableWeightInKg: currentRow.find("td:eq(16) input").val(),
+                    FreightAmountInUSD: currentRow.find("td:eq(17) input").val(),
+                    FrieghtRatePerKgERApproved: currentRow.find("td:eq(18) input").val(),
+                    FreightAmountInBDT: currentRow.find("td:eq(19) input").val(),
+                    FreightInvoiceNo: currentRow.find("td:eq(20) input").val(),
+                    FreightInvoiceReceivedDate: currentRow.find("td:eq(21) input").val(),
+                    BillSubDateForPayment: currentRow.find("td:eq(22) input").val(),
+                    CHQPOSubmitDateToForwarder: currentRow.find("td:eq(23) input").val(),
+                    AwabReleaseDate: currentRow.find("td:eq(24) input").val(),
+                    Remarks: currentRow.find("td:eq(25) input").val(),
+                    AirFreightFiles: TempAttachments
+                }
+            );
+        });
+
+        var urlPath = '@Url.Action("AirFreightInfoSaveForSQ", "Exception")';
+            $.ajax({
+                type: 'POST',
+                url: urlPath,
+                dataType: 'json',
+                data: {
+                    BuyersNameId: $('#buyersName').val(),
+                    BusinessUnitId: $('#businessUnit').val(),
+                    ForwarderId: $('#forwaredrsName').val(),
+                    FrieghtCostOnACOf: $('#frieghtCostOnAcOf').val(),
+                    AirFreightDetails: poList
+                },
+                success: function (data) {
+                    if (data.isSuccess) {
+                        swal({
+                            title: "Success!",
+                            text: "Information saved.",
+                            type: "success",
+                            button: "OK"
+                        });
+                    }
+                    else {
+                        swal({
+                            title: "Error!",
+                            text: "Something went wrong, Please try again.",
+                            type: "error",
+                            button: "OK"
+                        });
+                    }
+                }
+            });
+    }
+
+    function submitDataForSQ() {
+        let poList = [];
+        $("#pOTableBody tr").each(function () {
+            let currentRow = $(this).closest("tr");
+            let TempAttachments = [];
+            let attachmentCol = currentRow.find("td:eq(27)");
+            for (i = 4; i <= attachmentCol.children().length; i += 4) {
+                TempAttachments.push(
+                    {
+                        FileName: attachmentCol.children("a:nth-child(" + i + ")").text(),
+                        FilePath: attachmentCol.children("a:nth-child(" + (++i) + ")").text(),
+                        ShortPath: attachmentCol.children("a:nth-child(" + (++i) + ")").text(),
+                        ServerFileName: attachmentCol.children("a:nth-child(" + (++i) + ")").text()
+                    }
+                );
+            }
+
+            poList.push(
+                {
+                    PO: currentRow.find("td:eq(1)").text(),
+                    ParentPO: currentRow.find("td:eq(2)").text(),
+                    ModeOfShipment: currentRow.find("td:eq(3) select").val(),
+                    PortOfDestination: currentRow.find("td:eq(4) input").val(),
+                    CountryOfDestination: currentRow.find("td:eq(5) select option:selected").text(),
+                    Incoterm: currentRow.find("td:eq(6) select").val(),
+                    InvoiceNo: currentRow.find("td:eq(7) input").val(),
+                    InvoiceValueInUSD: currentRow.find("td:eq(8) input").val(),
+                    QTYInPack: currentRow.find("td:eq(9) input").val(),
+                    QTYInPc: currentRow.find("td:eq(10) input").val(),
+                    GrossWeightInKg: currentRow.find("td:eq(11) input").val(),
+                    HAWBLNo: currentRow.find("td:eq(12) input").val(),
+                    HAWBLDate: currentRow.find("td:eq(13) input").val(),
+                    ChargeableWeightInKgER: currentRow.find("td:eq(14) input").val(),
+                    FreightAmountInUSDER: currentRow.find("td:eq(15) input").val(),
+                    ChargeableWeightInKg: currentRow.find("td:eq(16) input").val(),
+                    FreightAmountInUSD: currentRow.find("td:eq(17) input").val(),
+                    FreightRatePerKgER: currentRow.find("td:eq(18) input").val(),
+                    FreightAmountInBDT: currentRow.find("td:eq(19) input").val(),
+                    FreightInvoiceNo: currentRow.find("td:eq(20) input").val(),
+                    FreightInvoiceReceivedDate: currentRow.find("td:eq(21) input").val(),
+                    BillSubDateForPayment: currentRow.find("td:eq(22) input").val(),
+                    CHQPOSubmitDateToForwarder: currentRow.find("td:eq(23) input").val(),
+                    AwabReleaseDate: currentRow.find("td:eq(24) input").val(),
+                    Remarks: currentRow.find("td:eq(25) input").val(),
+                    AirFreightFiles: TempAttachments
+                }
+            );
+        });
+
+        var urlPath = '@Url.Action("AirFreightInfoSaveForSQ", "Exception")';
+            $.ajax({
+                type: 'POST',
+                url: urlPath,
+                dataType: 'json',
+                data: {
+                    ExceptionMasterId: $('#ER').val(),
+                    BuyersNameId: $('#buyersName').val(),
+                    BusinessUnitId: $('#businessUnit').val(),
+                    ForwarderId: $('#forwaredrsName').val(),
+                    FrieghtCostOnACOf: $('#frieghtCostOnAcOf').val(),
+                    AirFreightDetails: poList
+                },
+                success: function (data) {
+                    if (data.isSuccess) {
+                        swal({
+                            title: "Success!",
+                            text: "Information saved.",
+                            type: "success",
+                            button: "OK"
+                        });
+                    }
+                    else {
+                        swal({
+                            title: "Error!",
+                            text: "Something went wrong, Please try again.",
+                            type: "error",
+                            button: "OK"
+                        });
+                    }
+                }
+            });
+    }
+
+    function submitDataForMod() {
+        let poList = [];
+        $("#pOTableBody tr").each(function () {
+            let currentRow = $(this).closest("tr");
+            let TempAttachments = [];
+            let attachmentCol = currentRow.find("td:eq(27)");
+            for (i = 4; i <= attachmentCol.children().length; i += 4) {
+                TempAttachments.push(
+                    {
+                        FileName: attachmentCol.children("a:nth-child(" + i + ")").text(),
+                        FilePath: attachmentCol.children("a:nth-child(" + (++i) + ")").text(),
+                        ShortPath: attachmentCol.children("a:nth-child(" + (++i) + ")").text(),
+                        ServerFileName: attachmentCol.children("a:nth-child(" + (++i) + ")").text()
+                    }
+                );
+            }
+
+            poList.push(
+                {
+                    AirFreightDetailsId: currentRow.find("td:eq(28)").text(),
+                    PO: currentRow.find("td:eq(1)").text(),
+                    ParentPO: currentRow.find("td:eq(2)").text(),
+                    ModeOfShipment: currentRow.find("td:eq(3) select").val(),
+                    PortOfDestination: currentRow.find("td:eq(4) input").val(),
+                    CountryOfDestination: currentRow.find("td:eq(5) select option:selected").text(),
+                    Incoterm: currentRow.find("td:eq(6) select").val(),
+                    InvoiceNo: currentRow.find("td:eq(7) input").val(),
+                    InvoiceValueInUSD: currentRow.find("td:eq(8) input").val(),
+                    QTYInPack: currentRow.find("td:eq(9) input").val(),
+                    QTYInPc: currentRow.find("td:eq(10) input").val(),
+                    GrossWeightInKg: currentRow.find("td:eq(11) input").val(),
+                    HAWBLNo: currentRow.find("td:eq(12) input").val(),
+                    HAWBLDate: currentRow.find("td:eq(13) input").val(),
+                    ChargeableWeightInKgER: currentRow.find("td:eq(14) input").val(),
+                    FreightAmountInUSDER: currentRow.find("td:eq(15) input").val(),
+                    ChargeableWeightInKg: currentRow.find("td:eq(16) input").val(),
+                    FreightAmountInUSD: currentRow.find("td:eq(17) input").val(),
+                    FreightRatePerKgER: currentRow.find("td:eq(18) input").val(),
+                    FreightAmountInBDT: currentRow.find("td:eq(19) input").val(),
+                    FreightInvoiceNo: currentRow.find("td:eq(20) input").val(),
+                    FreightInvoiceReceivedDate: currentRow.find("td:eq(21) input").val(),
+                    BillSubDateForPayment: currentRow.find("td:eq(22) input").val(),
+                    CHQPOSubmitDateToForwarder: currentRow.find("td:eq(23) input").val(),
+                    AwabReleaseDate: currentRow.find("td:eq(24) input").val(),
+                    Remarks: currentRow.find("td:eq(25) input").val(),
+                    AirFreightFiles: TempAttachments
+                }
+            );
+        });
+
+        var urlPath = '@Url.Action("AirFreightInfoSaveForMod", "Exception")';
+            $.ajax({
+                type: 'POST',
+                url: urlPath,
+                dataType: 'json',
+                data: {
+                    AirFreightMasterId: AirFreightMasterId,
+                    ExceptionMasterId: ExceptionMasterId,
+                    BuyersNameId: $('#buyersName').val(),
+                    BusinessUnitId: $('#businessUnit').val(),
+                    ForwarderId: $('#forwaredrsName').val(),
+                    FrieghtCostOnACOf: $('#frieghtCostOnAcOf').val(),
+                    AirFreightDetails: poList
+                },
+                success: function (data) {
+                    if (data.isSuccess) {
+                        swal({
+                            title: "Success!",
+                            text: "Information saved.",
+                            type: "success",
+                            button: "OK"
+                        });
+                    }
+                    else {
+                        swal({
+                            title: "Error!",
+                            text: "Something went wrong, Please try again.",
+                            type: "error",
+                            button: "OK"
+                        });
+                    }
+                }
+            });
+    }
+
+    function fileUploadBtnClick(r) {
+        $('#airFreightFileUpload').click();
+        currentRow = $(r).closest("tr");
+    }
+
+    function FileUploadOnChange() {
+        var fileData = new FormData();
+        var fileUpload = $("#airFreightFileUpload").prop('files');
+            if (fileUpload.length>0) {
+                for (var i = 0; i < fileUpload.length; i++) {
+                    if (fileUpload[i].size > 2097152) {
+                        alert("File is too big! Select a file under 2MB.");
+                        break;
+                    }
+                    fileData.append(fileUpload[i].name, fileUpload[i]);
+                 }
+        }
+        var urlpath = '@Url.Action("ExceptionFileUpload", "Exception")';
+        $.ajax({
+            url: urlpath,
+            type: "post",
+            processData: false,
+            contentType: false,
+            data: fileData  ,
+            success: function (result) {
+                for (var i = 0; i < result.length; i++) {
+                    var select = currentRow.find("td:eq(27)");
+                    select.append('<a href="' + result[i].ShortPath + '" download>' + result[i].CapexFileName + '</a> <a class="attachmentRemoveButton" onclick="DeleteFile(this,\'' + result[i].ServerFileName + '\')" ><i class="fa fa-times"></i></a><br><a style="display:none;">' + result[i].CapexFileName + '</a><a style="display:none;">' + result[i].CapexFilePath + '</a><a style="display:none;">' + result[i].ShortPath + '</a><a style="display:none;">' + result[i].ServerFileName +'</a>');
+                }
+                $("#airFreightFileUpload").val('');
+            },
+            error: function (err) {
+                alert(err.responseText);
+            }
+        });
+    }
+
+    function DeleteFile(r, filePath) {
+       var urlpath = '@Url.Action("DeleteFiles", "Exception")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { FilePath: filePath },
+            async: true,
+            success: function (data) {
+                let select = $(r).prev();
+                let nextItems = $(r).nextAll().slice(0, 5);
+                select.remove();
+                $(r).remove();
+                nextItems.remove();
+            }
+        });
+    }
+
+    function ConvertUsdToBDT(_this) {
+        let cRow = $(_this).closest("tr");
+        let USDVal = cRow.find("td:eq(17) input").val();
+        let xrate = $('#USDToBDTRate').val();
+
+        cRow.find("td:eq(19) input").val(roundToTwo(USDVal * xrate));
+
+    }
+
+    function roundToTwo(num) {
+        return +(Math.round(num + "e+2") + "e-2");
+    }
+
+    function rowSelected(r) {
+        if ($("#POListTable tr td input[type='checkbox']:checked").length >= 1) {
+            $('#addNewChildPOButton').show();
+        }
+        else {
+            $('#addNewChildPOButton').hide();
+        }
+
+        let cRow = $(r).closest("tr");
+    }
+
+    function loadMasterDataForModification() {
+        var urlpath = '@Url.Action("loadMasterDataForModification", "Exception")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "GET",
+            async: true,
+            data: {
+                id: AirFreightMasterId
+            },
+            success: function (data) {
+                console.log(data);
+                $('#businessUnit').val(data.BusinessUnitId);
+                $('#buyersName').val(data.BuyersNameId);
+                $('#forwaredrsName').val(data.ForwarderId);
+                ExceptionMasterId = data.ExceptionMasterId;
+                var adfjksdbn = data.ExceptionMasterId > 0 ? 2 : 1;
+
+                //$('#frieghtCostOnAcOf').attr('type', 'text');
+                $('#frieghtCostOnAcOf').attr('disabled', 'disabled');
+                $('#frieghtCostOnAcOf').val(adfjksdbn);
+
+                if (adfjksdbn == 2) {
+                    $('#erInfoSection').show();
+                    loadERData();
+                    $('#ER').attr('disabled', 'disabled');
+                    $('#ER').val(data.ExceptionMasterId);
+                    loadErDate(data.ExceptionMasterId);
+                }
+
+                tBody = $('#pOTableBody');
+                tBody.empty();
+                data.AirFreightDetails.forEach(function (subData) {
+                    tBody.append(`<tr>
+                    <td><input type="checkbox" class="custom-checkbox" onchange="rowSelected(this)" /></td>
+                    <td>` + subData.PO + `</td>
+                    <td class="parentPO"></td>
+                    <td>
+                        <select id="`+ subData.PO +`modeOfShipment" class="form-control">
+                            <option value="0">--Select Mode Of Shipment--</option>
+                            <option value="1">Air</option>
+                            <option value="2">Sea & Air</option>
+                        </select>
+                    </td>
+                    <td><input type="text" class="form-control" value="`+ subData.PortOfDestination +`" /></td>
+                    <td>
+                        <select id="`+ subData.PO +`countryOfDestination" class="form-control countryOfDestination">
+                            <option value="0">--Select Country Of Destination--</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select id="`+ subData.PO +`incoterm" class="form-control">
+                            <option value="0">--Select Incoterm--</option>
+                            <option value="1">EXW</option>
+                            <option value="2">FCA</option>
+                            <option value="3">CPT</option>
+                            <option value="4">CIP</option>
+                            <option value="5">DAT</option>
+                            <option value="6">DAP</option>
+                            <option value="7">DDP</option>
+                            <option value="8">FAS</option>
+                            <option value="9">FOB</option>
+                            <option value="10">CFT</option>
+                            <option value="11">CIF</option>
+                        </select>
+                    </td>
+                    <td><input type="text" class="form-control" value="`+ subData.InvoiceNo +`" /></td>
+                    <td><input type="text" class="form-control" value="`+ subData.InvoiceValueInUSD +`" /></td>
+                    <td><input type="number" class="form-control" value="`+ subData.QTYInPack +`" /></td>
+                    <td><input type="number" class="form-control" value="`+ subData.QtyInPc +`" /></td>
+                    <td><input type="text" class="form-control" value="`+ subData.GrossWeightInKg +`" /></td>
+                    <td><input type="text" class="form-control" value="`+ subData.HAWBLNo +`" /></td>
+                    <td><input type="date" class="form-control" value="`+ subData.HAWBLDate +`" /></td>
+                    <td><input type="text" class="form-control" value="`+ subData.ChargeableWeightInKgERApproved +`" /></td>
+                    <td><input type="text" class="form-control" value="`+ subData.FreightAmountInUSDErApproved +`" /></td>
+                    <td><input type="number" class="form-control" value="`+ subData.ChargeableWeightInKg +`" /></td>
+                    <td><input type="text" onchange="ConvertUsdToBDT(this)" class="form-control" value="`+ subData.FreightAmountInUSD +`" /></td>
+                    <td><input type="text" class="form-control" value="`+ subData.FrieghtRatePerKgERApproved +`" /></td>
+                    <td><input type="text" class="form-control" value="`+ subData.FreightAmountInBDT +`" /></td>
+                    <td><input type="text" class="form-control" value="`+ subData.FreightInvoiceNo +`" /></td>
+                    <td><input type="date" class="form-control" value="`+ subData.FreightInvoiceReceivedDate +`" /></td>
+                    <td><input type="date" class="form-control" value="`+ subData.BillSubDateForPayment +`" /></td>
+                    <td><input type="date" class="form-control" value="`+ subData.CHQPOSubmitDateToForwarder +`" /></td>
+                    <td><input type="date" class="form-control" value="`+ subData.AWABReleaseDate +`" /></td>
+                    <td><input type="text" class="form-control" value="`+ subData.Remarks +`" /></td>
+                    <td><button onclick="fileUploadBtnClick(this)" class="btn btn-primary"><i class="fa fa-file"></i></button><input type="file" multiple  style="display: none;" id="airFreightFileUpload" onchange="FileUploadOnChange()" /></td>
+                    <td style="white-space: nowrap;"></td>
+                    <td class="airFreightDetailsId">` + subData.AirFreightDetailsId + `</td>
+                </tr>`);
+
+                    let modeOfShipMentEl = '#' + subData.PO + 'modeOfShipment';
+                    let incotermEl = '#' + subData.PO + 'incoterm';
+
+                    $(modeOfShipMentEl).val(subData.ModeOfShipmentId);
+                    $(incotermEl).val(subData.IncotermId);
+                });
+            }
+        });
+    }
+
+    function loadErDate(ERId) {
+        var urlPath = '@Url.Action("LoadDataAgainstERId", "Exception")';
+        $.ajax({
+            type: 'GET',
+            url: urlPath,
+            dataType: 'json',
+            data: {
+                id: ERId
+            },
+            success: function (datas) {
+                $('#ERDate').val(datas.CreateDate);
+            }
+        });
+    }
+
+</script>
+
+

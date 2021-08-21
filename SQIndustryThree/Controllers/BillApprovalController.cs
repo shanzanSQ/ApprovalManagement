@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Script.Serialization;
 
 namespace SQIndustryThree.Controllers
 {
@@ -60,11 +61,75 @@ namespace SQIndustryThree.Controllers
 
             //ViewBag.POList = billAprrovalPoDetails
 
-            //List<BillAprrovalPoDetails> billAprrovalPoDetails= JsonConvert.DeserializeObject<List<BillAprrovalPoDetails>>(datalist.ToString());
+           // var dt = _BasicUtilities.ToDataTable(billAprrovalPoDetails);
+
+            //List<BillAprrovalPoDetails> billPoDetails= JsonConvert.DeserializeObject<List<BillAprrovalPoDetails>>(billAprrovalPoDetails.ToString());
             //return RedirectToAction("POUploadInterface", "BillApproval");
-            //return Json(billDal.BillApprovalDatabase(billAprrovalPoDetails, userid),JsonRequestBehavior.AllowGet);
+            //return Json(billDal.BillApprovalDatabase(billAprrovalPoDetails, userid), JsonRequestBehavior.AllowGet);
             return PartialView("_ExcelPartialView", billAprrovalPoDetails);
         }
+
+        [HttpPost]
+        public ActionResult UploadWFXFiletoDataBase(List<BillAprrovalPoDetails> billAprrovalPoDetails)
+        {
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+
+            int userid = Convert.ToInt32(Session["SQuserId"]);
+
+            var all = billAprrovalPoDetails.Select(s => s.PONumber).ToList();
+            object result = "";
+
+           // var bill = new BillAprrovalPoDetails();
+
+            for (int i = 0; i < all.Count; i++)
+            {
+                var poNumber = billAprrovalPoDetails.Select(p => new { p.PONumber, p.SupllierName, p.POCreationDate, p.DateInhouse, p.Status }).Distinct().ToList();
+
+                var POcheck = billDal.POUniqueNumber(billAprrovalPoDetails[i].PONumber);
+
+                
+
+                if (POcheck.Rows.Count == 0)
+                {
+                    var totalPOQty = billAprrovalPoDetails.Where(s => s.PONumber == billAprrovalPoDetails[i].PONumber).Sum(s => s.POQty);
+                    var totalPOValue = billAprrovalPoDetails.Where(s => s.PONumber == billAprrovalPoDetails[i].PONumber).Sum(s => s.PoValue);
+                    int currency = 16;
+                    //var poNumber = billAprrovalPoDetails.Select(p => p.PONumber).Distinct().ToList();
+
+
+                    // var primarykey = billDal.POMasterInsert(billAprrovalPoDetails[0].PONumber, billAprrovalPoDetails[0].SupllierName, currency, totalPOQty, totalPOValue, item.POCreationDate, item.DateInhouse, item.Status, userid);
+
+
+
+
+                    foreach (var item in poNumber)
+                    {
+                        var primarykey = billDal.POMasterInsert(item.PONumber, item.SupllierName, currency, totalPOQty, totalPOValue, item.POCreationDate, item.DateInhouse, item.Status, userid);
+                        result = primarykey.pk;
+
+                           var detail = billAprrovalPoDetails.Where(s => s.PONumber == item.PONumber).ToList();
+                            foreach (var data in detail)
+                            {
+                            //var dataVar = data;
+                            var PODetailsInsert = billDal.PODetailsInsert(Convert.ToInt64(result), data.PONumber, data.ArticleName, data.ArticleCode, data.ColorName, data.SizeName, data.UOM, data.POQty, data.Rate, data.PoValue);
+                            }
+                    }
+
+                    // primarykey = billDal.POMasterInsert(item.PONumber, item.SupllierName, currency, totalPOQty, totalPOValue, item.POCreationDate, item.DateInhouse, item.Status, userid);
+
+
+
+                }
+            }
+
+            var json = new JavaScriptSerializer().Serialize(billAprrovalPoDetails);
+
+            return PartialView("_ExcelPartialView", billAprrovalPoDetails);
+        }
+
         [HttpPost]
         public ActionResult GetBillApprovalPolist(int Status)
         {
@@ -76,6 +141,8 @@ namespace SQIndustryThree.Controllers
             //List<BillAprrovalPoDetails> billAprrovalPoDetails= JsonConvert.DeserializeObject<List<BillAprrovalPoDetails>>(datalist.ToString());
             return Json(billDal.GetAllBillAPpprovalPo(Status), JsonRequestBehavior.AllowGet);
         }
+
+
         [HttpPost]
         public ActionResult GetIndividualPODetails(int PoMasterKey,int BUnit,int CatKey)
         {
@@ -348,6 +415,28 @@ namespace SQIndustryThree.Controllers
             {
                 int userID = Convert.ToInt32(base.Session["SQuserId"].ToString());
                 DataTable dt = billDal.SupplierList(userID);
+                //   List<Dictionary<string, object>>
+                List<Dictionary<string, object>> _List = _BasicUtilities.GetTableRows(dt);
+
+                return Json(_List);
+            }
+            catch (Exception ex)
+            {
+                return Json(ex.Message);
+            }
+        }
+
+        public ActionResult SupplierListForBill()
+        {
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+
+            try
+            {
+                
+                DataTable dt = billDal.SupplierList(0);
                 //   List<Dictionary<string, object>>
                 List<Dictionary<string, object>> _List = _BasicUtilities.GetTableRows(dt);
 
@@ -1052,9 +1141,60 @@ namespace SQIndustryThree.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
+        public ActionResult DcFileUpload()
+        {
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+            List<DocumentCenterFileUpload> fileuploadList = new List<DocumentCenterFileUpload>();
+            if (Request.Files.Count > 0)
+            {
+                var files = Request.Files;
+                foreach (string str in files)
+                {
+                    HttpPostedFileBase file = Request.Files[str] as HttpPostedFileBase;
+                    //Checking file is available to save.  
+                    if (file != null)
+                    {
+                        var currentmilse = DateTime.Now.Ticks;
+                        var InputFileName = Path.GetFileNameWithoutExtension(file.FileName);
+                        var InputFileExtention = Path.GetExtension(file.FileName);
+                        var FullFileWithext = InputFileName + currentmilse + InputFileExtention;
+                        var ServerSavePath = Path.Combine(Server.MapPath("~/DocumentCenter/") + FullFileWithext);
+                        //Save file to server folder  
+                        file.SaveAs(ServerSavePath);
+                        DocumentCenterFileUpload fileUploadModel = new DocumentCenterFileUpload();
+                        fileUploadModel.FileName = file.FileName.ToString();
+                        fileUploadModel.FilePath = ServerSavePath;
+                        fileUploadModel.ServerFileName = FullFileWithext;
+                        fileuploadList.Add(fileUploadModel);
+                    }
+                }
+            }
+            return Json(fileuploadList, JsonRequestBehavior.AllowGet);
+        }
+
+        public FileResult DcDownloadFile(string filepath, string filename)
+        {
+            //string name = Path.GetFileName(filename);
+            //var ServerSavePath = Path.Combine(Server.MapPath("~/Uploads/") + name);
+            //return File(ServerSavePath, "image/png");
+            byte[] fileBytes = System.IO.File.ReadAllBytes(filepath);
+            string fileName = filename;
+            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, Path.GetFileName(filepath));
+
+            //string fname = Path.GetFileName(filename);
+            //Response.ContentType = "application/octet-stream";
+            //Response.AppendHeader("Content-Disposition", "attachment;filename=" + fname);
+            //string aaa = Server.MapPath("~/Uploads/" + fname);
+            //Response.TransmitFile(Server.MapPath("~/Uploads/" + fname));
+            //Response.End();
+        }
+
 
         public ActionResult BillApproveOrReject(string CommentText, int Progress, int RequestorId, string invoiceDetailKey, string verifyQty, string verifyValue,
-            List<GRNFileUploadDetails> gRNFiles, List<POFileUploadDetails> poFiles, List<BillFileUploadDetails> billFiles, int ProcurementUserId, int CapexInfoId, int CostCenterId)
+            List<GRNFileUploadDetails> gRNFiles, List<POFileUploadDetails> poFiles, List<BillFileUploadDetails> billFiles, List<DocumentCenterFileUpload> billDocList, int ProcurementUserId, int CapexInfoId, int CostCenterId)
         {
             if (base.Session["SQuserId"] == null)
             {
@@ -1069,7 +1209,7 @@ namespace SQIndustryThree.Controllers
             List<string> verifyQtyList = verifyQtyTrim.Split(',').ToList();
             List<string> verifyValueList = verifyValueTrim.Split(',').ToList();
 
-            var approvalInfo = this.billDal.BillApproveOrReject(Progress, CommentText, userID, RequestorId, gRNFiles,poFiles,billFiles, ProcurementUserId, CapexInfoId, CostCenterId);
+            var approvalInfo = this.billDal.BillApproveOrReject(Progress, CommentText, userID, RequestorId, gRNFiles,poFiles,billFiles, billDocList, ProcurementUserId, CapexInfoId, CostCenterId);
             if (invoiceDetailKeyList != null)
             {
                 for (int i = 0; i < invoiceDetailKeyList.Count; i++)
@@ -1203,6 +1343,90 @@ namespace SQIndustryThree.Controllers
 
         }
 
+        public ActionResult ApprovedBillListJson(int supplierId)
+        {
+
+            if (base.Session["SQuserId"] == null)
+            {
+                return base.RedirectToAction("Index", "Account");
+            }
+
+            try
+            {
+                int userID = Convert.ToInt32(base.Session["SQuserId"].ToString());
+                DataTable dt = billDal.ApprovedInvoiceList(supplierId);
+                //   List<Dictionary<string, object>>
+                List<Dictionary<string, object>> _List = _BasicUtilities.GetTableRows(dt);
+
+                //ViewBag.ApprovedBillList = _List;
+
+                return Json(_List);
+            }
+            catch (Exception ex)
+            {
+                return Json(ex.Message);
+            }
+
+        }
+
+        public ActionResult SupplierWiseInvoiceSearch(int supplierId, string search)
+        {
+
+            if (base.Session["SQuserId"] == null)
+            {
+                return base.RedirectToAction("Index", "Account");
+            }
+
+            try
+            {
+                int userID = Convert.ToInt32(base.Session["SQuserId"].ToString());
+                DataTable dt = billDal.SupplierWiseInvoiceSearch(supplierId, search);
+                //   List<Dictionary<string, object>>
+                List<Dictionary<string, object>> _List = _BasicUtilities.GetTableRows(dt);
+
+                //ViewBag.ApprovedBillList = _List;
+
+                return Json(_List);
+            }
+            catch (Exception ex)
+            {
+                return Json(ex.Message);
+            }
+
+        }
+
+
+        [HttpPost]
+        public ActionResult GetApprovedPOFromInvoice(int supplierId, string invoiceKey)
+        {
+
+            if (base.Session["SQuserId"] == null)
+            {
+                return base.RedirectToAction("Index", "Account");
+            }
+
+            try
+            {
+                var invoiceTrim = invoiceKey.TrimEnd(',');
+                var invoiceList = invoiceTrim.Split(',').ToList();
+                string joined = string.Join(",", invoiceList);
+
+                int userID = Convert.ToInt32(base.Session["SQuserId"].ToString());
+                DataTable dt = billDal.GetApprovedPOFromInvoice(supplierId, invoiceTrim);
+                //   List<Dictionary<string, object>>
+                List<Dictionary<string, object>> _List = _BasicUtilities.GetTableRows(dt);
+
+                //ViewBag.ApprovedBillList = _List;
+
+                return Json(_List);
+            }
+            catch (Exception ex)
+            {
+                return Json(ex.Message);
+            }
+
+        }
+
         public ActionResult ChequeInfoModalView(int MasterID, string ViewName, int Status)
         {
             if (base.Session["SQuserId"] == null)
@@ -1214,6 +1438,22 @@ namespace SQIndustryThree.Controllers
 
 
             return this.PartialView(ViewName, chequeInfo);
+        }
+
+        public ActionResult APTransationModalView(string ViewName)
+        {
+            if (base.Session["SQuserId"] == null)
+            {
+                return base.RedirectToAction("Index", "Account");
+            }
+
+            //var chequeInfo = billDal.GetChequeInforamtion(MasterID);
+            var doctype = "Bill";
+            var dt = billDal.GETSERILANO(doctype);
+            DataRow row = dt.Rows[0];
+            ViewBag.SerialNo = row["LASTSERIALNO"].ToString();
+
+            return this.PartialView(ViewName);
         }
 
         public ActionResult ChequeStatusList()
@@ -1348,6 +1588,103 @@ namespace SQIndustryThree.Controllers
             }
         }
 
+        [HttpPost]
+        public ActionResult AllocationModalBeforeSubmit(BillAllocationMaster billAllocationMaster)
+        {
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+
+            int userID = Convert.ToInt32(Session["SQuserId"].ToString());
+            return PartialView("_allocationModalPreview", billAllocationMaster);
+        }
+
+
+        public ActionResult SaveBillAllocationRequest(BillAllocationMaster billRequestMaster)
+        {
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+
+            ResultResponse result = new ResultResponse();
+            int userID = Convert.ToInt32(Session["SQuserId"].ToString());
+
+            result = billDal.SaveBillAllocationRequest(billRequestMaster, userID);
+
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult ChequeUniqueNumber(string cheque)
+        {
+            bool status = false;
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+            DataTable chequeNo = null;
+            int userID = Convert.ToInt32(Session["SQuserId"].ToString());
+
+            if (!string.IsNullOrEmpty(cheque))
+            {
+                chequeNo = billDal.chequeUniqueNumber(cheque);
+
+                if (chequeNo.Rows.Count > 0)
+                {
+                    status = true;
+                }
+            } 
+
+            return Json(status);
+        }
+
+        public ActionResult ChequePaymentDetails(string ViewName)
+        {
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+
+            var dt_Result = billDal.ChequePaymentDetails();
+
+            List<Dictionary<string, object>> _ResultList = _BasicUtilities.GetTableRows(dt_Result);
+
+            ViewBag.ChequePayment = _ResultList;
+
+            return this.PartialView(ViewName);
+        }
+
+        public ActionResult BillReportDashboard()
+        {
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+
+            //var dt_Result = billDal.BillDashboard(SupplierId, UnitId);
+            //List<Dictionary<string, object>> _ResultList = _BasicUtilities.GetTableRows(dt_Result);
+
+            //ViewBag.Billdashboard = _ResultList;
+
+            return View();
+        }
+
+
+        public ActionResult BillDashboardReportList(string SupplierId, string UnitId)
+        {
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+
+            var dt_Result = billDal.BillDashboard(SupplierId, UnitId);
+            List<Dictionary<string, object>> _ResultList = _BasicUtilities.GetTableRows(dt_Result);
+
+            ViewBag.Billdashboard = _ResultList;
+
+            return PartialView("_billReportAllList");
+        }
 
 
         #endregion

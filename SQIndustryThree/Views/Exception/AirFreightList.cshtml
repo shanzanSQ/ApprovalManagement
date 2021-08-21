@@ -1,0 +1,253 @@
+﻿
+@{
+    ViewBag.Title = "Air Frieght List";
+}
+
+<style>
+
+    @@media (min-width: 992px) {
+    .modal-lg {
+        width: 1250px;
+    }
+}
+    .modal-body {
+        font-size: 13px;
+        overflow-x: auto;
+    }
+</style>
+
+<div style="margin:0px 25px 0px 25px;">
+    <a href="/Exception/AirFreightDetailsPage" class="btn btn-primary" style="float:right;"><i class="fa fa-plus"></i> Add New</a>
+</div>
+
+<div style="min-height:550px; margin:40px 25px 0px 25px;">
+    
+    <table width="100%" cellpadding="5" cellspacing="0" border="1" id="airFreightDetailsTable" class="table table-striped">
+        <caption>Air Freight List</caption>
+        <thead>
+            <tr>
+                <th style="width:71px;">Tracking No</th>
+                <th style="width:90px;">Business Unit</th>
+                <th style="width:100px;">Buyers Name</th>
+                <th style="width:100px;">ER No</th>
+                <th>ER Date</th>
+                <th>Invoice No</th>
+                <th>Details</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="airFreightDetailsBody">
+            @*<tr>
+                <td>1</td>
+                <td>Birichina</td>
+                <td>H&M</td>
+                <td>12345678</td>
+                <td>05/07/2021</td>
+                <td>12345678</td>
+                <td><a href="#" onclick="showModal(1)" class="btn btn-primary">Details</a></td>
+                <td><a href="/Exception/AirFreightDetailsPage?id=1" class="btn btn-primary"><i class="fa fa-edit"></i></a></td>
+            </tr>*@
+        </tbody>
+    </table>
+
+    <div class="modal" id="detailsModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">PO List</h4>
+                </div>
+                <div id="detailsModalBody" class="modal-body">
+                    <table width="100%" cellpadding="5" cellspacing="0" border="1" id="detailsModalTable" class="table table-striped">
+                        <caption>PO Information</caption>
+                        <thead>
+                            <tr>
+                                <th style="min-width: 80px;">PO</th>
+                                <th style="min-width: 80px;">Parent PO</th>
+                                <th style="min-width: 90px;">Mode Of Shipment</th>
+                                <th style="min-width: 90px;">Port Of Destination</th>
+                                <th style="min-width: 90px;">Country Of Destination</th>
+                                <th style="min-width: 90px;">Incoterm</th>
+                                <th style="min-width: 90px;">Invoice No</th>
+                                <th style="min-width: 90px;">Invoice Value in USD</th>
+                                <th style="min-width: 90px;">QTY in pack</th>
+                                <th style="min-width: 90px;">QTY in PC</th>
+                                <th style="min-width: 90px;">Gross Weight In KG</th>
+                                <th style="min-width: 90px;">HAWBL No</th>
+                                <th style="min-width: 90px;">HAWBL Date</th>
+                                <th style="min-width: 126px;">Chargable Weight in KG (ER Approved)</th>
+                                <th style="min-width: 121px;">Freight Amount In USD (ER Approved)</th>
+                                <th style="min-width: 90px;">Chargable Weight in KG</th>
+                                <th style="min-width: 100px;">Freight Amount In USD</th>
+                                <th style="min-width: 113px;">Freight Rate Per KG (ER Approved)</th>
+                                <th style="min-width: 99px;">Freight Amount In BDT</th>
+                                <th style="min-width: 90px;">Freight Invoice No</th>
+                                <th style="min-width: 97px;">Freight Invoice Received Date</th>
+                                <th style="min-width: 105px;">Bill Submit Date for Payment</th>
+                                <th style="min-width: 115px;">CHQ/PO Submit Date to Forwarder</th>
+                                <th style="min-width: 90px;">AWAB Release Date</th>
+                                <th style="min-width: 90px;">Remarks</th>
+                                <th style="min-width: 90px;">Attachments</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailsModalTableBody">
+                            <tr>
+                                <td>123456</td>
+                                <td>Sea & Air</td>
+                                <td>Something</td>
+                                <td>Australia</td>
+                                <td>CPT</td>
+                                <td>123456</td>
+                                <td>23.50</td>
+                                <td>5</td>
+                                <td>10</td>
+                                <td>60</td>
+                                <td>123456</td>
+                                <td>07/05/2021</td>
+                                <td>45</td>
+                                <td>22</td>
+                                <td>34</td>
+                                <td>34</td>
+                                <td>21</td>
+                                <td>2345</td>
+                                <td>123456</td>
+                                <td>07/05/2021</td>
+                                <td>07/05/2021</td>
+                                <td>07/05/2021</td>
+                                <td>07/05/2021</td>
+                                <td>This is important</td>
+                                <td>Attachment1 Attachment2</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="modalCloseButton" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        loadAirFreightList();
+        //loadAirFreightDetailsData();
+    });
+
+    function loadAirFreightList() {
+        var urlPath = '@Url.Action("AllAirFreightList", "Exception")';
+        $.ajax({
+            type: 'GET',
+            url: urlPath,
+            dataType: 'json',
+            success: function (datas) {
+                table = $('#airFreightDetailsBody');
+                table.empty();
+                datas.forEach(function (data) {
+                    let ER = data.ExceptionMasterId == 0 ? '---' : data.ExceptionMasterId;
+                    table.append(`<tr>
+                                            <td>`+ data.AirFreightMasterId + `</td>
+                                            <td>`+ data.BusinessUnit + `</td>
+                                            <td>`+ data.BuyersName + `</td>
+                                            <td>`+ ER + `</td>
+                                            <td>`+ data.ERDate +`</td>
+                                            <td></td>
+                                            <td><a href="#" onclick="showModal(` + data.AirFreightMasterId + `)" class="btn btn-primary">Details</a></td>
+                                            <td><a href="/Exception/AirFreightDetailsPage?id=` + data.AirFreightMasterId + `" class="btn btn-primary"><i class="fa fa-edit"></i></a></td>
+                                        </tr>`);
+                });
+                $('#airFreightDetailsTable').DataTable();
+            }
+        });
+    }
+
+    @*function loadAirFreightDetailsData() {
+        var urlPath = '@Url.Action("AllVehicleAllocationList", "Vehicle")';
+        $.ajax({
+            type: 'GET',
+            url: urlPath,
+            dataType: 'json',
+            success: function (datas) {
+                table = $('#vhAllocationListTableBody');
+                table.empty();
+                datas.forEach(function (data) {
+                    table.append(`<tr>
+                                            <td>`+ data.VehicleAllocationMasterId + `</td>
+                                            <td>`+ data.VehicleNo + `</td>
+                                            <td>`+ data.DriverName + `</td>
+                                            <td>`+ data.DriverPhone + `</td>
+                                            <td>`+ data.VehicleType + `</td>
+                                            <td>`+ data.StartPoint + `</td>
+                                            <td>`+ data.TripType + `</td>
+                                            <td>`+ data.Route + `</td>
+                                            <td>`+ data.TripCost + `</td>
+                                            <td><a href="#" onclick="showModal(` + data.VehicleAllocationMasterId + `)" class="btn btn-primary">Details</a></td>
+                                            <td><a href="#" onclick="costAdjustmentModal(` + data.VehicleAllocationMasterId + `)" class="btn btn-primary"><i class="fa fa-edit"></i></a></td>
+                                        </tr>`);
+                });
+            }
+        });
+    }*@
+
+    function showDataOnModal(aid) {
+        var urlPath = '@Url.Action("PoListForAirFreightMaster", "Exception")';
+        $.ajax({
+            type: 'GET',
+            url: urlPath,
+            dataType: 'json',
+            data: { id: aid },
+            success: function (datas) {
+                table = $('#detailsModalTableBody');
+                table.empty();
+                datas.forEach(function (data) {
+                    let attachments = '';
+                    data.AirFreightFiles.forEach(function (subData) {
+                        attachments += subData.FileName + '<br>';
+                    });
+
+                    table.append(`<tr>
+                                    <td>` + data.PO + `</td>
+                                    <td>` + data.ParentPO + `</td>
+                                    <td>` + data.ModeOfShipment + `</td>
+                                    <td>` + data.PortOfDestination + `</td>
+                                    <td>` + data.CountryOfDestination + `</td>
+                                    <td>` + data.Incoterm + `</td>
+                                    <td>` + data.InvoiceNo + `</td>
+                                    <td>` + data.InvoiceValueInUSD + `</td>
+                                    <td>` + data.QTYInPack + `</td>
+                                    <td>` + data.QtyInPc + `</td>
+                                    <td>` + data.GrossWeightInKg + `</td>
+                                    <td>` + data.HAWBLNo + `</td>
+                                    <td>` + data.HAWBLDate + `</td>
+                                    <td>` + data.ChargeableWeightInKgERApproved + `</td>
+                                    <td>` + data.FreightAmountInUSDErApproved + `</td>
+                                    <td>` + data.ChargeableWeightInKg + `</td>
+                                    <td>` + data.FreightAmountInUSD + `</td>
+                                    <td>` + data.FrieghtRatePerKgERApproved + `</td>
+                                    <td>` + data.FreightAmountInBDT + `</td>
+                                    <td>` + data.FreightInvoiceNo + `</td>
+                                    <td>` + data.FreightInvoiceReceivedDate + `</td>
+                                    <td>` + data.BillSubDateForPayment + `</td>
+                                    <td>` + data.CHQPOSubmitDateToForwarder + `</td>
+                                    <td>` + data.AWABReleaseDate + `</td>
+                                    <td>` + data.Remarks + `</td>
+                                    <td>` + attachments + `</td>
+                                </tr>`);
+                });
+            }
+        });
+    }
+
+    function showModal(id) {
+        $("#detailsModal").modal("show");
+        $('#detailsModalTableBody').empty();
+        showDataOnModal(id);
+    }
+
+</script>

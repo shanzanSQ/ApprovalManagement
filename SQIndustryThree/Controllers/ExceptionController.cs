@@ -1,6 +1,7 @@
 ﻿using DocSoOperation.Models;
 using SQIndustryThree.DAL;
 using SQIndustryThree.Models;
+using SQIndustryThree.Models.AirFreightTracker;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +13,7 @@ namespace SQIndustryThree.Controllers
     public class ExceptionController : Controller
     {
         ExceptionDAL exceptionDAL = new ExceptionDAL();
+        AirFreightDAL airFreightDAL = new AirFreightDAL();
         // GET: Exception
         public ActionResult ExceptionRequest()
         {
@@ -60,7 +62,7 @@ namespace SQIndustryThree.Controllers
         public ActionResult AllBuyerList()
         {
             int userid = Convert.ToInt32(Session["SQuserId"]);
-            return Json(exceptionDAL.LoadBuyerList(0), JsonRequestBehavior.AllowGet);
+            return Json(airFreightDAL.LoadBuyerList(), JsonRequestBehavior.AllowGet);
         }
         public ActionResult LoadReasonCategory()
         {
@@ -111,12 +113,14 @@ namespace SQIndustryThree.Controllers
                         var InputFileExtention = Path.GetExtension(file.FileName);
                         var FullFileWithext = InputFileName + currentmilse + InputFileExtention;
                         var ServerSavePath = Path.Combine(Server.MapPath("~/ExceptionFileUpload/") + FullFileWithext);
+                        var FilePath = @"\ExceptionFileUpload\" + FullFileWithext;
                         //Save file to server folder  
                         file.SaveAs(ServerSavePath);
                         CapexFileUploadDetails fileUploadModel = new CapexFileUploadDetails();
                         fileUploadModel.CapexFileName = file.FileName.ToString();
                         fileUploadModel.CapexFilePath = ServerSavePath;
                         fileUploadModel.ServerFileName = FullFileWithext;
+                        fileUploadModel.ShortPath = FilePath;
                         fileuploadList.Add(fileUploadModel);
                     }
                 }
@@ -211,6 +215,82 @@ namespace SQIndustryThree.Controllers
             int userID = Convert.ToInt32(Session["SQuserId"].ToString());
             result = exceptionDAL.UpdateExceptionRequest(ExceptionMasterInfo, userID);
             return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        //////// Second phase of development ////////
+
+        public ActionResult AirFreightDetailsPage(int? id)
+        {
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+
+            ViewBag.AirFreightMasterId = id == null? 0 : id;
+            if(id != null)
+            {
+                //ViewBag.date
+                var airFreightMaster = airFreightDAL.GetAirFreightMasterById(id.Value);
+                airFreightMaster.AirFreightDetails = airFreightDAL.GetPoListForAirFreightMaster(id.Value);
+                ViewBag.date = airFreightMaster.AirFreightDetails[0].HAWBLDateD;
+            }    
+
+            return View();
+        }
+
+        public ActionResult AirFreightList()
+        {
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+            return View();
+        }
+
+        public ActionResult loadERData(int buyerId, int businessUnitId)
+        {
+            return Json(airFreightDAL.LoadERList(buyerId, businessUnitId), JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult LoadForwarders()
+        {
+            return Json(airFreightDAL.LoadForwardersList(), JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult LoadDataAgainstERId(int id)
+        {
+            var ERData = airFreightDAL.LoadDataAgainstERId(id);
+            ERData.ExpgenaralInfoList = airFreightDAL.LoadPOAgainstERId(id);
+            return Json(ERData, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult AirFreightInfoSaveForSQ(AirFreightMaster data)
+        {
+            return Json(airFreightDAL.SubmitDataForSQ(data), JsonRequestBehavior.AllowGet);
+        }
+        
+        [HttpPost]
+        public ActionResult AirFreightInfoSaveForMod(AirFreightMaster data)
+        {
+            return Json(airFreightDAL.SubmitDataForMod(data), JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult AllAirFreightList()
+        {
+            return Json(airFreightDAL.GetAllAirFreightList(), JsonRequestBehavior.AllowGet);
+        }
+        
+        public ActionResult PoListForAirFreightMaster(int id)
+        {
+            return Json(airFreightDAL.GetPoListForAirFreightMaster(id), JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult loadMasterDataForModification(int id)
+        {
+            var airFreightMaster = airFreightDAL.GetAirFreightMasterById(id);
+            airFreightMaster.AirFreightDetails = airFreightDAL.GetPoListForAirFreightMaster(id);
+            return Json(airFreightMaster, JsonRequestBehavior.AllowGet);
         }
     }
 }

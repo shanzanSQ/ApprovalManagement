@@ -1,217 +1,228 @@
 ﻿<style>
-    #radioBtn a{
-        margin:1px;
+    #radioBtn a {
+        margin: 1px;
     }
-    
+
     .form-control, .btn {
         border-radius: 0px;
     }
+
     .required:after {
         content: "*";
         color: red;
     }
+
     .inputhidegroup {
         border: none;
         pointer-events: none;
         text-align: center;
     }
+
     input[type=text] {
         margin: 2px;
         padding: 2px;
     }
+
     #genaralInformationTable td input[type=text], #genaralInformationTable td input[type=date], #genaralInformationTable td input[type=number] {
         text-align: center;
-        width:95%;
+        width: 95%;
         height: 25px;
     }
 
-   
+
     #genaralInformationTable td input[type=button] {
         height: 25px;
         width: 25px;
         border-radius: 50%;
-        background-color:green;
-        color:white;
+        background-color: green;
+        color: white;
     }
 
-    #genaralInformationTable th, #genaralInformationTable td{
+    #genaralInformationTable th, #genaralInformationTable td {
         margin: 0px;
         padding: 0px;
         text-align: center;
     }
-    .leftlable{
-        text-align:left;
+
+    .leftlable {
+        text-align: left;
     }
+
     #airfreight td {
         width: 12%;
         padding: 2px;
     }
-        #disclaimCancel td, #otherexception td{
-            padding:2px;
+
+    #disclaimCancel td, #otherexception td {
+        padding: 2px;
+    }
+
+        #disclaimCancel td input[type=text], #airfreight td input[type=text], #otherexception td input[type=text] {
+            text-align: center;
         }
-            #disclaimCancel td input[type=text], #airfreight td input[type=text], #otherexception td input[type=text] {
-                text-align: center;
-            }
-        .airfreightDisplay{
-            display:none;
-        }
+
+    .airfreightDisplay {
+        display: none;
+    }
 </style>
 
-    <div class="container-fluid">
-        <p style="text-align:center;font-size:20px;font-weight:bold">Exception Request Approval Form</p>
-        <hr style="margin:0px" />
-        <div class="row">
-            <div>
-                <div class="col-md-2">
-                    <label for="current_date">Current Date :</label>
-                    <h5 id="current_date"></h5>
-                </div>
-                <div class="col-md-2">
-                    <label for="exception_type" class="required">Exception Type :</label>
-                    <select id="exception_type" onchange="ChangeColor('#exception_type')" class="form-control">
-                        <option value="0">--Select Exception Type--</option>
-                        <option value="1">Air Freight</option>
-                        <option value="2">Discount </option>
-                        <option value="3">Claimed </option>
-                        <option value="4">Order Canceled</option>
-                        <option value="5">Others</option>
-                        <option value="6">Over Purchased </option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label for="exceptionReasons" class="required">Exception Reason</label>
-                    <select id="exceptionReasons" onchange="ChangeColor('#exceptionReasons')" class="form-control">
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label for="scapprover" class="required">SC Approver</label>
-                    <select id="scapprover" onchange="LoadApproverList()" class="form-control">
-                        <option value="0">--Supply Chain Approver--</option>
-                        <option value="1">Pranab Das Gupta</option>
-                        <option value="2">Prithu Bhowmik</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label for="business_unit" class="required">Business Unit:</label>
-                    <select id="business_unit" class="form-control" onchange="LoadApproverList()">
-                        <option>--Select  Business Unit--</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label for="loadbuyer" class="required">Select Buyer:</label>
-                    <select class="form-control" id="loadbuyer" onchange="LoadApproverList()">
-                    </select>
-                </div>
-                @*<div class="col-md-2">
-            <label for="odddate">Orginal Delivery Date</label>
-            <input type="date" id="odddate" class="form-control" />
-        </div>
-        <div class="col-md-2">
-            <label for="revisedddate">Revised Delivery Date</label>
-            <input type="date" id="revisedddate" class="form-control" />
-        </div>*@
+<div class="container-fluid">
+    <p style="text-align:center;font-size:20px;font-weight:bold">Exception Request Approval Form</p>
+    <hr style="margin:0px" />
+    <div class="row">
+        <div>
+            <div class="col-md-2">
+                <label for="current_date">Current Date :</label>
+                <h5 id="current_date"></h5>
             </div>
-        </div>
-        <div >
-            <div style="overflow-x:auto">
-                <table width="100%" border="1" id="genaralInformationTable" class="table table-striped">
-                    <caption>Genaral Information Table</caption>
-                    <thead>
-                        <tr>
-                            <th class="required">Style No</th>
-                            <th class="required">Color </th>
-                            <th class="required">PO</th>
-                            <th class="required">ODD</th>
-                            <th class="required">RDD</th>
-                            <th class="required">Quantity</th>
-                            <th class="required">Unit Price($)</th>
-                            <th class="required">FOB($)</th>
-                            <th class="required discount_td" style="display:none" >Discount Amount($)</th>
-                            <th class="required claimed_td" style="display:none" >Claimed Amount($)</th>
-                            <th class="required material_td" style="display:none">Material Liability($)</th>
-                            <th class="required garmentsli_td" style="display:none">Garments Liability($)</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="genaralInformationBody">
-                        <tr>
-                            <td><input type="text" id="styleName" name="styleName" placeholder="Enter Style Number" /></td>
-                            <td><input type="text" id="colorName" name="colorName" placeholder="Enter Color " /></td>
-                            <td><input type="text" id="PoName" name="PoName" placeholder="Enter PO Number" /></td>
-                            <td><input type="date" id="odddate" name="odddate" /></td>
-                            <td><input type="date" id="revisedddate" name="revisedddate" /></td>
-                            <td><input type="number" step="0.01" id="quantinty" name="quantity" onchange="calculateGrandTotal()" placeholder="Enter Quantity" /></td>
-                            <td><input type="number" step="0.01" id="unitprice" name="unitprice" onchange="calculateGrandTotal()" placeholder="Enter Price" /></td>
-                            <td><input class="inputhidegroup" type="number" id="fobinput" name="fobinput" /></td>
-                            <td style="display:none" class="discount_td"><input type="number" step="0.01" id="discountclaim" name="discountclaim" onchange="calculateGrandTotal()" placeholder="Enter Price" /></td>
-                            <td style="display:none" class="claimed_td"><input type="number" step="0.01" id="claimedAmmount" name="claimedAmmount" onchange="calculateGrandTotal()" placeholder="Enter Price" /></td>
-                            <td style="display:none" class="material_td"><input type="number" step="0.01" id="materialliability" name="materialliability" onchange="calculateGrandTotal()" placeholder="Enter Price" /></td>
-                            <td style="display:none" class="garmentsli_td"><input type="number" step="0.01" id="garments_liability" name="garments_liability" onchange="calculateGrandTotal()" placeholder="Enter Price" /></td>
-                            <td>
-                                <input type="button" id="addNewGenaralInformation" value="+" />
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th colspan="7">Total</th>
-                            <th><input class="inputhidegroup" type="text" id="totalFobs" /></th>
-                            <th class="discount_td"  style="display:none"><input class="inputhidegroup" id="totaldis" type="number"  /></th>
-                            <th class="claimed_td" style="display:none"><input class="inputhidegroup" id="totalclaim" type="number" /></th>
-                            <th class="material_td" style="display:none"><input class="inputhidegroup" id="totalmat" type="number" /></th>
-                            <th class="garmentsli_td" style="display:none"><input class="inputhidegroup" id="totalgar" type="number" /></th>
-                            <th ></th>
-                        </tr>
-                    </tfoot>
-                </table>
+            <div class="col-md-2">
+                <label for="exception_type" class="required">Exception Type :</label>
+                <select id="exception_type" onchange="ChangeColor('#exception_type')" class="form-control">
+                    <option value="0">--Select Exception Type--</option>
+                    <option value="1">Air Freight</option>
+                    <option value="2">Discount </option>
+                    <option value="3">Claim </option>
+                    <option value="4">Order Cancel</option>
+                    <option value="5">Others</option>
+                    <option value="6">Over Purchase </option>
+                </select>
             </div>
+            <div class="col-md-2">
+                <label for="exceptionReasons" class="required">Exception Reason</label>
+                <select id="exceptionReasons" onchange="ChangeColor('#exceptionReasons')" class="form-control">
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="scapprover" class="required">SC Approver</label>
+                <select id="scapprover" onchange="LoadApproverList()" class="form-control">
+                    <option value="0">--Supply Chain Approver--</option>
+                    <option value="1">Pranab Das Gupta</option>
+                    <option value="2">Prithu Bhowmik</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="business_unit" class="required">Business Unit:</label>
+                <select id="business_unit" class="form-control" onchange="LoadApproverList()">
+                    <option>--Select  Business Unit--</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="loadbuyer" class="required">Select Buyer:</label>
+                <select class="form-control" id="" onchange="LoadApproverList()">
+                    <option value="0">--Select Buyer--</option>
+                    <option value="1">M&S</option>
+                </select>
+            </div>
+            @*<div class="col-md-2">
+                    <label for="odddate">Orginal Delivery Date</label>
+                    <input type="date" id="odddate" class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <label for="revisedddate">Revised Delivery Date</label>
+                    <input type="date" id="revisedddate" class="form-control" />
+                </div>*@
+        </div>
+    </div>
+    <div>
+        <div style="overflow-x:auto">
+            <table width="100%" border="1" id="genaralInformationTable" class="table table-striped">
+                <caption>Genaral Information Table</caption>
+                <thead>
+                    <tr>
+                        <th class="required">Style No</th>
+                        <th class="required">Color </th>
+                        <th class="required">PO</th>
+                        <th class="required">ODD</th>
+                        <th class="required">RDD</th>
+                        <th class="required">Quantity</th>
+                        <th class="required">Unit Price($)</th>
+                        <th class="required">FOB($)</th>
+                        <th class="required discount_td" style="display:none">Discount Amount($)</th>
+                        <th class="required claimed_td" style="display:none">Claimed Amount($)</th>
+                        <th class="required material_td" style="display:none">Material Liability($)</th>
+                        <th class="required garmentsli_td" style="display:none">Garments Liability($)</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="genaralInformationBody">
+                    <tr>
+                        <td><input type="text" id="styleName" name="styleName" placeholder="Enter Style Number" /></td>
+                        <td><input type="text" id="colorName" name="colorName" placeholder="Enter Color " /></td>
+                        <td><input type="text" id="PoName" name="PoName" placeholder="Enter PO Number" /></td>
+                        <td><input type="date" id="odddate" name="odddate" /></td>
+                        <td><input type="date" id="revisedddate" name="revisedddate" /></td>
+                        <td><input type="number" step="0.01" id="quantinty" name="quantity" onchange="calculateGrandTotal()" placeholder="Enter Quantity" /></td>
+                        <td><input type="number" step="0.01" id="unitprice" name="unitprice" onchange="calculateGrandTotal()" placeholder="Enter Price" /></td>
+                        <td><input class="inputhidegroup" type="number" id="fobinput" name="fobinput" /></td>
+                        <td style="display:none" class="discount_td"><input type="number" step="0.01" id="discountclaim" name="discountclaim" onchange="calculateGrandTotal()" placeholder="Enter Price" /></td>
+                        <td style="display:none" class="claimed_td"><input type="number" step="0.01" id="claimedAmmount" name="claimedAmmount" onchange="calculateGrandTotal()" placeholder="Enter Price" /></td>
+                        <td style="display:none" class="material_td"><input type="number" step="0.01" id="materialliability" name="materialliability" onchange="calculateGrandTotal()" placeholder="Enter Price" /></td>
+                        <td style="display:none" class="garmentsli_td"><input type="number" step="0.01" id="garments_liability" name="garments_liability" onchange="calculateGrandTotal()" placeholder="Enter Price" /></td>
+                        <td>
+                            <input type="button" id="addNewGenaralInformation" value="+" />
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="7">Total</th>
+                        <th><input class="inputhidegroup" type="text" id="totalFobs" /></th>
+                        <th class="discount_td" style="display:none"><input class="inputhidegroup" id="totaldis" type="number" /></th>
+                        <th class="claimed_td" style="display:none"><input class="inputhidegroup" id="totalclaim" type="number" /></th>
+                        <th class="material_td" style="display:none"><input class="inputhidegroup" id="totalmat" type="number" /></th>
+                        <th class="garmentsli_td" style="display:none"><input class="inputhidegroup" id="totalgar" type="number" /></th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
 
+    </div>
+    <div class="col-md-12">
+        <div id="airfreight" style="display:none">
+            <table width="100%">
+                <caption>Air Freight</caption>
+                <tbody>
+                    <tr>
+                        <td width="10%">
+                            <label class="required">Recoverable</label>
+                            <div id="radioBtn" class="btn-group input-group">
+                                <span style="display:inline-block" class="btn btn-default btn-sm" data-toggle="estado" data-value="1">Yes</span>
+                                <span style="display:inline-block" class="btn btn-primary btn-sm active" data-toggle="estado" data-value="2">No</span>
+                            </div>
+                        </td>
+                        <td width="5%">
+                            <input type="checkbox" id="volumetCheck" onchange="AirFraightCostCal()" /><br /><span id="checkhtml">Volumetric Weight</span>
+                        </td>
+                        <td id="gross_weighttd">
+                            <label class="required" for="gross_weight">Gross Weight(Kg)</label>
+                            <input type="number" id="gross_weight" class="form-control" onchange="AirFraightCostCal()" value=0 />
+                        </td>
+                        <td id="volumetricWeighttd" style="display:none">
+                            <label class="required" for="volumetricWeight">Volumetric Weight(CC)</label>
+                            <input type="number" id="volumetricWeight" class="form-control" onchange="AirFraightCostCal()" value=0 />
+                        </td>
+                        <td>
+                            <label class="required">Air Freight Rate($)</label>
+                            <input type="number" id="airfreightRate" class="form-control" onchange="AirFraightCostCal()" value=0 />
+                        </td>
+                        <td>
+                            <label class="required">Air Freight Cost($)</label>
+                            <input type="number" id="airfreightCost" class="form-control" value=0 disabled style="background-color:white" />
+                        </td>
+                        <td class="airfreightDisplay">
+                            <label class="required">Recoverable From</label>
+                            <input type="text" id="recoverableform" class="form-control" />
+                        </td>
+                        <td class="airfreightDisplay">
+                            <label class="required">Recoverable Amount</label>
+                            <input type="number" id="recoverableammount" class="form-control" />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-        <div class="col-md-12">
-            <div id="airfreight" style="display:none">
-                    <table width="100%">
-                        <caption>Air Freight</caption>
-                        <tbody>
-                            <tr>
-                                <td width="10%">
-                                    <label class="required">Recoverable</label>
-                                    <div id="radioBtn" class="btn-group input-group">
-                                        <span style="display:inline-block" class="btn btn-default btn-sm" data-toggle="estado" data-value="1">Yes</span>
-                                        <span style="display:inline-block" class="btn btn-primary btn-sm active" data-toggle="estado" data-value="2">No</span>
-                                    </div>
-                                </td>
-                                <td width="5%">
-                                    <input type="checkbox" id="volumetCheck" onchange="AirFraightCostCal()" /><br/><span id="checkhtml">Volumetric Weight</span>
-                                </td>
-                                <td id="gross_weighttd">
-                                    <label class="required" for="gross_weight">Gross Weight(Kg)</label>
-                                    <input type="number" id="gross_weight" class="form-control" onchange="AirFraightCostCal()" value=0 />
-                                </td>
-                                <td id="volumetricWeighttd" style="display:none" >
-                                    <label class="required" for="volumetricWeight">Volumetric Weight(CC)</label>
-                                    <input type="number" id="volumetricWeight" class="form-control" onchange="AirFraightCostCal()" value=0 />
-                                </td>
-                                <td>
-                                    <label class="required">Air Freight Rate($)</label>
-                                    <input type="number" id="airfreightRate" class="form-control" onchange="AirFraightCostCal()" value=0 />
-                                </td>
-                                <td>
-                                    <label class="required">Air Freight Cost($)</label>
-                                    <input type="number" id="airfreightCost" class="form-control" value=0 disabled style="background-color:white" />
-                                </td>
-                                <td class="airfreightDisplay">
-                                    <label class="required">Recoverable From</label>
-                                    <input type="text" id="recoverableform" class="form-control" />
-                                </td>
-                                <td class="airfreightDisplay">
-                                    <label class="required">Recoverable Amount</label>
-                                    <input type="number" id="recoverableammount" class="form-control" />
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>       
-            </div>
-            @*<div id="disclaimCancel" style="display:none">
+        @*<div id="disclaimCancel" style="display:none">
                 <table width="100%">
                     <caption>Discount/Claim/Cancellation</caption>
                     <tr>
@@ -239,96 +250,96 @@
                     </tr>
                 </table>
             </div>*@
-            <div id="otherexception" style="display:none">
-                <table width="100%">
-                    <caption>Other</caption>
+        <div id="otherexception" style="display:none">
+            <table width="100%">
+                <caption>Other</caption>
+                <tr>
+                    <td>
+                        <label class="required" for="exceptionDetails">Exception Details </label>
+                        <input type="text" id="exceptionDetails" class="form-control" />
+                    </td>
+                    <td>
+                        <label class="required" for="lossliabilitycompany">Loss/Liability to company(qty)</label>
+                        <input type="number" id="lossliabilitycompany" class="form-control" />
+                    </td>
+                    <td>
+                        <label class="required" for="valueofloss">Value of loss / Liability($)</label>
+                        <input type="number" id="valueofloss" class="form-control" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="col-md-4" style="margin:0px;padding:0px">
+            <div class="row">
+                <div class="col-md-12">
+                    <table width="100%">
+                        <caption>Attach File</caption>
+                        <tr>
+                            <td style="padding-right:2PX;"><input type="file" multiple class="form-control" id="exceptionFileUpload" onchange="FileUploadOnChange()" /></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <table style="width:98%" border="1" id="exceptionfiletable">
+                        <caption>Attached File</caption>
+                        <thead>
+                            <tr>
+                                <th>File Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attachedFileTable">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <table style="width:100%" border="1">
+                <caption>Approval Flow</caption>
+                <thead>
                     <tr>
-                        <td>
-                            <label class="required" for="exceptionDetails">Exception Details </label>
-                            <input type="text" id="exceptionDetails" class="form-control" />
+                        <th>No</th>
+                        <th>Approver Name</th>
+                        <th>Designation</th>
+                    </tr>
+                </thead>
+                <tbody id="approverlistbody">
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-4">
+            <div class="row">
+                <table width="100%">
+                    <tr>
+                        <td width="50%">
+                            <label class="required" for="reasons">Remarks</label>
+                            <textarea style="resize:none;width:98%" onchange="ChangeColor('#reasons')" id="reasons" rows="3" />
                         </td>
-                        <td>
-                            <label class="required" for="lossliabilitycompany">Loss/Liability to company(qty)</label>
-                            <input type="number" id="lossliabilitycompany" class="form-control" />
-                        </td>
-                        <td>
-                            <label class="required" for="valueofloss">Value of loss / Liability($)</label>
-                            <input type="number" id="valueofloss" class="form-control" />
+                        <td width="50%">
+                            <label class="required" for="responsibleperson">Responsible Person</label>
+                            <textarea style="resize:none;width:98%" id="responsibleperson" rows="3" />
                         </td>
                     </tr>
                 </table>
-            </div>
-        </div>
-        <div class="col-md-12">
-            <div class="col-md-4" style="margin:0px;padding:0px">
-                <div class="row">
-                    <div class="col-md-12">
-                        <table width="100%">
-                            <caption>Attach File</caption>
-                            <tr>
-                                <td style="padding-right:2PX;"><input type="file" multiple class="form-control" id="exceptionFileUpload" onchange="FileUploadOnChange()" /></td>
-                            </tr>
-                        </table>
-                    </div>
+                <div class="col-md-6">
+
                 </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <table style="width:98%" border="1" id="exceptionfiletable">
-                            <caption>Attached File</caption>
-                            <thead>
-                                <tr>
-                                    <th>File Name</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="attachedFileTable">
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="col-md-6">
+
                 </div>
             </div>
-            <div class="col-md-4">
-                <table style="width:100%" border="1">
-                    <caption>Approval Flow</caption>
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Approver Name</th>
-                            <th>Designation</th>
-                        </tr>
-                    </thead>
-                    <tbody id="approverlistbody">
-                    </tbody>
-                </table>
-            </div>
-            <div class="col-md-4">
-                <div class="row">
-                    <table width="100%">
-                        <tr>
-                            <td width="50%">
-                                <label class="required" for="reasons">Remarks</label>
-                                <textarea style="resize:none;width:98%" onchange="ChangeColor('#reasons')"  id="reasons" rows="3" />
-                            </td>
-                            <td width="50%">
-                                <label class="required" for="responsibleperson">Responsible Person</label>
-                                <textarea style="resize:none;width:98%" id="responsibleperson"  rows="3" />
-                            </td>
-                        </tr>
-                    </table>
-                    <div class="col-md-6">
-                        
-                    </div>
-                    <div class="col-md-6">
-                        
-                    </div>
-                </div>
-                <br />
-                <div class="row" style="text-align:center">
-                    <input type="button" class="btn btn-success" value="Submit For Approval" onclick="formValidate()" />
-                </div>
+            <br />
+            <div class="row" style="text-align:center">
+                <input type="button" class="btn btn-success" value="Submit For Approval" onclick="formValidate()" />
             </div>
         </div>
     </div>
+</div>
 
 <script type="text/javascript">
     HideSidebar();
@@ -361,10 +372,10 @@
              $('.material_td').hide();
              $('.garmentsli_td').hide();
 
-            $('#airfreight').find('input').val('');   
-            $('#disclaimCancel').find('input').val('');   
-            $('#otherexception').find('input').val('');   
-            
+            $('#airfreight').find('input').val('');
+            $('#disclaimCancel').find('input').val('');
+            $('#otherexception').find('input').val('');
+
         } else if ($('#exception_type').val() == 5 || $('#exception_type').val() == 6) {
             $('#airfreight').hide();
             $('#otherexception').show();
@@ -374,9 +385,9 @@
                 $('.material_td').hide();
                 $('.garmentsli_td').hide();
 
-            $('#airfreight').find('input').val('');   
-            $('.discount_td').find('input').val('');   
-            $('#otherexception').find('input').val('');   
+            $('#airfreight').find('input').val('');
+            $('.discount_td').find('input').val('');
+            $('#otherexception').find('input').val('');
         }else if ($('#exception_type').val() == 0) {
             $('#disclaimCancel').hide();
             $('#airfreight').hide();
@@ -387,9 +398,9 @@
                 $('.material_td').hide();
                 $('.garmentsli_td').hide();
 
-            $('#airfreight').find('input').val('');   
-            $('#disclaimCancel').find('input').val('');   
-            $('#otherexception').find('input').val('');   
+            $('#airfreight').find('input').val('');
+            $('#disclaimCancel').find('input').val('');
+            $('#otherexception').find('input').val('');
         } else {
             $('#disclaimCancel').show();
             $('#airfreight').hide();
@@ -412,9 +423,9 @@
                 $('.garmentsli_td').show();
             }
 
-            $('#airfreight').find('input').val('');   
-            $('#disclaimCancel').find('input').val('');   
-            $('#otherexception').find('input').val('');   
+            $('#airfreight').find('input').val('');
+            $('#disclaimCancel').find('input').val('');
+            $('#otherexception').find('input').val('');
         }
     });
     LoadBusinessUnit();
@@ -427,7 +438,7 @@
         if ($('#volumetCheck').is(":checked")) {
             $("#gross_weighttd").hide();
             $("#volumetricWeighttd").show();
-            $("#gross_weight").val(0); 
+            $("#gross_weight").val(0);
             //$("#checkhtml").html("Gross Weight");
             var valueg = $("#volumetricWeight").val();
             $("#airfreightCost").val(airfreightrate * valueg);
@@ -585,7 +596,7 @@
                 $('.material_td').show();
                 $('.garmentsli_td').show();
             }
-        }   
+        }
     }
     function ShowAlert() {
         swal({
@@ -649,7 +660,7 @@
                 myData["GarmentsLiability"] = $(this).find('input[name^="garments_liability"]').val();
                 genaralInformation.push(myData);
         });
-        jsonData["ExpgenaralInfoList"] = genaralInformation; 
+        jsonData["ExpgenaralInfoList"] = genaralInformation;
         var dtinfo = {};
         dtinfo["Recoverable"]=$("#radioBtn span.active").data('value');
         dtinfo["GrossWeight"]=$("#gross_weight").val();
@@ -674,7 +685,7 @@
             filedate["CapexFilePath"] = $(this).find('td[name^="filePath"]').html();
                 fileUpload.push(filedate);
         });
-        jsonData["ExceptionFilesList"] = fileUpload; 
+        jsonData["ExceptionFilesList"] = fileUpload;
 
         var approverList = [];
         $('#approverlistbody tr').each(function () {
@@ -685,7 +696,7 @@
             approver["DesignationName"] = $(this).find('p[name^="designationName"]').html();
             approverList.push(approver);
         });
-        jsonData["ApproverList"] = approverList; 
+        jsonData["ApproverList"] = approverList;
         return jsonData;
     }
     function varifyInputElement() {
@@ -745,7 +756,7 @@
         var urlpath = '@Url.Action("ExceptionFileUpload", "Exception")';
         $.ajax({
             url: urlpath,
-            type: "post", 
+            type: "post",
             processData: false,
             contentType: false,
             data: fileData  ,
@@ -779,7 +790,7 @@
                document.getElementById("exceptionfiletable").deleteRow(i);
             }
         });
-        
+
     }
     function LoadApproverList() {
         var buid = $('#business_unit').val();
@@ -816,7 +827,6 @@
         });
     }
     function formValidate() {
-        debugger;
         if ($("#exception_type").val() == "0") {
             $('#exception_type').css({ "border-color": "#FF0000" });
         } else if ($("#exceptionReasons").val() == "0") {
@@ -868,7 +878,7 @@
                     cheval = false;
                 }
             } else if ($("#exception_type").val()==5 || $("#exception_type").val()==6) {
-                if ($("#exceptionDetails").val()== "" || $("#lossliabilitycompany").val()=="" || 
+                if ($("#exceptionDetails").val()== "" || $("#lossliabilitycompany").val()=="" ||
                         $("#valueofloss").val()=="") {
                     cheval = false;
                 }
@@ -881,4 +891,3 @@
         }
     }
 </script>
-

@@ -19,33 +19,60 @@ namespace SQIndustryThree.DAL
     {
         private DataAccessManager accessManager = new DataAccessManager();
         private string connStr = ConfigurationManager.ConnectionStrings["SQQEYEDatabase"].ConnectionString;
-     
-        public List<BusinessUnit> GetBusinessUnits()
-        {
 
+        //public List<BusinessUnit> GetBusinessUnits()
+        //{
+
+        //    try
+        //    {
+        //        accessManager.SqlConnectionOpen(DataBase.SQQeye);
+        //        List<BusinessUnit> businessUnits = new List<BusinessUnit>();
+        //        List<SqlParameter> aList = new List<SqlParameter>();
+        //        SqlDataReader dr = accessManager.GetSqlDataReader("sp_GetCourierAllBusinessUnit");
+        //        while (dr.Read())
+        //        {
+        //            BusinessUnit businessUnit = new BusinessUnit();
+        //            businessUnit.BusinessUnitId = (int)dr["BusinessUnitId"];
+        //            businessUnit.BusinessUnitName = dr["BusinessUnitName"].ToString();
+        //            businessUnits.Add(businessUnit);
+        //        }
+        //        return businessUnits;
+        //    }
+        //    catch (Exception exception)
+        //    {
+
+        //        throw exception;
+        //    }
+        //    finally
+        //    {
+        //        accessManager.SqlConnectionClose();
+        //    }
+        //}
+        public List<BusinessUnit> GetBusinessUnits(int userID)
+        {
             try
             {
-                accessManager.SqlConnectionOpen(DataBase.SQQeye);
-                List<BusinessUnit> businessUnits = new List<BusinessUnit>();
-                List<SqlParameter> aList = new List<SqlParameter>();
-                SqlDataReader dr = accessManager.GetSqlDataReader("sp_GetCourierAllBusinessUnit");
-                while (dr.Read())
-                {
-                    BusinessUnit businessUnit = new BusinessUnit();
-                    businessUnit.BusinessUnitId = (int)dr["BusinessUnitId"];
-                    businessUnit.BusinessUnitName = dr["BusinessUnitName"].ToString();
-                    businessUnits.Add(businessUnit);
-                }
-                return businessUnits;
+                this.accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<BusinessUnit> commonModelList = new List<BusinessUnit>();
+                SqlDataReader sqlDataReader = this.accessManager.GetSqlDataReader("sp_getCourierUserWiseBusinessUnit", new List<SqlParameter>()
+        {
+          new SqlParameter("@UserId", (object) userID)
+        });
+                while (sqlDataReader.Read())
+                    commonModelList.Add(new BusinessUnit()
+                    {
+                        BusinessUnitId = (int)sqlDataReader["BusinessUnitId"],
+                        BusinessUnitName = sqlDataReader["BusinessUnitName"].ToString()
+                    });
+                return commonModelList;
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-
-                throw exception;
+                throw ex;
             }
             finally
             {
-                accessManager.SqlConnectionClose();
+                this.accessManager.SqlConnectionClose();
             }
         }
         public List<CommonModel> GetDepartmentList(int location)
@@ -86,7 +113,7 @@ namespace SQIndustryThree.DAL
                     string str1 = new JavaScriptSerializer().Serialize((object)courierRequestModel.CourierApproverList);
                     int count = courierRequestModel.CourierApproverList.Count;
                     courierRequestModel.CourierApproverList = (List<CourierApproverModel>)null;
-                     new JavaScriptSerializer().Serialize((object)courierRequestModel);
+                    new JavaScriptSerializer().Serialize((object)courierRequestModel);
                     DynamicParameters dynamicParameters = new DynamicParameters();
                     dynamicParameters.Add("@RequestorId", (object)UserId);
                     dynamicParameters.Add("@SQId", (object)courierRequestModel.LocationId);
@@ -117,6 +144,37 @@ namespace SQIndustryThree.DAL
                     //dynamicParameters.Add("@UserId", (object)UserId);
 
                     int num = cnn.Execute("sp_CourierRequestDetailsEntryTable", (object)dynamicParameters, commandType: new CommandType?(CommandType.StoredProcedure));
+                    return new ResultResponse()
+                    {
+                        pk = num,
+                        isSuccess = true
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        public ResultResponse SaveCourierBudget(CourierRequestModel courierRequestModel, int UserId)
+        {
+            try
+            {
+                using (IDbConnection cnn = (IDbConnection)new SqlConnection(this.connStr))
+                {
+                    if (cnn.State == ConnectionState.Closed)
+                        cnn.Open();
+
+                    new JavaScriptSerializer().Serialize((object)courierRequestModel);
+                    DynamicParameters dynamicParameters = new DynamicParameters();
+                    dynamicParameters.Add("@BusinessUnitId", (object)courierRequestModel.BusinessUnitId);
+                    dynamicParameters.Add("@DepartmentID", (object)courierRequestModel.DepartmentID);
+                    dynamicParameters.Add("@BudgetYear", (object)courierRequestModel.BudgetYear);
+                    dynamicParameters.Add("@MonthOfYear", (object)courierRequestModel.MonthOfYear);
+                    dynamicParameters.Add("@Amount", (object)courierRequestModel.Amount);
+                    dynamicParameters.Add("@CreateBy", (object)UserId);
+
+                    int num = cnn.Execute("sp_CourierBudgetEntry", (object)dynamicParameters, commandType: new CommandType?(CommandType.StoredProcedure));
                     return new ResultResponse()
                     {
                         pk = num,
@@ -184,7 +242,7 @@ namespace SQIndustryThree.DAL
                 throw ex;
             }
         }
-        public List<CourierRequestModel> GetCourierProposedDate(string country, string delivery_date, string weight,string type)
+        public List<CourierRequestModel> GetCourierProposedDate(string country, string delivery_date, string weight, string type)
         {
             try
             {
@@ -248,7 +306,7 @@ namespace SQIndustryThree.DAL
                 this.accessManager.SqlConnectionClose();
             }
         }
-        public List<CourierRequestModel> GetproposedDateWisecourierCostDate(string country, string delivery_date, string weight, string type,string proposed_date)
+        public List<CourierRequestModel> GetproposedDateWisecourierCostDate(string country, string delivery_date, string weight, string type, string proposed_date)
         {
             try
             {
@@ -281,6 +339,31 @@ namespace SQIndustryThree.DAL
                 this.accessManager.SqlConnectionClose();
             }
         }
+        public List<CourierRequestModel> LoadFiscalYear()
+        {
+            try
+            {
+                this.accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<CourierRequestModel> CourierRequestModelList = new List<CourierRequestModel>();
+                SqlDataReader sqlDataReader = this.accessManager.GetSqlDataReader("sp_Get_Fiscal_Year");
+
+                while (sqlDataReader.Read())
+                    CourierRequestModelList.Add(new CourierRequestModel()
+                    {
+                        Current_Financial_Year = sqlDataReader["Current_Financial_Year"].ToString(),
+
+                    });
+                return CourierRequestModelList;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                this.accessManager.SqlConnectionClose();
+            }
+        }
         public List<CourierRequestModel> GetcourierWiseConsolidateCostDate(string Courier, string CountryName, string Weight)
         {
             try
@@ -292,15 +375,15 @@ namespace SQIndustryThree.DAL
           new SqlParameter("@country", (object) CountryName),
           new SqlParameter("@courier", (object) Courier),
            new SqlParameter("@weightRange", (object) Weight)
-            
+
         });
                 while (sqlDataReader.Read())
                     CourierRequestModelList.Add(new CourierRequestModel()
                     {
-                        
+
                         ServiceProvider = sqlDataReader["ServiceProvider"].ToString(),
                         Rate = sqlDataReader["Rate"].ToString(),
-                        
+
                     });
                 return CourierRequestModelList;
             }
@@ -357,7 +440,7 @@ namespace SQIndustryThree.DAL
                         Pending = (int)sqlDataReader["Pending"],
                         DateOfRequest = sqlDataReader["DateOfRequest"].ToString(),
                         UserName = sqlDataReader["UserName"].ToString(),
-                         //Status = (int)sqlDataReader["Status"]
+                        //Status = (int)sqlDataReader["Status"]
 
                         //CreateDate = sqlDataReader["CreateDate"].ToString(),
 
@@ -373,6 +456,7 @@ namespace SQIndustryThree.DAL
                 this.accessManager.SqlConnectionClose();
             }
         }
+        
         public List<CourierRequestModel> GetAllCourierDispatch(
         int Status
         )
@@ -383,9 +467,9 @@ namespace SQIndustryThree.DAL
                 this.accessManager.SqlConnectionOpen(DataBase.SQQeye);
                 SqlDataReader sqlDataReader = this.accessManager.GetSqlDataReader("sp_GetCourierDispatchList", new List<SqlParameter>()
         {
-         
+
           new SqlParameter("@status", (object) Status),
-         
+
         });
                 while (sqlDataReader.Read())
                     CourierRequestModelList.Add(new CourierRequestModel()
@@ -401,7 +485,7 @@ namespace SQIndustryThree.DAL
                         ConsolidateWeight = sqlDataReader["ConsolidateWeight"].ToString(),
                         ReferenceNo = sqlDataReader["ReferenceNo"].ToString(),
                         Remarks = sqlDataReader["Remarks"].ToString(),
-                        
+
                     });
                 return CourierRequestModelList;
             }
@@ -438,7 +522,7 @@ namespace SQIndustryThree.DAL
                         ReceivedWeight = sqlDataReader["ReceivedWeight"].ToString(),
                         HandOverTo = sqlDataReader["HandOverTo"].ToString(),
                         ReferenceNo = sqlDataReader["ReferenceNo"].ToString(),
-                       Remarks = sqlDataReader["Remarks"].ToString(),
+                        Remarks = sqlDataReader["Remarks"].ToString(),
 
                     });
                 return CourierRequestModelList;
@@ -586,7 +670,69 @@ namespace SQIndustryThree.DAL
                 accessManager.SqlConnectionClose();
             }
         }
-        public List<Country> GetCustomer()
+        public List<Country> GetCustomer(
+   int userID
+   )
+        {
+            List<Country> CourierRequestModelList = new List<Country>();
+            try
+            {
+                this.accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                SqlDataReader sqlDataReader = this.accessManager.GetSqlDataReader("sp_getAllCustomer", new List<SqlParameter>()
+        {
+
+          new SqlParameter("@UserId", (object) userID),
+
+        });
+                while (sqlDataReader.Read())
+                    CourierRequestModelList.Add(new Country()
+                    {
+                        BuyerId = (int)sqlDataReader["BuyerId"],
+                        BuyerName = sqlDataReader["BuyerName"].ToString()
+
+
+                    });
+                return CourierRequestModelList;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                this.accessManager.SqlConnectionClose();
+            }
+        }
+        //public List<Country> GetCustomer(int userID)
+        //{
+
+        //    try
+        //    {
+        //        accessManager.SqlConnectionOpen(DataBase.SQQeye);
+        //        List<Country> countrys = new List<Country>();
+        //        List<SqlParameter> aList = new List<SqlParameter>();
+        //        aList.Add(new SqlParameter("@UserId", userID));
+        //        SqlDataReader dr = accessManager.GetSqlDataReader("sp_getAllCustomer");
+        //        while (dr.Read())
+        //        {
+        //            Country country = new Country();
+        //            country.CustomerId = (int)dr["CustomerId"];
+        //            country.CustomerName = dr["CustomerName"].ToString();
+        //            countrys.Add(country);
+        //        }
+        //        return countrys;
+        //    }
+        //    catch (Exception exception)
+        //    {
+
+        //        throw exception;
+        //    }
+        //    finally
+        //    {
+        //        accessManager.SqlConnectionClose();
+        //    }
+        //}
+        public List<Country> GetWeightByCourierDispatchId()
         {
 
             try
@@ -594,12 +740,12 @@ namespace SQIndustryThree.DAL
                 accessManager.SqlConnectionOpen(DataBase.SQQeye);
                 List<Country> countrys = new List<Country>();
                 List<SqlParameter> aList = new List<SqlParameter>();
-                SqlDataReader dr = accessManager.GetSqlDataReader("sp_getAllBuyer");
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_GetActualWeightByMachine");
                 while (dr.Read())
                 {
                     Country country = new Country();
-                    country.BuyerId = (int)dr["BuyerId"];
-                    country.BuyerName = dr["BuyerName"].ToString();
+                    country.Id = (int)dr["Id"];
+                    country.Weight = dr["Weight"].ToString();
                     countrys.Add(country);
                 }
                 return countrys;
@@ -614,7 +760,7 @@ namespace SQIndustryThree.DAL
                 accessManager.SqlConnectionClose();
             }
         }
-        
+
         public CourierRequestModel CourierDetailsInformation(int masterId, int userId)
         {
             CourierRequestModel CourierRequestModel = new CourierRequestModel();
@@ -830,7 +976,7 @@ namespace SQIndustryThree.DAL
                 SqlDataReader sqlDataReader = this.accessManager.GetSqlDataReader("sp_GetCourierDispatchDetailsList", new List<SqlParameter>()
         {
           new SqlParameter("@courierDispatchNo", (object) masterId)
-         
+
         });
                 while (sqlDataReader.Read())
                     CourierRequestModelList.Add(new CourierRequestModel()
@@ -865,7 +1011,7 @@ namespace SQIndustryThree.DAL
                         Remarks = sqlDataReader["Remarks"].ToString(),
                         CountryName = sqlDataReader["CountryName"].ToString(),
                         ServiceProvider = sqlDataReader["ServiceProvider"].ToString(),
-                      
+
                     });
                 return CourierRequestModelList;
             }
@@ -878,7 +1024,7 @@ namespace SQIndustryThree.DAL
                 this.accessManager.SqlConnectionClose();
             }
         }
-      
+
         public bool CommentSent(int MasterID, int ReviewTo, string ReviewMessage, int UserID)
         {
             bool result = false;
@@ -934,7 +1080,7 @@ namespace SQIndustryThree.DAL
                 int masterId = 0;
                 accessManager.SqlConnectionOpen(DataBase.SQQeye);
                 List<SqlParameter> aParameters = new List<SqlParameter>();
-               ResultResponse result = new ResultResponse();
+                ResultResponse result = new ResultResponse();
                 result.pk = masterId;
                 result.isSuccess = true;
                 foreach (CourierTypeDetails item in courierType.CourierTypeDetails)
@@ -964,7 +1110,7 @@ namespace SQIndustryThree.DAL
                 accessManager.SqlConnectionClose();
             }
         }
-        public List<CourierTypeDetails> GetCourierTypeInfo(int status,string type)
+        public List<CourierTypeDetails> GetCourierTypeInfo(int status, string type)
         {
             List<CourierTypeDetails> courierType = new List<CourierTypeDetails>();
             try
@@ -1006,9 +1152,53 @@ namespace SQIndustryThree.DAL
                 accessManager.SqlConnectionClose();
             }
         }
+        public List<CourierTypeDetails> GetCourierTypeInfoByCountry(int status, string type, string country, string weight)
+        {
+            List<CourierTypeDetails> courierType = new List<CourierTypeDetails>();
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<SqlParameter> aList = new List<SqlParameter>();
+                //aList.Add(new SqlParameter("@userId", UserId));
+                aList.Add(new SqlParameter("@status", status));
+                aList.Add(new SqlParameter("@type", type));
+                aList.Add(new SqlParameter("@country", country));
+                aList.Add(new SqlParameter("@weight", weight));
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_GetCourierTypeByCountryWieghtWise", aList);
+                while (dr.Read())
+                {
+                    CourierTypeDetails courierTypeInfromation = new CourierTypeDetails();
+                    courierTypeInfromation.CourierTypeId = (int)dr["CourierTypeId"];
+                    courierTypeInfromation.WeightRange = dr["WeightRange"].ToString();
+                    courierTypeInfromation.Country = dr["Country"].ToString();
+                    courierTypeInfromation.CountryName = dr["CountryName"].ToString();
+                    courierTypeInfromation.ServiceProviderId = dr["ServiceProviderId"].ToString();
+                    courierTypeInfromation.ServiceProvider = dr["ServiceProvider"].ToString();
+                    courierTypeInfromation.Currency = dr["Currency"].ToString();
+                    courierTypeInfromation.Rate = dr["Rate"].ToString();
+                    courierTypeInfromation.LeadTimeFrom = dr["LeadTimeFrom"].ToString();
+                    courierTypeInfromation.LeadTimeTo = dr["LeadTimeTo"].ToString();
+                    courierTypeInfromation.Type = dr["Type"].ToString();
+                    courierTypeInfromation.CreateDate = dr["CreateDate"].ToString();
+                    courierTypeInfromation.UserName = dr["UserName"].ToString();
+                    courierTypeInfromation.Rate = dr["Rate"].ToString();
+                    courierType.Add(courierTypeInfromation);
+                }
+                return courierType;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw e;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
         public List<CourierTypeDetails> courierTypeCheck(CourierTypeDetails courierTypeDetails, int userID)
         {
-           // DataTable dt = new DataTable();
+            // DataTable dt = new DataTable();
             List<CourierTypeDetails> CheckcourierTypeDetails = new List<CourierTypeDetails>();
             try
             {
@@ -1089,7 +1279,7 @@ namespace SQIndustryThree.DAL
                 {
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                 
+
                     DynamicParameters dynamicParameters = new DynamicParameters();
                     dynamicParameters.Add("@CourierTypeId", (object)courierTypeDetails.CourierTypeId);
                     dynamicParameters.Add("@CourierType", (object)courierTypeDetails.Type);
@@ -1102,6 +1292,36 @@ namespace SQIndustryThree.DAL
                     dynamicParameters.Add("@Rate", (object)courierTypeDetails.Rate);
                     dynamicParameters.Add("@CreateBy", (object)UserId);
                     int num = cnn.Execute("sp_UpdateCourierTypeEntry", (object)dynamicParameters, commandType: new CommandType?(CommandType.StoredProcedure));
+                    return new ResultResponse()
+                    {
+                        pk = num,
+                        isSuccess = true
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        public ResultResponse UpdateCourierBudget(CourierRequestModel courierRequestModel, int UserId)
+        {
+            try
+            {
+                using (IDbConnection cnn = (IDbConnection)new SqlConnection(this.connStr))
+                {
+                    if (cnn.State == ConnectionState.Closed)
+                        cnn.Open();
+
+                    DynamicParameters dynamicParameters = new DynamicParameters();
+                    dynamicParameters.Add("@CourierBudgetEntryId", (object)courierRequestModel.CourierBudgetEntryId);
+                    dynamicParameters.Add("@BusinessUnitId", (object)courierRequestModel.BusinessUnitId);
+                    dynamicParameters.Add("@DepartmentID", (object)courierRequestModel.DepartmentID);
+                    dynamicParameters.Add("@BudgetYear", (object)courierRequestModel.BudgetYear);
+                    dynamicParameters.Add("@MonthOfYear", (object)courierRequestModel.MonthOfYear);
+                    dynamicParameters.Add("@Amount", (object)courierRequestModel.Amount);
+                    dynamicParameters.Add("@CreateBy", (object)UserId);
+                    int num = cnn.Execute("sp_UpdateCourierBudgetEntry", (object)dynamicParameters, commandType: new CommandType?(CommandType.StoredProcedure));
                     return new ResultResponse()
                     {
                         pk = num,
@@ -1130,7 +1350,7 @@ namespace SQIndustryThree.DAL
           new SqlParameter("@frontdesk", (object) frontdesk)
         });
                 while (sqlDataReader.Read())
-                courierRequestModelList.Add(new CourierRequestModel()
+                    courierRequestModelList.Add(new CourierRequestModel()
                     {
                         CourierRequestId = (int)sqlDataReader["CourierRequestId"],
                         DeartmentName = sqlDataReader["DeartmentName"].ToString(),
@@ -1156,7 +1376,7 @@ namespace SQIndustryThree.DAL
                         //Pending = (int)sqlDataReader["PendingStatus"],
                         DateOfRequest = sqlDataReader["DateOfRequest"].ToString(),
                         UserName = sqlDataReader["UserName"].ToString()
-                     
+
                     });
                 return courierRequestModelList;
             }
@@ -1170,7 +1390,7 @@ namespace SQIndustryThree.DAL
                 this.accessManager.SqlConnectionClose();
             }
         }
-       public ResultResponse SaveCourierDispatchDatabase(CourierRequestModel courierRequestModel, int userId, long InvoiceNo)
+        public ResultResponse SaveCourierDispatchDatabase(CourierRequestModel courierRequestModel, int userId, long InvoiceNo)
         {
             try
             {
@@ -1241,7 +1461,7 @@ namespace SQIndustryThree.DAL
                 ResultResponse result = new ResultResponse();
                 result.pk = masterId;
                 result.isSuccess = true;
-               
+
                 return result;
             }
             catch (Exception e)
@@ -1256,7 +1476,7 @@ namespace SQIndustryThree.DAL
         public long GetInvoice_No(string _dDname)
         {
             long value = 0;
-            
+
             try
             {
                 accessManager.SqlConnectionOpen(DataBase.SQQeye);
@@ -1268,6 +1488,125 @@ namespace SQIndustryThree.DAL
                 value = int.Parse(dt.Rows[0]["LASTSERIALNO"].ToString());
 
                 return value;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw e;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+        public List<CourierRequestModel> GetAllCourierBudget(
+  int Status,
+  int Pgress)
+        {
+            List<CourierRequestModel> CourierRequestModelList = new List<CourierRequestModel>();
+            try
+            {
+                this.accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                SqlDataReader sqlDataReader = this.accessManager.GetSqlDataReader("sp_CourierGetAllBudget", new List<SqlParameter>()
+        {
+          new SqlParameter("@Status", (object) Status),
+          new SqlParameter("@Progress", (object) Pgress)
+        });
+                while (sqlDataReader.Read())
+                    CourierRequestModelList.Add(new CourierRequestModel()
+                    {
+                        CourierBudgetEntryId = (int)sqlDataReader["CourierBudgetEntryId"],
+                        BusinessUnitId = (int)sqlDataReader["BusinessUnitId"],
+                        BusinessUnitName = sqlDataReader["BusinessUnitName"].ToString(),
+                        DepartmentID = (int)sqlDataReader["DepartmentID"],
+                        //  DepartmentName = sqlDataReader["DepartmentName"].ToString(),
+                        MonthOfYear = sqlDataReader["MonthOfYear"].ToString(),
+                        BudgetYear = sqlDataReader["BudgetYear"].ToString(),
+                        Amount = sqlDataReader["Amount"].ToString(),
+                        UserName = sqlDataReader["UserName"].ToString(),
+
+                    });
+                return CourierRequestModelList;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                this.accessManager.SqlConnectionClose();
+            }
+        }
+
+
+
+
+
+
+
+        public CourierRequestModel GetcourierBudget(int UserId, int primarykey)
+        {
+            CourierRequestModel CourierTypeDetails = new CourierRequestModel();
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<SqlParameter> aList = new List<SqlParameter>();
+                aList.Add(new SqlParameter("@courierBudgetEntryId", primarykey));
+                //aList.Add(new SqlParameter("@UserId", userId));
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_GetCourierBudgetInfo", aList);
+                while (dr.Read())
+                {
+                    // CourierTypeDetails courierTypeInfromation = new CourierTypeDetails();
+                    CourierTypeDetails.CourierBudgetEntryId = (int)dr["CourierBudgetEntryId"];
+                    CourierTypeDetails.BusinessUnitId = (int)dr["BusinessUnitId"];
+                    CourierTypeDetails.BusinessUnitName = dr["BusinessUnitName"].ToString();
+                    CourierTypeDetails.DepartmentID = (int)dr["DepartmentID"];
+                    //  CourierTypeDetails.DepartmentName = dr["DepartmentName"].ToString();
+                    CourierTypeDetails.BudgetYear = dr["BudgetYear"].ToString();
+                    CourierTypeDetails.MonthOfYear = dr["MonthOfYear"].ToString();
+                    CourierTypeDetails.Amount = dr["Amount"].ToString();
+                    CourierTypeDetails.UserName = dr["UserName"].ToString();
+
+                }
+                return CourierTypeDetails;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw e;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+
+
+
+
+        public List<CourierRequestModel> GetCourierBudgetCheck(int business_unit, string financialYear, int month)
+        {
+            // DataTable dt = new DataTable();
+            List<CourierRequestModel> CourierRequestModel = new List<CourierRequestModel>();
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<SqlParameter> aList = new List<SqlParameter>();
+                //aList.Add(new SqlParameter("@userId", UserId));
+                aList.Add(new SqlParameter("@BusinessUnitId", (object)business_unit));
+                aList.Add(new SqlParameter("@BudgetYear", (object)financialYear));
+                aList.Add(new SqlParameter("@MonthOfYear", (object)month));
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_CourierBudgetCheck", aList);
+                while (dr.Read())
+                {
+                    CourierRequestModel courierRequestModel = new CourierRequestModel();
+                    courierRequestModel.Amount = dr["Amount"].ToString();
+
+                    CourierRequestModel.Add(courierRequestModel);
+                }
+                return CourierRequestModel;
             }
             catch (Exception e)
             {

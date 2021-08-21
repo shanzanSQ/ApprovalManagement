@@ -282,7 +282,9 @@
                             $("#myModal").modal("hide");
                             $("#iousubmenu").find('li').removeClass();
                             $("#iousubmenu").find('li:nth-child(2)').addClass("active");
-                            GetAllVisitorRequest(1, 0);
+                        GetAllVisitorRequest(1, 0);
+
+                        
                     });
                 },
                 error: function () {
@@ -290,6 +292,8 @@
                 }
             });
     }
+
+
 
 </script>
 

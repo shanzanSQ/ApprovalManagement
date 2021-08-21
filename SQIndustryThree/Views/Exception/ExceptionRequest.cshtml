@@ -29,11 +29,78 @@
     #exceptionNavigaton {
         background-color: #37474F;
     }
-    
+
+    #radioBtn a {
+        margin: 1px;
+    }
+
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    .required:after {
+        content: "*";
+        color: red;
+    }
+
+    .inputhidegroup {
+        border: none;
+        pointer-events: none;
+        text-align: center;
+    }
+
+    input[type=text] {
+        margin: 2px;
+        padding: 2px;
+    }
+
+    #genaralInformationTable td input[type=text], #genaralInformationTable td input[type=date], #genaralInformationTable td input[type=number] {
+        text-align: center;
+        width: 95%;
+        height: 25px;
+    }
+
+
+    #genaralInformationTable td input[type=button] {
+        height: 25px;
+        width: 25px;
+        border-radius: 50%;
+        background-color: green;
+        color: white;
+    }
+
+    #genaralInformationTable th, #genaralInformationTable td {
+        margin: 0px;
+        padding: 0px;
+        text-align: center;
+    }
+
+    .leftlable {
+        text-align: left;
+    }
+
+    #airfreight td {
+        width: 12%;
+        padding: 2px;
+    }
+
+    #disclaimCancel td, #otherexception td {
+        padding: 2px;
+    }
+
+        #disclaimCancel td input[type=text], #airfreight td input[type=text], #otherexception td input[type=text] {
+            text-align: center;
+        }
+
+    .airfreightDisplay {
+        display: none;
+    }
 </style>
 <div class="container-fluid">
     <h3 style="text-align: center;
-    "><b>Exception Request Management System</b></h3>
+    ">
+        <b>Exception Request Management System</b>
+    </h3>
     <hr style="margin: 0px" />
     <div class="row">
         <div id="exceptionNavigaton" class="navbar navbar-default navbar-static-top">
@@ -173,7 +240,7 @@
                     }
                 });
         }
-        
+
     }
     function PrintModal() {
             var print_div = document.getElementById("printablearea");

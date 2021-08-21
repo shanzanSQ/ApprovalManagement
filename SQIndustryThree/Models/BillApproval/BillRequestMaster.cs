@@ -64,6 +64,7 @@ namespace SQIndustryThree.Models.BillApproval
         public List<BillFileUploadDetails> BillFilesList { get; set; }
         public List<POFileUploadDetails> POFilesList { get; set; }
         public List<GRNFileUploadDetails> GRNFilesList { get; set; }
+        public List<DocumentCenterFileUpload> BillDocList { get; set; }
         public List<BillApproverModel> ApproverList { get; set; }
         public List<BillComments> BillComments { get; set; }
         public List<LogSection> BillLogSection { get; set; }

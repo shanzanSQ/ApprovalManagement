@@ -14,10 +14,10 @@
 </style>
 <div id="printablearea">
 
-    <div>
+    <!--<div>-->
         @*<span style="float:left;font-weight:bold;font-size:20px">@Model.BusinessUnitName</span>*@
-        <span style="float:right;font-weight:bold;font-size:20px">Courier Dispatch No: @Model.CourierRequestId</span>
-    </div>
+        <!--<span style="float:right;font-weight:bold;font-size:20px">Courier Dispatch No: @Model.CourierRequestId</span>
+    </div>-->
     @if (Model.CourierFontDeskModelList != null)
     {
         <div class="row">
@@ -64,7 +64,7 @@
     @if (Model.CourierFontDeskModelList != null)
     {
         <table border="1" width="100%" id="Courierlist">
-            <caption>Courier Cost Consolidate </caption>
+            <caption>Courier Request Information </caption>
             <thead style="background-color:aquamarine">
                 <tr>
                     <th style="text-align:center">Request Id</th>
@@ -76,6 +76,7 @@
                     <th style="text-align:center">Delivery Date</th>
                     <th style="text-align:center">Proposed Date</th>
                     <th style="text-align:center">Cost</th>
+                    <th style="text-align:center"> Get Actual Weight </th>
                 </tr>
             </thead>
             <tbody  id="ammountInformationbody">
@@ -88,12 +89,13 @@
                     <td style="text-align:center">@item.DeartmentName</td>
                     <td style="text-align:center">@item.Receiver</td>
                     @*<td style="background-color:aqua;">@item.PostCode</td>*@
-                <td style="text-align:center"><input id="weight" style="width:100%;overflow-wrap:break-word" type="text" name="weight" value="@item.Weight" onchange="calculateGrandTotalWeight()" /></td>
+                    <td style="text-align:center"><input id="weight" style="width:100%;overflow-wrap:break-word" type="text" name="weight" value="@item.Weight" onchange="calculateGrandTotalWeight()" /></td>
                     @*<td>@item.Weight</td>*@
-                <td style="text-align:center">@item.DispatchDate</td>
-                <td style="text-align:center">@item.Deliverydate</td>
-                <td style="text-align:center">@item.ProposedDate</td>
+                    <td style="text-align:center">@item.DispatchDate</td>
+                    <td style="text-align:center">@item.Deliverydate</td>
+                    <td style="text-align:center">@item.ProposedDate</td>
                     <td style="text-align:center">@item.Cost</td>
+                    <td style="text-align:center"><form><input type="button" value="Get Weight" id="getWeight" data-Weight="@item.Weight"  onclick="getWeightByCourierDispatchId(@item.CourierRequestId)" onchange="calculateGrandTotalWeight()"></form></td>
                     @*<td>@item.total</td>*@
                 </tr>
 
@@ -111,7 +113,7 @@
                     <td></td>
                     <td></td>
                     <td id="total" name="grandtotal"><input id="total" disable style=" width: 100%; text-align: center;overflow-wrap: break-word" type="text" value="@Model.total" /></td>
-
+                    <td></td>
 
                 </tr>
             </tfoot>
@@ -120,14 +122,14 @@
     
     <div>
         <br />
-        <table width="30%" align="center">
+        <table width="45%" align="center">
             <tr>
                 <td>
                     <label for="courier_number" class="courier_number">Courier Number:</label>
                     @*<button value="Comments" onclick="showComments()" class="btn btn-sm btn-primary">Consolidate Value:</button>*@
                 </td>
                 <td style="padding:5px">
-                    <input id="courier_number" style=" width: 100%; text-align: center;overflow-wrap: break-word" type="text" autocomplete="off" />
+                    <input id="courier_number" style=" width: 100%; text-align: center;overflow-wrap: break-word" type="text" autocomplete="off" placeholder="Enter Courier Number"/>
                 </td>
             </tr>
             <tr>
@@ -151,20 +153,20 @@
             </tr>
             <tr>
                 <td>
-                    <label for="font_airway_bill_no" class="airway_bill_no">Airway Bill no:</label>
+                    <label for="font_airway_bill_no" class="airway_bill_no">Airway Bill No:</label>
                     @*<button value="Comments" onclick="showComments()" class="btn btn-sm btn-primary">Referance No:</button>*@
                 </td>
                 <td style="padding:5px">
-                    <input id="font_airway_bill_no" style=" width: 100%; text-align: center;overflow-wrap: break-word" type="text" autocomplete="off" value=" "/>
+                    <input id="font_airway_bill_no" style=" width: 100%; text-align: center;overflow-wrap: break-word" type="text" autocomplete="off" value=" "  placeholder="Enter Airway Bill No"/>
                 </td>
             </tr>
             <tr>
                 <td>
-                    <label for="font_referance_no" class="referance_no">Referance No:</label>
+                    <label for="font_referance_no" class="referance_no">Reference No:</label>
                     @*<button value="Comments" onclick="showComments()" class="btn btn-sm btn-primary">Referance No:</button>*@
                 </td>
                 <td style="padding:5px">
-                    <input id="referance_no" style=" width: 100%; text-align: center;overflow-wrap: break-word" type="text" autocomplete="off" value=" "/>
+                    <input id="referance_no" style=" width: 100%; text-align: center;overflow-wrap: break-word" type="text" autocomplete="off" value=" "  placeholder="Enter Reference No"/>
                 </td>
             </tr>
             <tr>
@@ -173,7 +175,7 @@
                     @*<button value="Comments" onclick="showComments()" class="btn btn-sm btn-primary">Remarks:</button>*@
                 </td>
                 <td style="padding:5px">
-                    <input id="font_remarks" style=" width: 100%; text-align: center;overflow-wrap: break-word" type="text" autocomplete="off" value=" " />
+                    <input id="font_remarks" style=" width: 100%; text-align: center;overflow-wrap: break-word" type="text" autocomplete="off" value=" "  placeholder="Enter Remarks" />
                 </td>
             </tr>
         </table>

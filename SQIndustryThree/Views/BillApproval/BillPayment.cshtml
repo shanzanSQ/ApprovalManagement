@@ -46,7 +46,9 @@
                 <div class="navbar-collapse collapse">
                     <ul id="billSubmrnu" class="nav navbar-nav">
                         <li onclick="GetApprovedRequestList(1)"><a href="#">Pending For Payment</a></li>
+                        <li onclick="APTranstion()"><a href="#">Cheque Issue</a></li>
                         <li onclick="GetApprovedRequestList(2)"><a href="#">Completed Payment</a></li>
+                        <li onclick="ChequePaymentDetails()"><a href="#">Cheque Payment Details</a></li>
                     </ul>
                 </div>
             </div>
@@ -76,7 +78,7 @@
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
-    <div class="modal" id="chequeInfo">
+    <div class="modal chequeInfo" id="chequeInfo">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -86,7 +88,7 @@
                     </button>
                     <h4 class="modal-title" style="text-align: center">Cheque Information</h4>
                 </div>
-                <div id="qualitybody" class="modal-body">
+                <div id="qualitybody" class="modal-body qualitybody">
                 </div>
                 <div class="modal-footer">
                     @*<button type="button" class="btn btn-primary btn-sm" id="UpdateQuality" onclick="UpdateQuality()">Submit</button>*@
@@ -95,6 +97,26 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
+
+    <div class="modal" id="myPreview">
+        <div class="modal-dialog modal-lg">
+            <div class="col-md-12 modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Bill Request Preview</h4>
+                </div>
+                <div id="previewmodalbody" class="previewmodal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div>
 
 </div>
 @*@Scripts.Render("~/bundles/jquery")*@
@@ -106,9 +128,9 @@
         $(this).parent().addClass('active');
        // $("#spmenuid").html($(this).html());
     });
+
+
     var ExceptionRequestId = 0;
-
-
 
     function GetApprovedRequestList(status) {
         var urlpath = '@Url.Action("ApprovedBillList", "BillApproval")';
@@ -127,7 +149,7 @@
             }
         });
     }
-    function ChequeInfo(masterID,status) {
+    @*function ChequeInfo(masterID,status) {
          var urlpath = '@Url.Action("ChequeInfoModalView", "BillApproval")';
         $.ajax({
             data: { MasterID: masterID, ViewName:"_chequeInfoModalView",Status:status},
@@ -138,6 +160,50 @@
                 $("#qualitybody").html("");
                 $("#qualitybody").append(data);
                 $("#chequeInfo").modal("show");
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }*@
+
+    function APTranstion() {
+         var urlpath = '@Url.Action("APTransationModalView", "BillApproval")';
+        $.ajax({
+            data: { ViewName:"_apTransationModalView"},
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                //$(".qualitybody").html("");
+                //$(".qualitybody").append(data);
+                //$(".chequeInfo").modal("show");
+                $('#billPaymentDashboard').empty();
+                $('#billPaymentDashboard').append(data);
+
+                supplierList();
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+
+        function ChequePaymentDetails() {
+         var urlpath = '@Url.Action("ChequePaymentDetails", "BillApproval")';
+        $.ajax({
+            data: { ViewName:"_chequePaymentDetails"},
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                //$(".qualitybody").html("");
+                //$(".qualitybody").append(data);
+                //$(".chequeInfo").modal("show");
+                $('#billPaymentDashboard').empty();
+                $('#billPaymentDashboard').append(data);
+                $('#BillPaymentTable').DataTable();
+               // supplierList();
             },
             error: function () {
                 alert("Error");

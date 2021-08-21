@@ -1,0 +1,118 @@
+﻿@model SQIndustryThree.Models.BillApproval.BillAllocationMaster
+
+<style>
+    th {
+        text-align: left;
+    }
+
+    td {
+        text-align: left;
+    }
+
+    #genaralInfodt tr th, #genaralInfodt tr td, #approverlist tr td, #approverlist tr th {
+        text-align: center;
+    }
+</style>
+
+<div class="">
+    <div id="printablearea">
+
+        <div class="row">
+            <div class="col-md-6">
+                <table border="1" width="100%">
+                    <caption>Invoice Information</caption>
+                    <tr>
+                        <th width="30%">Create Date</th>
+                        <td width="70%">@DateTime.Parse(Model.CreatedDate).ToString("dd MMM yyyy")</td>
+                    </tr>
+                    <tr>
+                        <th width="30%">Payment Transaction No</th>
+                        <td width="70%">@Model.PaymentTransactionNo</td>
+                    </tr>
+                    <tr>
+                        <th width="30%">Payment Mode</th>
+                        <td width="70%">@Model.PaymentModeName</td>
+                    </tr>
+                    <tr>
+                        <th width="30%">Cheque No</th>
+                        <td width="70%">@Model.ChequeNo</td>
+                    </tr>
+                    <tr>
+                        <th width="30%">Cheque Amount</th>
+                        <td width="70%">@Model.ChequeAmount.ToString("0.00")</td>
+                    </tr>
+                    <tr>
+                        <th width="30%">Cheque Date</th>
+                        <td width="70%">@Model.ChequeDate</td>
+                    </tr>
+                    <tr>
+                        <th width="30%">Invoice Date</th>
+                        <td width="70%">@DateTime.Parse(Model.ChequeDate).ToString("dd MMM yyyy")</td>
+                    </tr>
+
+                    <tr>
+                        <th width="30%">Supplier: </th>
+                        <td width="70%">@Model.SupplierName</td>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+
+        <table border="1" width="100%" id="genaralInfodt">
+            @{float countFob = 1;}
+            <caption>Invoice Details</caption>
+            <thead>
+                <tr>
+                    <th>SL</th>
+                    <th>Request ID</th>
+                    <th>Invoice No</th>
+                    <th>Invoice Date</th>
+                    <th>PO No</th>
+                    <th>Bill Amount</th>
+                    <th>Paid So Far</th>
+                    <th>Paid</th>
+                    <th>Balance Amount</th>
+
+                </tr>
+            </thead>
+            <tbody>
+
+                @if (Model.AllocationDetails != null)
+                {
+                    foreach (var item in Model.AllocationDetails)
+                    {
+
+                        <tr>
+                            <td>@countFob</td>
+                            <td>@item.InvoiceKey</td>
+                            <td>@item.InvoiceNo</td>
+                            <td>@DateTime.Parse(@item.InvoiceDate).ToString("dd MMM yyyy")</td>
+                            <td>@item.PONo</td>
+                            <td>@item.BillAmount.ToString("0.00")</td>
+                            <td>@item.PaidSoFar.ToString("0.00")</td>
+                            <td>@item.Paid.ToString("0.00")</td>
+                            <td>@item.BalanceAmount.ToString("0.00")</td>
+                        </tr>
+                        countFob++;
+
+
+
+                    }
+                }
+
+
+            </tbody>
+            <tfoot>
+                <tr>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div style="text-align:center">
+            <br />
+            <button type="button" style="width:30%" class="btn btn-primary btn-sm" onclick="SubmitToDatabase()">Submit</button>
+        </div>
+
+    </div>
+</div>

@@ -59,7 +59,7 @@
                 <div id="Dmodalbody" class="modal-body">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                    @*<button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>*@
                     <button type="button" class="btn btn-primary btn-sm" id="confirmCourierInfo" @*onclick="PrintModal()"*@>Confirm</button>
                     <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
                 </div>
@@ -93,7 +93,7 @@
     load();
 
     function load() {
-       
+
 
     }
 
@@ -218,6 +218,29 @@
         //}
 
     }
+     function getWeightByCourierDispatchId() {
+        debugger;
+            var urlpath = '@Url.Action("GetWeightByCourierDispatchId", "Courier")';
+
+        $.ajax({
+            url: urlpath,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            type: "Post",
+            data: JSON.stringify({
+
+            }),
+            success: function (response) {
+                //alert(response.data[0].Weight);
+                $("#font_received_weight").val(response.data[0].Weight);
+               
+            },
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+
+    }
     $("#save_button").click(function () {
 
         debugger;
@@ -229,7 +252,7 @@
                 closeOnCancel: true
             });
         }
-     
+
        else if ($('#fontDeskCourierTable tr td input[type=checkbox]:checked').length >1) {
             //alert($('#approverTable tr td input[type=checkbox]:checked').length);
             swal({
@@ -269,7 +292,7 @@
 
                     var date = new String(yr + '-' + mon + '-' + day);
 
-                  
+
                     font_received_date.setAttribute('max', date);
                     $('#font_received_date').val(date);
 
@@ -314,14 +337,14 @@
 
             });
         }
-      
+
         jsonData["Courier"] =(Courier);
         jsonData["CountryName"] = CountryName
         jsonData["Weight"] = Weight;
         var Courier =(Courier);
         var CountryName =(CountryName);
         var Weight =$("#netWeight").val();
-        
+
 
           var urlpath = '@Url.Action("GetcourierWiseConsolidateCostDate", "Courier")';
             $.ajax({
@@ -336,7 +359,7 @@
                  }),
                 success: function (response) {
                     $("#consolidate_value").val(response.data[0].Rate);
-                   
+
                 },
                 error: function () {
                     alert("Error");
@@ -370,7 +393,7 @@
 
             return false;
         }
-  
+
         else {
              var jsonData = SaveCourieFontDeskrRequest();
         var urlpath = '@Url.Action("SaveCourierReceived", "Courier")';
@@ -506,9 +529,9 @@
             myData["ActualWeight"] = $(this).find('input[name^="weight"]').val();
             ammountList.push(myData);
         });
-        jsonData["CourierAmmountList"] = ammountList; 
-        
-      
+        jsonData["CourierAmmountList"] = ammountList;
+
+
         return jsonData;
 
         }

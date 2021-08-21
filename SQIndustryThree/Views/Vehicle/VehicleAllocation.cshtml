@@ -1,0 +1,752 @@
+﻿
+@{
+    ViewBag.Title = "VehicleAllocation";
+}
+
+<style type="text/css">
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    input, select {
+        width: 100%;
+    }
+
+        input[type=text], input[type=button], select {
+            height: 30px;
+        }
+
+    .overlay {
+        background: #463e3e;
+        display: none;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        opacity: 0.5;
+    }
+
+    .mt {
+        margin-top: 8px;
+    }
+
+    .vhRequestTableDiv {
+        margin-top: 20px;
+    }
+
+    #addNewButton {
+        float: right;
+    }
+
+    .custom-checkbox {
+        height: 22px;
+    }
+</style>
+
+
+<div class="container-fluid">
+    <h3 style="text-align: center;">
+        <b>Vehicle Allocation</b>
+    </h3>
+    <hr style="margin: 0px" />
+    <div class="row" style="margin-top:20px;">
+        <div class="col-md-4">
+            <div class="row">
+                <label class="col-sm-4">Vehicle No :</label>
+                <div class="col-sm-6">
+                    <input type="text" id="vhNo" class="form-control" autocomplete="off"/>
+                </div>
+            </div>
+            <div class="row mt">
+                <label class="col-sm-4">Driver Name :</label>
+                <div class="col-sm-6">
+                    <input type="text" id="vhDriverName" class="form-control" autocomplete="off" />
+                </div>
+            </div>
+            <div class="row mt">
+                <label class="col-sm-4">Driver Phone :</label>
+                <div class="col-sm-6">
+                    <input type="text" id="vhDriverPhone" class="form-control" autocomplete="off"/>
+                </div>
+            </div>
+            <div class="row mt">
+                <label class="col-sm-4">Start Point :</label>
+                <div class="col-sm-6">
+                    <select id="vhStartPoint" onchange="startPointSelectFunction()" class="form-control">
+                        <option value="0">--Select Start Point--</option>
+                        <option value="1">Station</option>
+                        <option value="2">Celcius 1</option>
+                        <option value="3">Central</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt">
+                <label class="col-sm-4">Route :</label>
+                <div class="col-sm-6">
+                    <select id="vhRoute" onchange="routeSelectFunction()" class="form-control" disabled>
+                        <option value="0">--Select Route--</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt">
+                <label class="col-sm-4">Trip Type :</label>
+                <div class="col-sm-6">
+                    <select id="vhTripType" onchange="tripTypeSelectFunction()" class="form-control" disabled>
+                        <option value="0">--Select Trip Type--</option>
+                        <option value="1">Round</option>
+                        <option value="2">Single</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt">
+                <label class="col-sm-4">Vehicle Type :</label>
+                <div class="col-sm-6">
+                    <select id="vhVehicleType" onchange="vehicleTypeSelectFunction()" class="form-control" disabled>
+                        <option value="0">--Select Type--</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt">
+                <label class="col-sm-4">Vehicle Vendor :</label>
+                <div class="col-sm-6">
+                    <select id="vhVehicleVendor" onchange="vehicleVendorSelectFunction()" class="form-control" disabled>
+                        <option value="0">--Select Vendor--</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="row">
+                        <label class="col-sm-4">Available Seats:</label>
+                        <div class="col-sm-6">
+                            <input type="text" id="vhAvailableSeats" class="form-control" disabled />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="row">
+                        <label class="col-sm-6">Approximate Cost (BDT):</label>
+                        <div class="col-sm-5">
+                            <input type="text" id="vhApproximateCost" class="form-control" disabled />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <table width="100%" cellpadding="5" cellspacing="0" border="1" id="vhAllocationTable" class="table table-striped">
+                    <caption>Vehicle Allocation Table</caption>
+                    <thead>
+                        <tr>
+                            <th>Request ID</th>
+                            <th>Route</th>
+                            <th>Number of Passenger</th>
+                            <th>Allocated Cost</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vhAllocationTableBody">
+                    </tbody>
+                    <tfoot id="totalAllocatedSeats">
+                    </tfoot>
+                </table>
+                <a href="#" id="submitButton" class="btn btn-primary">Submit</a>
+            </div>
+        </div>
+    </div>
+    <a href="#" id="addNewButton" class="btn btn-primary"><i class="fa fa-plus"></i> Add New</a>
+    <div class="vhRequestTableDiv">
+        <table width="100%" cellpadding="5" cellspacing="0" border="1" id="vhRequestTable" class="table table-striped">
+            <caption>Pending Approved User Requests</caption>
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>SL</th>
+                    <th>Request ID</th>
+                    <th>Requestor</th>
+                    <th>Travel Date</th>
+                    <th>Business Unit</th>
+                    <th>Department</th>
+                    <th>Start Point</th>
+                    <th>Route</th>
+                    <th>Purpose of Visit</th>
+                    <th>Number of Passenger</th>
+                    <th>Comment from COO</th>
+                    <th>Comment from Head of Station Manager</th>
+                </tr>
+            </thead>
+            <tbody id="vhRequestTableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <div class="modal" id="submitConfirmModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Confirm Vehicle Allocation</h4>
+                </div>
+                <div id="submitModalBody" class="modal-body">
+                    <div class="row">
+                        <div id="submitModalBodyVehicleInfo" class="col-md-5">
+                            <table width="100%" cellpadding="5" cellspacing="0" border="1" id="vhAllocationTableModal" class="table table-striped">
+                                <caption>Vehicle Allocation Table</caption>
+                                <tr>
+                                    <th>Vehicle No</th>
+                                    <td><span id="vhNoModal"></span></td>
+                                </tr>
+                                <tr>
+                                    <th>Driver Name</th>
+                                    <td><span id="vhDriverNameModal"></span></td>
+                                </tr>
+                                <tr>
+                                    <th>Driver Phone</th>
+                                    <td><span id="vhDriverPhoneModal"></span></td>
+                                </tr>
+                                <tr>
+                                    <th>Vehicle Type</th>
+                                    <td><span id="vhVehicleTypeModal"></span></td>
+                                </tr>
+                                <tr>
+                                    <th>Start Point</th>
+                                    <td><span id="vhStartPointModal"></span></td>
+                                </tr>
+                                <tr>
+                                    <th>Trip Type</th>
+                                    <td><span id="vhTripTypeModal"></span></td>
+                                </tr>
+                                <tr>
+                                    <th>Route</th>
+                                    <td><span id="vhRouteModal"></span></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div id="submitModalBodyApporvedUserInfo" class="col-md-7">
+                            <table width="100%" cellpadding="5" cellspacing="0" border="1" id="vhAllocationTableForModal" class="table table-striped">
+                                <caption>Allocated Passenger Table</caption>
+                                <thead>
+                                    <tr>
+                                        <th>Request ID</th>
+                                        <th>Route</th>
+                                        <th>Number of Passenger</th>
+                                        <th>Allocated Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="vhAllocationTableBodyModal">
+                                </tbody>
+                                <tfoot id="totalAllocatedSeatsModal">
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="/Vehicle/VehicleAllocationList" type="button" id="submitConfirmButton" class="btn btn-success">Confirm Submission</a>
+                    <button type="button" id="modalCloseButton" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+<script type="text/javascript">
+    var dataLength;
+    var availableSeats;
+
+    $(document).ready(function () {
+        loadVehicleRequstData();
+        //loadVehicleTypeDropDownOptions();
+        //loadRouteDropDownOptions();
+    });
+
+    function loadVehicleRequstData() {
+        var urlPath = '@Url.Action("AllVehicleRequestsForAllocation", "Vehicle")';
+        $.ajax({
+            type: 'GET',
+            url: urlPath,
+            dataType: 'json',
+            success: function (datas) {
+                table = $('#vhRequestTableBody');
+                i = 0;
+                dataLength = datas.length;
+                datas.forEach(function (data) {
+                    table.append(`<tr id="` + 'vhRequestRow' + (++i)+ `">
+                                            <td><input type="checkbox" id="` + 'chkId' + i + `" class="custom-checkbox" /></td>
+                                            <td>`+ i + `</td>
+                                            <td id="requestId` + i + `">`+ data.VehicleRequestMasterId + `</td>
+                                            <td>`+ data.UserInformation.UserInformationName + `</td>
+                                            <td>`+ data.TravelStratDate + `</td>
+                                            <td>`+ data.BusinessUnit + `</td>
+                                            <td>`+ data.DepartmentName + `</td>
+                                            <td>`+ data.StartingPoint + `</td>
+                                            <td>`+ data.Route + `</td>
+                                            <td>`+ data.PurposeofTravel + `</td>
+                                            <td id="visitorCountId` + i + `">`+ data.NoofUser + `</td>
+                                            <td>`+ data.CommentFromCOO + `</td>
+                                            <td>`+ data.CommentFromStationMaster + `</td>
+                                        </tr>`);
+                });
+            }
+        });
+    }
+
+    $('#addNewButton').click(function () {
+
+        if ($("#vhRequestTable tr td input[type='checkbox']:checked").length < 1) {
+            toastr.error("PLease select at least one request!");
+            return;
+        }
+
+        $("#vhRequestTable tr td input[type='checkbox']:checked").each(function () {
+            var currentRow = $(this).closest("tr");
+            var requestId = currentRow.find("td:eq(2)").text();
+            var destination = currentRow.find("td:eq(8)").text();
+            var noOfVisitor = currentRow.find("td:eq(10)").text();
+            currentRow.remove();
+            var appendData = `<tr id="` + requestId + `">
+                                            <td>` + requestId + `</td>
+                                            <td>`+ destination + `</td>
+                                            <td>`+ noOfVisitor + `</td>
+                                            <td></td>
+                                            <td><a href="javascript:restoreRequestRow(` + requestId + `);"><i class="fa fa-times-circle" style="font-size: 24px;"></i></a></td>
+                                        </tr>`;
+            var appendDataForModal = `<tr id="` + requestId + `Modal">
+                                            <td>` + requestId + `</td>
+                                            <td>`+ destination + `</td>
+                                            <td>`+ noOfVisitor + `</td>
+                                            <td></td>
+                                        </tr>`;
+            $('#vhAllocationTableBody').append(appendData);
+            $('#vhAllocationTableBodyModal').append(appendDataForModal);
+        });
+
+        //var totalAllocatedSeatsCount = 0;
+        //$("#vhAllocationTable tbody tr").each(function () {
+        //    var currentRow = $(this).closest("tr");
+        //    totalAllocatedSeatsCount += parseInt(currentRow.find("td:eq(2)").text());
+        //});
+
+        //var appendData = `<tr>
+        //        <th style="text-align: center;" colspan="2">Total Allocated Seats:</th>
+        //        <th colspan="3">` + totalAllocatedSeatsCount + `</th>
+        //    </tr>`;
+        //$("#totalAllocatedSeats").empty();
+        //$("#totalAllocatedSeatsModal").empty();
+        //$("#totalAllocatedSeats").append(appendData);
+        //$("#totalAllocatedSeatsModal").append(appendData);
+
+        showTotalAllocatedSeats();
+        showAllocatedCost();
+    });
+
+    $('#submitButton').click(function () {
+
+        var VehicleNo = $("#vhNo").val();
+        var DriverName = $("#vhDriverName").val();
+        var DriverPhone = $("#vhDriverPhone").val();
+        var VehicleVendorId = $("#vhVehicleVendor").val();
+        var VehicleTypeId = $("#vhVehicleType").val();
+        var StartPointId = $("#vhStartPoint").val();
+        var TripTypeId = $("#vhTripType").val();
+        var RouteId = $("#vhRoute").val();
+        var passengersRowCount = $('#vhAllocationTableBody tr').length;
+
+        if (VehicleNo == "") {
+            toastr.error("Please enter Vehicle No!");
+            return;
+        } else if (DriverName == "") {
+            toastr.error("You didn't enter Driver Name!");
+            return;
+        } else if (DriverPhone.length != 11) {
+            toastr.error("Driver phone number is invalid!");
+            return;
+        } else if (VehicleVendorId == 0) {
+            toastr.error("Please select a Vendor!");
+            return;
+        } else if (VehicleTypeId == 0) {
+            toastr.error("Please select a VehicleType!");
+            return;
+        } else if (StartPointId == 0) {
+            toastr.error("Please select a StartPoint!");
+            return;
+        } else if (TripTypeId == 0) {
+            toastr.error("Please select a TripType!");
+            return;
+        } else if (RouteId == 0) {
+            toastr.error("Please select a Route!");
+            return;
+        } else if (passengersRowCount < 1) {
+            toastr.error("PLease select any passenger!");
+            return;
+        }
+
+        $('#vhNoModal').text($("#vhNo").val());
+        $('#vhDriverNameModal').text($("#vhDriverName").val());
+        $('#vhDriverPhoneModal').text($("#vhDriverPhone").val());
+        $('#vhVehicleTypeModal').text($("#vhVehicleType option:selected").text());
+        $('#vhStartPointModal').text($("#vhStartPoint option:selected").text());
+        $('#vhTripTypeModal').text($("#vhTripType option:selected").text());
+        $('#vhRouteModal').text($("#vhRoute option:selected").text());
+
+        $("#submitConfirmModal").modal("show");
+    });
+
+    $('#submitConfirmButton').click(function () {
+        const vehicleAllocationDetailsList = [];
+        var totalAllocatedSeatsCount = 0;
+        $("#vhAllocationTable tbody tr").each(function () {
+            var currentRow = $(this).closest("tr");
+            totalAllocatedSeatsCount += parseInt(currentRow.find("td:eq(2)").text());
+        });
+        var urlPath = '@Url.Action("VehicleAllocateForUsers", "Vehicle")';
+        $('#vhAllocationTableBody tr').each(function () {
+            var currentRow = $(this).closest("tr");
+            vehicleAllocationDetailsList.push(
+                {
+                    VehicleRequestMasterId: currentRow.find("td:eq(0)").text(),
+                    AllocatedCost: parseInt(parseInt(currentRow.find("td:eq(2)").text()) * ($('#vhApproximateCost').val() / parseInt(totalAllocatedSeatsCount)))
+                }
+            );
+        });
+        $.ajax(
+            {
+                type: 'POST',
+                url: urlPath,
+                data: {
+                    VehicleNo: $("#vhNo").val(),
+                    DriverName: $("#vhDriverName").val(),
+                    DriverPhone: $("#vhDriverPhone").val(),
+                    VehicleTypeId: $("#vhVehicleType").val(),
+                    StartPointId: $("#vhStartPoint").val(),
+                    TripTypeId: $("#vhTripType").val(),
+                    RouteId: $("#vhRoute").val(),
+                    TripCost: $('#vhApproximateCost').val(),
+                    VehicleAllocationDetailsList: vehicleAllocationDetailsList
+                },
+                success: function (result) {
+                    if (result.isSuccess) {
+                        toastr.success("Vehicle allocated for selected user!");
+                        $("#submitConfirmModal").modal("toggle");
+                        $('#vhAllocationTableBody').empty();
+                        $('#vhAllocationTableBodyModal').empty();
+                        $("#totalAllocatedSeats").empty();
+                        $("#totalAllocatedSeatsModal").empty();
+                        initialState();
+                    } else {
+                        toastr.error("An error occured, try again!");
+                    }
+                }
+            }
+        );
+    });
+
+    function initialState() {
+        $("#vhNo").val("");
+        $("#vhDriverName").val("");
+        $("#vhDriverPhone").val("");
+        $("#vhVehicleType").val("0");
+        $("#vhStartPoint").val("0");
+        $("#vhTripType").val("0");
+        $("#vhRoute").val("0");
+    }
+
+    function getRequestIds() {
+        $('#vhAllocationTableBody tr').each(function () {
+            const requestIdList = [];
+            var currentRow = $(this).closest("tr");
+            requestIdList.push(currentRow.find("td:eq(0)").text());
+            return requestIdList;
+        });
+    }
+
+    function loadVehicleVendorDropDownOptions(_routeId, _tripTypeId, _vehicleTypeId) {
+        var urlPath = '@Url.Action("loadVehicleVendorDropDownOptions", "Vehicle")';
+        $.ajax({
+            type: 'GET',
+            url: urlPath,
+            dataType: 'json',
+            data: {
+                routeId: _routeId,
+                tripTypeId: _tripTypeId,
+                vehicleTypeId: _vehicleTypeId
+            },
+            success: function (datas) {
+                select = $('#vhVehicleVendor');
+                select.empty();
+                select.append('<option value="0">--Select Vendor--</option>');
+                select.removeAttr('disabled');
+                datas.forEach(function (data) {
+                    select.append(`<option value="` + data.Value + `">` + data.Text + `</option>`);
+                });
+            }
+        });
+    }
+
+    function loadVehicleTypeDropDownOptions(_routeId, _tripTypeId) {
+        var urlPath = '@Url.Action("loadVehicleTypeDropDownOptions", "Vehicle")';
+        $.ajax({
+            type: 'GET',
+            url: urlPath,
+            dataType: 'json',
+            data: {
+                routeId : _routeId,
+                tripTypeId : _tripTypeId
+            },
+            success: function (datas) {
+                select = $('#vhVehicleType');
+                select.empty();
+                select.append('<option value="0">--Select Vehicle Type--</option>');
+                if (datas.length > 0) {
+                    select.removeAttr('disabled');
+                }
+                datas.forEach(function (data) {
+                    select.append(`<option value="` + data.Value + `">` + data.Text + `</option>`);
+                });
+            }
+        });
+    }
+
+    function loadTripTypeDropDownOptions() {
+        select = $('#vhTripType');
+        select.val(0);
+        select.removeAttr('disabled');
+    }
+
+    function loadRouteDropDownOptions(_startPointId) {
+        var urlPath = '@Url.Action("LoadRoute", "Vehicle")';
+        $.ajax({
+            type: 'Post',
+            url: urlPath,
+            dataType: 'json',
+            data: {
+                starting_point: _startPointId
+            },
+            success: function (datas) {
+                select = $('#vhRoute');
+                select.empty();
+                select.append('<option value="0">--Select Route--</option>');
+                if (datas.length > 0) {
+                    select.removeAttr('disabled');
+                }
+                datas.forEach(function (data) {
+                    select.append(`<option value="` + data.RouteId + `">` + data.RouteName + `</option>`);
+                });
+            }
+        });
+    }
+
+    function startPointSelectFunction() {
+        var startpointId = $('#vhStartPoint').val();
+        $('#vhApproximateCost').val('');
+        if (startpointId > 0) {
+            loadRouteDropDownOptions(startpointId);
+            $('#vhTripType').val(0);
+            $('#vhTripType').attr('disabled', 'disabled');
+            $('#vhVehicleType').val(0);
+            $('#vhVehicleType').attr('disabled', 'disabled');
+            $('#vhVehicleVendor').val(0);
+            $('#vhVehicleVendor').attr('disabled', 'disabled');
+            $('#vhAvailableSeats').val('');
+        }
+        else {
+            $('#vhRoute').val(0);
+            $('#vhRoute').attr('disabled', 'disabled');
+            $('#vhTripType').val(0);
+            $('#vhTripType').attr('disabled', 'disabled');
+            $('#vhVehicleType').val(0);
+            $('#vhVehicleType').attr('disabled', 'disabled');
+            $('#vhVehicleVendor').val(0);
+            $('#vhVehicleVendor').attr('disabled', 'disabled');
+            $('#vhAvailableSeats').val('');
+        }
+    }
+
+    function routeSelectFunction() {
+        var routeId = $('#vhRoute').val();
+
+        if (routeId > 0) {
+            $('#vhTripType').removeAttr('disabled');
+            $('#vhTripType').val(0);
+            $('#vhVehicleType').val(0);
+            $('#vhVehicleType').attr('disabled', 'disabled');
+            $('#vhVehicleVendor').val(0);
+            $('#vhVehicleVendor').attr('disabled', 'disabled');
+            $('#vhAvailableSeats').val('');
+        }
+        else {
+            $('#vhTripType').val(0);
+            $('#vhTripType').attr('disabled', 'disabled');
+            $('#vhVehicleType').val(0);
+            $('#vhVehicleType').attr('disabled', 'disabled');
+            $('#vhVehicleVendor').val(0);
+            $('#vhVehicleVendor').attr('disabled', 'disabled');
+            $('#vhAvailableSeats').val('');
+        }
+    }
+
+    function tripTypeSelectFunction() {
+        var routeId = $('#vhRoute').val();
+        var tripTypeId = $('#vhTripType').val();
+        if (routeId > 0 && tripTypeId > 0 ) {
+            loadVehicleTypeDropDownOptions(routeId, tripTypeId);
+            $('#vhVehicleVendor').val(0);
+            $('#vhVehicleVendor').attr('disabled', 'disabled');
+            $('#vhAvailableSeats').val('');
+        }
+        else {
+            $('#vhVehicleType').val(0);
+            $('#vhVehicleType').attr('disabled', 'disabled');
+            $('#vhVehicleVendor').val(0);
+            $('#vhVehicleVendor').attr('disabled', 'disabled');
+            $('#vhAvailableSeats').val('');
+        }
+    }
+
+    function vehicleTypeSelectFunction() {
+        var routeId = $('#vhRoute').val();
+        var tripTypeId = $('#vhTripType').val();
+        var vehicleTypeId = $('#vhVehicleType').val();
+        if (routeId > 0 && tripTypeId > 0 && vehicleTypeId > 0) {
+            loadVehicleVendorDropDownOptions(routeId, tripTypeId, vehicleTypeId);
+            $('#vhAvailableSeats').val('');
+
+            var urlPath = '@Url.Action("VehicleInfo", "Vehicle")';
+            $.ajax({
+                type: 'GET',
+                url: urlPath,
+                dataType: 'json',
+                data: {
+                    id: vehicleTypeId
+                },
+                success: function (data) {
+                    $('#vhAvailableSeats').val(data.NoOfSeats);
+                    availableSeats = data.NoOfSeats;
+                }
+            });
+        }
+        else {
+            $('#vhVehicleVendor').val(0);
+            $('#vhVehicleVendor').attr('disabled', 'disabled');
+            $('#vhAvailableSeats').val('');
+        }
+    }
+
+    function vehicleVendorSelectFunction() {
+        var routeId = $('#vhRoute').val();
+        var tripTypeId = $('#vhTripType').val();
+        var vehicleTypeId = $('#vhVehicleType').val();
+        var vendorid = $('#vhVehicleVendor').val();
+        $('#vhApproximateCost').val('');
+        if (routeId > 0 && tripTypeId > 0 && vehicleTypeId > 0 && vendorid > 0) {
+            var urlPath = '@Url.Action("VehicleCost", "Vehicle")';
+            $.ajax({
+                type: 'GET',
+                url: urlPath,
+                dataType: 'json',
+                data: {
+                    VendorId: vendorid,
+                    VehicleTypeId: vehicleTypeId,
+                    RouteId: routeId,
+                    TripTypeId: tripTypeId,
+                },
+                success: function (data) {
+                    if (data.Rate == -1) {
+                        $('#vhApproximateCost').val('');
+                    }
+                    else {
+                        $('#vhApproximateCost').val(data.Rate);
+                        showAllocatedCost();
+                    }
+                }
+            });
+        }
+    }
+
+    function showAllocatedCost() {
+        var totalAllocatedSeatsCount = 0;
+        $("#vhAllocationTable tbody tr").each(function () {
+            var currentRow = $(this).closest("tr");
+            totalAllocatedSeatsCount += parseInt(currentRow.find("td:eq(2)").text());
+        });
+        $('#vhAllocationTableBody tr').each(function () {
+            var currentRow = $(this).closest("tr");
+            var allocatedCostForCurrentRow = parseInt(parseInt(currentRow.find("td:eq(2)").text()) * ($('#vhApproximateCost').val() / parseInt(totalAllocatedSeatsCount)));
+            currentRow.find("td:eq(3)").text(allocatedCostForCurrentRow);
+        });
+        $('#vhAllocationTableBodyModal tr').each(function () {
+            var currentRow1 = $(this).closest("tr");
+            var allocatedCostForCurrentRow1 = parseInt(parseInt(currentRow1.find("td:eq(2)").text()) * ($('#vhApproximateCost').val() / parseInt(totalAllocatedSeatsCount)));
+            currentRow1.find("td:eq(3)").text(allocatedCostForCurrentRow1);
+        });
+    }
+
+    function showTotalAllocatedSeats() {
+        var totalAllocatedSeatsCount = 0;
+        $("#vhAllocationTable tbody tr").each(function () {
+            var currentRow = $(this).closest("tr");
+            totalAllocatedSeatsCount += parseInt(currentRow.find("td:eq(2)").text());
+        });
+
+        var appendData = `<tr>
+                <th style="text-align: center;" colspan="2">Total Allocated Seats:</th>
+                <th colspan="3">` + totalAllocatedSeatsCount + `</th>
+            </tr>`;
+        $("#totalAllocatedSeats").empty();
+        $("#totalAllocatedSeatsModal").empty();
+        $("#totalAllocatedSeats").append(appendData);
+        $("#totalAllocatedSeatsModal").append(appendData);
+        $('#vhAvailableSeats').val(availableSeats - totalAllocatedSeatsCount);
+
+    }
+
+    function restoreRequestRow(_id) {
+        rowId = '#' + _id
+        $(rowId).remove();
+        rowIdModal = rowId + 'Modal';
+        $(rowIdModal).remove();
+        showTotalAllocatedSeats();
+        showAllocatedCost();
+
+        var urlPath = '@Url.Action("VehicleRequestById", "Vehicle")';
+        $.ajax({
+            type: 'GET',
+            url: urlPath,
+            dataType: 'json',
+            data: {
+                id : _id
+            },
+            success: function (data) {
+                console.log(data);
+                table = $('#vhRequestTableBody');
+                    table.prepend(`<tr>
+                                            <td><input type="checkbox" class="custom-checkbox" /></td>
+                                            <td></td>
+                                            <td>`+ data.VehicleRequestMasterId + `</td>
+                                            <td>`+ data.UserInformation.UserInformationName + `</td>
+                                            <td>`+ data.TravelStratDate + `</td>
+                                            <td>`+ data.BusinessUnit + `</td>
+                                            <td>`+ data.DepartmentName + `</td>
+                                            <td>`+ data.StartingPoint + `</td>
+                                            <td>`+ data.Route + `</td>
+                                            <td>`+ data.PurposeofTravel + `</td>
+                                            <td>`+ data.NoofUser + `</td>
+                                            <td>`+ data.CommentFromCOO + `</td>
+                                            <td>`+ data.CommentFromStationMaster + `</td>
+                                        </tr>`);
+            }
+        });
+    }
+
+</script>
+
+

@@ -121,10 +121,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @{double total = 0; int count = 1;}
+                            @{decimal total = 0; int count = 1;}
                             @foreach (var item in Model.CapexInformationDetails)
                             {
-                                total += Convert.ToDouble(item.CapexEstimatedCost);
+                                total += Convert.ToDecimal(item.CapexEstimatedCost);
                                 <tr>
                                     <td>@count</td>
                                     <td>@item.CapexAssetCatagory</td>
