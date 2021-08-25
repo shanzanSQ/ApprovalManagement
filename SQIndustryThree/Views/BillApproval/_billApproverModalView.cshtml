@@ -973,24 +973,24 @@
                         <td>@item.Color</td>
                         <td>@item.Size</td>
                         <td>@item.Unit</td>
-                        <td><span id="apporver_Rate_@item.PODetailsKey">@item.Rate.ToString()</span></td>
+                        <td><span id="apporver_Rate_@item.PODetailsKey">@item.Rate.ToString("N")</span></td>
                         @if (Model.ApproverList.Where(s => s.ApproverNo == 2).Single().UserID == (int)Session["SQuserId"])
                         {
-                            <td>@item.FirstEntryQty</td>
+                            <td>@item.FirstEntryQty.ToString("N")</td>
                         }
-                        <td><span id="apporver_InvoiceQty_@item.PODetailsKey"> @item.InvoiceQty.ToString() </span></td>
+                        <td><span id="apporver_InvoiceQty_@item.PODetailsKey"> @item.InvoiceQty </span></td>
                         @if (Model.ApproverList.Where(s => s.ApproverNo == 1).Single().UserID == (int)Session["SQuserId"])
                         {
                             <td><input class="checked_qty" id="checked_qty_@item.PODetailsKey" value="@item.InvoiceQty" onkeyup="chengeVerifyQty()" /></td>
                         }
                         else
                         {
-                            <td>@item.CheckedQty</td>
+                            <td>@item.CheckedQty.ToString("N")</td>
                         }
-                        <td><span id="apporver_invoiceValue_@item.PODetailsKey">@item.InvoiceValue.ToString()</span></td>
-                        <td><span id="apporver_verifyValue_@item.PODetailsKey">@item.CheckedValue.ToString()</span></td>
-                        <td>@item.Discount.ToString()</td>
-                        <td>@item.Total.ToString()</td>
+                        <td><span id="apporver_invoiceValue_@item.PODetailsKey">@item.InvoiceValue.ToString("N")</span></td>
+                        <td><span id="apporver_verifyValue_@item.PODetailsKey">@item.CheckedValue.ToString("N")</span></td>
+                        <td>@item.Discount.ToString("N")</td>
+                        <td>@item.Total.ToString("N")</td>
                     </tr>
 
                     r += @item.Rate;
@@ -1007,28 +1007,28 @@
             <tfoot>
                 <tr>
                     <th colspan="6">Total </th>
-                    <th>@r</th>
+                    <th>@r.ToString("N")</th>
                     @if (Model.ApproverList.Where(s => s.ApproverNo == 2).Single().UserID == (int)Session["SQuserId"])
                     {
-                        <th>@IQty</th>
+                        <th>@IQty.ToString("N")</th>
                     }
-                    <th>@TotalQty</th>
+                    <th>@TotalQty.ToString("N")</th>
                     @if (Model.ApproverList.Where(s => s.ApproverNo == 1).Single().UserID == (int)Session["SQuserId"])
                     {
-                        <th><span id="input_Qty"> @inputQty </span></th>
+                        <th><span id="input_Qty"> @inputQty.ToString("N") </span></th>
                     }
                     else
                     {
-                        <th>@checkQty</th>
+                        <th>@checkQty.ToString("N")</th>
                     }
-                    <th>@TotalInvoiceValue</th>
-                    <th><span id="verify_value">@TotalVerifiedValue</span></th>
+                    <th>@TotalInvoiceValue.ToString("N")</th>
+                    <th><span id="verify_value">@TotalVerifiedValue.ToString("N")</span></th>
                     @*@if (Model.ApproverList.Where(s => s.ApproverNo == 2).Single().UserID == (int)Session["SQuserId"])
                     {
                         <th></th>
                     }*@
-                    <th>@TotalDiscount</th>
-                    <th>@Model.TotalPaid.ToString()</th>
+                    <th>@TotalDiscount.ToString("N")</th>
+                    <th>@Model.TotalPaid.ToString("N")</th>
                 </tr>
             </tfoot>
         </table>
@@ -1062,7 +1062,7 @@
                                         <tr>
                                             <td style="text-align:center">@item.InvoiceKey</td>
                                             <td style="text-align:center">@item.ChequeNo</td>
-                                            <td style="text-align:center">@item.Amount</td>
+                                            <td style="text-align:center">@item.Amount.ToString("N")</td>
                                             <td style="text-align:center">@item.Date.ToString("yyyy-MM-dd")</td>
                                             <td style="text-align:center">@item.CheckStatus</td>
                                             <td style="text-align:center">@item.CreatedDate.ToString("yyyy-MM-dd hh:mm:ss tt")</td>
@@ -1075,7 +1075,7 @@
 
                                     <tr>
                                         <td style="text-align:right; font-weight:bold;" colspan="2">Total Amount :</td>
-                                        <td style="text-align:center;font-weight:bold;">@TotalAmount</td>
+                                        <td style="text-align:center;font-weight:bold;">@TotalAmount.ToString("N")</td>
                                         <td style="text-align:center"></td>
                                         <td style="text-align:center"></td>
                                         <td style="text-align:center"></td>
@@ -1090,40 +1090,40 @@
             <div class="col-md-5" style='float:right;'>
                 <div style='border: 1px solid black;'>
                     <table class='table table-striped'>
-                        <tr><th style=''>PO Total</th><th></th><th><span id=''>@Model.TotalPaid</span></th></tr>
+                        <tr><th style=''>PO Total</th><th></th><th><span id=''>@Model.TotalPaid.ToString("N")</span></th></tr>
                         @if (Model.DiscountPercent != 0)
                         {
-                            <tr><th>Discount</th><th style='width:100px;'><span id=''>@Model.DiscountPercent % </span></th><th><span id=''>@Model.DiscountAmt</span></th></tr>
+                            <tr><th>Discount</th><th style='width:100px;'><span id=''>@Model.DiscountPercent % </span></th><th><span id=''>@Model.DiscountAmt.ToString("N")</span></th></tr>
                         }
 
 
-                        <tr><th style='width:100px;'>Sub Total </th><th></th><th><span id=''>@Model.TotalAmount</span></th></tr>
+                        <tr><th style='width:100px;'>Sub Total </th><th></th><th><span id=''>@Model.TotalAmount.ToString("N")</span></th></tr>
 
                         @if (Model.AdjustmentPercent != 0)
                         {
-                            <tr><th>Adv Adjustment</th><th><span id=''>@Model.AdjustmentPercent %</span></th><th><span id='vat'>@Model.AdjustmentAmt</span></th></tr>
+                            <tr><th>Adv Adjustment</th><th><span id=''>@Model.AdjustmentPercent %</span></th><th><span id='vat'>@Model.AdjustmentAmt.ToString("N")</span></th></tr>
                         }
 
                         @if (Model.RetaintionPercent != 0)
                         {
-                            <tr><th>Retaintion</th><th><span id=''>@Model.RetaintionPercent %</span></th><th><span id='vat'>@Model.RetaintionAmt </span></th></tr>
+                            <tr><th>Retaintion</th><th><span id=''>@Model.RetaintionPercent %</span></th><th><span id='vat'>@Model.RetaintionAmt.ToString("N") </span></th></tr>
                         }
 
 
-                        <tr><th style='width:100px;'>Total </th><th></th><th><span id=''>@Model.AdvTotal</span></th></tr>
+                        <tr><th style='width:100px;'>Total </th><th></th><th><span id=''>@Model.AdvTotal.ToString("N")</span></th></tr>
 
                         @if (Model.VATPercent != 0)
                         {
-                            <tr><th>VAT</th><th><span id=''>@Model.VATPercent %</span></th><th><span id='vat'>@Model.VATAmt</span></th></tr>
+                            <tr><th>VAT</th><th><span id=''>@Model.VATPercent %</span></th><th><span id='vat'>@Model.VATAmt.ToString("N")</span></th></tr>
                         }
 
                         @if (Model.AITPercent != 0)
                         {
 
-                            <tr><th>AIT</th><th><span id=''>@Model.AITPercent %</span></th><th><span id='vat'>@Model.AITAmt </span></th></tr>
+                            <tr><th>AIT</th><th><span id=''>@Model.AITPercent %</span></th><th><span id='vat'>@Model.AITAmt.ToString("N") </span></th></tr>
                         }
 
-                         <tr><th>Net Value</th><th></th><th><span id='net_value'>@Model.NetValue</span></th></tr>
+                         <tr><th>Net Value</th><th></th><th><span id='net_value'>@Model.NetValue.ToString("N")</span></th></tr>
 
                         </table>
 

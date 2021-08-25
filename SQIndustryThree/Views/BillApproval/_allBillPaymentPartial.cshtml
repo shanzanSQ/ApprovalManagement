@@ -64,10 +64,10 @@
                         <td style="text-align:center">@item["Supplier"]</td>
                         <td style="text-align:center">@item["InvoiceNo"]</td>
                         <td style="text-align:center">@item["InvoiceDate"].ToString("yyyy-MM-dd")</td>
-                        <td style="text-align:center">@item["Total_Paid"]</td>
-                        <td style="text-align:center">@item["Net_Value"]</td>
-                        <td style="text-align:center">@item["PaidAmount"]</td>
-                        <td style="text-align:center">@item["OutstandingAmount"]</td>
+                        <td style="text-align:center">@item["Total_Paid"].ToString("N")</td>
+                        <td style="text-align:center">@item["Net_Value"].ToString("N")</td>
+                        <td style="text-align:center">@item["PaidAmount"].ToString("N")</td>
+                        <td style="text-align:center">@item["OutstandingAmount"].ToString("N")</td>
                         <td style="text-align:center">@item["Requestor"]</td>
                         <td style="text-align:center"> <button type="button" class="btn  btn-block btn-primary btn-sm" data-toggle="modal" data-target="#myModal" onclick="BillRequestDetails(@item["InvoiceKey"],0,'_billModalRequestView')" data-idkey="@item["InvoiceKey"]">Details</button></td>
                         @*<td style="text-align:center"> <button type="button" class="btn  btn-block btn-info btn-sm" data-toggle="modal" data-target="#chequeInfo" onclick="APTranstion(@item["InvoiceKey"],1)" data-idkey="@item["InvoiceKey"]">Cheque No Update</button></td>*@

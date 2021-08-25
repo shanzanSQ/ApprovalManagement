@@ -224,17 +224,17 @@
                             <td>@item.Color</td>
                             <td>@item.Size</td>
                             <td>@item.Unit</td>
-                            <td>@item.POQty.ToString()</td>
-                            <td>@item.Rate.ToString()</td>
-                            <td>@item.POValue.ToString()</td>
+                            <td>@item.POQty.ToString("N")</td>
+                            <td>@item.Rate.ToString("N")</td>
+                            <td>@item.POValue.ToString("N")</td>
                             @*<td>@item.InitialQty.ToString()</td>
                     <td>@item.InvoiceBalance.ToString()</td>*@
-                            <td>@item.InvoiceQty.ToString()</td>
-                            <td>@item.CheckedQty.ToString()</td>
-                            <td>@item.InvoiceValue.ToString()</td>
-                            <td>@item.CheckedValue.ToString()</td>
-                            <td>@item.Discount.ToString()</td>
-                            <td>@item.Total.ToString()</td>
+                            <td>@item.InvoiceQty.ToString("N")</td>
+                            <td>@item.CheckedQty.ToString("N")</td>
+                            <td>@item.InvoiceValue.ToString("N")</td>
+                            <td>@item.CheckedValue.ToString("N")</td>
+                            <td>@item.Discount.ToString("N")</td>
+                            <td>@item.Total.ToString("N")</td>
                         </tr>
                         countFob++;
                     }
@@ -249,17 +249,17 @@
             <tfoot>
                 <tr>
                     <th colspan="6">Total </th>
-                    <th>@Model.TotalQty.ToString()</th>
-                    <th>@Model.TotalRate.ToString()</th>
-                    <th>@Model.TotalValue.ToString()</th>
+                    <th>@Model.TotalQty.ToString("N")</th>
+                    <th>@Model.TotalRate.ToString("N")</th>
+                    <th>@Model.TotalValue.ToString("N")</th>
                     @*<th>@Model.AlreadyQty.ToString()</th>
                         <th>@Model.TotalBalanceQty.ToString()</th>*@
-                    <th>@TotalQty</th>
-                    <th>@TotalCheckQty</th>
-                    <th>@Model.TotalInvoiceValue.ToString()</th>
-                    <th>@TotalCheckValue</th>
-                    <th>@TotalDiscount</th>
-                    <th>@Model.TotalPaid.ToString()</th>
+                    <th>@TotalQty.ToString("N")</th>
+                    <th>@TotalCheckQty.ToString("N")</th>
+                    <th>@Model.TotalInvoiceValue.ToString("N")</th>
+                    <th>@TotalCheckValue.ToString("N")</th>
+                    <th>@TotalDiscount.ToString("N")</th>
+                    <th>@Model.TotalPaid.ToString("N")</th>
                 </tr>
             </tfoot>
         </table>
@@ -292,7 +292,7 @@
                                     <tr>
                                         <td style="text-align:center">@item.InvoiceKey</td>
                                         <td style="text-align:center">@item.ChequeNo</td>
-                                        <td style="text-align:center">@item.Amount</td>
+                                        <td style="text-align:center">@item.Amount.ToString("N")</td>
                                         <td style="text-align:center">@item.Date.ToString("yyyy-MM-dd")</td>
                                         <td style="text-align:center">@item.CheckStatus</td>
                                         <td style="text-align:center">@item.CreatedDate.ToString("yyyy-MM-dd hh:mm:ss tt")</td>
@@ -305,7 +305,7 @@
 
                             <tr>
                                 <td style="text-align:right; font-weight:bold;" colspan="2">Total Amount :</td>
-                                <td style="text-align:center;font-weight:bold;">@TotalAmount</td>
+                                <td style="text-align:center;font-weight:bold;">@TotalAmount.ToString("N")</td>
                                 <td style="text-align:center"></td>
                                 <td style="text-align:center"></td>
                                 <td style="text-align:center"></td>
@@ -320,17 +320,17 @@
             <div class="col-md-4" style='float:right;'>
                 <div style='border: 1px solid black;'>
                     <table class='table table-striped'>
-                        <tr><th style=''>PO Total</th><th></th><th><span id=''>@Model.TotalPaid</span></th></tr>
-                        <tr><th>Discount</th><th style='width:100px;'><span id=''>@Model.DiscountPercent % </span></th><th><span id=''>@Model.DiscountAmt</span></th></tr>
+                        <tr><th style=''>PO Total</th><th></th><th><span id=''>@Model.TotalPaid.ToString("N")</span></th></tr>
+                        <tr><th>Discount</th><th style='width:100px;'><span id=''>@Model.DiscountPercent.ToString("N") % </span></th><th><span id=''>@Model.DiscountAmt</span></th></tr>
 
-                        <tr><th style='width:100px;'>Sub Total </th><th></th><th><span id=''>@Model.TotalAmount</span></th></tr>
-                        <tr><th>VAT</th><th><span id=''>@Model.AdjustmentPercent %</span></th><th><span id='vat'>@Model.AdjustmentAmt</span></th></tr>
-                        <tr><th>AIT</th><th><span id=''>@Model.RetaintionPercent %</span></th><th><span id='vat'>@Model.RetaintionAmt </span></th></tr>
-                        <tr><th style='width:100px;'>Total </th><th></th><th><span id=''>@Model.AdvTotal</span></th></tr>
-                        <tr><th>VAT</th><th><span id=''>@Model.VATPercent %</span></th><th><span id='vat'>@Model.VATAmt</span></th></tr>
-                        <tr><th>AIT</th><th><span id=''>@Model.AITPercent %</span></th><th><span id='vat'>@Model.AITAmt </span></th></tr>
+                        <tr><th style='width:100px;'>Sub Total </th><th></th><th><span id=''>@Model.TotalAmount.ToString("N")</span></th></tr>
+                        <tr><th>Adjustment %</th><th><span id=''>@Model.AdjustmentPercent.ToString("N") %</span></th><th><span id='vat'>@Model.AdjustmentAmt</span></th></tr>
+                        <tr><th>Retaintion %</th><th><span id=''>@Model.RetaintionPercent.ToString("N") %</span></th><th><span id='vat'>@Model.RetaintionAmt </span></th></tr>
+                        <tr><th style='width:100px;'>Total </th><th></th><th><span id=''>@Model.AdvTotal.ToString("N")</span></th></tr>
+                        <tr><th>VAT</th><th><span id=''>@Model.VATPercent %</span></th><th><span id='vat'>@Model.VATAmt.ToString("N")</span></th></tr>
+                        <tr><th>AIT</th><th><span id=''>@Model.AITPercent %</span></th><th><span id='vat'>@Model.AITAmt.ToString("N") </span></th></tr>
 
-                        <tr><th>Net Value</th><th></th><th><span id='net_value'>@Model.NetValue</span></th></tr>
+                        <tr><th>Net Value</th><th></th><th><span id='net_value'>@Model.NetValue.ToString("N")</span></th></tr>
 
                     </table>
 

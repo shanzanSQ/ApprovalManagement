@@ -1686,6 +1686,25 @@ namespace SQIndustryThree.Controllers
             return PartialView("_billReportAllList");
         }
 
+        public ActionResult BillInvoicePODetails (int invoiceKey)
+        {
+            if (Session["SQuserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+
+            List<Dictionary<string, object>> _ResultList = null;
+
+            if (invoiceKey > 0)
+            {
+                var dt_Result = billDal.BillInvoicePODetails(invoiceKey);
+                _ResultList = _BasicUtilities.GetTableRows(dt_Result);
+            }
+           // var dt_Result = billDal.BillInvoicePODetails(invoiceKey);
+
+            return Json(_ResultList);
+        }
+
 
         #endregion
 

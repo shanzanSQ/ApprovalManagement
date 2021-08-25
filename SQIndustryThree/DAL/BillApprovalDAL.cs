@@ -1501,6 +1501,36 @@ namespace SQIndustryThree.DAL
             }
         }
 
+
+        public DataTable BillInvoicePODetails(int invoiceKey)
+        {
+            try
+            {
+                DataTable dt = new DataTable();
+
+                if (conn.State == 0)
+                {
+                    conn.Open();
+                }
+
+                SqlCommand cmd = new SqlCommand("sp_BillInvoicePODetails", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@InvoiceKey", SqlDbType.Int).Value = invoiceKey;
+                //cmd.Parameters.Add("@UnitID", SqlDbType.NVarChar).Value = UnitId;
+                SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+                adpt.Fill(dt);
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                conn.Close();
+            }
+        }
+
         #endregion
 
 
