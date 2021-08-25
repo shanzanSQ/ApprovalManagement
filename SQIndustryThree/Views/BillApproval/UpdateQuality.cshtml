@@ -1,0 +1,373 @@
+﻿
+@{
+    ViewBag.Title = "UpdateQuality";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<div class="row">
+    <div class="col-md-4">
+        <div class="panel panel-primary">
+            <div class="panel-heading">Transaction Info</div>
+            <div class="panel-body">
+                <label for="transaction" class="transaction">Transaction: <span style="color:red">*</span></label>
+                <input type="text" id="invoice_key" readonly class="form-control invoice_key" value="@ViewBag.InvoiceKey" />
+                <label for="invoice_no" class="invoice_no">Invoice No: <span style="color:red">*</span></label>
+                <input type="text" id="invoice_no" readonly class="form-control invoice_no" value="@ViewBag.InvoiceNo" />
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="text-right">
+            <input type="button" class="btn btn-success btn-sm add-row" value="Add Row">&nbsp;&nbsp;
+            <a href="/BillApproval/BillEntry" class="btn btn-info btn-sm">Back</a>
+        </div>
+        <table class="table table-responsive">
+            <thead>
+                <tr>
+
+                    <th>Quality Item</th>
+                    <th>Quality Result</th>
+                    <th>Comment</th>
+                    <th>Files</th>
+                    <th>Upload</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="tableBodyQuality">
+                @{ int count = 0; }
+                @foreach (var item in ViewBag.QList)
+                {
+                    <tr id="@count" data-qualityId="@item["QualityID"]">
+
+                        <td><input class="form-control parameter" id="parameter_@count" type="text" value="@item["QualityParam"]" placeholder="Item"></td>
+                        <td>
+                            <input class="form-control parameter" id="result_input_@count" type="hidden" value="@item["QualityResultID"]" placeholder="Item">
+                            <select class="form-control" id="result_@count" placeholder="Result" onchange="">
+
+                                @if (ViewBag.ResultList != null)
+                                {
+                                    foreach (var qItem in ViewBag.ResultList)
+                                    {
+                                        if (item["QualityResultID"] == qItem["QualityResultID"])
+                                        {
+                                            <option selected value="@qItem["QualityResultID"]">@qItem["QualityResultName"]</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@qItem["QualityResultID"]">@qItem["QualityResultName"]</option>
+                                        }
+                                    }
+                                }
+
+
+                                @*<option value="fail">Fail</option>*@
+                            </select>
+                        </td>
+                        <td><input class="form-control comment" id="comment_@count" type="text" placeholder="Comment" value="@item["QualityComment"]"></td>
+
+                        <td>
+                            <span id="attachedFileTable_@count" class="attachedFileTable"> @item["FileName"] </span>
+                            @if (!string.IsNullOrEmpty(@item["FileName"].ToString()))
+                            {
+                                <span id="deleteFile" style="color:red" onclick="deleteQualityFile(@item["InvoiceKey"], @item["QualityID"])">X</span>
+                            }
+                            <span style="display:none" name="filePath" id="filePath_@count">' + @item["FilePath"] + '</span>
+
+                        </td>
+                        <td><input type="file" multiple class="form-control qualityFileUpload" id="qualityFileUpload_@count" onchange="FileUploadOnChange(@count)" /></td>
+                        <td><button class="btn btn-danger ibtnDel" type="button"> <span class="glyphicon glyphicon-minus" aria-hidden="true"></span> </button></td>
+                    </tr>
+
+                    count++;
+                }
+
+
+            </tbody>
+        </table>
+
+        <div class="text-center">
+            <button class="btn btn-info" id="POAdd" onclick="submitQuality()">S U B M I T</button> &nbsp;&nbsp;
+        </div>
+
+    </div>
+</div>
+
+<script>
+    $(function () {
+        QualityResultList();
+    })
+
+    const QualityResultList = () => {
+        $.ajax({
+            url: '/BillApproval/QualityResultList',
+            type: 'POST',
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                $('.result').empty();
+                //$('#supplier').append("<option value='0'>-- Select Qua --</option>");
+
+                if (response.length > 0) {
+                   // var count = 0;
+                    var result = "";
+                    for (let i = 0; response.length > i; i++) {
+
+                        $(".result").append($("<option></option>").val(response[i].QualityResultID)
+                            .html(response[i].QualityResultName));
+                    }
+                    //$('select#supplier').append(result);
+                    $('select.result').append(result);
+                }
+            }
+        });
+    }
+
+    var i = 0;
+
+    $('#tableBodyQuality tr').each(function () {
+        i = $(this).attr('id');
+    })
+
+    //if (typeof $('#tableBodyQuality tr').attr('id') === "undefined") {
+    //    i = 0;
+    //} else {
+    //    i = $('#tableBodyQuality tr').attr('id');
+    //}
+
+    //alert(i);
+
+    $(".add-row").click(function () {
+
+         i++;
+        var markup = "<tr id='" + i + "'><td><input class='form-control parameter' id='parameter_"+i+"' type='text' placeholder='Item' ></td>";
+        markup += "<td><select class='form-control result' id='result_" + i + "' placeholder='Result'>";
+        //markup += "<option value='pass'>Pass</option><option value='fail'>Fail</option>"
+        markup += "</select></td>";
+        markup += "<td><input class='form-control comment' id='comment_" + i + "' type='text' placeholder='Comment' ></td>";
+
+        markup += "<td><span id='attachedFileTable_"+i+"' class='attachedFileTable'> File </span></td>";
+        markup += "<td><input type='file' multiple class='form-control qualityFileUpload' id='qualityFileUpload_"+i+"' onchange='FileUploadOnChange("+i+")' /></td>";
+        markup +="<td><button class='btn btn-danger ibtnDel' onclick='deleterow(" + i + ")' type='button'> <span class='glyphicon glyphicon-minus' aria-hidden='true'></span> </button></td>";
+        markup += "</tr>";
+        $("table tbody").append(markup);
+
+        QualityResultList();
+    });
+
+    function deleterow(rowval) {
+        $('tr#' + rowval + '').remove();
+    }
+
+
+    function FileUploadOnChange(row) {
+        var fileData = new FormData();
+        var fileUpload = $("#qualityFileUpload_" + row).prop('files');
+            if (fileUpload.length>0) {
+                 for (var i = 0; i < fileUpload.length; i++) {
+                     fileData.append(fileUpload[i].name, fileUpload[i]);
+                 }
+        }
+        var urlpath = '@Url.Action("QualityFileUpload", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            type: "post",
+            processData: false,
+            contentType: false,
+            data: fileData  ,
+            success: function (result) {
+                for (var i = 0; i < result.length; i++) {
+                   //var newRow = $('<tr>');
+                   var cols = "";
+                    cols += '<span name="fileName" for="fileName" id="fileName_' + row + '">' + result[i].QualityFileName + '</span>';
+                    cols += '<span style="display:none" name="filePath" id="filePath_' + row + '">' + result[i].QualityFilePath + '</span>';
+                   cols += '<input type="button" style="margin:2px" class="btn btn-danger btn-sm" id="deleteFile_'+row+'" onclick="DeleteFile('+i+',\''+result[i].ServerFileName+'\')"   value="X">';
+                    //newRow.append(cols);
+                    $("#attachedFileTable_" + row).html(cols);
+                }
+                $("#qualityFileUpload_" + row).val('');
+            },
+            error: function (err) {
+                alert(err.responseText);
+            }
+        });
+    }
+    function DeleteFile(r, filePath) {
+       var urlpath = '@Url.Action("QualityDeleteFiles", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { FilePath: filePath },
+            async: true,
+            success: function (data) {
+               //var i = r.parentNode.parentNode.rowIndex;
+                $("#fileName_" + r).remove();
+                $("#filePath_" + r).remove();
+                $("#deleteFile_" + r).remove();
+                //document.getElementById("billFileTable").deleteRow(i);
+            }
+        });
+
+    }
+
+    function submitQuality() {
+
+        var checkVal = false;
+
+        var invoiceKey = $('#invoice_key').val();
+        var invoiceNo = $('#invoice_no').val();
+
+        if (invoiceKey == '') {
+            toastr.error("Transaction Number Not Found", "Transaction Number", {
+                "positionClass": "toast-top-right",
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "closeButton": true
+            });
+
+            return false;
+        }
+
+        if (invoiceNo == '') {
+            toastr.error("Invoice Number Not Found", "Invoice Number", {
+                "positionClass": "toast-top-right",
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "closeButton": true
+            });
+
+            return false;
+        }
+
+        var vItem = "";
+        var vResult = "";
+        var vComment = "";
+        var vFileName = "";
+        var vFilePath = "";
+        var vQualityId = "";
+
+        $('#tableBodyQuality tr').each(function () {
+
+            var Id = $(this).attr('id');
+            var qualityId = $(this).attr('data-qualityId');
+            var item = $('#parameter_' + Id).val();
+            var result = $('#result_' + Id).val();
+            var comment = $('#comment_' + Id).val();
+            var fileName = $('#fileName_' + Id).html();
+            var attatchfile = "";
+            if (typeof fileName === "undefined") {
+                attatchfile = $('#attachedFileTable_' + Id).html();
+
+            } else {
+                attatchfile = $('#fileName_' + Id).html();
+            }
+
+           // var fileName = ; //$('#fileName_' + Id).html();
+            var filePath = $('#filePath_' + Id).html();
+
+            if (result == 4) {
+
+                //toastr.error("Seleted Item result Below Average thats why Quality not submited", "Quality not submited", {
+                //    "positionClass": "toast-top-right",
+                //    "showDuration": "300",
+                //    "hideDuration": "1000",
+                //    "timeOut": "5000",
+                //    "closeButton": true
+                //});
+
+                checkVal = false
+
+                return false;
+            } else {
+                checkVal = true;
+            }
+
+            vQualityId += qualityId + ','
+            vItem += item + ',';
+            vResult += result + ',';
+            vComment += comment + ',';
+            vFileName += attatchfile + ',';
+            vFilePath += filePath + ',';
+
+        })
+
+        //alert(invoiceKey + "  " + invoiceNo + "  " + vItem + "  " + vResult + "  " + vComment + "  " + vFileName + "  " + vFilePath);
+         if (checkVal == false) {
+            toastr.error("Seleted Item result Below Average thats why Quality not submited", "Quality not submited", {
+                "positionClass": "toast-top-right",
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "closeButton": true
+            });
+            return false;
+        } else {
+            var urlpath = '@Url.Action("QualityForUpdate", "BillApproval")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({ qualityId: vQualityId, invoiceKey: invoiceKey, invoiceNo: invoiceNo, item: vItem, result: vResult, comment: vComment, fileName: vFileName, filePath: vFilePath }),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    if (data == true) {
+                        swal({
+                            title: "Item Quality Submited Successfully!",
+                            type: 'success',
+                            closeOnConfirm: false,
+                            closeOnCancel: true
+                        }, function () {
+                                //location.reload();
+                                location.replace('/BillApproval/BillApproval');
+                        });
+
+                    }
+                    else {
+                        swal({
+                            title: "Data Not Saved!",
+                            type: 'warning',
+                            closeOnConfirm: false,
+                            closeOnCancel: true
+                        }, function () {
+                            location.reload();
+                        });
+                    }
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+
+           // alert(result);
+        }
+    }
+
+    function deleteQualityFile(invoice, qualityID) {
+       var urlpath = '@Url.Action("DeleteQualityFiles", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { invoicekey: invoice, qualityID: qualityID},
+            async: true,
+            success: function (data) {
+
+                location.reload();
+               //var i = r.parentNode.parentNode.rowIndex;
+                //$("#fileName_" + r).remove();
+                //$("#filePath_" + r).remove();
+                //$("#deleteFile_" + r).remove();
+                //document.getElementById("billFileTable").deleteRow(i);
+            }
+        });
+
+    }
+
+
+</script>
+
+

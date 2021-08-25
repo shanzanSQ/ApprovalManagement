@@ -1,0 +1,97 @@
+﻿@model IEnumerable<SQIndustryThree.Models.CourierRequestModel>
+<style>
+    #IourequestTable tr th, #IourequestTable tr td {
+        text-align: center;
+        padding: 5px;
+    }
+
+    button {
+        padding: 0;
+    }
+</style>
+<div class="box">
+    <h3 style="text-align:center">My Courier Request List</h3>
+    <!-- /.box-header -->
+    <div class="box-body">
+        <div class="col-xs-12" id="personlocdiv" style="overflow:scroll;">
+            <table id="VisitorRequestTable" class="table-bordered table table-striped" width="100%" style="overflow:scroll">
+                <thead>
+                    <tr>
+                        <th>SL</th>
+                        <th>Request #</th>
+                        <th>Customer</th>
+                        <th>Receiver</th>
+                        <th>Country</th>
+                        <th>Post Code</th>
+                        <th>Address</th>
+                        <th>Request Date</th>
+                        <th>Dispatch Date</th>
+                        <th>Product Description</th>
+                        <th>Weight</th>
+                        @*<th>Volume</th>
+                        <th>Airway Bill no</th>*@
+                        <th>Courier</th>
+                        <th>Proposed Delivery Date</th>
+                        <th>Cost</th>
+                        <th>Remarks</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ int count = 1;}
+                    @foreach (var item in Model)
+                    {
+                    <tr>
+                        <td>@count</td>
+                        <td>@item.CourierRequestId</td>
+                        <td>@item.BuyerName</td>
+                        <td>@item.Receiver</td>
+                        <td>@item.CountryName</td>
+                        <td>@item.PostCode</td>
+                        <td>@item.Address</td>
+                        <td>@item.DispatchDate</td>
+                        <td>@item.Deliverydate</td>
+                        <td>@item.ProductDescription</td>
+                        <td>@item.Weight</td>
+                        @*<td>@item.Volume</td>
+        <td>@item.AirwayBillno</td>*@
+
+                        <td>@item.ServiceProvider</td>
+                        <td>@item.ProposedDate</td>
+                        <td>@item.Cost</td>
+                        <td>@item.Remarks</td>
+                        @if (item.IsApproved == 3)
+                        {
+                            @*@item.Pending*@
+                            <td> <button type="button" class="btn  btn-block btn-primary btn-sm" data-toggle="modal" data-target="#myModal" onclick="CourierRequestDetails(@item.CourierRequestId,0,'_modalCourierRequestView')" data-idkey="@item.CourierRequestId">Pending(@item.Pending)</button></td>
+                        }
+                        else if (item.IsApproved == 1)
+                        {
+                            <td><button type="button" class="btn  btn-block btn-success btn-sm" data-toggle="modal" data-target="#myModal" onclick="CourierRequestDetails(@item.CourierRequestId,0,'_modalCourierRequestView')" data-idkey="@item.CourierRequestId">Approved(@item.Pending)</button></td>
+
+                        }
+                        else if (item.IsApproved == 4)
+                        {
+                            <td><button type="button" class="btn  btn-block btn-info btn-sm" data-toggle="modal" data-target="#myModal" onclick="CourierDispatchedRequestDetails(@item.CourierRequestId,0,'_modalCourierRequestViewDispatch')" data-idkey="@item.CourierRequestId">Dispatched(@item.Pending)</button></td>
+
+                        }
+                        else if (item.IsApproved == 5)
+                        {
+                            <td><button type="button" class="btn  btn-block btn-success btn-sm" data-toggle="modal" data-target="#myModal" onclick="CourierReceivedRequestDetails(@item.CourierRequestId,0,'_modalCourierRequestViewReceived')" data-idkey="@item.CourierRequestId">Received(@item.Pending)</button></td>
+
+                        }
+                        else if (item.IsApproved == 2)
+                        {
+                            <td> <button type="button" class="btn  btn-block btn-danger btn-sm" onclick="UpdateRejectedRequest(@item.CourierRequestId,0)">Update(@item.Pending)</button></td>
+                        }
+                    </tr>
+                        count++;
+
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <!-- /.box-body -->
+</div>

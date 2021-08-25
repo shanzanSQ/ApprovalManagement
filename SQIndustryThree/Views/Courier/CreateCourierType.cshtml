@@ -1,0 +1,670 @@
+﻿
+@{
+    ViewBag.Title = "CreateType";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+@Styles.Render("~/Content/capexform.css")
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+<link href="~/Content/LoadingModal.css" rel="stylesheet" />
+<style type="text/css">
+    .form-control,.btn{
+        border-radius:0px;
+        
+    }
+    #capNavigation {
+        background-color: #37474F;
+    }
+
+    #capsubmenu li a {
+        color: white;
+    }
+</style>
+<div class="container-fluid" style="background-color:white">
+    <h3 style="text-align:center"><b>COURIER RATE MATRIX</b></h3>
+    <hr />
+  
+    <div>
+        <div style="margin-top:10px" class="form-group row">
+            <div class="col-md-4">
+                <label for="type" style="text-align: center;float:right;">Courier Type</label>
+            </div>
+            <div class="col-md-4">
+                <select id="type" class="form-control cke_required">
+                    <option value="0">--Select Type--</option>
+                    <option value="I">Inbound</option>
+                    <option value="O">Outbound</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button class="btn btn-success btn-sm" id="showTable">SHOW</button>
+                <button class="btn btn-success btn-sm" id="addrow">Add Row</button>
+            </div>
+            </br>
+            <table id="type_description" class="table order-list">
+                <thead>
+                    <tr>
+                        <td>Country</td>
+                        <td>Service Provider</td>
+                        <td>Weight</td>
+                        <td>Lead Time From</td>
+                        <td>Lead Time To</td>
+                        <td>Rate</td>
+                        @*<td>Currency</td>*@
+                        <td>Action</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    </tr>
+                </tbody>
+
+            </table>
+            <div style="margin-top:20px;margin-bottom:20px;text-align:center" class="row">
+                <button class="btn btn-danger" id="cancel_button">Cancel</button>
+                <button id="save_button" class="btn btn-info">Submit</button>
+            </div>
+            <div class="container-fluid">
+                <hr />
+                <div class="row">
+                    <div id="pendingCapexTable"> </div>
+                </div>
+            </div>
+            @*<div class="col-md-4">
+
+            <button class="btn btn-success btn-sm" style="margin-left:300%;" id="addrow">Add Row</button>
+        </div>*@
+        </div>
+
+       
+    </div>
+    
+   
+
+</div>
+
+<div class="modal" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" style="text-align:center">Courier Type Preview</h4>
+            </div>
+            <div id="modalbody" class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="remove_button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-info" id="confirmCourierType">Submit</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-- / Loading modal  -->
+<div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="loader"></div>
+                <div clas="loader-txt">
+                    <p>
+                        Please Wait Until The file is Processing....................<br>
+                        <br><small>
+                            File Uploading ...........................
+                            <br />
+                            SQ Group Approval Management System
+                        </small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@Scripts.Render("~/bundles/jquery")
+
+<script type="text/javascript">
+
+    window.onload = function () {
+        $('#pendingCapexTable').hide();
+        $('#type_description').hide();
+        $('#cancel_button').hide();
+        $('#save_button').hide();
+        LoadCurrency();
+       // LoadCountry();
+    };
+    $(function () {
+        $('#capsubmenu > li > a').click(function () {
+            $('li').removeClass();
+            $(this).parent().addClass('inactive');
+            // $("#spmenuid").html($(this).html());
+        });
+       // getAllPendingCourierType(4);
+    });
+    $('#showTable').on('click', function () {
+        $('#type_description').hide();
+        $('#cancel_button').hide();
+        $('#save_button').hide();
+        var type = $('#type').val();
+       // alert(type);
+         var urlpath = '@Url.Action("showCourierTypeInformation", "Courier")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {
+                    status: '4',
+                    type: type
+                },
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $('#pendingCapexTable').show();
+                            $('#pendingCapexTable').empty();
+                            $('#pendingCapexTable').html(data);
+                            $("#courierTypeshowTable").DataTable();
+                            if (status == 0) {
+                                $('#pending_Capex').show();
+                            } else {
+                                $('#pending_Capex').hide();
+                            }
+                        }
+                    }
+                });
+    });
+
+    function updateCourierType(courierTypeid) {
+        debugger;
+                var courierTypeid = $("#update_primarykey").val();
+                var urlpath = '@Url.Action("EditcourierType", "Courier")';
+                $.ajax({
+                    data: { courierTypeid: courierTypeid},
+                    url: urlpath,
+                    type: "Post",
+                    async: true,
+                            success: function(data) {
+                                if (data) {
+                                     $('#pendingCapexTable').empty();
+                                    $('#pendingCapexTable').html(data);
+                                }
+                            }
+                        });
+            }
+            function LoadCountry(ID) {
+                debugger;
+                $.ajax({
+                    url: '/Courier/LoadCountry',
+                    type: 'POST',
+                    contentType: "application/json;charset=utf-8",
+
+                    dataType: "json",
+                    success: function (response) {
+                        console.log(response);
+                        if (response.length > 0) {
+                            $(ID).html('');
+
+                            var result = '';
+                            result += "<option value=''>Select One</option>";
+                            for (var i = 0; response.length > i; i++) {
+                                result += "<option id='" + response[i].CountryId + "' value='" + response[i].CountryId + "' data-shortname='" + response[i].CountryId + "'>" + response[i].CountryName + "</option>";
+                            }
+                            $(ID).append(result);
+                            $('select.country').append(result);
+                        }
+                    }
+                });
+            }
+            function LoadCourier(ID) {
+                debugger;
+                $.ajax({
+                    url: '/Courier/LoadCourier',
+                    type: 'POST',
+                    contentType: "application/json;charset=utf-8",
+
+                    dataType: "json",
+                    success: function (response) {
+                        console.log(response);
+                        if (response.length > 0) {
+                            $(ID).html('');
+
+                            var result = '';
+                            result += "<option value=''>Select One</option>";
+                            for (var i = 0; response.length > i; i++) {
+                                result += "<option id='" + response[i].ServiceProviderId + "' value='" + response[i].ServiceProviderId + "' data-shortname='" + response[i].ServiceProviderId + "'>" + response[i].ServiceProviderName + "</option>";
+                            }
+                            $(ID).append(result);
+                            $('select.service_provider').append(result);
+                        }
+                    }
+                });
+            }
+            function UpdateCourierType(couriertypeid) {
+                debugger;
+                var valid = false;
+                var jsonData = {};
+               // jsonData["DateOfRequest"] = new Date();
+                jsonData["CourierTypeId"] = $("#primarykey").val();
+                jsonData["Type"] = $("#uptype").val();
+                jsonData["Country"] = $("#country").val();
+                jsonData["CountryName"] = $("#country").children("option:selected").html();
+                jsonData["ServiceProvider"] = $("#service_provider").val();
+                jsonData["ServiceProvider"] = $("#service_provider").children("option:selected").html();
+                jsonData["WeightRange"] = $("#weight").val();
+                jsonData["LeadTimeFrom"] = $("#leadTimeFrom").val();
+                jsonData["LeadTimeTo"] = $("#leadTimeTo").val();
+                jsonData["Rate"] = $("#rate").val();
+                jsonData["Currency"] = $("#currency").val();
+              //  jsonData["CourierTypeDetails"] = jsonData;
+
+                    var urlpath = '@Url.Action("UpdateCourierType", "Courier")';
+                    $.ajax({
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(jsonData),
+                        url: urlpath,
+                        type: "POST",
+                        async: true,
+                        success: function (data) {
+                            swal({
+                                title: 'Courier Type Updated Successfully',
+                                type: 'success',
+                                closeOnCancel: true
+                            }, function () {
+                                $("#myModal").modal("hide");
+                                $("#iousubmenu").find('li').removeClass();
+                                $("#iousubmenu").find('li:nth-child(2)').addClass("active");
+                                    $("#pendingCapexTable").load(" #pendingCapexTable");
+                                    $('#pendingCapexTable').show();
+                            });
+                        },
+                        error: function () {
+                            alert("Error");
+                        }
+                    });
+
+
+            }
+
+       function getAllPendingCourierType(status) {
+            var urlpath = '@Url.Action("showCourierTypeInformation", "Courier")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {status:status},
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $('#pendingCapexTable').empty();
+                            $('#pendingCapexTable').html(data);
+                            $("#capexshowTable").DataTable();
+                            if (status == 0) {
+                                $('#pending_Capex').show();
+                            } else {
+                                $('#pending_Capex').hide();
+                            }
+                        }
+                    }
+                });
+        }
+
+     $('#remove_button').on('click', function() {
+         var urlpath = '@Url.Action("DeleteFiles", "CapexApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (rest) {
+                if (rest) {
+                    swal({
+                        title: 'Please Re upload the files again',
+                        type: 'success',
+                    });
+                }
+            }
+        });
+    });
+
+    $("#save_button").click(function () {
+        //SaveCapexApproval();
+        modalView();
+    });
+    $("#confirmCourierType").click(function () {
+        SaveCourierType();
+     });
+    $("#cancel_button").click(function () {
+        window.location.href = '@Url.Action("Index", "Home")';
+     });
+
+
+    $(document).ready(function () {
+        var counter = 0;
+
+        $("#addrow").on("click", function () {
+            $('#type_description').show();
+            $('#cancel_button').show();
+            $('#save_button').show();
+           // LoadCountry();
+            counter = $('#myTable tr').length - 2;
+            var newRow = $("<tr>");
+            var cols = "";
+
+
+
+            cols += '<td class="text-center"><select type="text" style="width:150px;" id="country' + counter + '" data-number="' + counter + '" name="country[' + counter + ']" style="width:100%" placeholder="Country" class="form-control country"></select></td>';
+            cols += '<td class="text-center"><select type="text" style="width:150px;" id="service_provider' + counter + '" data-number="' + counter + '" name="service_provider[' + counter + ']" style="width:100%" placeholder="Service Provider" class="form-control service_provider"></select></td>';
+            cols += '<td><input type="number" class="form-control" onblur="courierTypeCheck()"  name="Weight' + counter + '"/></td>';
+            cols += '<td><input type="number" class="form-control" name="lead_time_from' + counter + '"/></td>';
+            cols += '<td><input type="number" class="form-control"  name="lead_time_to' + counter + '"/></td>';
+            cols += '<td><input type="text" class="form-control"  name="rate' + counter + '"/></td>';
+          /*  cols += '<td><input type="text" class="form-control"  name="currency' + counter + '"/></td>';*/
+            cols += '<td><input type="button" class="btn btn-danger ibtnDel"  value="X"></td>';
+            newRow.append(cols);
+            if (counter == 4) $('#addrow').attr('disabled', true).prop('value', "You've reached the limit");
+            $("table.order-list").append(newRow);
+            counter++;
+            /*courierTypeCheck("#Weight" + counter);*/
+            LoadCountry("#country" + counter);
+            LoadCourier("#service_provider" + counter);
+           // $("#country" + counter).select2();
+
+        });
+        @*function courierTypeCheck(ID) {
+            var valid = false;
+            var jsonData = {};
+            var jsonObj = [];
+            $('#type_description tr').each(function () {
+                var myData = {};
+                myData["Country"] = $(this).find('select[name^="country"]').val();
+                myData["CountryName"] = $(this).find('select[name^="country"]').children("option:selected").html();
+                myData["ServiceProvider"] = $(this).find('select[name^="service_provider"]').val();
+                myData["ServiceProviderName"] = $(this).find('select[name^="service_provider"]').children("option:selected").html();
+                myData["WeightRange"] = $(this).find('input[name^="Weight"]').val();
+                myData["LeadTimeFrom"] = $(this).find('input[name^="lead_time_from"]').val();
+                myData["LeadTimeTo"] = $(this).find('input[name^="lead_time_to"]').val();
+                myData["Rate"] = $(this).find('input[name^="rate"]').val();
+                myData["Currency"] = $(this).find('input[name^="currency"]').val();
+
+                if (Number.isNaN(myData["Rate"]) == false && parseFloat(myData["Rate"]) > 0) {
+                    jsonObj.push(myData);
+                }
+            });
+            if (jsonObj.length > 0) {
+                valid = true;
+            }
+        jsonData["CourierTypeDetails"] = jsonObj;
+        if (valid == true) {
+            var urlpath = '@Url.Action("courierTypeCheck", "Courier")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsonData),
+                dataType: 'json',
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function (result) {
+                    if (result.isSuccess) {
+                        swal({
+                            title: 'Courier Type Already Exist!!',
+                                        type: 'success',
+                                        closeOnCancel: true
+                                    },
+                            function () {
+                               // window.location(true);
+                                $('#pendingCapexTable').show();
+                                    });
+                    }
+                }
+            });
+        } else {
+            swal({
+                title: 'PLEASE ENTER ALL THE FIELD!!',
+                type: 'error',
+                closeOnCancel: true
+            });
+        }
+        }*@
+        function LoadCountry(ID) {
+            debugger;
+            $.ajax({
+                url: '/Courier/LoadCountry',
+                type: 'POST',
+                contentType: "application/json;charset=utf-8",
+
+                dataType: "json",
+                success: function (response) {
+                    console.log(response);
+                    if (response.length > 0) {
+                        $(ID).html('');
+
+                        var result = '';
+                        result += "<option value=''>Select One</option>";
+                        for (var i = 0; response.length > i; i++) {
+                            result += "<option id='" + response[i].CountryId + "' value='" + response[i].CountryId + "' data-shortname='" + response[i].CountryId + "'>" + response[i].CountryName + "</option>";
+                        }
+                        $(ID).append(result);
+                        $('select.country').append(result);
+                    }
+                }
+            });
+        }
+        function LoadCourier(ID) {
+            debugger;
+            $.ajax({
+                url: '/Courier/LoadCourier',
+                type: 'POST',
+                contentType: "application/json;charset=utf-8",
+
+                dataType: "json",
+                success: function (response) {
+                    console.log(response);
+                    if (response.length > 0) {
+                        $(ID).html('');
+
+                        var result = '';
+                        result += "<option value=''>Select One</option>";
+                        for (var i = 0; response.length > i; i++) {
+                            result += "<option id='" + response[i].ServiceProviderId + "' value='" + response[i].ServiceProviderId + "' data-shortname='" + response[i].ServiceProviderId + "'>" + response[i].ServiceProviderName + "</option>";
+                        }
+                        $(ID).append(result);
+                        $('select.service_provider').append(result);
+                    }
+                }
+            });
+        }
+
+
+        $("table.order-list").on("change", 'input[name^="asset_estimated_cost"]', function (event) {
+            calculateRow($(this).closest("tr"));
+           // LoadCountry();
+        });
+
+
+        $("table.order-list").on("click", ".ibtnDel", function (event) {
+            $(this).closest("tr").remove();
+            calculateGrandTotal();
+
+            counter -= 1
+            $('#addrow').attr('disabled', false).prop('value', "Add Row");
+        });
+    });
+    function calculateRow(row) {
+        var price = +row.find('input[name^="asset_estimated_cost"]').val();
+    }
+
+
+    function LoadCurrency() {
+        $('#currency').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadCurrency", "CapexApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+                $('#currency').empty();
+               $('#currency').append("<option value='0'>--Currency-</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#currency").append($("<option></option>").val(data[i].CurrencyId)
+                        .html(data[i].CurrencyName));
+                }
+            }
+        });
+    }
+
+
+    $('#catagory_caperx').on('change',
+        function () {
+            $('#catagory_caperx').css({ "border-color": "#d3d3d3" });
+            loadCFOBYBusinessUnit();
+        });
+    $('#business_unit').on('change',
+        function () {
+            $('#business_unit').css({ "border-color": "#d3d3d3" });
+             loadCFOBYBusinessUnit();
+        });
+    $('#currency').on('change',
+        function () {
+             $('#currency').css({ "border-color": "#d3d3d3" });
+        });
+    $('#locationCheck').on('change',
+        function () {
+             $('#locationCheck').css({ "border-color": "#d3d3d3" });
+        });
+
+    $('#projectname').on('click',
+        function () {
+             $('#projectname').css({ "border-color": "#d3d3d3" });
+        });
+    $('#project_description').on('click',
+        function () {
+             $('#project_description').css({ "border-color": "#d3d3d3" });
+        });
+
+
+
+
+    function SaveCourierType() {
+        var valid = false;
+        var jsonData = {};
+        jsonData["Type"] = $('#type').val();
+        jsonData["CourierTypeName"] = $('#type').children("option:selected").html();
+
+            var jsonObj = [];
+
+        $('#type_description tr').each(function () {
+                var myData = {};
+                myData["Country"] = $(this).find('select[name^="country"]').val();
+                myData["CountryName"] = $(this).find('select[name^="country"]').children("option:selected").html();
+                myData["ServiceProvider"] = $(this).find('select[name^="service_provider"]').val();
+                myData["ServiceProviderName"] = $(this).find('select[name^="service_provider"]').children("option:selected").html();
+                myData["WeightRange"] = $(this).find('input[name^="Weight"]').val();
+                myData["LeadTimeFrom"] = $(this).find('input[name^="lead_time_from"]').val();
+                myData["LeadTimeTo"] = $(this).find('input[name^="lead_time_to"]').val();
+                myData["Rate"] = $(this).find('input[name^="rate"]').val();
+               /* myData["Currency"] = $(this).find('input[name^="currency"]').val();*/
+
+                if (Number.isNaN(myData["Rate"]) == false && parseFloat(myData["Rate"]) > 0) {
+                    jsonObj.push(myData);
+                }
+            });
+            if (jsonObj.length > 0) {
+                valid = true;
+            }
+        jsonData["CourierTypeDetails"] = jsonObj;
+        if (valid == true) {
+            var urlpath = '@Url.Action("SaveCourierType", "Courier")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsonData),
+                dataType: 'json',
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function (result) {
+                    if (result.isSuccess) {
+                        swal({
+                            title: 'Courier Type Saved Successfully!!',
+                                        type: 'success',
+                                        closeOnCancel: true
+                                    },
+                            function () {
+                               // window.location(true);
+                                $('#pendingCapexTable').show();
+                                $("#myModal").modal("hide");
+                                    });
+                    }
+                }
+            });
+        } else {
+            swal({
+                title: 'PLEASE ENTER ALL THE FIELD!!',
+                type: 'error',
+                closeOnCancel: true
+            });
+        }
+
+    }
+    function modalView() {
+            var submit = true;
+               var jsonData = {};
+
+        if ($('#type').val() == "0") {
+            $('#type').css({ "border-color": "#FF0000" });
+                submit = false;
+        }
+        jsonData["Type"] = $('#type').val();
+        jsonData["CourierTypeName"] = $('#type').children("option:selected").html();
+
+        var jsonObj = [];
+       //var count = 1;
+        $('#type_description tr').each(function () {
+                var myData = {};
+                myData["Country"] = $(this).find('select[name^="country"]').val();
+                myData["CountryName"] = $(this).find('select[name^="country"]').children("option:selected").html();
+                myData["ServiceProvider"] = $(this).find('select[name^="service_provider"]').val();
+               myData["ServiceProviderName"] = $(this).find('select[name^="service_provider"]').children("option:selected").html();
+                myData["WeightRange"] = $(this).find('input[name^="Weight"]').val();
+                myData["LeadTimeFrom"] = $(this).find('input[name^="lead_time_from"]').val();
+                myData["LeadTimeTo"] = $(this).find('input[name^="lead_time_to"]').val();
+                myData["Rate"] = $(this).find('input[name^="rate"]').val();
+                /*myData["Currency"] = $(this).find('input[name^="currency"]').val();*/
+
+                if (Number.isNaN(myData["Rate"]) == false && parseFloat(myData["Rate"]) > 0) {
+                    jsonObj.push(myData);
+                }
+                   // jsonObj.push(myData);
+                //count++;
+            });
+
+        jsonData["CourierTypeDetails"] = jsonObj;
+
+        if (submit == true) {
+            var urlpath = '@Url.Action("ShowCourierTypePertialviewModal", "Courier")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsonData),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    $("#modalbody").html("");
+                    $("#modalbody").append(data);
+                    $("#myModal").modal("show");
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+        } else {
+            swal({
+                title: 'PLEASE ENTER ALL THE FIELD!!',
+                type: 'error',
+                closeOnCancel: true
+            });
+        }
+    }
+
+</script>

@@ -60,7 +60,7 @@ namespace SQIndustryThree.DAL
                     user.UserInformationName = dr["UserName"].ToString();
                     user.UserInformationEmail = dr["UserEmail"].ToString();
                     user.DesignationId = (int)dr["DesignationID"];
-                    //user.UserInformationPhoneNumber = (int)dr["UserPhone"];
+                    user.IsSupplier = Convert.ToInt32(dr["IsSupplier"]);
                 }
 
                 return user;
@@ -68,7 +68,7 @@ namespace SQIndustryThree.DAL
             catch (Exception e)
             {
                 accessManager.SqlConnectionClose(true);
-                throw;
+                throw e;
             }
             finally
             {
@@ -96,6 +96,66 @@ namespace SQIndustryThree.DAL
                 }
 
                 return user;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw e;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+        public List<ModuleModel> GetModuleByUser(int userId,int ProjectId)
+        {
+            List<ModuleModel> moduleList = new List<ModuleModel>();
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<SqlParameter> aParameters = new List<SqlParameter>();
+                aParameters.Add(new SqlParameter("@userId", userId));
+                aParameters.Add(new SqlParameter("@prjectId", ProjectId));
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_GetModulePermissionUser", aParameters);
+                while (dr.Read())
+                {
+                    ModuleModel moduleModel = new ModuleModel();
+                    moduleModel.ModuleKey =(int) dr["Modulekey"];
+                    moduleModel.ModuleName =dr["ModuleName"].ToString();
+                    moduleModel.ModuleValue =dr["ModuleValue"].ToString();
+                    moduleModel.ModuleController =dr["ModuleController"].ToString();
+                    moduleList.Add(moduleModel);
+                }
+                return moduleList;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw e;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
+        public List<ModuleModel> GetProjectmenu(int userId)
+        {
+            List<ModuleModel> moduleList = new List<ModuleModel>();
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.SQQeye);
+                List<SqlParameter> aParameters = new List<SqlParameter>();
+                aParameters.Add(new SqlParameter("@UserId", userId));
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_ProjectPermission", aParameters);
+                while (dr.Read())
+                {
+                    ModuleModel moduleModel = new ModuleModel();
+                    moduleModel.ModuleKey = (int)dr["ProjectId"];
+                    moduleModel.ModuleName = dr["ProjectName"].ToString();
+                    moduleList.Add(moduleModel);
+                }
+                return moduleList;
             }
             catch (Exception e)
             {
@@ -158,12 +218,12 @@ namespace SQIndustryThree.DAL
                         message.IsBodyHtml = true; //to make message body as html  
                         message.Body = "Dear Mr."+name+ "<br/> You requested for Recover your password <br/> Your Password for the Approval management system is : " + PasswordManager.Decrypt(password)+ " <br/>" +
                             "Thank you For Being with Us <br/>" +
-                            "<br/>Thank You<br/> Approval Management System<br/>http://10.12.8.152:8080/<br/>sqgc.com";
+                             "<br/>Thank You<br/> <a href='http://10.12.13.163:8080/'>Approval Management System</a><br/><br/>sqgc.com";
                         smtp.Port = 587;
                         smtp.Host = "smtp.office365.com"; //for gmail host  
                         smtp.EnableSsl = true;
                         smtp.UseDefaultCredentials = false;
-                        smtp.Credentials = new NetworkCredential("noreply@sqgc.com", "Sweater@123");
+                        smtp.Credentials = new NetworkCredential("noreply@sqgc.com", "ysd9kE6&195{rcU");
                         smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
                         smtp.Send(message);
                         success = true;

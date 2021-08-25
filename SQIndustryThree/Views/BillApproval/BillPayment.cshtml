@@ -1,0 +1,277 @@
+﻿
+@{
+    ViewBag.Title = "BillApproval";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+
+<style type="text/css">
+    .modal-lg {
+        max-width: 80% !important;
+    }
+
+    .sweet-alert {
+        background-color: #DAF7A6;
+    }
+
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    #billmenu {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #billSubmrnu li a {
+        color: white;
+    }
+
+    #billNavigaton {
+        background-color: #37474F;
+    }
+    /*#exceptionNavigaton{
+        padding:0px;
+        margin:0px;
+    }*/
+</style>
+<div class="container-fluid">
+    <h3 style="text-align: center;"><b>Bill Payment </b></h3>
+    <hr style="margin:0px" />
+    <div class="row">
+        <div id="billNavigaton" class="navbar navbar-default navbar-static-top">
+            <div id="billmenu">
+                <div class="navbar-collapse collapse">
+                    <ul id="billSubmrnu" class="nav navbar-nav">
+                        <li onclick="GetApprovedRequestList(1)"><a href="#">Pending For Payment</a></li>
+                        <li onclick="APTranstion()"><a href="#">Cheque Issue</a></li>
+                        <li onclick="GetApprovedRequestList(2)"><a href="#">Completed Payment</a></li>
+                        <li onclick="ChequePaymentDetails()"><a href="#">Cheque Payment Details</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        @*  style="height:400px;width:100%;overflow:scroll"*@
+        <div id="billPaymentDashboard" style="width:100%;overflow:scroll">
+
+        </div>
+    </div>
+    <div class="modal" id="myModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Bill Payment Preview</h4>
+                </div>
+                <div id="modalbody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div class="modal chequeInfo" id="chequeInfo">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Cheque Information</h4>
+                </div>
+                <div id="qualitybody" class="modal-body qualitybody">
+                </div>
+                <div class="modal-footer">
+                    @*<button type="button" class="btn btn-primary btn-sm" id="UpdateQuality" onclick="UpdateQuality()">Submit</button>*@
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div class="modal" id="myPreview">
+        <div class="modal-dialog modal-lg">
+            <div class="col-md-12 modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Bill Request Preview</h4>
+                </div>
+                <div id="previewmodalbody" class="previewmodal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div>
+
+</div>
+@*@Scripts.Render("~/bundles/jquery")*@
+<script type="text/javascript">
+    $("#billsubmenu").find('li:nth-child(1)').addClass("active");
+    GetApprovedRequestList(1);
+    $('#billsubmenu > li > a').click(function() {
+        $('li').removeClass();
+        $(this).parent().addClass('active');
+       // $("#spmenuid").html($(this).html());
+    });
+
+
+    var ExceptionRequestId = 0;
+
+    function GetApprovedRequestList(status) {
+        var urlpath = '@Url.Action("ApprovedBillList", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: { ViewName: '_allBillPaymentPartial', Status: status },
+            async: true,
+            success: function (data) {
+                if (data) {
+                    console.log(data);
+                    $('#billPaymentDashboard').empty();
+                    $('#billPaymentDashboard').append(data);
+                    $('#BillPaymentTable').DataTable();
+                }
+            }
+        });
+    }
+    @*function ChequeInfo(masterID,status) {
+         var urlpath = '@Url.Action("ChequeInfoModalView", "BillApproval")';
+        $.ajax({
+            data: { MasterID: masterID, ViewName:"_chequeInfoModalView",Status:status},
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $("#qualitybody").html("");
+                $("#qualitybody").append(data);
+                $("#chequeInfo").modal("show");
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }*@
+
+    function APTranstion() {
+         var urlpath = '@Url.Action("APTransationModalView", "BillApproval")';
+        $.ajax({
+            data: { ViewName:"_apTransationModalView"},
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                //$(".qualitybody").html("");
+                //$(".qualitybody").append(data);
+                //$(".chequeInfo").modal("show");
+                $('#billPaymentDashboard').empty();
+                $('#billPaymentDashboard').append(data);
+
+                supplierList();
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+
+        function ChequePaymentDetails() {
+         var urlpath = '@Url.Action("ChequePaymentDetails", "BillApproval")';
+        $.ajax({
+            data: { ViewName:"_chequePaymentDetails"},
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                //$(".qualitybody").html("");
+                //$(".qualitybody").append(data);
+                //$(".chequeInfo").modal("show");
+                $('#billPaymentDashboard').empty();
+                $('#billPaymentDashboard').append(data);
+                $('#BillPaymentTable').DataTable();
+               // supplierList();
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+
+    function BillRequestDetails(masterID,status,viewName) {
+        var urlpath = '@Url.Action("BillRequestDetails", "BillApproval")';
+        $.ajax({
+            data: { MasterID: masterID, ViewName: viewName, Status: status },
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $("#modalbody").html("");
+                $("#modalbody").append(data);
+                $("#myModal").modal("show");
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+
+
+
+
+
+
+
+    @*function ExceptionDetails(masterID,usertype) {
+        var urlpath = '@Url.Action("IndividualExceptionRequest", "Exception")';
+        $.ajax({
+            data: { MasterID: masterID,ViewName:"_approveOrRejectmodal",UserType:usertype},
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    $("#modalbody").html("");
+                    $("#modalbody").append(data);
+                    $("#myModal").modal("show");
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+    }*@
+    function showComments() {
+        $("#comments_section").toggle();
+    }
+
+
+    function ChangeColor(id) {
+        $(id).css({ "border-color": "#d3d3d3" });
+    }
+
+    function PrintModal() {
+            var print_div = document.getElementById("printablearea");
+            var print_area = window.open();
+            print_area.document.write("<style>table{border-collapse:collapse;}</style><img width='20' height='20' src='../../Images/logo.png' /><img style='width:80px;' src='../../Images/logo.png' />");
+            print_area.document.write("<h1 style='text-align:center'>Exception Request Preview</h1>");
+            print_area.document.write(print_div.innerHTML);
+            print_area.document.close();
+            print_area.focus();
+            print_area.print();
+            print_area.close();
+    }
+</script>
+
+

@@ -1,0 +1,91 @@
+﻿@model IEnumerable<SQIndustryThree.Models.VisitorRequestModel>
+<style type="text/css">
+    #visitorTable td {
+        word-break: break-word;
+        text-align: center;
+    }
+    .btn,.form-control{
+        border-radius:0px;
+    }
+</style>
+
+    <div class="box" >
+        <table width="100%" class="table table-striped table-bordered" id="visitorTable" >
+            <thead>
+                <tr>
+                    <th>SL</th>
+                    <th>Date of Visit</th>
+                    <th>Purpose </th>
+                    <th>Visitor Name</th>
+
+                    <th>Visitor Mobile</th>
+
+                    <th>China Visit</th>
+                    <th>Requestor Name</th>
+                    <th>Department</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                    <th></th>
+                    <th></th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @{ int count = 1;}
+                @foreach (var item in Model)
+                {
+                <tr id="@item.RequestorId">
+                    <td>@count</td>
+                    <td>@item.VisitDate.ToString("dd MMM yyyy")</td>
+                    <td>@item.PurposeOfVisitSQ</td>
+                    <td>@item.VisitorName</td>
+                    <td>@item.VisitorMobile</td>
+                    <td>@item.Chainavisit</td>
+                    <td>@item.RequestorName</td>
+                    <td>@item.RequestorDepartment</td>
+                    <td>@item.ApprovedStatus</td>
+                    <td>
+                        <input type="button" value="Details" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#showmodal" onclick=" getInvidualRequest(@item.VisitorId)" />
+                    </td>
+                    @if (item.IsApproved == 1)
+                    {
+                        <td>
+                            <input type="button" value="Approve" class="btn btn-success btn-sm" onclick="UpdateOrReject(@item.VisitorId,2)" />
+                        </td>
+                        <td>
+                            <input type="button" value="Reject" class="btn btn-danger btn-sm" onclick="UpdateOrReject(@item.VisitorId,3)" />
+                        </td>
+                    }
+                    else
+                    {
+                        <td></td>
+                        <td></td>
+                    }
+                </tr>
+                    count++;
+                }
+            </tbody>
+        </table>
+    </div>
+    <script type="text/javascript">
+
+    // $('#showmodal').on('show.bs.modal', function(event) {
+    //    var modalmap = $(event.relatedTarget);
+    //    getInvidualRequest(modalmap.data('idkey'));
+    //});
+    function getInvidualRequest(primarykey) {
+         var urlpath = '@Url.Action("IndividualRequestShow", "Visitor")';
+            $.ajax({
+                data: { PrimaryKey: primarykey },
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function(data) {
+                            if (data) {
+                                $('#showcanvas').empty();
+                                $('#showcanvas').append(data);
+                            }
+                        }
+                });
+    }
+    </script>

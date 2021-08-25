@@ -1,0 +1,125 @@
+﻿
+@{
+    ViewBag.Title = "ExceptionHRView";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+     .form-control, .btn {
+        border-radius: 0px;
+    }
+</style>
+<div class="container-fluid">
+    <h3 style="text-align: center;"><b>Exception Request HR View</b></h3>
+    <hr style="margin:0px" />
+    <div class="row">
+        
+        <div id="hrallapprovedRequest">
+
+        </div>
+    </div>
+    <div class="modal" id="myModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Exception Request Preview</h4>
+                </div>
+                <div id="modalbody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+</div>
+@Scripts.Render("~/bundles/jquery")
+<script type="text/javascript">
+    GetAllApprovedRequestList(3, 1);
+    function GetAllApprovedRequestList(status,progrss) {
+        var urlpath = '@Url.Action("GetAllExceptionRequest", "Exception")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: {Status: status,ViewName: '_hrPartialView',Progrss:progrss},
+            async: true,
+            success: function (data) {
+                if (data) {
+                    $('#hrallapprovedRequest').empty();
+                    $('#hrallapprovedRequest').append(data);
+                    $('#approvalPartailTable').DataTable();
+                }
+            }
+        });
+    }
+    function ExceptionDetailsHr(masterID,usertype) {
+        var urlpath = '@Url.Action("IndividualExceptionRequest", "Exception")';
+        $.ajax({
+            data: { MasterID: masterID,ViewName:"_hrDetailsException",UserType:usertype},
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    $("#modalbody").html("");
+                    $("#modalbody").append(data);
+                    $("#myModal").modal("show");
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+    }
+    function TakeAction(progress, masterId, commentText) {
+        if (commentText == "") {
+            swal({
+                title: 'Please write some things',
+                type: 'error',
+                closeOnCancel: true
+            });
+        } else {
+            var urlpath = '@Url.Action("ApproveOrReject", "Exception")';
+            $.ajax({
+                data: { CommentText: commentText, Progress: progress, ExceptionMasterId: masterId },
+                dataType: 'json',
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function (result) {
+                    if (result) {
+                     
+                        swal({
+                            title: 'Done Successfully',
+                            type: 'success',
+                            closeOnCancel: true
+                        },function () {
+                               $("#myModal").modal("hide");
+                                GetAllApprovedRequestList(3, 1);
+                            });
+                    }
+                }, error: function (xhr, status, error) {
+                    swal({
+                        title: 'Error Occoured',
+                        type: 'error',
+                        closeOnCancel: true
+                    });
+                }
+                    });
+        }
+    }
+    function PrintModal() {
+            var print_div = document.getElementById("printablearea");
+            var print_area = window.open();
+            print_area.document.write("<style>table{border-collapse:collapse;}</style><img width='20' height='20' src='../../Images/logo.png' /><img style='width:80px;' src='../../Images/logo.png' />");
+            print_area.document.write("<h1 style='text-align:center'>Exception Request Preview</h1>");
+            print_area.document.write(print_div.innerHTML);
+            print_area.document.close();
+            print_area.focus();
+            print_area.print();
+            print_area.close();
+    }
+</script>

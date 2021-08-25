@@ -1,0 +1,208 @@
+﻿
+@{
+    ViewBag.Title = "CourierBudgetIndex";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .modal-lg {
+        max-width: 80% !important;
+    }
+
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    #ioumenu {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #iousubmenu li a {
+        color: white;
+    }
+    /*#exceptionSubmrnu li:active{
+        color:white;
+        background-color:#0a0a22;
+
+    }*/
+    #iouNavigation {
+        background-color: #37474F;
+    }
+
+    #expmenu {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #exceptionSubmrnu li a {
+        color: white;
+    }
+    /*#exceptionSubmrnu li:active{
+        color:white;
+        background-color:#0a0a22;
+
+    }*/
+    #exceptionNavigaton {
+        background-color: #37474F;
+    }
+</style>
+<div class="container-fluid">
+    <h3 style="text-align: center;">
+        <b>Courier Management System</b>
+    </h3>
+    <hr style="margin: 0px" />
+    <div class="row">
+        <div id="iouNavigation" class="navbar navbar-default navbar-static-top">
+            <div id="ioumenu">
+                <div>
+                    <ul id="iousubmenu" class="nav navbar-nav">
+                        <li><a href="#" onclick="GetWidgetPartial('CourierBudgetWindow')">Courier Budget Form</a></li>
+                        <li><a href="#" onclick="GetAllCourierBudget(1,0)">Courier Budget So Far</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="pendingCapexTable"> </div>
+        <div id="ioucreateDashboard" style="width:100%">
+
+        </div>
+        @*<div id="pendingCapexTable"> </div>*@
+    </div>
+    <div class="container-fluid">
+        <hr />
+        <div class="row">
+            <div id="pendingCapexTable"> </div>
+        </div>
+    </div>
+    <div class="modal" id="myModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Courier Request Preview</h4>
+                </div>
+                <div id="modalbody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+<script type="text/javascript">
+
+    $('#pendingCapexTable').hide();
+
+      $("#iousubmenu").find('li:nth-child(1)').addClass("active");
+    GetWidgetPartial('CourierBudgetWindow');
+    $('#iousubmenu > li > a').click(function() {
+        $('li').removeClass();
+        $(this).parent().addClass('active');
+
+    });
+
+    function GetWidgetPartial(variable) {
+    var urlpath = '@Url.Action("GetCourierPartial", "Courier")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: {viewName:variable},
+            async: true,
+            success: function(data) {
+                    if (data) {
+                        $('#ioucreateDashboard').empty();
+                        $('#ioucreateDashboard').append(data);
+                    }
+                }
+            });
+    }
+    function GetAllCourierBudget(status,progress) {
+        var urlpath = '@Url.Action("GetAllCourierBudget", "Courier")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: { Status: status, ViewName: '_myCourierBudget',Progrss:progress},
+            async: true,
+            success: function (data) {
+
+                if (data) {
+                 /*   alert(data);*/
+                     $('#ioucreateDashboard').empty();
+                    $('#ioucreateDashboard').append(data);
+                   $('#VisitorRequestTable').DataTable();
+                }
+            }
+        });
+    }
+    function updateCourierBudget(courierBudgetEntryId) {
+        debugger;
+        var courierBudgetEntryId = $("#update_primarykey").val();
+                var urlpath = '@Url.Action("EditcourierBudget", "Courier")';
+                $.ajax({
+                    data: { courierBudgetEntryId: courierBudgetEntryId},
+                    url: urlpath,
+                    type: "Post",
+                    async: true,
+                            success: function(data) {
+                                if (data) {
+                                    $('#pendingCapexTable').show();
+                                    $('#pendingCapexTable').empty();
+                                    //$('#ioucreateDashboard').empty();
+                                    //$('#ioucreateDashboard').append(data);
+                                    $('#pendingCapexTable').html(data);
+                                }
+                            }
+                        });
+            }
+    function UpdateCourierBudget(courierBudgetEntryId) {
+        debugger;
+        var jsonData = {};
+        jsonData["CourierBudgetEntryId"] = $("#primarykey").val();
+        jsonData["DateOfRequest"] = new Date();
+        jsonData["BusinessUnitId"] = $("#upBusinessunit").val();
+        jsonData["BusinessUnitName"] = $("#upBusinessunit").children("option:selected").html();
+        jsonData["DepartmentID"] = $("#upDepartment").val();
+        jsonData["DepartmentName"] = $("#upDepartment").children("option:selected").html();
+        jsonData["BudgetYear"] = $("#budgetYear").val();
+        jsonData["MonthOfYear"] = $("#monthOfYear").val();
+        jsonData["Amount"] = $("#upamount").val();
+
+
+                    var urlpath = '@Url.Action("UpdateCourierBudget", "Courier")';
+                    $.ajax({
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(jsonData),
+                        url: urlpath,
+                        type: "POST",
+                        async: true,
+                        success: function (data) {
+                            swal({
+                                title: 'Courier Budget Updated Successfully',
+                                type: 'success',
+                                closeOnCancel: true
+                            }, function () {
+                                    $("#pendingCapexTable").load(" #pendingCapexTable");
+                                    $('#pendingCapexTable').hide();
+                                    $('#ioucreateDashboard').append(data);
+                                    
+                            });
+                        },
+                        error: function () {
+                            alert("Error");
+                        }
+                    });
+
+
+            }
+
+
+</script>
+
+

@@ -1,0 +1,893 @@
+﻿<style>
+    #radioBtn a {
+        margin: 1px;
+    }
+
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    .required:after {
+        content: "*";
+        color: red;
+    }
+
+    .inputhidegroup {
+        border: none;
+        pointer-events: none;
+        text-align: center;
+    }
+
+    input[type=text] {
+        margin: 2px;
+        padding: 2px;
+    }
+
+    #genaralInformationTable td input[type=text], #genaralInformationTable td input[type=date], #genaralInformationTable td input[type=number] {
+        text-align: center;
+        width: 95%;
+        height: 25px;
+    }
+
+
+    #genaralInformationTable td input[type=button] {
+        height: 25px;
+        width: 25px;
+        border-radius: 50%;
+        background-color: green;
+        color: white;
+    }
+
+    #genaralInformationTable th, #genaralInformationTable td {
+        margin: 0px;
+        padding: 0px;
+        text-align: center;
+    }
+
+    .leftlable {
+        text-align: left;
+    }
+
+    #airfreight td {
+        width: 12%;
+        padding: 2px;
+    }
+
+    #disclaimCancel td, #otherexception td {
+        padding: 2px;
+    }
+
+        #disclaimCancel td input[type=text], #airfreight td input[type=text], #otherexception td input[type=text] {
+            text-align: center;
+        }
+
+    .airfreightDisplay {
+        display: none;
+    }
+</style>
+
+<div class="container-fluid">
+    <p style="text-align:center;font-size:20px;font-weight:bold">Exception Request Approval Form</p>
+    <hr style="margin:0px" />
+    <div class="row">
+        <div>
+            <div class="col-md-2">
+                <label for="current_date">Current Date :</label>
+                <h5 id="current_date"></h5>
+            </div>
+            <div class="col-md-2">
+                <label for="exception_type" class="required">Exception Type :</label>
+                <select id="exception_type" onchange="ChangeColor('#exception_type')" class="form-control">
+                    <option value="0">--Select Exception Type--</option>
+                    <option value="1">Air Freight</option>
+                    <option value="2">Discount </option>
+                    <option value="3">Claim </option>
+                    <option value="4">Order Cancel</option>
+                    <option value="5">Others</option>
+                    <option value="6">Over Purchase </option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="exceptionReasons" class="required">Exception Reason</label>
+                <select id="exceptionReasons" onchange="ChangeColor('#exceptionReasons')" class="form-control">
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="scapprover" class="required">SC Approver</label>
+                <select id="scapprover" onchange="LoadApproverList()" class="form-control">
+                    <option value="0">--Supply Chain Approver--</option>
+                    <option value="1">Pranab Das Gupta</option>
+                    <option value="2">Prithu Bhowmik</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="business_unit" class="required">Business Unit:</label>
+                <select id="business_unit" class="form-control" onchange="LoadApproverList()">
+                    <option>--Select  Business Unit--</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="loadbuyer" class="required">Select Buyer:</label>
+                <select class="form-control" id="" onchange="LoadApproverList()">
+                    <option value="0">--Select Buyer--</option>
+                    <option value="1">M&S</option>
+                </select>
+            </div>
+            @*<div class="col-md-2">
+                    <label for="odddate">Orginal Delivery Date</label>
+                    <input type="date" id="odddate" class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <label for="revisedddate">Revised Delivery Date</label>
+                    <input type="date" id="revisedddate" class="form-control" />
+                </div>*@
+        </div>
+    </div>
+    <div>
+        <div style="overflow-x:auto">
+            <table width="100%" border="1" id="genaralInformationTable" class="table table-striped">
+                <caption>Genaral Information Table</caption>
+                <thead>
+                    <tr>
+                        <th class="required">Style No</th>
+                        <th class="required">Color </th>
+                        <th class="required">PO</th>
+                        <th class="required">ODD</th>
+                        <th class="required">RDD</th>
+                        <th class="required">Quantity</th>
+                        <th class="required">Unit Price($)</th>
+                        <th class="required">FOB($)</th>
+                        <th class="required discount_td" style="display:none">Discount Amount($)</th>
+                        <th class="required claimed_td" style="display:none">Claimed Amount($)</th>
+                        <th class="required material_td" style="display:none">Material Liability($)</th>
+                        <th class="required garmentsli_td" style="display:none">Garments Liability($)</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="genaralInformationBody">
+                    <tr>
+                        <td><input type="text" id="styleName" name="styleName" placeholder="Enter Style Number" /></td>
+                        <td><input type="text" id="colorName" name="colorName" placeholder="Enter Color " /></td>
+                        <td><input type="text" id="PoName" name="PoName" placeholder="Enter PO Number" /></td>
+                        <td><input type="date" id="odddate" name="odddate" /></td>
+                        <td><input type="date" id="revisedddate" name="revisedddate" /></td>
+                        <td><input type="number" step="0.01" id="quantinty" name="quantity" onchange="calculateGrandTotal()" placeholder="Enter Quantity" /></td>
+                        <td><input type="number" step="0.01" id="unitprice" name="unitprice" onchange="calculateGrandTotal()" placeholder="Enter Price" /></td>
+                        <td><input class="inputhidegroup" type="number" id="fobinput" name="fobinput" /></td>
+                        <td style="display:none" class="discount_td"><input type="number" step="0.01" id="discountclaim" name="discountclaim" onchange="calculateGrandTotal()" placeholder="Enter Price" /></td>
+                        <td style="display:none" class="claimed_td"><input type="number" step="0.01" id="claimedAmmount" name="claimedAmmount" onchange="calculateGrandTotal()" placeholder="Enter Price" /></td>
+                        <td style="display:none" class="material_td"><input type="number" step="0.01" id="materialliability" name="materialliability" onchange="calculateGrandTotal()" placeholder="Enter Price" /></td>
+                        <td style="display:none" class="garmentsli_td"><input type="number" step="0.01" id="garments_liability" name="garments_liability" onchange="calculateGrandTotal()" placeholder="Enter Price" /></td>
+                        <td>
+                            <input type="button" id="addNewGenaralInformation" value="+" />
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="7">Total</th>
+                        <th><input class="inputhidegroup" type="text" id="totalFobs" /></th>
+                        <th class="discount_td" style="display:none"><input class="inputhidegroup" id="totaldis" type="number" /></th>
+                        <th class="claimed_td" style="display:none"><input class="inputhidegroup" id="totalclaim" type="number" /></th>
+                        <th class="material_td" style="display:none"><input class="inputhidegroup" id="totalmat" type="number" /></th>
+                        <th class="garmentsli_td" style="display:none"><input class="inputhidegroup" id="totalgar" type="number" /></th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+    </div>
+    <div class="col-md-12">
+        <div id="airfreight" style="display:none">
+            <table width="100%">
+                <caption>Air Freight</caption>
+                <tbody>
+                    <tr>
+                        <td width="10%">
+                            <label class="required">Recoverable</label>
+                            <div id="radioBtn" class="btn-group input-group">
+                                <span style="display:inline-block" class="btn btn-default btn-sm" data-toggle="estado" data-value="1">Yes</span>
+                                <span style="display:inline-block" class="btn btn-primary btn-sm active" data-toggle="estado" data-value="2">No</span>
+                            </div>
+                        </td>
+                        <td width="5%">
+                            <input type="checkbox" id="volumetCheck" onchange="AirFraightCostCal()" /><br /><span id="checkhtml">Volumetric Weight</span>
+                        </td>
+                        <td id="gross_weighttd">
+                            <label class="required" for="gross_weight">Gross Weight(Kg)</label>
+                            <input type="number" id="gross_weight" class="form-control" onchange="AirFraightCostCal()" value=0 />
+                        </td>
+                        <td id="volumetricWeighttd" style="display:none">
+                            <label class="required" for="volumetricWeight">Volumetric Weight(CC)</label>
+                            <input type="number" id="volumetricWeight" class="form-control" onchange="AirFraightCostCal()" value=0 />
+                        </td>
+                        <td>
+                            <label class="required">Air Freight Rate($)</label>
+                            <input type="number" id="airfreightRate" class="form-control" onchange="AirFraightCostCal()" value=0 />
+                        </td>
+                        <td>
+                            <label class="required">Air Freight Cost($)</label>
+                            <input type="number" id="airfreightCost" class="form-control" value=0 disabled style="background-color:white" />
+                        </td>
+                        <td class="airfreightDisplay">
+                            <label class="required">Recoverable From</label>
+                            <input type="text" id="recoverableform" class="form-control" />
+                        </td>
+                        <td class="airfreightDisplay">
+                            <label class="required">Recoverable Amount</label>
+                            <input type="number" id="recoverableammount" class="form-control" />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        @*<div id="disclaimCancel" style="display:none">
+                <table width="100%">
+                    <caption>Discount/Claim/Cancellation</caption>
+                    <tr>
+                        <td>
+                            <label class="required" for="poinvoiceNo">PO & / or Invoice No: </label>
+                            <input type="text" id="poinvoiceNo" class="form-control" />
+                        </td>
+                        <td id="discount_td">
+                            <label class="required" for="discountclaim">Discount Amount($)</label>
+                            <input type="text" id="discountAmount" class="form-control" />
+                        </td>
+                        <td id="claimed_td">
+                            <label class="required" for="claimedAmmount">Claimed Amount($)</label>
+                            <input type="text" id="" class="form-control" />
+                        </td>
+                        <td id="garmentsli_td">
+                            <label class="required" for="garments_liability">Garments Liability Amount($)</label>
+                            <input type="text" id="" class="form-control" />
+                        </td>
+                        <td id="material_td">
+                            <label class="required" for="materialliability">Material Liability Amount($)</label>
+                            <input type="text" id="" class="form-control" />
+                        </td>
+
+                    </tr>
+                </table>
+            </div>*@
+        <div id="otherexception" style="display:none">
+            <table width="100%">
+                <caption>Other</caption>
+                <tr>
+                    <td>
+                        <label class="required" for="exceptionDetails">Exception Details </label>
+                        <input type="text" id="exceptionDetails" class="form-control" />
+                    </td>
+                    <td>
+                        <label class="required" for="lossliabilitycompany">Loss/Liability to company(qty)</label>
+                        <input type="number" id="lossliabilitycompany" class="form-control" />
+                    </td>
+                    <td>
+                        <label class="required" for="valueofloss">Value of loss / Liability($)</label>
+                        <input type="number" id="valueofloss" class="form-control" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="col-md-4" style="margin:0px;padding:0px">
+            <div class="row">
+                <div class="col-md-12">
+                    <table width="100%">
+                        <caption>Attach File</caption>
+                        <tr>
+                            <td style="padding-right:2PX;"><input type="file" multiple class="form-control" id="exceptionFileUpload" onchange="FileUploadOnChange()" /></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <table style="width:98%" border="1" id="exceptionfiletable">
+                        <caption>Attached File</caption>
+                        <thead>
+                            <tr>
+                                <th>File Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attachedFileTable">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <table style="width:100%" border="1">
+                <caption>Approval Flow</caption>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Approver Name</th>
+                        <th>Designation</th>
+                    </tr>
+                </thead>
+                <tbody id="approverlistbody">
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-4">
+            <div class="row">
+                <table width="100%">
+                    <tr>
+                        <td width="50%">
+                            <label class="required" for="reasons">Remarks</label>
+                            <textarea style="resize:none;width:98%" onchange="ChangeColor('#reasons')" id="reasons" rows="3" />
+                        </td>
+                        <td width="50%">
+                            <label class="required" for="responsibleperson">Responsible Person</label>
+                            <textarea style="resize:none;width:98%" id="responsibleperson" rows="3" />
+                        </td>
+                    </tr>
+                </table>
+                <div class="col-md-6">
+
+                </div>
+                <div class="col-md-6">
+
+                </div>
+            </div>
+            <br />
+            <div class="row" style="text-align:center">
+                <input type="button" class="btn btn-success" value="Submit For Approval" onclick="formValidate()" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    HideSidebar();
+    $('#radioBtn span').on('click', function () {
+        var sel = $(this).data('value');
+        var tog = $(this).data('toggle');
+        $('#'+tog).val(sel);
+        // You can change these lines to change classes (Ex. btn-default to btn-danger)
+        $('span[data-toggle="'+tog+'"]').not('[data-value="'+sel+'"]').removeClass('active btn-primary').addClass('notActive btn-default');
+        $('span[data-toggle="' + tog + '"][data-value="' + sel + '"]').removeClass('notActive btn-default').addClass('active btn-primary');
+        if (sel == 1) {
+            $(".airfreightDisplay").show();
+        } else if(sel==2) {
+            $(".airfreightDisplay").hide();
+            $(".airfreightDisplay td").each(function () {
+                $(this).find('input[type="number"]').val("");
+                $(this).find('input[type="text"]').val("");
+            });
+        }
+    });
+    var trrowNo = 0;
+    $('#exception_type').change(function () {
+        if ($('#exception_type').val() == 1) {
+           // $('#disclaimCancel').hide();
+            $('#airfreight').show();
+            $('#otherexception').hide();
+
+             $('.discount_td').hide();
+             $('.claimed_td').hide();
+             $('.material_td').hide();
+             $('.garmentsli_td').hide();
+
+            $('#airfreight').find('input').val('');
+            $('#disclaimCancel').find('input').val('');
+            $('#otherexception').find('input').val('');
+
+        } else if ($('#exception_type').val() == 5 || $('#exception_type').val() == 6) {
+            $('#airfreight').hide();
+            $('#otherexception').show();
+
+                $('.discount_td').hide();
+                $('.claimed_td').hide();
+                $('.material_td').hide();
+                $('.garmentsli_td').hide();
+
+            $('#airfreight').find('input').val('');
+            $('.discount_td').find('input').val('');
+            $('#otherexception').find('input').val('');
+        }else if ($('#exception_type').val() == 0) {
+            $('#disclaimCancel').hide();
+            $('#airfreight').hide();
+            $('#otherexception').hide();
+
+                $('.discount_td').show();
+                $('.claimed_td').hide();
+                $('.material_td').hide();
+                $('.garmentsli_td').hide();
+
+            $('#airfreight').find('input').val('');
+            $('#disclaimCancel').find('input').val('');
+            $('#otherexception').find('input').val('');
+        } else {
+            $('#disclaimCancel').show();
+            $('#airfreight').hide();
+            $('#otherexception').hide();
+
+            if ($('#exception_type').val() == "2") {
+                $('.discount_td').show();
+                $('.claimed_td').hide();
+                $('.material_td').hide();
+                $('.garmentsli_td').hide();
+            } else if ($('#exception_type').val() == "3") {
+                $('.discount_td').hide();
+                $('.claimed_td').show();
+                $('.material_td').hide();
+                $('.garmentsli_td').hide();
+            } else if ($('#exception_type').val() == "4") {
+                $('.discount_td').hide();
+                $('.claimed_td').hide();
+                $('.material_td').show();
+                $('.garmentsli_td').show();
+            }
+
+            $('#airfreight').find('input').val('');
+            $('#disclaimCancel').find('input').val('');
+            $('#otherexception').find('input').val('');
+        }
+    });
+    LoadBusinessUnit();
+    LoadLocation();
+    LoadReasonCategory();
+    LoadBuyerList();
+    GetDate();
+    function AirFraightCostCal() {
+        var airfreightrate = $("#airfreightRate").val();
+        if ($('#volumetCheck').is(":checked")) {
+            $("#gross_weighttd").hide();
+            $("#volumetricWeighttd").show();
+            $("#gross_weight").val(0);
+            //$("#checkhtml").html("Gross Weight");
+            var valueg = $("#volumetricWeight").val();
+            $("#airfreightCost").val(airfreightrate * valueg);
+        } else if ($('#volumetCheck').is(":checked") == false) {
+            $("#gross_weighttd").show();
+            $("#volumetricWeighttd").hide();
+            $("#volumetricWeight").val(0);
+            //$("#checkhtml").html("Volumetric Weight");
+            var valueg = $("#gross_weight").val();
+            $("#airfreightCost").val(airfreightrate * valueg);
+        }
+    }
+    function LoadBusinessUnit() {
+        $('#business_unit').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadBusinessUnit", "CapexApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+                $('#business_unit').empty();
+                $('#business_unit').append("<option value='0'>--Select Business Unit--</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#business_unit").append($("<option></option>").val(data[i].BusinessUnitId)
+                        .html(data[i].BusinessUnitName));
+                }
+            }
+        });
+    }
+    function GetDate() {
+        var dt = new Date();
+        var dd;
+        dd = dt.getDate();
+        const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+                      "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
+        ];
+        document.getElementById('current_date').innerHTML = dd + '-' + monthNames[dt.getMonth()] + '-' + dt.getFullYear();
+    }
+    function LoadLocation() {
+        $('#locationCheck').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadLocation", "CapexApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+                $('#locationCheck').empty();
+                $('#locationCheck').append("<option value='0'>--Select Location --</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#locationCheck").append($("<option></option>").val(data[i].LocationId)
+                        .html(data[i].LocationName));
+                }
+            }
+        });
+    }
+    function LoadReasonCategory() {
+        $('#exceptionReasons').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadReasonCategory", "Exception")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+                $('#exceptionReasons').empty();
+                $('#exceptionReasons').append("<option value='0'>--Select Reason --</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#exceptionReasons").append($("<option></option>").val(data[i].ExceptioReasonsId)
+                        .html(data[i].ExceptionReasonName));
+                }
+            }
+        });
+    }
+    function LoadBuyerList() {
+        $('#loadbuyer').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadBuyer", "Exception")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+                $('#loadbuyer').empty();
+                $('#loadbuyer').append("<option value='0'>--Select Buyer --</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#loadbuyer").append($("<option></option>").val(data[i].BuyerId)
+                        .html(data[i].BuyerName));
+                }
+            }
+        });
+    }
+    function ChangeColor(id) {
+        $(id).css({ "border-color": "#d3d3d3" });
+    }
+    $("#addNewGenaralInformation").click(function () {
+        AddGenralInformation();
+    });
+    function deleterow(rowval) {
+        $('tr#'+ rowval +'').remove();
+    }
+    function AddGenralInformation() {
+        var cheval = true;
+        $("#genaralInformationBody tr").each(function () {
+            var stylename = $(this).find('input[name^="styleName"]').val();
+            var color = $(this).find('input[name^="colorName"]').val();
+            var po = $(this).find('input[name^="PoName"]').val();
+            var odd = $(this).find('input[name^="odddate"]').val();
+            var fbb = $(this).find('input[name^="revisedddate"]').val();
+            var quantit = $(this).find('input[name^="quantity"]').val();
+            var unitp = $(this).find('input[name^="unitprice"]').val();
+            if (stylename == "" || color=="" || po == "" || odd == "" || fbb == "" || quantit == "" || unitp == "")
+            {
+                cheval = false;
+            }
+        });
+        if (cheval == false) {
+            ShowAlert();
+        }else {
+            trrowNo++;
+            var col = '<tr id="' + trrowNo + '">'
+                col += '<td ><input type="text"  name="styleName"  /></td>';
+                col += '<td ><input type="text"  name="colorName"  /></td>';
+                col += '<td ><input type="text" name="PoName"  /></td>';
+                col += '<td ><input type="date" name="odddate"  /></td>';
+                col += '<td ><input type="date" name="revisedddate"  /></td>';
+                col += '<td ><input type="number" onchange="calculateGrandTotal()" name="quantity"  /></td>';
+                col += '<td ><input type="number" onchange="calculateGrandTotal()" name="unitprice"  /></td>';
+                col += '<td ><input style="border:none;pointer-events:none" type="text" name="fobinput"  /></td>';
+                col+='<td style="display:none" class="discount_td"><input type="number" step="0.01" id="discountclaim" name="discountclaim" onchange="calculateGrandTotal()" placeholder="Enter Price" /></td>'
+                col+='<td style="display:none" class="claimed_td"><input type="number" step="0.01" id="claimedAmmount" name="claimedAmmount" onchange="calculateGrandTotal()" placeholder="Enter Price" /></td>'
+                col+='<td style="display:none" class="material_td"><input type="number" step="0.01" id="materialliability" name="materialliability" onchange="calculateGrandTotal()" placeholder="Enter Price" /></td>'
+                col+='<td style="display:none" class="garmentsli_td"><input type="number" step="0.01" id="garments_liability" name="garments_liability" onchange="calculateGrandTotal()" placeholder="Enter Price" /></td>'
+                col += '<td><input type="button" value="x" onclick="deleterow('+trrowNo+')"  style="background-color: red;" /></td></tr>';
+            $("#genaralInformationBody").append(col);
+            calculateGrandTotal();
+            if ($('#exception_type').val() == "2") {
+                $('.discount_td').show();
+                $('.claimed_td').hide();
+                $('.material_td').hide();
+                $('.garmentsli_td').hide();
+            } else if ($('#exception_type').val() == "3") {
+                $('.discount_td').hide();
+                $('.claimed_td').show();
+                $('.material_td').hide();
+                $('.garmentsli_td').hide();
+            } else if ($('#exception_type').val() == "4") {
+                $('.discount_td').hide();
+                $('.claimed_td').hide();
+                $('.material_td').show();
+                $('.garmentsli_td').show();
+            }
+        }
+    }
+    function ShowAlert() {
+        swal({
+            title: 'Please Insert the input value Correctly',
+            type: 'warning',
+            closeOnCancel: true
+        });
+    }
+    function calculateGrandTotal() {
+        var grandTotal = 0;
+        var distct = 0;
+        var claim = 0
+        var matelia = 0;
+        var garmentli = 0;
+        $("#genaralInformationBody tr").each(function () {
+            var qnty = $(this).find('input[name^="quantity"]').val();
+            var unitprice = $(this).find('input[name^="unitprice"]').val();
+            $(this).find('input[name^="fobinput"]').val(qnty * unitprice);
+            grandTotal += (qnty * unitprice);
+            if ($('#exception_type').val()==2) {
+                distct += ($(this).find('input[name^="discountclaim"]').val()*1);
+            } else if ($('#exception_type').val() == 3) {
+                claim += ($(this).find('input[name^="claimedAmmount"]').val()*1);
+            } else if ($('#exception_type').val() == 4) {
+                garmentli += ($(this).find('input[name^="garments_liability"]').val()*1);
+                matelia += ($(this).find('input[name^="materialliability"]').val()*1);
+            }
+        });
+        $("#totalFobs").val(grandTotal);
+        $("#totaldis").val(distct);
+        $("#totalclaim").val(claim);
+        $("#totalmat").val(matelia);
+        $("#totalgar").val(garmentli);
+    }
+    function GetInputData() {
+        var jsonData = {};
+        jsonData["CreateDate"] = new Date();
+        jsonData["ExceptionTypeName"] = $("#exception_type").children("option:selected").html();
+        jsonData["ExceptionTypeId"] = $("#exception_type").val();
+        jsonData["BusinessUnitName"] = $("#business_unit").children("option:selected").html();
+        jsonData["BuyerName"] = $("#loadbuyer").children("option:selected").html();
+        jsonData["BusinessUnitId"] = $("#business_unit").val();
+        jsonData["BuyerId"] = $("#loadbuyer").val();
+        jsonData["ExceptioReasonsId"] = $("#exceptionReasons").val();
+        jsonData["ExceptionReasonName"] = $("#exceptionReasons").children("option:selected").html();
+        jsonData["Reasons"] = $("#reasons").val();
+        jsonData["ResponsiblePerson"] = $("#responsibleperson").val();
+        var genaralInformation = [];
+        $('#genaralInformationBody tr').each(function () {
+                var myData = {};
+                myData["StyleNo"] = $(this).find('input[name^="styleName"]').val();
+                myData["Color"] = $(this).find('input[name^="colorName"]').val();
+                myData["PO"] = $(this).find('input[name^="PoName"]').val();
+                myData["Quantity"] = $(this).find('input[name^="quantity"]').val();
+                myData["FOB"] = $(this).find('input[name^="fobinput"]').val();
+                myData["OriginalDD"] = $(this).find('input[name^="odddate"]').val();
+                myData["RevisedDD"] = $(this).find('input[name^="revisedddate"]').val();
+                myData["Discount"] = $(this).find('input[name^="discountclaim"]').val();
+                myData["Claim"] = $(this).find('input[name^="claimedAmmount"]').val();
+                myData["MaterialLiability"] = $(this).find('input[name^="materialliability"]').val();
+                myData["GarmentsLiability"] = $(this).find('input[name^="garments_liability"]').val();
+                genaralInformation.push(myData);
+        });
+        jsonData["ExpgenaralInfoList"] = genaralInformation;
+        var dtinfo = {};
+        dtinfo["Recoverable"]=$("#radioBtn span.active").data('value');
+        dtinfo["GrossWeight"]=$("#gross_weight").val();
+        dtinfo["VolumetricWeight"]=$("#volumetricWeight").val();
+        dtinfo["AirFreightRate"]=$("#airfreightRate").val();
+        dtinfo["AirFreightCost"]=$("#airfreightCost").val();
+        dtinfo["RecoverableFrom"]=$("#recoverableform").val();
+        dtinfo["RecoverableAmmount"]=$("#recoverableammount").val();
+        dtinfo["PoInvoiceNo"]=$("#poinvoiceNo").val();
+        //dtinfo["DiscountAmount"]=$("#discountAmount").val();
+        //dtinfo["ClaimedAmmount"]=$("#claimedAmmount").val();
+        //dtinfo["AmmountCancelation"]=$("#materialliability").val();
+        //dtinfo["GarmentsLiability"]=$("#garments_liability").val();
+        dtinfo["ExceptionDetails"]=$("#exceptionDetails").val();
+        dtinfo["LossOrLiabilityCompany"]=$("#lossliabilitycompany").val();
+        dtinfo["ValueOfLoss"] = $("#valueofloss").val();
+        jsonData["ExceptionDetails"] = dtinfo;
+        var fileUpload = [];
+        $('#attachedFileTable tr').each(function () {
+            var filedate = {};
+            filedate["CapexFileName"] = $(this).find('td[name^="fileName"]').html();
+            filedate["CapexFilePath"] = $(this).find('td[name^="filePath"]').html();
+                fileUpload.push(filedate);
+        });
+        jsonData["ExceptionFilesList"] = fileUpload;
+
+        var approverList = [];
+        $('#approverlistbody tr').each(function () {
+            var approver = {};
+            approver["ApproverUserId"] = $(this).find('p[name^="userId"]').html();
+            approver["ApproverNO"] = $(this).find('p[name^="approverNo"]').html();
+            approver["ApproverName"] = $(this).find('p[name^="userName"]').html();
+            approver["DesignationName"] = $(this).find('p[name^="designationName"]').html();
+            approverList.push(approver);
+        });
+        jsonData["ApproverList"] = approverList;
+        return jsonData;
+    }
+    function varifyInputElement() {
+        var jsondate = GetInputData();
+        var urlpath = '@Url.Action("ModalShowBeforeSubmit", "Exception")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsondate),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    $("#modalbody").html("");
+                    $("#modalbody").append(data);
+                    $("#myModal").modal("show");
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+    }
+    function SubmitToDatabase() {
+         var jsondate = GetInputData();
+         var urlpath = '@Url.Action("SaveExceptionRequest", "Exception")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsondate),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    swal({
+                        title: 'Exception Request Submit Successfully',
+                        type: 'success',
+                        closeOnCancel: true
+                    },function () {
+                            $("#myModal").modal("hide");
+                             $("#exceptionSubmrnu").find('li').removeClass();
+                            $("#exceptionSubmrnu").find('li:nth-child(2)').addClass("active");
+                                    GetAllExceptionRequest(1,0);
+                                });
+                   // ExceptionFileUpload(data.pk);
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+    }
+    function FileUploadOnChange() {
+        var fileData = new FormData();
+        var fileUpload = $("#exceptionFileUpload").prop('files');
+            if (fileUpload.length>0) {
+                 for (var i = 0; i < fileUpload.length; i++) {
+                     fileData.append(fileUpload[i].name, fileUpload[i]);
+                 }
+        }
+        var urlpath = '@Url.Action("ExceptionFileUpload", "Exception")';
+        $.ajax({
+            url: urlpath,
+            type: "post",
+            processData: false,
+            contentType: false,
+            data: fileData  ,
+            success: function (result) {
+                for (var i = 0; i < result.length; i++) {
+                   var newRow = $('<tr>');
+                   var cols = "";
+                   cols += '<td name="fileName">' + result[i].CapexFileName + '</td>';
+                   cols += '<td style="display:none" name="filePath">' + result[i].CapexFilePath + '</td>';
+                   cols += '<td><input type="button" style="margin:2px" class="btn btn-danger btn-sm" onclick="DeleteFile(this,\''+result[i].ServerFileName+'\')"   value="X"></td></tr>';
+                   newRow.append(cols);
+                   $("#attachedFileTable").append(newRow);
+                }
+                $("#exceptionFileUpload").val('');
+            },
+            error: function (err) {
+                alert(err.responseText);
+            }
+        });
+    }
+    function DeleteFile(r, filePath) {
+       var urlpath = '@Url.Action("DeleteFiles", "Exception")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { FilePath: filePath },
+            async: true,
+            success: function (data) {
+               var i = r.parentNode.parentNode.rowIndex;
+               document.getElementById("exceptionfiletable").deleteRow(i);
+            }
+        });
+
+    }
+    function LoadApproverList() {
+        var buid = $('#business_unit').val();
+        var buyer = $('#loadbuyer').val();
+        var scappro = $('#scapprover').val();
+        $('#business_unit').css({ "border-color": "#d3d3d3" });
+        $('#loadbuyer').css({ "border-color": "#d3d3d3" });
+        $('#scapprover').css({ "border-color": "#d3d3d3" });
+
+        var urlpath = '@Url.Action("GetApproverListMaster", "Exception")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {
+                BusinessUnit: buid,
+                BuyerId: buyer,
+                SupplyChain:scappro
+            },
+            async: true,
+            success: function (data) {
+                $("#approverlistbody").empty();
+                 for (var i = 0; i < data.length; i++) {
+                    var newRow = $("<tr>");
+                     var cols = "";
+                     cols += '<td style="display:none"><p name="userId">' + data[i].UserInformationId + '</p></td>';
+                     cols += '<td><p name="approverNo">' + data[i].ApproverNo + '</p></td>';
+                     cols += '<td><p name="userName">' + data[i].UserInformationName + '</p></td>';
+                     cols += '<td><p name="designationName">' + data[i].DesignationName + '</p></td>';
+                    newRow.append(cols);
+                    $("#approverlistbody").append(newRow);
+                }
+            }
+        });
+    }
+    function formValidate() {
+        if ($("#exception_type").val() == "0") {
+            $('#exception_type').css({ "border-color": "#FF0000" });
+        } else if ($("#exceptionReasons").val() == "0") {
+            $('#exceptionReasons').css({ "border-color": "#FF0000" });
+        }else if ($("#scapprover").val() == "0") {
+            $('#scapprover').css({ "border-color": "#FF0000" });
+        }else if ($("#business_unit").val() == "0") {
+            $('#business_unit').css({ "border-color": "#FF0000" });
+        } else if ($("#loadbuyer").val() == "0") {
+            $('#loadbuyer').css({ "border-color": "#FF0000" });
+        } else if ($("#reasons").val() == "") {
+            $('#reasons').css({ "border-color": "#FF0000" });
+        }else if ($("#responsibleperson").val() == "") {
+            $('#responsibleperson').css({ "border-color": "#FF0000" });
+        }else {
+            var cheval = true;
+            $("#genaralInformationBody tr").each(function () {
+                var stylename = $(this).find('input[name^="styleName"]').val();
+                var color = $(this).find('input[name^="colorName"]').val();
+                var po = $(this).find('input[name^="PoName"]').val();
+                var odd = $(this).find('input[name^="odddate"]').val();
+                var fbb = $(this).find('input[name^="revisedddate"]').val();
+                var quantit = $(this).find('input[name^="quantity"]').val();
+                var unitp = $(this).find('input[name^="unitprice"]').val();
+                if (stylename == "" || color=="" || po == "" || odd == "" || fbb == "" || quantit == "" || unitp == "")
+                {
+                    cheval = false;
+                }
+                if ($("#exception_type").val() == 2) {
+                    var discount = $(this).find('input[name^="discountclaim"]').val();
+                    if (discount == "" || discount < 1) {
+                        cheval = false;
+                    }
+                } else if ($("#exception_type").val() == 3) {
+                    var claim = $(this).find('input[name^="claimedAmmount"]').val();
+                    if (claim == "" || claim < 1) {
+                        cheval = false;
+                    }
+                } else if ($("#exception_type").val() == 4) {
+                    var garment = $(this).find('input[name^="garments_liability"]').val();
+                    var material = $(this).find('input[name^="materialliability"]').val();
+                    if (garment == "" || garment < 1 || material == "" || material < 1) {
+                        cheval = false;
+                    }
+                }
+            });
+            if ($("#exception_type").val() == 1) {
+                if ($("#airfreightCost").val()<=0) {
+                    cheval = false;
+                }
+            } else if ($("#exception_type").val()==5 || $("#exception_type").val()==6) {
+                if ($("#exceptionDetails").val()== "" || $("#lossliabilitycompany").val()=="" ||
+                        $("#valueofloss").val()=="") {
+                    cheval = false;
+                }
+            }
+            if (cheval == false) {
+                ShowAlert();
+            } else {
+                varifyInputElement();
+            }
+        }
+    }
+</script>

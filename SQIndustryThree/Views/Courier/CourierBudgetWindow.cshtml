@@ -1,0 +1,597 @@
+﻿@*@{
+        ViewBag.Title = "VisitorRequestForm";
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }*@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+<link href="~/Content/LoadingModal.css" rel="stylesheet" />
+@Styles.Render("~/Content/capexform.css")
+<style type="text/css">
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+</style>
+<style type="text/css">
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    input, select {
+        width: 100%;
+    }
+
+    #visitorTable td, #visitorTable th {
+        text-align: center;
+    }
+
+        #visitorTable td input[type=text] {
+            all: initial;
+            all: unset;
+        }
+
+    input[type=text], input[type=button], select {
+        height: 30px;
+    }
+
+    #visitorinputtable {
+    }
+
+        #visitorinputtable td {
+            padding-right: 5px;
+            padding-left: 5px;
+        }
+
+    #loading-img {
+        background: url('../../Images/ajax-loader.gif') center center no-repeat;
+        height: 100%;
+        z-index: 20;
+    }
+
+    .overlay {
+        background: #463e3e;
+        display: none;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        opacity: 0.5;
+    }
+
+    .table > thead > tr > th {
+        vertical-align: top;
+        border-bottom: 2px solid #ddd;
+    }
+</style>
+
+
+<div class="row">
+    <div class="col-md-12">
+        @*<h4 style="text-align: center; background-color: #9bb07e; padding: 5px"><strong>Courier Budget Window</strong></h4>*@
+        <div class="col-lg-6 col-md-6 center-block" style="float: none;">
+            <div class="panel panel-success">
+                <div class="panel-heading"></div>
+                <div class="panel-body">
+                    <div class="col-md-12">
+
+                        <div class="form-group">
+                            <label for="outletSelect" class="col-sm-4 control-label">Unit</label>
+                            <div class="col-sm-8">
+                                <select id="business_unit" class="form-control business_unit"></select>
+
+                                @*</div>*@
+                            </div>
+                            <br />
+                            <br />
+                          
+                            <div class="form-group">
+                                <label for="outletSelect" class="col-sm-2 control-label" style="margin-left:-0px;">Budget Year</label>
+                                <div class="col-sm-8">
+                                    <select id='financialYear'style="margin-left:83px;">
+                                    </select>
+                                 
+                                </div>
+                            </div>
+                            <br />
+                            <br />
+                            <div class="form-group">
+                                <label for="outletSelect" class="col-sm-2 control-label" style="margin-left:-0px;">Month</label>
+                                <div class="col-sm-8">
+                                <select name="month" id="month" style="margin-left:83px;" onblur="courierBudgetCheck()">
+                                        <option value="">Select Month</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <br />
+                            <br />
+                            <div class="form-group">
+                                <label for="outletSelect" class="col-sm-2 control-label" style="margin-left:-0px;">Amount</label>
+                                <div class="col-sm-8">
+                                    <input type="number" class="form-control weight" autocomplete="off" style="margin-left:83px;" id="amount" onblur="courierBudgetCheck()">
+                                </div>
+                            </div>
+                            @*<div class="form-group">
+            &nbsp;<br />
+            <br />
+        </div>*@
+                        </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12">
+
+            <div class="row">
+                <div class="col-md-10">
+                    <div id="external-events">
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-lg-offset-4">
+                <!-------------------------------------
+            -----------------------------------
+            ------------------------------>
+
+                <a href="#" class="btn btn-success btn-sm ad-click-event btn-block" id="save_button">
+                    S A V E
+                </a>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+
+        </div>
+
+        <br />
+        <br />
+
+    </div>
+    <div class="col-md-6">
+        <div class="row">
+           
+          
+          
+         
+
+        </div>
+     
+    </div>
+
+</div>
+
+
+
+<div class="modal" id="myModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" style="text-align: center;font-weight:bold ;">Courier Request Preview</h4>
+            </div>
+            <div id="modalbody" class="modal-body">
+            </div>
+            <div class="modal-footer">
+                 <button type="button"  class="btn btn-primary btn-sm" onclick="PrintModal()" >Print</button>
+                @*<button type="button" class="btn btn-primary btn-sm" id="confirmCourierInfo">Confirm</button>*@
+                <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<div class="modal" id="courierTypeModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" style="text-align: center;font-weight:bold ;">Rate Matrix Preview</h4>
+            </div>
+            <div id="courierTypemodalbody" class="modal-body">
+            </div>
+            <div class="modal-footer">
+             
+                <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+@*<img src="http://i.giphy.com/13Xkz5sLdjGiQw.gif" id="loader">*@
+<div id="loader" style="margin-top:10px; display:none;">
+    <img src="~/Images/ajax-loader.gif" />
+</div>
+
+<div class="overlay">
+    <div id="loading-img"></div>
+</div>
+<div class="modal" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" style="text-align:center">Courier Preview</h4>
+            </div>
+            <div id="modalbody" class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="remove_button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-info" id="confirmCapexInfo">Submit</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+@*@Scripts.Render("~/bundles/jquery")*@
+    <script type="text/javascript">
+  //  $('#business_unit').prop('disabled', true);
+    function PrintModal() {
+        var print_div = document.getElementById("printablearea");
+        var print_area = window.open();
+        print_area.document.write("<style>table{border-collapse:collapse;}</style><img width='20' height='20' src='../../Images/logo.png' /><img style='width:80px;' src='../../Images/logo.png' />");
+        print_area.document.write("<h1 style='text-align:center'>Courier Request Preview</h1>");
+        print_area.document.write(print_div.innerHTML);
+        print_area.document.close();
+        print_area.focus();
+        print_area.print();
+        print_area.close();
+        }
+
+        var d = new Date();
+        var monthArray = new Array();
+
+        monthArray[6] = "July";
+        monthArray[7] = "August";
+        monthArray[8] = "September";
+        monthArray[9] = "October";
+        monthArray[10] = "November";
+        monthArray[11] = "December";
+        monthArray[12] = "January";
+        monthArray[13] = "February";
+        monthArray[14] = "March";
+        monthArray[15] = "April";
+        monthArray[16] = "May";
+        monthArray[17] = "June";
+        var currentYear = new Date().getFullYear();
+        var preYear = (currentYear - 1);
+
+
+        for (m = 6; m <= 17; m++) {
+            var optn = document.createElement("OPTION");
+            optn.text = monthArray[m];
+            // server side month start from one
+
+            if (optn.text == "January") {
+                optn.value='1'
+            }
+            else if (optn.text == "February") {
+                optn.value = '2'
+            }
+            else if (optn.text == "March") {
+                optn.value = '3'
+            }
+            else if (optn.text == "April") {
+                optn.value = '4'
+            }
+            else if (optn.text == "May") {
+                optn.value = '5'
+            }
+            else if (optn.text == "June") {
+                optn.value = '6'
+            }
+            else if (optn.text == "July") {
+                optn.value = '7'
+            }
+            else if (optn.text == "August") {
+                optn.value = '8'
+            }
+            else if (optn.text == "September") {
+                optn.value = '9'
+            }
+            else if (optn.text == "October") {
+                optn.value = '10'
+            }
+            else if (optn.text == "November") {
+                optn.value = '11'
+            }
+            else if (optn.text == "December") {
+                optn.value = '12'
+            }
+            //optn.value = (m + 1);
+            // if june selected
+            if (m == 5) {
+                optn.selected = true;
+            }
+            document.getElementById('month').options.add(optn);
+        }
+        var yearsLength = 3;
+
+        for (var i = 0; i < 3; i++) {
+            var next = currentYear + 1;
+            var year = currentYear + '-' + next.toString().slice(-2);
+            $('#financialYear').append(new Option(year, year));
+            currentYear--;
+        }
+    onLoad();
+
+    function onLoad() {
+        LoadFiscalYear();
+        LoadBusinessUnit();
+        LoadDepartment();
+    }
+
+        function LoadFiscalYear() {
+      /*  $('#location').css({ "border-color": "#d3d3d3" });*/
+        var urlpath = '@Url.Action("LoadFiscalYear", "Courier")';
+
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
+            success: function (response) {
+              //  alert(response);
+                $("#month_of_year").val(response.data[0].Current_Financial_Year);
+            },
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+    }
+    function LoadLocation() {
+        $('#location').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadLocation", "Home")';
+
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
+            success: function (data) {
+                $('#location').empty();
+                $('#location').append("<option value='0'>--Select Location --</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#location").append($("<option></option>").val(data[i].LocationId)
+                        .html(data[i].LocatioName));
+                }
+            },
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+    }
+
+     function LoadBusinessUnit() {
+        $('#business_unit').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadBusinessUnit", "Admin")';
+
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
+            success: function (data) {
+                $('#upBusinessunit').empty();
+                $('#business_unit').empty();
+                $("#visitorCompanySQ").empty();
+                $('#business_unit').append("<option value='0'>--Select Business Unit--</option>");
+                $('#upBusinessunit').append("<option value='0'>--Select Business Unit--</option>");
+                $('#visitorCompanySQ').append("<option value='0'>--Select Business Unit--</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#business_unit").append($("<option></option>").val(data[i].BusinessUnitId)
+                        .html(data[i].BusinessUnitName));
+                    $("#visitorCompanySQ").append($("<option></option>").val(data[i].BusinessUnitId)
+                        .html(data[i].BusinessUnitName));
+                    $("#upBusinessunit").append($("<option></option>").val(data[i].BusinessUnitId)
+                        .html(data[i].BusinessUnitName));
+                }
+            },
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+    }
+    function LoadDepartment(location) {
+        $('#requestorDepartment').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("GetDepartmentList", "Courier")';
+
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {location:1},
+            async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
+            success: function (data) {
+                $('#upDepartment').empty();
+                $('#department').empty();
+                $('#requestorDepartmentSQ').empty();
+                $('#requestorDepartmentSQ').append("<option value='0'>-- Select Department --</option>");
+                $('#upDepartment').append("<option value='0'>-- Select Department --</option>");
+                $('#department').append("<option value='0'>-- Select Department --</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#upDepartment").append($("<option></option>").val(data[i].DepartmentId)
+                        .html(data[i].DeartmentName));
+                    $("#department").append($("<option></option>").val(data[i].DepartmentId)
+                        .html(data[i].DeartmentName));
+                    $("#requestorDepartmentSQ").append($("<option></option>").val(data[i].DepartmentId)
+                        .html(data[i].DeartmentName));
+                }
+            }
+            ,
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+    }
+        function courierBudgetCheck() {
+        debugger;
+     //  LoadCourier();
+            var business_unit = $('#business_unit').val();
+            var financialYear = $('#financialYear').val();
+            var month = $('#month').val();
+      
+
+          var urlpath = '@Url.Action("GetCourierBudgetCheck", "Courier")';
+            $.ajax({
+                 url: urlpath,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                type: "Post",
+                data: JSON.stringify({
+                    business_unit: business_unit,
+                    financialYear: financialYear,
+                    month: month
+                 
+
+                }),
+                success: function (response) {
+                  //  alert(response.data[0].Amount);
+                    if (response.data[0].Amount) {
+                        //$('#save_button').prop('disabled', true);
+                        //$('#save_button').hide();
+                        swal({
+                            title: 'Already exist Amount for this Budget Year and Month ',
+                            type: 'error',
+                            closeOnCancel: true
+                        });
+                    
+                        $("#amount").val("");
+                    }
+                    else {
+                        $('#save_button').show();
+                    }
+                   
+                },
+                //error: function () {
+                //    alert("Error");
+                //}
+            });
+
+    }
+
+
+    $("#save_button").click(function () {
+
+        debugger;
+        modalView();
+    });
+
+    function modalView() {
+
+        if ($("#business_unit").val() == "0") {
+            swal({
+                title: 'Please Select Unit ',
+                type: 'error',
+                closeOnCancel: true
+            });
+
+
+            return false;
+        }
+        if ($("#department").val() == "0") {
+            swal({
+                title: 'Please Select Department ',
+                type: 'error',
+                closeOnCancel: true
+            });
+
+
+            return false;
+        }
+        if ($("#month_of_year").val() == '') {
+            swal({
+                title: 'Please Select Month of Year ',
+                type: 'error',
+                closeOnCancel: true
+            });
+
+
+            return false;
+        }
+        if ($("#amount").val() == '') {
+            swal({
+                title: 'Amount date is empty ',
+                type: 'error',
+                closeOnCancel: true
+            });
+
+
+            return false;
+        }
+        else {
+            var jsondate = SaveCourierRequest();
+          var urlpath = '@Url.Action("SaveCourierBudget", "Courier")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsondate),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    swal({
+                        title: 'Courier Budget Submit Successfully',
+                        type: 'success',
+                        closeOnCancel: true
+                    },function () {
+                            $("#myModal").modal("hide");
+                            $("#iousubmenu").find('li').removeClass();
+                            $("#iousubmenu").find('li:nth-child(2)').addClass("active");
+
+                    });
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+        }
+
+
+    }
+
+    function SaveCourierRequest() {
+        debugger;
+        var jsonData = {};
+        jsonData["DateOfRequest"] = new Date();
+        jsonData["BusinessUnitId"] = $("#business_unit").val();
+        jsonData["BusinessUnitName"] = $("#business_unit").children("option:selected").html();
+        jsonData["DepartmentID"] = $("#department").val();
+        jsonData["DepartmentName"] = $("#department").children("option:selected").html();
+        jsonData["BudgetYear"] = $("#financialYear").val();
+        jsonData["MonthOfYear"] = $("#month").val();
+        jsonData["Amount"] = $("#amount").val();
+
+
+        return jsonData;
+
+
+
+
+    }
+
+    </script>
+

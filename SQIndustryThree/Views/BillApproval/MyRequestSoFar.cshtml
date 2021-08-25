@@ -1,0 +1,30 @@
+﻿
+@{
+    ViewBag.Title = "MyRequestSoFar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h5 style="text-align:center">MyRequestSoFar</h5>
+<div class="row">
+    <div id="mydetailscontainer">
+
+    </div>
+</div>
+@Scripts.Render("~/bundles/jquery")
+<script type="text/javascript">
+    GetAllRequestList(0);
+     function GetAllRequestList(status) {
+        var urlpath = '@Url.Action("GetAllBillRequest", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'html',
+            type: "Post",
+            data: {status:status},
+            async: true,
+            success: function (data) {
+                $('#mydetailscontainer').empty();
+                $('#mydetailscontainer').html(data);
+            }
+        });
+    }
+</script>

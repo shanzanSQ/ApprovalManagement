@@ -1,0 +1,117 @@
+﻿@model IEnumerable<SQIndustryThree.Models.VisitorRequestModel>
+<style type="text/css">
+    #visitorTable td, th {
+        text-align: center;
+    }
+
+    .btn, .form-control {
+        border-radius: 0px;
+    }
+</style>
+
+<div class="box">
+    <table width="100%" class="table table-striped table-bordered" id="visitorTable" style="overflow:scroll">
+        <thead>
+            <tr>
+                <th>SL</th>
+                <th>Visitor Pic</th>
+                <th>Request ID</th>
+                @* <th>Visitor ID</th>*@
+                <th>Mode Of Visit</th>
+                <th>Date of Visit</th>
+                <th>Purpose of visit</th>
+                <th>Business Unit</th>
+                <th>Visitor Name</th>
+                <th>Visitor Company</th>
+                <th>Visitor Mobile</th>
+                <th>Vehicle No</th>
+                <th>Requestor Name</th>
+                <th>Requestor Department</th>
+                <th>Requestor Mobile</th>
+                @*<th>Status </th>*@
+                @*<th>Details </th>*@
+
+            </tr>
+        </thead>
+        <tbody>
+            @{ int count = 1;}
+            @foreach (var item in Model)
+            {
+                <tr id="@item.VisitorId">
+                    <td>@count</td>
+                    @if (string.IsNullOrEmpty(@item.Image))
+                    {
+                        <th><img src="~/Images/user.png" height="50" width="50" /></th>
+                    }
+                    else
+                    {
+                        <th><img src="~/Images/Visitors/@item.Image" height="50" width="50" /></th>
+                    }
+
+                    <td>@item.RequestorId</td>
+                    @*<th><img src="~/Images/Visitors/20191204_153909637436270755398107.jpg" height="350" width="240" /></th>*@
+                    @*<td>@item.VisitorId</td>*@
+                    @if (item.ModeOfVisit == 2)
+                        {
+                            <td>Multiple Days</td>
+                        }
+                        else
+                        {
+                            <td>Single Days</td>
+                        }
+
+                    
+                        <td>@item.VisitDate.ToString("dd MMM yyyy")</td>
+                    
+
+                    <td>@item.PurposeOfVisitSQ</td>
+                    <td>@item.BusinessUnitName</td>
+                    <td>@item.VisitorName</td>
+
+                    @if (string.IsNullOrEmpty(item.VisitorCompany))
+                    {
+                        <td>@item.SQUnitName</td>
+                    }
+                    else
+                    {
+                        <td>@item.VisitorCompany</td>
+                    }
+
+                    <td>@item.VisitorMobile</td>
+                    <td>@item.VehicleNo</td>
+                    <td>@item.RequestorName</td>
+                    <td>@item.RequestorDepartment</td>
+                    <td>@item.RequerstorMobile</td>
+                    
+                    @*@if (item.ApprovedStatus == "Approved")
+                        {
+                            <td><span class="btn-success btn-sm">@item.ApprovedStatus</span> </td>
+                        }
+                        else if (item.ApprovedStatus == "Rejected")
+                        {
+                            <td><span class="btn-danger btn-sm">@item.ApprovedStatus</span> </td>
+                        }
+                        else
+                        {
+                            <td><span class="btn-primary btn-sm">@item.ApprovedStatus</span> </td>
+                        }*@
+
+                    @*<td>
+                        <input type="button" value="Details" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#showmodal" onclick="getInvidualRequest(@item.VisitorId)" />
+                    </td>*@
+                    @*@if (item.IsApproved == 2)
+                        {
+                            <td>
+                                <input type="button" value="Visitor Arrived" class="btn btn-success btn-sm" onclick="UpdateFrontDesk(@item.VisitorId,4)" />
+                            </td>
+                        }
+                        else
+                        {
+                            <td style="display:none"></td>
+                        }*@
+                </tr>
+                count++;
+            }
+        </tbody>
+    </table>
+</div>

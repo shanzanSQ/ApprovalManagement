@@ -1,0 +1,174 @@
+﻿@model SQIndustryThree.Models.CourierRequestModel
+<style>
+    th {
+        text-align: left;
+    }
+
+    td {
+        text-align: left;
+    }
+
+    #genaralInfodt tr th, #genaralInfodt tr td, #approverlist tr td, #approverlist tr th {
+        text-align: center;
+    }
+</style>
+<div id="printablearea">
+
+    <div>
+        @*<span style="float:left;font-weight:bold;font-size:20px">@Model.BusinessUnitName</span>*@
+        <span style="float:right;font-weight:bold;font-size:20px">Courier Request Id: @Model.CourierRequestId</span>
+    </div>
+    @if (Model.CourierFontDeskModelList != null)
+    {
+        <div class="row">
+            <div class="col-md-6">
+                <table border="1" width="100%" id="dispatchTable">
+                    <caption>Courier Received Header</caption>
+                    <tr>
+                        <th>Received Id</th>
+                        <td>
+                            <input id="total" style=" width: 100%; text-align: center;overflow-wrap: break-word" type="text" />
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <th>Courier</th>
+                        @*@foreach (var item in Model.CourierFontDeskModelList)
+                            {*@
+                        <td name="ServiceProvider">
+                            @*<input id="ServiceProvider" style=" width: 100%; text-align: center;overflow-wrap: break-word" type="text" name="ServiceProvider" value="@Model.ServiceProvider" />*@
+                            @Model.ServiceProvider
+                        </td>
+                        @*}*@
+
+                    </tr>
+                    <tr>
+                        <th>Country</th>
+                        <td name="CountryName">
+                            @Model.CountryName
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <th>Post Code</th>
+                        <td>
+                            @Model.PostCode
+                        </td>
+                    </tr>
+
+                </table>
+            </div>
+        </div>
+    }
+
+    @if (Model.CourierFontDeskModelList != null)
+    {
+        <table border="1" width="100%" id="Courierlist">
+            <caption>Courier Information </caption>
+            <thead>
+                <tr>
+                    <th style="text-align:center">Request Id</th>
+                    <th style="text-align:center">Requestor Name</th>
+                    <th style="text-align:center">Department</th>
+                    <th style="text-align:center">Receiver</th>
+                    <th style="text-align:center">Weight</th>
+                    <th style="text-align:center">Requested Dispatch Date</th>
+                    <th style="text-align:center">Requested Delivery Date</th>
+                    <th style="text-align:center">Proposed Date</th>
+                    <th style="text-align:center">Cost</th>
+                </tr>
+            </thead>
+            <tbody id="ammountInformationbody">
+                @foreach (var item in Model.CourierFontDeskModelList)
+                {
+                    <tr>
+                        <td style="text-align:center">@item.CourierRequestId</td>
+                        <td style="display:none;"><input id="actualCourierRequestId" style="width:100%;overflow-wrap:break-word" type="hidden" name="actualCourierRequestId" value="@item.CourierRequestId" onchange="calculateGrandTotalWeight()" /></td>
+                        <td style="text-align:center">@item.UserName</td>
+                        <td style="text-align:center">@item.DeartmentName</td>
+                        <td style="text-align:center">@item.Receiver</td>
+                        @*<td><input id="weight" style="width:100%;overflow-wrap:break-word" type="text" name="weight" value="@item.Weight" onchange="calculateGrandTotalWeight()" /></td>*@
+                    <td style="text-align:center">@item.Weight</td>
+                    <td style="text-align:center">@item.DispatchDate</td>
+                    <td style="text-align:center">@item.Deliverydate</td>
+                    <td style="text-align:center">@item.ProposedDate</td>
+                    <td style="text-align:center">@item.Cost</td>
+                        @*<td>@item.total</td>*@
+                    </tr>
+
+                }
+            </tbody>
+           
+        </table>
+    }
+
+    <div>
+        <br />
+        <table width="45%" align="center">
+            <tr>
+                <td>
+                    <label for="courier_number" class="proposed_date">Courier Number:</label>
+                 </td>
+                <td style="padding:5px">
+                    <input id="courier_number" style=" width: 100%; text-align: center;overflow-wrap: break-word" type="text" autocomplete="off" placeholder="Enter Courier Number" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="font_airway_bill_no" class="airway_bill_no">Airway Bill No:</label>
+                  </td>
+                <td style="padding:5px">
+                    <input id="font_airway_bill_no" style=" width: 100%; text-align: center;overflow-wrap: break-word" type="text" autocomplete="off" placeholder="Enter Airway Bill No"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="font_received_date" class="proposed_date">Received  Date:</label>
+                </td>
+                <td style="padding:5px">
+                    <input type="date" id="font_received_date" class="form-control DateFrom" name="font_received_date"/>
+
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="font_received_weight" class="proposed_date">Received  Weight:</label>
+                </td>
+                <td style="padding:5px">
+                    <input type="text" id="font_received_weight" class="form-control DateFrom" autocomplete="off" value="0" />
+                 </td>
+                <td style="padding:5px">
+                    <input type="button" value="Get Weight" id="getWeight" onclick="getWeightByCourierDispatchId()" />
+               </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="font_handover_to" class="proposed_date">Handed Over To:</label>
+                 </td>
+                <td style="padding:5px">
+                    <input type="text" id="font_handover_to" class="form-control DateFrom" autocomplete="off" value=" " />
+
+                </td>
+            </tr>
+           <tr>
+                <td>
+                    <label for="font_referance_no" class="referance_no">Referance No:</label>
+                </td>
+                <td style="padding:5px">
+                    <input id="referance_no" style=" width: 100%; text-align: center;overflow-wrap: break-word" type="text" autocomplete="off" value=" " />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="font_remarks" class="proposed_date">Remarks:</label>
+                 </td>
+                <td style="padding:5px">
+                    <input id="font_remarks" style=" width: 100%; text-align: center;overflow-wrap: break-word" type="text" autocomplete="off" value=" "/>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+</div>
+
+

@@ -1,0 +1,255 @@
+﻿<link href="~/Assets/bower_components/select2/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    #total_div {
+        margin-left: 20px;
+    }
+
+    .lable_table {
+        width: 20%;
+        font-weight: bold;
+    }
+    .form-control{
+        border-radius:0px;
+    }
+    
+    .select2-container .select2-selection--single{
+    height:34px !important;
+}
+.select2-container--default .select2-selection--single{
+         border: 1px solid #ccc !important; 
+     border-radius: 0px !important; 
+}
+</style>
+<div id="total_div" class="container-fluid">
+    <div class="row">
+        <table style="text-align:left" class="table table-responsive table-bordered">
+            <tr>
+                <td>
+                    <label for="locationCheck">Select Location : </label>
+                    <select id="locationCheck" name="locationCheck" class="form-control select2">
+                    </select>
+                </td>
+                <td>
+                    <label for="business_unit">Select Business Unit : </label>
+                    <select id="business_unit" name="business_unit" class="form-control select2">
+                    </select>
+                </td>
+                <td>
+                    <label for="cashLimit">Select Cash Limit</label>
+                    <select class="form-control" id="cashLimit">
+                        <option value="0">--Select Cash Limit--</option>
+                        <option value="1">1k-25k</option>
+                        <option value="2">25k-1LAC</option>
+                        <option value="3">Above 1LAC</option>
+                    </select>
+                </td>
+                <td>
+                    <label>Select Department</label>
+                    <select class="form-control">
+                        <option>--Select Department--</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="lable_table">Select Catagory : </td>
+                <td>
+                    <select id="catagoryselect" name="catagoryselect" class="form-control">
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <button class="btn btn-info" id="show_approver">Show Approver List</button>
+        <button class="btn btn-primary" id="addnewapprover">Add Approver List </button>
+        <br />
+        <div style="display:none" id="approverdiv">
+            <table class="table">
+                <tr>
+                    <td>
+                        <label for="select_user">Select User</label>
+                        <select id="select_user" class="form-control"></select>
+                    </td>
+                    <td>
+                        <label for="userstatus">Select Status</label>
+                        <select id="userstatus" name="userstatus" class="form-control">
+                            <option value="1"> Active </option>
+                            <option value="0"> InActive </option>
+                        </select>
+                    </td>
+                    <td>
+                        <label for="add_approver">Action</label>
+                        <button class="btn btn-success form-control" id="add_approver">Add Approver</button>
+                    </td>
+                </tr>
+            </table>
+            <table id="approverTable" width="80%" class="table table-striped">
+            </table>
+            <button id="submitApprover" class="btn btn-primary">Submit</button>
+        </div>
+        <br />
+        <table id="approverlisttable" border="1" width="80%" class="table table-striped">
+        </table>
+    </div>
+
+</div>
+@Scripts.Render("~/bundles/jquery")
+<script src="~/Assets/bower_components/select2/dist/js/select2.min.js"></script>
+<script type="text/javascript">
+    $('.select2').select2();
+    LoadBusinessUnit();
+    LoadLocation();
+    var counter = 0;
+
+    $("#add_approver").click(function () {
+
+        if ($("#select_user").val() != "0") {
+            var userId = $("#select_user").val();
+            counter++;
+            var UserName = $('#select_user').children("option:selected").html();;
+            var newRow = $("<tr>");
+            var cols = "";
+            cols += '<td width="5%">' + counter + '</td>';
+            cols += '<td width="10%"><input type="text" class="form-control" disabled name="approverUserId" id="approverUserId" value="' + userId + '" /></td>';
+            cols += '<td width="80%">' + UserName + '</td>';
+            cols += '<td width="10%"><input type="button" class="btn btn-danger delfile"  value="X"></td></tr>';
+            newRow.append(cols);
+            $("#approverTable").append(newRow);
+        } else {
+            swal({
+                title: 'Please select The user first',
+                type: 'error',
+                closeOnCancel: true
+            });
+        }
+
+    });
+
+     $("#approverTable").on("click", ".delfile", function (event) {
+         $(this).closest("tr").remove();
+         counter--;
+    });
+
+
+    function LoadUsers() {
+        var urlpath = '@Url.Action("LoadUsers", "Admin")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+                $('#select_user').empty();
+                $('#select_user').append("<option value='0'>--Select Users --</option>");
+                    for (var i = 0; i < data.length; i++) {
+                        $("#select_user").append($("<option></option>").val(data[i].UserInformationId)
+                        .html(data[i].UserSQNumber+":"+data[i].UserInformationName));
+                    }
+                }
+        });
+    }
+
+    function LoadCatagory() {
+        var urlpath = '@Url.Action("LoadCatagory", "Admin")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+                $('#catagoryselect').empty();
+                $('#catagoryselect').append("<option value='0'>--Select Catagory --</option>");
+                    for (var i = 0; i < data.length; i++) {
+                        $("#catagoryselect").append($("<option></option>").val(data[i].CapexCatagoryID)
+                        .html(data[i].CapexCatagoryName));
+                    }
+                }
+        });
+    }
+    $("#submitApprover").click(function () {
+
+        var jsonData = {}
+        jsonData["BusinessUnitId"] = $('#business_unit').val();
+        jsonData["Status"] = $('#userstatus').val();
+        jsonData["CatagoryId"] = $('#catagoryselect').val();
+
+        var jsonObj = [];
+
+            $('#approverTable tr').each(function () {
+                var myData = {};
+                myData["UserInformationId"] = $(this).find('input[name^="approverUserId"]').val();
+                jsonObj.push(myData);
+            });
+        jsonData["UserInformationList"] = jsonObj;
+
+        var urlpath = '@Url.Action("SaveApproverList", "Admin")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsonData),
+                dataType: 'json',
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function (result) {
+                    if (result) {
+                        swal({
+                                        title: 'Approver Added Successfully!!',
+                                        type: 'success',
+                                        closeOnCancel: true
+                                    },
+                            function () {
+                                 window.location.href = '@Url.Action("DashboardAdmin", "Admin")';
+                                    });
+                    }
+                }
+            });
+    });
+
+    $("#addnewapprover").click(function () {
+        $("#approverdiv").show();
+        $("#approverTable").show();
+        $("#approverlisttable").hide();
+        LoadUsers();
+    });
+    $("#show_approver").click(function () {
+        $("#approverdiv").hide();
+        $("#approverTable").hide();
+        $("#approverlisttable").show();
+        buid= $('#business_unit').val();
+        catgoryid = $('#catagoryselect').val();
+
+         var urlpath = '@Url.Action("showApproverList", "Admin")';
+        $.ajax({
+                data: { BusinessUnitId: buid, CatagoryId:catgoryid  },
+                dataType: 'json',
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function (result) {
+                    if (result) {
+                        $("#approverlisttable").empty();
+                        var newRow = $("<tr>");
+                            var cols = "";
+                            cols += '<th>Approver No </th>';
+                            cols += '<th>Approver ID </th>';
+                            cols += '<th>Approver Name</th>';
+                            cols += '<th>Approver Designation </th>';
+                            cols += '<th> Status </th></tr>';
+                            newRow.append(cols);
+                            $("#approverlisttable").append(newRow);
+                        for (var i = 0; i < result.length; i++) {
+                           var newRow = $("<tr>");
+                            var cols = "";
+                            cols += '<td>'+result[i].ApproverNo+'</td>';
+                            cols += '<td>'+result[i].UserInformationId+'</td>';
+                            cols += '<td>'+result[i].UserInformationName+'</td>';
+                            cols += '<td>'+result[i].DesignationName+'</td>';
+                            cols += '<td>'+result[i].UserTypeId+'</td></tr>';
+                            newRow.append(cols);
+                            $("#approverlisttable").append(newRow);
+                        }
+                    }
+                }
+            });
+    });
+</script>

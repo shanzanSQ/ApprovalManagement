@@ -1,0 +1,68 @@
+﻿@model IEnumerable<SQIndustryThree.Models.CourierTypeDetails>
+@{
+    ViewBag.Title = "_courierTypePertialView";
+}
+<style>
+    th {
+        text-align: center;
+    }
+
+    td {
+        text-align: center;
+    }
+</style>
+<div class="box">
+    <!-- /.box-header -->
+    <div class="box-body">
+        <div class="col-xs-12" id="personlocdiv">
+            <table id="courierTypeshowTable" class="table-bordered table table-responsive">
+                <thead>
+                    <tr>
+                        <th>SL</th>
+                        <th>Type</th>
+                        <th>Country</th>
+                        <th>Service Provider</th>
+                        <th>Weight</th>
+                        <th>Lead Time From</th>
+                        <th>Lead Time To</th>
+                        <th>Rate</th>
+                        <th>Currency</th>
+                        @*<th>Created By</th>*@
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ int count = 1;}
+                    @foreach (var item in Model)
+                    {
+                    <tr>
+                        <td>@count</td>
+                        <td>@item.Type</td>
+                        <td>@item.CountryName</td>
+                        <td>@item.ServiceProvider</td>
+                        <td>@item.WeightRange</td>
+                        <td>@item.LeadTimeFrom</td>
+                        <td>@item.LeadTimeTo</td>
+                        <td>@item.Rate</td>
+                        <td>@item.Currency</td>
+                        @*<td>@item.UserName</td>*@
+                        <input id="update_primarykey" type="hidden" value="@item.CourierTypeId" />
+                        <td> <button type="button" id="update_capex" onclick="updateCourierType(@item.CourierTypeId)" class="btn  btn-block btn-danger">Update </button></td>
+
+                    </tr>
+                        count++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- /.box-body -->
+</div>
+<!-- /.box -->
+<script src="~/Assets/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="~/Assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script>
+    $(function () {
+        $("#pending_Capex").html("("+@Model.Count()+")");
+    });
+</script>

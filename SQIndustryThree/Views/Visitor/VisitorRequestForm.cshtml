@@ -1,0 +1,2049 @@
+﻿@*@{
+        ViewBag.Title = "VisitorRequestForm";
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }*@
+<style type="text/css">
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    input, select {
+        width: 100%;
+    }
+
+    #visitorTable td, #visitorTable th {
+        text-align: center;
+    }
+
+        #visitorTable td input[type=text] {
+            all: initial;
+            all: unset;
+        }
+
+    input[type=text], input[type=button], select {
+        height: 30px;
+    }
+
+    #visitorinputtable {
+    }
+
+        #visitorinputtable td {
+            padding-right: 5px;
+            padding-left: 5px;
+        }
+
+    #loading-img {
+        background: url('../../Images/ajax-loader.gif') center center no-repeat;
+        height: 100%;
+        z-index: 20;
+    }
+
+    .overlay {
+        background: #463e3e;
+        display: none;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        opacity: 0.5;
+    }
+
+    .table > thead > tr > th {
+        vertical-align: top;
+        border-bottom: 2px solid #ddd;
+    }
+</style>
+<h3 style="text-align:center">Visitor Request Form</h3>
+<div class="row">
+    <div class="col-md-6">
+        <h4 style="text-align: center; background-color: #9bb08e; padding: 5px"><strong>Requestor Information</strong></h4>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="col-md-6">
+                    <label for="location">Location : <span style="color:red">*</span></label>
+                    <select id="location" onchange="colorChange('#location')" class="form-control cke_required">
+                        <option value="0">--Select loction--</option>
+                        <option value="1">Central</option>
+                        <option value="2">Factory</option>
+                    </select>
+                </div>
+                <div class="col-md-6 business_unit">
+                    <label for="business_unit" class="business_unit">Business Unit: <span style="color:red">*</span></label>
+                    <select id="business_unit" onchange="colorChange('#business_unit')" class="form-control business_unit"></select>
+                </div>
+                <div class="col-md-6 visit_mode">
+                    <label for="visit_mode" class="visit_mode">Visit Mode: <span style="color:red">*</span></label>
+                    <select id="visit_mode" onchange="colorChange('#visit_mode')" class="form-control visit_mode">
+                        <option value="0">--Select Visit Mode--</option>
+                        <option value="1">Internal</option>
+                        <option value="2">External</option>
+
+                    </select>
+                </div>
+                <div class="col-md-6 department_head">
+                    <label for="department_head" class="department_head">Department Head : <span style="color:red">*</span></label>
+                    <select id="department_head" onchange="colorChange('#department_head')" class="form-control department_head"></select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="category" class="hello">Category : <span style="color:red">*</span></label>
+                    <select id="category" onchange="colorChange('#category')" class="form-control"></select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="subcategory" class="hidedata">SubCategory :</label>
+                    <select id="subcategory" onchange="colorChange('#subcategory')" class="form-control"></select>
+                </div>
+                <div class="col-md-6">
+                    <label for="requestorDepartment">Requestor Department:<span style="color:red">*</span></label>
+                    <select type="text" id="requestorDepartment" data-departmentId="" onchange="colorChange('#requestorDepartment')" class="form-control"></select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="permission">Mode Of Visit : <span style="color:red">*</span></label>
+                    <select id="permission" onchange="colorChange('#permission')" class="form-control">
+                        @*<option value="0">--Select Purpose--</option>*@
+                        <option value="1">Single Day</option>
+                        <option value="2">Multiple Days</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="dateVisit" class="date12hide">Date Of Visit :</label>
+                    <input type="date" id="dateVisit" onchange="colorChange('#dateVisit')" min="2020-12-12" class="form-control DateFrom" />
+                </div>
+                <div class="col-md-6">
+                    <label for="endVisit" class="date123hide">Start Date:</label>
+                    <input type="date" id="startVisit" onchange="colorChange('#startVisit')" min="2020-12-12" class="form-control DateFrom" />
+                </div>
+                <div class="col-md-6">
+                    <label for="endVisit" class="date123hide">End Date:</label>
+                    <input type="date" id="endVisit" onchange="colorChange('#endVisit')" min="2020-12-12" class="form-control DateFrom" />
+                </div>
+
+            </div>
+
+
+
+
+
+
+
+    <!--<div class="col-md-6">
+        <div class="row">
+            <div class="col-md-6 expandvisitmode">
+                <label for="visit_mode" class="visit_mode">Visit Mode: <span style="color:red">*</span></label>
+                <select id="visit_mode" onchange="colorChange('#visit_mode')" class="form-control visit_mode">
+                    <option value="0">Select Visit Mode</option>
+                    <option value="1">Internal</option>
+                    <option value="2">External</option>
+
+                </select>
+            </div>
+            <div class="col-md-6 expandunit">
+                <label for="business_unit" class="business_unit">Business Unit: <span style="color:red">*</span></label>
+                <select id="business_unit" onchange="colorChange('#business_unit')" class="form-control business_unit"></select>
+            </div>
+
+
+        </div>
+
+        <label for="subcategory" class="hidedata hidden">abc :</label>
+        <input type="date" id="abc" onchange="colorChange('#abc')" class="form-control hidden" />
+
+        <label for="subcategory" class="hidedata">SubCategory :</label>
+        <select id="subcategory" onchange="colorChange('#subcategory')" class="form-control"></select>
+                    @*<label for="approver">Approver:</label>
+        <select id="approver" onchange="colorChange('#approver')" class="form-control"></select>*@
+
+                    @*<input id="dateVisit" type="date" min="2014-01-01" disabled />*@
+                    @*<div class="row">
+            <div class="col-md-6">
+                <input type="checkbox" value="1" id="single" /> Single
+            </div>
+            <div class="col-md-6">
+                <input type="checkbox" value="1" id="multiple" /> Multiple
+            </div>
+        </div>*@
+                    @*<input type="checkbox" id="single" value="1" /> Single*@
+                    <!--<label for="permission">Mode Of Visit : <span style="color:red">*</span></label>
+    <select id="permission" onchange="colorChange('#permission')" class="form-control">-->
+                    @*<option value="0">--Select Purpose--</option>*@
+                    <!--<option value="1">Single Day</option>
+            <option value="2">Multiple Days</option>
+        </select>
+
+
+
+
+        <label for="endVisit" class="date123hide">End Date:</label>
+        <input type="date" id="endVisit" onchange="colorChange('#endVisit')" min="2020-12-12" class="form-control DateFrom" />
+
+    </div>-->
+                </div>
+
+        @*To develope and review business activities
+            To check the product quality
+            To advise on product technical issues
+            To assess the quantity of disposed items
+            To take out the disposed items
+            To conduct audit
+            To conduct awareness and training
+            To align with local regulation
+            To review and evaluate production facilities
+            To supply products or services
+            To do project consultancy
+            To service and repair
+            To provide out sourcing services
+            To assist in materials movement
+            To attend the interview
+            To collect finished goods for shipment*@
+
+
+        <br />
+        <br />
+
+        <div class="row">
+            <div class="col-md-12">
+                <h4 style="text-align: center;background-color: #5AA3E6;
+        padding: 5px"><strong>Visitor Information</strong></h4>
+                <table width="100%" id="visitorinputtable">
+
+                    @*<caption>Add Visitor</caption>*@
+                    <tr>
+                        <td>
+                            <label for="purposeVisit">Purpose of visiting SQ Group: <span style="color:red">*</span></label>
+                            <select id="purposeVisit" onchange="colorChange('#purposeVisit')" class="form-control">
+                                <option value="0">--Select Purpose--</option>
+                                <option value="1">To develope and review business activities</option>
+                                <option value="2">To check the product quality</option>
+                                <option value="3">To advise on product technical issues</option>
+                                <option value="4">To assess the quantity of disposed items</option>
+                                <option value="5">To take out the disposed items</option>
+                                <option value="6">To conduct audit</option>
+                                <option value="7">To conduct awareness and training</option>
+                                <option value="8">To align with local regulation</option>
+                                <option value="9">To review and evaluate production facilities</option>
+                                <option value="10">To supply products or services</option>
+                                <option value="11">To do project consultancy</option>
+                                <option value="12">To service and repair</option>
+                                <option value="13">To provide out sourcing services</option>
+                                <option value="14">To assist in materials movement</option>
+                                <option value="15">To attend the interview</option>
+                                <option value="16">To collect finished goods for shipment</option>
+                            </select>
+                        </td>
+                        <td>
+                            <label>Upload Visitor Pic: <b>maximum file size 300 kb</b> </label>
+                            <div class="">
+                                <div class="img-responsive" style="">
+                                    <img id="blah" src="#" alt="your image" height="50" width="50" />
+                                </div>
+                            </div>
+
+
+                        </td>
+                    </tr>
+
+                    <!--<tr>
+                    <td>
+                        <label for="permission">Permission Type :</label>
+                        <select id="permission" onchange="colorChange('#permission')" class="form-control">-->
+                    @*<option value="0">--Select Purpose--</option>*@
+                    <!--<option value="1">Single Time</option>
+                        <option value="2">Multiple Times</option>
+                    </select>-->
+                    @*<input type="text" id="permission" onchange="colorChange('#permission')" class="form-control" />*@
+                    <!--</td>
+                    <td>
+                        <label for="dateVisit">Date Of Visit :</label>-->
+                    @*<input id="dateVisit" type="date" min="2014-01-01" disabled />*@
+                    <!--<input type="date" id="singleVisit" onchange="colorChange('#dateVisit')" min="2020-12-12" class="form-control DateFrom" />-->
+                    @*<label for="dateVisit">Date Of Visit :</label>*@
+                    @*<input id="dateVisit" type="date" min="2014-01-01" disabled />*@
+                    <!--<div class="row">
+                    <div class="col-md-6">-->
+                    @*<label for="dateVisit">Start Date :</label>*@
+                    <!--<input type="date" id="startVisit" onchange="colorChange('#dateVisit')" min="2020-12-12" class="form-control DateFrom" />
+                    </div>
+                    <div class="col-md-6">-->
+                    @*<label for="dateVisit">End Date :</label>*@
+                    <!--<input type="date" id="endVisit" onchange="colorChange('#dateVisit')" min="2020-12-12" class="form-control DateFrom" />
+                        </div>
+                    </div>
+
+                    </td>-->
+                    @*<td>
+                            <label for="visitorDesignation">Visitor Designation :</label>
+                            <input type="text" id="visitorDesignation" onchange="colorChange('#visitorDesignation')" class="form-control" />
+                        </td>*@
+                    <!--</tr>-->
+
+                    <tr>
+
+                        <td>
+                            <label for="nid" class="nid">NID / Passport </label>
+                            <input type="text" class="form-control nid" onchange="colorChange('#nid')" id="nid" />
+                            <label for="sqid" class="sqid">SQ ID  <span style="color:red">*</span></label>
+                            <input type="text" class="form-control sqid"  onchange="colorChange('#sqid')" id="sqid" onkeypress="return isNumberKey(event)" placeholder="Only Number"/>
+                            @*<label for="remarksText">Remarks: </label>
+        <input type="text" class="form-control" onchange="colorChange('#remarksText')" id="remarksText" />*@
+                        </td>
+                        <td>
+                            @*<form id="AddProduct" method="post" enctype="multipart/form-data">*@
+                            @*<label>Upload: </label>*@
+                            <input type="file" id="UploadImage" name="UploadImage" accept="image/*" class="form-control" />
+                            <input type="hidden" id="filename" name="filename" value="" />
+                            <input type="hidden" id="filepath" name="filepath" value="" />
+                            @*</form>*@
+                        </td>
+                        @*<td>
+                                <label for="visitorCompany">Visitor Company :</label>
+                                <input type="text" id="visitorCompany" onchange="colorChange('#visitorCompany')" class="form-control" />
+                            </td>*@
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="visitorName">Visitor Name: <span style="color:red">*</span> &nbsp; (Full Name)</label>
+                            <input type="text" id="visitorName" onchange="colorChange('#visitorName')" class="form-control" />
+                            
+                        </td>
+                        <td>
+                            <label for="visitorCompany" class="visitorCompany">Visitor Company : <span style="color:red">*</span></label>
+                            <input type="text" id="visitorCompany" onchange="colorChange('#visitorCompany')" class="form-control visitorCompany" />
+                            <label for="visitorCompanySQ" class="visitorCompanySQ">Visitor Company : <span style="color:red">*</span></label>
+                            <select id="visitorCompanySQ" onchange="colorChange('#visitorCompanySQ')" class="form-control visitorCompanySQ"></select>
+
+                            
+                        </td>
+                        @*<td>
+                                <label for="visitorDesignation">Visitor Designation :</label>
+                                <input type="text" id="visitorDesignation" onchange="colorChange('#visitorDesignation')" class="form-control" />
+                            </td>*@
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="visitorEmail">Visitor Email:</label>
+                            <input type="text" id="visitorEmail" onchange="colorChange('#visitorEmail')" class="form-control" />
+                        </td>
+                        <td>
+                            <label for="requestorDepartmentSQ" class="requestorDepartmentSQ">Department:<span style="color:red">*</span></label>
+                            <select type="text" id="requestorDepartmentSQ" data-departmentId="" onchange="colorChange('#requestorDepartmentSQ')" class="form-control requestorDepartmentSQ"></select>
+                            <label for="visitorNationality" class="visitorNationality">Visitor Nationality :</label>
+                            <input type="text" id="visitorNationality" onchange="colorChange('#visitorNationality')" class="form-control visitorNationality" />
+                        </td>
+                        @*<td>
+                                <label for="travlechainaOrNot">
+                                    Travelled China In Last 30 Days ?
+                                </label>
+                                <input type="text" id="travlechainaOrNot" onchange="colorChange('#travlechainaOrNot')" placeholder="If Yes, then in which city? Please specify" class="form-control" />
+                            </td>*@
+                    </tr>
+                    <tr>
+
+                        <td>
+                            <label for="visitorDesignation">Visitor Designation : <span style="color:red">*</span></label>
+                            <input type="text" id="visitorDesignation" onchange="colorChange('#visitorDesignation')" class="form-control" />
+                        </td>
+                        <td>
+                            <label for="travlechainaOrNot">
+                                Travelled Abroad In Last 30 Days ? <span style="color:red">*</span>
+                            </label>
+                            <input type="text" id="travlechainaOrNot" onchange="colorChange('#travlechainaOrNot')" placeholder="If Yes, then in which city? Please specify" class="form-control" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="visitorMobile">Visitor Mobile: <span style="color:red">*</span></label>
+                            <input type="text" id="visitorMobile" onchange="colorChange('#visitorMobile')" class="form-control" />
+                        </td>
+                        <td>
+                            <label for="meetingWith">Meeting With: <span style="color:red">*</span></label>
+                            <input type="text" class="form-control" onchange="colorChange('#meetingWith')" id="meetingWith" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="visitorVehicleNo">Vehicle No: (If Any)</label>
+                            <input type="text" class="form-control" onchange="colorChange('#visitorVehicleNo')" id="visitorVehicleNo" />
+                        </td>
+                        <td>
+                            <label for="remarksText">Remarks: </label>
+                            <input type="text" class="form-control" onchange="colorChange('#remarksText')" id="remarksText" />
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="">Action</label>
+                            <input type="button" class="btn btn-info btn-sm" value="Add Visitor" id="addVisitor" />
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <h4 style="text-align:center;background-color:#5AA3E6;padding:5px"><strong>Visitor Information</strong></h4>
+        <div class="row">
+            <div class="col-md-12" style="overflow-x:auto">
+                <table width="100%" cellpadding="5" cellspacing="0" border="1" id="visitorTable" class="table table-striped">
+                    <caption>Visitor Information</caption>
+                    <thead>
+                        <tr>
+                            <th>Picture</th>
+                            <th>Purpose</th>
+                            <th>Meeting With</th>
+                            <th>Remarks</th>
+                            <th>Visitor Name</th>
+                            <th>Visitor Email</th>
+                            <th>Visitor Mobile</th>
+                            <th>Visitor Company/ SQ Unit</th>
+                            <th>Visitor Designation</th>
+                            <th>NID/SQID</th>
+                            <th>Visitor Nationality/ SQ Department</th>
+                            <th>Vehicle No</th>
+                            <th>Abroad Visit</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="visitorTableBody">
+                    </tbody>
+                </table>
+            </div>
+            <br />
+            <br />
+            <br />
+            <div style="text-align:center">
+
+                @*<button class="btn btn-success btn-sm" style="width:40%;margin-top:5px;" id="submitTovisit"> SUBMIT</button>*@
+                <button class="btn btn-success btn-sm" style="width:40%;margin-top:5px;" id="save" onclick="varifyInputElement()"> SUBMIT</button>
+            </div>
+
+
+            @*<div class="col-md-12 center" style="text-align:center">
+            <div style="display:inline-block;" id="mycanvas">
+
+                <table width="100%">
+                    <caption>Please ensure you are not a robot.Solve the calculation</caption>
+                    <tr>
+                        <td>
+                            <p id="captcha" style="padding:5px;font-size:25px;font-family:Goudy Stout;color:black">
+
+                            </p>
+                        </td>
+                        <td>
+                            <input type="text" id="returnValue" class="form-control" />
+                        </td>
+                        <td>
+                            <button type="button" style="margin:5px" class="btn btn-info btn-sm" id="reloadCapcha"><span class="glyphicon glyphicon-refresh"></span></button>
+                        </td>
+                        <td>
+                            <input type="button" style="margin:5px" class="btn btn-sm btn-success" value="send" id="validateCapcha" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="row" style="text-align:center;margin-top:5px">
+
+            </div>
+        </div>*@
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h4 style="text-align: center; padding: 5px"><strong>Approver List</strong></h4>
+                <table width="100%" id="ListOfApprover" class="table table-bordered table-responsive table-condensed table-hover">
+                    @*<caption>Approver List</caption>*@
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>SL</th>
+                            <th>Approver Name</th>
+                            <th>Approver Designation</th>
+                        </tr>
+                    </thead>
+                    <tbody id="approverTable">
+                    </tbody>
+                    @*<tr data-approver="">
+                            <td class="countApprover"></td>
+                            <td class="approverName"></td>
+                            <td class="approverDesignation"></td>
+                        </tr>
+                        <tr data-approver="">
+                            <td class="countApprover"></td>
+                            <td class="approverName"></td>
+                            <td class="approverDesignation"></td>
+                        </tr>*@
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+
+</div>
+
+<div class="modal" id="myModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" style="text-align: center">Visitor Request Preview</h4>
+            </div>
+            <div id="modalbody" class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+@*<img src="http://i.giphy.com/13Xkz5sLdjGiQw.gif" id="loader">*@
+<div id="loader" style="margin-top:10px; display:none;">
+    <img src="~/Images/ajax-loader.gif" />
+</div>
+
+<div class="overlay">
+    <div id="loading-img"></div>
+</div>
+
+@*@Scripts.Render("~/bundles/jquery")*@
+<script type="text/javascript">
+
+    $('#dateVisit').show();
+    $('#startVisit').hide();
+    $('#endVisit').hide();
+    $('.date12hide').show();
+    $('.date123hide').hide();
+
+
+    $('.department_head').hide();
+    $('#business_unit').prop('disabled', true);
+    $('#category').prop('disabled', true);
+    $('#subcategory').prop('disabled', true);
+    $('#requestorDepartment').prop('disabled', true);
+    $('#permission').prop('disabled', true);
+    $('#dateVisit').attr('readonly', 'readonly');
+    $(".visit_mode").hide();
+
+    $(".sqid").hide();
+    $(".visitorCompanySQ").hide();
+    $(".requestorDepartmentSQ").hide();
+
+    $('.expandunit').removeClass('col-md-6');
+    $('.expandunit').addClass('col-md-12');
+
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : evt.keyCode
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+
+    //if ($('input#single').is(':checked')) {
+
+
+    //}
+
+    $('#permission').change(function () {
+
+        if ($('#permission').val() == 1) {
+            $('#dateVisit').show();
+            $('#startVisit').hide();
+            $('#endVisit').hide();
+            $('.date123hide').hide()
+            $('.date12hide').show()
+        } else {
+            $('#dateVisit').hide();
+            $('#startVisit').show();
+            $('#endVisit').show();
+            $('.date123hide').show()
+            $('.date12hide').hide()
+        }
+    })
+
+
+
+    //HideSidebar();
+    //$('.hidedata').hide();
+   // $('#category').hide();
+    //$('#subcategory').hide();
+
+    onLoad();
+
+    function onLoad() {
+        var input = document.getElementById("dateVisit");
+        var startdate = document.getElementById("startVisit");
+        var endVisit = document.getElementById("endVisit");
+        var today = new Date();
+        // Set month and day to string to add leading 0
+        var day = new String(today.getDate());
+        var mon = new String(today.getMonth() + 1); //January is 0!
+        var yr = today.getFullYear();
+
+        if (day.length < 2) { day = "0" + day; }
+        if (mon.length < 2) { mon = "0" + mon; }
+
+        var date = new String(yr + '-' + mon + '-' + day);
+
+        input.disabled = false;
+        input.setAttribute('min', date);
+
+        startdate.disabled = false;
+        startdate.setAttribute('min', date);
+
+        endVisit.disabled = false;
+        endVisit.setAttribute('min', date);
+
+        $('#dateVisit').val(date);
+        $('#startVisit').val(date);
+        $('#endVisit').val(date);
+    }
+
+    var finalResult = 0;
+    var trrowNo = 0;
+     createCaptcha();
+    $("#reloadCapcha").click(function () {
+        createCaptcha();
+    });
+    $("#validateCapcha").click(function () {
+        validateCaptcha();
+    });
+
+    $("#addVisitor").click(function () {
+
+        var cheval = true;
+
+        if ($("#purposeVisit").val()=="0") {
+            //$('#purposeVisit').css({ "border-color": "#FF0000" });
+            toastr.error("Please Select Purpose Of Visit ", " Purpose Of Visit ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+        }
+        //else if ($("#purposeVisit").val() == "3" && $("#remarksText").val().length < 1) {
+        //    $('#remarksText').css({ "border-color": "#FF0000" });
+        //}
+        else if ($("#visitorName").val().length < 1) {
+            toastr.error("Please Enter Visitor Name ", " Visitor Name ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+            //$('#visitorName').css({ "border-color": "#FF0000" });
+        }
+        //else if ($("#visitorEmail").val().length < 1) {
+        //    $('#visitorEmail').css({ "border-color": "#FF0000" });
+        //}
+        else if ($("#visitorMobile").val().length < 1) {
+            toastr.error("Please Enter Mobile Number ", " Mobile Number ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+            //$('#visitorMobile').css({ "border-color": "#FF0000" });
+        }
+        //else if ($("#visitorNationality").val().length < 1) {
+        //    $('#visitorNationality').css({ "border-color": "#FF0000" });
+        //}
+        else if ($('#sqid').is(':visible') && $('#sqid').val() == '') {
+            toastr.error("Please Enter SQID ", " SQID ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+        }
+        else if ($('#visitorCompanySQ').is(':visible') && $('#visitorCompanySQ').val() == '') {
+            toastr.error("Please Select Business Unit ", " Business Unit ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+        }
+        else if ($('#requestorDepartmentSQ').is(':visible') && $('#requestorDepartmentSQ').val() == '0') {
+            toastr.error("Please Select Department ", " Department",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+        }
+        else if ($('#visitorCompany').is(':visible') && $('#visitorCompany').val() == '') {
+            toastr.error("Please Enter Company ", " Company ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+        }
+        else if ($("#visitorDesignation").val().length < 1) {
+            toastr.error("Please Enter Designation ", " Designation ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+            //$('#visitorDesignation').css({ "border-color": "#FF0000" });
+        } else if ($("#travlechainaOrNot").val().length < 1) {
+
+            toastr.error("Please Enter Travelled Abroad Information", " Travelled ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+
+            //$('#travlechainaOrNot').css({ "border-color": "#FF0000" });
+        } else if ($("#meetingWith").val().length < 1) {
+            toastr.error("Please Enter Meeting With Person", " Information ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+            //$('#meetingWith').css({ "border-color": "#FF0000" });
+        }
+        else {
+            
+            if (cheval == false) {
+                toastr.error("Please Insert the input value Correctly", " Information ",
+                    {
+                        "positionClass": "toast-top-right",
+                        "showDuration": "300",
+                        "hideDuration": "1000",
+                        "timeOut": "5000",
+                        "closeButton": true
+                    });
+            }
+            else {
+                var remarks = "";
+                if ($("#remarksText").val().length < 1) {
+                    remarks = "N/A";
+                } else {
+                    remarks = $("#remarksText").val();
+                }
+
+                var pic = document.getElementById('blah').src;
+                trrowNo++;
+                var col = '<tr id="' + trrowNo + '" data-image ="' + $('#filename').val() + '" data-filepath="' + $('#filepath').val() + '">'
+                col += '<td><img id="image" src="' + pic + '" alt="your image" height="50" width="50" /></td>';
+                col += '<td><input type="text"  name="visitpurpose"  value="' + $("#purposeVisit").children("option:selected").html() + '"/></td>';
+                col += '<td><input type="text" name="meetingWith"  value="' + $("#meetingWith").val() + '"/></td>';
+                col += '<td><input type="text"  name="visitRemarks"  value="' + remarks + '"/></td>';
+                col += '<td><input type="text"  name="visitorName"  value="' + $("#visitorName").val() + '"/></td>';
+                col += '<td><input type="text" name="visitorEmail"  value="' + $("#visitorEmail").val() + '"/></td>';
+                col += '<td><input type="text" name="visitorMobile"  value="' + $("#visitorMobile").val() + '"/></td>'; //$("#myselect option:selected").text();
+                if ($("#visitorCompany").val() == "") {
+                    //alert($("#visitorCompanySQ").val())
+                    col += '<td><input type="hidden" name="visitorCompanySQ"  value="' + $("#visitorCompanySQ").val() + '"/><input type="text" name="squnit"  value="' + $("#visitorCompanySQ option:selected").text() + '"/></td>';
+                }
+                else {
+                    col += '<td><input type="text" name="visitorCompany"  value="' + $("#visitorCompany").val() + '"/></td>';
+                }
+                col += '<td><input type="text" name="visitorDesignation"  value="' + $("#visitorDesignation").val() + '"/></td>';
+                if ($("#nid").val() == "") {
+                    col += '<td><input type="text" name="sqid"  value="' + $("#sqid").val() + '"/></td>';
+                } else {
+                    col += '<td><input type="text" name="nid"  value="' + $("#nid").val() + '"/></td>';
+                }
+
+
+                if ($("#visitorNationality").val() == "") {
+                    //alert($("#requestorDepartmentSQ").val())
+                    col += '<td><input type="text" name="requestorDepartmentSQ"  value="' + $("#requestorDepartmentSQ").val() + '"/></td>';
+                } else {
+                    col += '<td><input type="text" name="visitorNationality"  value="' + $("#visitorNationality").val() + '"/></td>';
+                }
+
+                col += '<td><input type="text" name="visitorVehicleNo"  value="' + $("#visitorVehicleNo").val() + '"/></td>';
+
+                col += '<td><input type="text" name="travlechainaOrNot"  value="' + $("#travlechainaOrNot").val() + '"/></td>';
+                col += '<td><input type="button" value="X" onclick="deleterow(' + trrowNo + ')" class="btn btn-danger" /></td></tr>';
+                $("#visitorTableBody").append(col);
+
+                $('#blah').attr('src', '/Images/user.png');
+            }
+
+        }
+        //$("#visitorName").val("");
+        //$("#visitorEmail").val("");
+        //$("#visitorMobile").val("");
+        //$("#visitorNationality").val("");
+        //$("#travlechainaOrNot").val("");
+    })
+
+    $("#purposeVisit").change(function () {
+        if ($("#purposeVisit").val() == '15') {
+            $("#visitorCompany").val("N/A");
+            $("#visitorDesignation").val("N/A");
+            $("#visitorCompany").prop("disabled", true);
+            $("#visitorDesignation").prop("disabled", true);
+        } else {
+             $("#visitorCompany").val("");
+            $("#visitorDesignation").val("");
+            $("#visitorCompany").prop("disabled", false);
+            $("#visitorDesignation").prop("disabled", false);
+        }
+    });
+
+    function deleterow(rowval) {
+        $('tr#'+ rowval +'').remove();
+    }
+
+    function createCaptcha() {
+        var firstInput=Math.floor(Math.random() *10 + 1);
+        var secondInput = Math.floor(Math.random() * 10 + 1);
+        finalResult = firstInput + secondInput;
+        $("#captcha").html(firstInput + " + " + secondInput);
+    }
+
+    function validateCaptcha() {
+        if (document.getElementById("returnValue").value == parseInt(finalResult)) {
+              $("#submitTovisit").show();
+              $("#mycanvas").hide();
+          }else{
+            alert("Invalid Calculation. try Again");
+            createCaptcha();
+            $("#returnValue").val("");
+          }
+    }
+
+
+    //LoadLocation();
+    function colorChange(elem) {
+        $(elem).css({ "border-color": "#d3d3d3" });
+    }
+
+    function LoadBusinessUnit() {
+        $('#business_unit').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadBusinessUnit", "Admin")';
+        //$('#loader').show();
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
+            success: function (data) {
+                $('#business_unit').empty();
+                $("#visitorCompanySQ").empty();
+                $('#business_unit').append("<option value=''>--Select Business Unit--</option>");
+                $('#visitorCompanySQ').append("<option value=''>--Select Business Unit--</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#business_unit").append($("<option></option>").val(data[i].BusinessUnitId)
+                        .html(data[i].BusinessUnitName));
+                    $("#visitorCompanySQ").append($("<option></option>").val(data[i].BusinessUnitId)
+                        .html(data[i].BusinessUnitName));
+                }
+            },
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+    }
+
+    $('#business_unit').on('change', function () {
+        $('#category').prop('disabled', false);
+        var catId = $('#category').val();
+        var subCatId = $('#subcategory').val();
+        var unitId = $('#business_unit').val();
+        //approverlist(catId, subCatId, unitId);
+        approverlistnew(catId, subCatId, unitId, 0);
+        VisitorCategoryList(unitId,0);
+
+    })
+
+
+    function VisitorCategoryList(unitId,visitmode) {
+        $('#category').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("GetVisitorCategories", "Visitor")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { unit: unitId },
+            async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
+            success: function (data) {
+                console.log(data)
+                $('#category').empty();
+                $('#category').append("<option value='0'>-- Select Category --</option>");
+                for (var i = 0; i < data.length; i++) {
+                    //if ($('#business_unit').val() != 6) {
+                    if (visitmode == "1") {
+                        if (i == 0) {
+                            $('#category').append("<option value='24'>Manufacturing Facilities</option>");
+                        }
+                        
+                    }
+                    else if (visitmode == "2") {
+                        //if ($('#location').val() == '0') {
+                            //alert($('#location').val());
+                            if (data[i].CategoryID != "23" && data[i].CategoryID != "24") {
+                                $("#category").append($("<option></option>").val(data[i].CategoryID)
+                                    .html(data[i].CategoryName));
+                            }
+                        //} 
+                        
+                    } else {
+                        if (data[i].CategoryID != "24") {
+                            $("#category").append($("<option></option>").val(data[i].CategoryID)
+                                .html(data[i].CategoryName));
+                        }
+                    }
+                        
+                    //}
+
+                }
+            },
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+    }
+
+    $("#category").on('change', function () {
+        $('#requestorDepartment').attr('disabled', false);
+        var catId = $('#category').val();
+        
+        var subCatId = $('#subcategory').val();
+        var unitId = $('#business_unit').val();
+        var department_head = $('#department_head').val();
+        //approverlistnew(catId, subCatId, unitId);
+        
+        if (catId == 1) {
+            approverlistnew(catId, 16, unitId, 0);
+            VisitorSubCategoryList(catId);
+        }
+        else if (catId == 2) {
+            approverlistnew(catId, 17, unitId, 0);
+            VisitorSubCategoryList(catId);
+        }
+        else if (catId == 7) {
+            approverlistnew(catId, 21, unitId, 0);
+            VisitorSubCategoryList(catId);
+        }
+        else if (catId == 8) {
+            approverlistnew(catId, 22, unitId, 0);
+            VisitorSubCategoryList(catId);
+        }
+        else if (catId == 9) {
+            approverlistnew(catId, 23, unitId, 0);
+            VisitorSubCategoryList(catId);
+        }
+        else if (catId == 20) {
+            approverlistnew(catId, 24, unitId, 0);
+            VisitorSubCategoryList(catId);
+        }
+        else if (catId == 21) {
+            approverlistnew(catId, 25, unitId, 0);
+            VisitorSubCategoryList(catId);
+        }
+        else if (catId == 23) {
+            approverlistnew(catId, 15, unitId, 0);
+            VisitorSubCategoryList(catId);
+        }
+        else if (catId == 22) {
+            approverlistnew(catId, 26, unitId,0);
+            VisitorSubCategoryList(catId);
+        }
+        else if (catId == 24) {
+            //alert(department_head);
+            approverlistnew(catId, 27, unitId, department_head);
+            VisitorSubCategoryList(catId);
+        }
+        else {
+            approverlistnew(catId, subCatId, unitId, 0);
+            VisitorSubCategoryList(catId);
+        }
+
+    })
+
+    $('#subcategory').change(function () {
+        var catId = $('#category').val();
+        var subCatId = $('#subcategory').val();
+        var unitId = $('#business_unit').val();
+        var department_head = $('#department_head').val();
+        //approverlist(catId, subCatId, unitId);
+        approverlistnew(catId, subCatId, unitId, department_head);
+    })
+
+    $('#requestorDepartment').change(function () {
+        $('#permission').prop('disabled', false);
+        $('#dateVisit').removeAttr('readonly');
+    })
+
+    $('#permission').change(function () {
+        $('#dateVisit').removeAttr('readonly');
+    })
+
+
+    function VisitorSubCategoryList(catId) {
+        var catId = $('#category').val();
+        var subCatId = $('#subcategory').val();
+        var unitId = $('#business_unit').val();
+        $('#subcategory').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("GetVisitorSubCategories", "Visitor")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { catId: catId },
+            async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
+            success: function (data) {
+                console.log(data)
+                $('#subcategory').empty();
+               //$('#subcategory').append("<option value='0'>--Select SubCategory--</option>");
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].SubCategoryName == 'N/A') {
+                        $("#subcategory").attr('disabled', true);
+                        $("#subcategory").append($("<option></option>").val(data[i].SubCategoryID)
+                            .html(data[i].SubCategoryName));
+                       // approverlist(catId, subCatId, unitId);
+                    } else {
+                        if (i == 0) {
+                            $('#subcategory').append("<option value='0'>--Select SubCategory--</option>");
+                        }
+
+                        if ($('#business_unit').val() == '6') {
+
+                            $("#subcategory").attr('disabled', false);
+
+                            if ($('#category').val() == '10') {
+                                if (data[i].SubCategoryID != 7 && data[i].SubCategoryID != 6 && data[i].SubCategoryID != 5) {
+                                    $("#subcategory").append($("<option></option>").val(data[i].SubCategoryID)
+                                        .html(data[i].SubCategoryName));
+                                }
+                            }
+                            else if ($('#category').val() == '18') {
+                               
+
+                                if (data[i].SubCategoryID != 14) {
+                                    $("#subcategory").append($("<option></option>").val(data[i].SubCategoryID)
+                                        .html(data[i].SubCategoryName));
+                                }
+                            }
+                        }
+                        else{ 
+                        //$('#subcategory').append("<option value='0'>--Select SubCategory--</option>");
+                        $("#subcategory").attr('disabled', false);
+                        $("#subcategory").append($("<option></option>").val(data[i].SubCategoryID)
+                            .html(data[i].SubCategoryName));
+                        }
+                    }
+
+                }
+
+
+            },
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+    }
+
+    function approverlistnew(category, subcategory, unit, departmentHead) {
+        //alert(departmentHead);
+        $('#ListOfApprover').show();
+         var urlpath = '@Url.Action("ApproverListCategoryBased", "Visitor")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { category: category, subcategory: subcategory, unit: unit, DepartmentHeadId: departmentHead },
+            async: true,
+            success: function (data) {
+                console.log(data)
+                //$('#ListOfApprover').empty();
+                var result = "";
+                var count = 1;
+                $('#ListOfApprover tr').not(function () { return !!$(this).has('th').length; }).remove();
+               // $('#subcategory').append("<option value='0'>--Select Business Unit--</option>");
+                for (var i = 0; i < data.length; i++) {
+
+                    result += "<tr data-approverid=" + data[i].UserId + ">"
+                    //result += "<td>" + count + "<td>"Designation
+                    if (data.length > 2) {
+                        result += "<td style='text-align: center;width:25px'><input type='checkbox' checked class='approval' id='enableCheck' value=" + data[i].UserId + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].Designation + "\"></td>"
+                    }
+                    else {
+                        result += "<td style='text-align: center;width:25px'><input type='checkbox' checked disabled class='approval' id='enableCheck' value=" + data[i].UserId + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].Designation + "\"></td>"
+                    }
+
+                    result += '<td><p name="approverNo">' + count + '</p></td>';
+                    result += '<td><p name="userName">' + data[i].UserName + '</p></td>';
+                    result += '<td><p name="designation">' + data[i].Designation + '</p></td>';
+                    result += "</tr>"
+                    count++;
+                }
+
+                $('#ListOfApprover').append(result);
+            }
+        });
+    }
+
+    function approverlist(category, subcategory, unit) {
+
+        $('#ListOfApprover').show();
+         var urlpath = '@Url.Action("ApproverList", "Visitor")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { category: category, subcategory: subcategory, unit: unit },
+            async: true,
+            success: function (data) {
+                console.log(data)
+                //$('#ListOfApprover').empty();
+                var result = "";
+                var count = 1;
+                $('#ListOfApprover tr').not(function () { return !!$(this).has('th').length; }).remove();
+               // $('#subcategory').append("<option value='0'>--Select Business Unit--</option>");
+                for (var i = 0; i < data.length; i++) {
+
+                    result += "<tr data-approverid=" + data[i].UserId + ">"
+                    //result += "<td>" + count + "<td>"Designation
+                    if (data.length > 2) {
+                        result += "<td style='text-align: center;width:25px'><input type='checkbox' checked class='approval' id='enableCheck' value=" + data[i].UserId + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].Designation + "\"></td>"
+                    }
+                    else {
+                        result += "<td style='text-align: center;width:25px'><input type='checkbox' checked disabled class='approval' id='enableCheck' value=" + data[i].UserId + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].Designation + "\"></td>"
+                    }
+
+                    result += '<td><p name="approverNo">' + count + '</p></td>';
+                    result += '<td><p name="userName">' + data[i].UserName + '</p></td>';
+                    result += '<td><p name="designation">' + data[i].Designation + '</p></td>';
+                    result += "</tr>"
+                    count++;
+                }
+
+                $('#ListOfApprover').append(result);
+            }
+        });
+    }
+
+    //$("#business_unit").change(function () {
+    //    var unitId = $(this).val();
+    //    if (unitId != "0") {
+    //        approverList(unitId);
+    //    }
+
+    //});
+
+
+    function LoadLocation() {
+        $('#location').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadLocation", "Home")';
+        //
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
+            success: function (data) {
+                $('#location').empty();
+                $('#location').append("<option value='0'>--Select Location --</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#location").append($("<option></option>").val(data[i].LocationId)
+                        .html(data[i].LocatioName));
+                }
+            },
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+    }
+
+    //LoadDepartment();
+
+    function LoadDepartment(location) {
+        $('#requestorDepartment').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("GetDepartmentList", "Visitor")';
+
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {location:location},
+            async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
+            success: function (data) {
+                $('#requestorDepartment').empty();
+                $('#requestorDepartmentSQ').empty();
+                $('#requestorDepartmentSQ').append("<option value='0'>-- Select Department --</option>");
+                $('#requestorDepartment').append("<option value='0'>-- Select Department --</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#requestorDepartment").append($("<option></option>").val(data[i].DeartmentName)
+                        .html(data[i].DeartmentName));
+                    $("#requestorDepartmentSQ").append($("<option></option>").val(data[i].DeartmentName)
+                        .html(data[i].DeartmentName));
+                }
+            }
+            ,
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+    }
+
+    $("#location").change(function () {
+        if ($("#location").val() == 1) {
+
+            $(this).attr("selected","selected");
+
+            $('#business_unit').prop('disabled', true);
+            $('#permission').prop('disabled', true);
+            $('#dateVisit').attr('readonly', 'readonly');
+            $('#business_unit').empty();
+            //$("#business_unit").append($("<option></option>").val("0")
+            //    .html("SQ Central"));
+
+            $('.department_head').hide();
+            $(".visit_mode").show();
+            $(".business_unit").hide();
+            $("#business_unit").hide();
+
+            //$('.expandunit').removeClass('col-md-6');
+            //$('.expandunit').addClass('col-md-12');
+            $('.expandvisitmode').removeClass('col-md-6');
+            $('.expandvisitmode').addClass('col-md-12');
+            
+
+
+            $(".sqid").hide();
+            $(".visitorCompanySQ").hide();
+            $(".requestorDepartmentSQ").hide();
+            $(".nid").show();
+            $(".visitorCompany").show();
+            $(".visitorNationality").show();
+
+            $("#visit_mode").val("0")
+
+            //approverList(0);
+            //approverlist(0, 0, 0);
+            approverlistnew(0, 0, 0, 0);
+            //$('.hidedata').hide();
+            //$('#category').hide();
+           // $('#subcategory').hide();
+           // console.log()
+            $('#category').prop('disabled', false);
+            $('#requestorDepartment').attr('disabled', true);
+            VisitorCategoryList(0,0);
+            LoadDepartment(1)
+        } else if ($("#location").val() == 2) {
+
+            $('.department_head').hide();
+
+            $(this).attr("selected","selected");
+            $('#business_unit').prop('disabled', false);
+            $('#category').prop('disabled', true);
+            $('#subcategory').prop('disabled', true);
+            $('#requestorDepartment').prop('disabled', true);
+            $('#permission').prop('disabled', true);
+            $('#dateVisit').attr('readonly', 'readonly');
+
+            $(".sqid").hide();
+            $(".visitorCompanySQ").hide();
+            $(".requestorDepartmentSQ").hide();
+            $(".nid").show();
+            $(".visitorCompany").show();
+            $(".visitorNationality").show();
+
+            $("#visit_mode").val("0")
+
+
+            //$('.expandunit').removeClass('col-md-6');
+            $('.expandunit').addClass('col-md-12');
+
+            //$('#requestorDepartment').attr('disabled', true);
+            var category = $('#category').val();
+            var subCategory = $('#subcategory').val();
+            LoadBusinessUnit();
+            // approverList(1);
+            //approverlist(category, subCategory, 1);
+            //$('.hidedata').hide();
+            $('#category').show();
+            //$('#subcategory').hide();
+
+            $(".visit_mode").hide();
+            $(".business_unit").show();
+            $("#business_unit").show();
+
+            LoadDepartment(2);
+
+        } else {
+            $(this).attr("selected","selected");
+            $('#business_unit').empty();
+        }
+
+        //alert($(this).val());
+    });
+    $('#visit_mode').change(function () {
+        if ($('#visit_mode').val() == 1) {
+            //alert("1")
+
+            $(".sqid").show();
+            $(".visitorCompanySQ").show();
+            $(".requestorDepartmentSQ").show();
+            $(".nid").hide();
+            $(".visitorCompany").hide();
+            $(".visitorNationality").hide();
+            //$(".business_unit").hide();
+            //$("#business_unit").hide();
+            $('.department_head').show();
+            //$('.expandunit').removeClass('col-md-6');
+            //$('.expandvisitmode').removeClass('col-md-6');
+
+            //$('.expandvisitmode').addClass('col-md-12');
+
+            VisitorCategoryList(0, 1)
+            LoadBusinessUnit();
+            LoadDepartment(1);
+        } else {
+            //alert("2")
+            $('.department_head').hide();
+            $(".sqid").hide();
+            $(".visitorCompanySQ").hide();
+            $(".requestorDepartmentSQ").hide();
+            $(".nid").show();
+            $(".visitorCompany").show();
+            $(".visitorNationality").show();
+
+            //$(".business_unit").show();
+           // $("#business_unit").show();
+            $('#business_unit').prop('disabled', false);
+
+            //$('.expandunit').removeClass('col-md-12');
+            //$('.expandvisitmode').removeClass('col-md-12');
+            //$('.expandunit').addClass('col-md-6');
+            ////$('.expandunit').addClass('col-md-12');
+            //$('.expandvisitmode').addClass('col-md-6');
+            
+
+            LoadBusinessUnit();
+            VisitorCategoryList(0, 2)
+
+            $('#department_head').val('0');
+            approverlistnew(0, 0, 0, 0);
+        }
+    })
+
+    $("#submitTovisit").click(function (e) {
+        e.preventDefault();
+        var check = true;
+        if ($("#location").val() == "0") {
+            check = false;
+            $('#location').css({ "border-color": "#FF0000" });
+        }
+        else if ($("#location").val() == "2" ) {
+                check = false;
+                $('#business_unit').css({ "border-color": "#FF0000" });
+        }
+        else if ($('#categroy').is(":visible"))
+        {
+            $('#categroy').css({ "border-color": "#FF0000" });
+        }
+        else if ($('#subcategroy').is(":visible")) {
+            if($('#subcategroy').val() == '0') {
+                $('#subcategroy').css({ "border-color": "#FF0000" });
+            }
+        }
+        else if ($("#requestorDepartment").val().length < 1) {
+            check = false;
+            $('#requestorDepartment').css({ "border-color": "#FF0000" });
+        } else if ($("#dateVisit").val().length < 1) {
+            check = false;
+            $('#dateVisit').css({ "border-color": "#FF0000" });
+        } else {
+            check = true;
+        }
+
+        if (check == true) {
+            SaveVisitorTODatabase();
+        } else {
+            swal({
+                title: 'Please Enter All the value',
+                type: 'error',
+                closeOnCancel: true
+            });
+        }
+
+    });
+    function isEmail(email) {
+        var regex = /^([\w-\.]+@@(sqgc.)+[\w-]{2,4})?$/;
+        if (!regex.test(email.toLowerCase())) {
+           return false;
+        }else{
+           return true;
+        }
+    }
+    function SaveVisitorRequest() {
+        var jsonObj = {};
+        
+        jsonObj["LocationId"] = $("#location").val();
+        //alert($("#location").find('option:selected').text());
+        jsonObj["LocationName"] = $("#location").find('option:selected').text();
+        //jsonObj["RequestorName"]= $("#requestorName").val();
+        //jsonObj["RequestorEmail"]= $("#requestorEmail").val();
+        //jsonObj["RequerstorMobile"]= $("#requestorMobile").val();
+        //jsonObj["RequestorDesignation"]= $("#requestorDesignation").val();
+
+        if (jsonObj["LocationId"] == 1) {
+            jsonObj["VisitMode"] = $('#visit_mode').val();
+            jsonObj["CategoryId"] = $('#category').val();
+            jsonObj["SubCategoryId"] = $('#subcategory').val();
+            if (jsonObj["VisitMode"] == 1) {
+                jsonObj["BusinessUnitId"] = "0";
+                jsonObj["BusinessUnitName"] = "SQ Central";
+                jsonObj["DepartmentHeadId"] = $('#department_head').val();
+            } else {
+                jsonObj["BusinessUnitId"] = $("#business_unit").val();
+                jsonObj["BusinessUnitName"] = $("#business_unit").find('option:selected').text();
+                jsonObj["DepartmentHeadId"] = 0;
+            }
+        } else {
+            jsonObj["VisitMode"] = 0;
+            jsonObj["BusinessUnitId"] = $("#business_unit").val();
+            jsonObj["BusinessUnitName"] = $("#business_unit").find('option:selected').text();
+            jsonObj["CategoryId"] = $('#category').val();
+            jsonObj["SubCategoryId"] = $('#subcategory').val();
+            jsonObj["DepartmentHeadId"] = 0;
+        }
+
+        jsonObj["RequestorDepartment"] = $("#requestorDepartment").val();
+        jsonObj["ModeOfVisit"] = $("#permission").val();
+        if ($("#permission").val() == 1) {
+            jsonObj["VisitDate"] = formatDate($('#dateVisit').val());
+        } else {
+            jsonObj["StartDate"] = formatDate($('#startVisit').val());
+            jsonObj["EndDate"] = formatDate($('#endVisit').val());
+        }
+
+        //document.getElementById('blah').src = "data:image/png;base64," + base64JsonData;
+        jsonObj["Image"] = $('#filename').val(); //document.getElementById('blah').src;
+        jsonObj["ImagePath"] = $('#filepath').val();
+
+
+
+         var jsondataobj = [];
+        $('#visitorTableBody  tr').each(function () {
+            //alert($(this).attr('data-image') + "  " + $(this).attr('data-filepath'))
+                var myData = {};
+                myData["VisitorName"] = $(this).find('input[name="visitorName"]').val();
+                myData["VisitorEmail"] = $(this).find('input[name="visitorEmail"]').val();
+                myData["VisitorMobile"] = $(this).find('input[name="visitorMobile"]').val();
+                myData["VisitorDesignation"] = $(this).find('input[name="visitorDesignation"]').val();
+                myData["VisitorCompany"] = $(this).find('input[name="visitorCompany"]').val();
+                myData["VisitorNationality"] = $(this).find('input[name="visitorNationality"]').val();
+                myData["MeetingWith"] = $(this).find('input[name="meetingWith"]').val();
+                myData["NIDorPassport"] = $(this).find('input[name="nid"]').val();
+                myData["SQID"] = $(this).find('input[name="sqid"]').val();
+            myData["SQUnitId"] = $(this).find('input[name="visitorCompanySQ"]').val();
+            myData["SQUnitName"] = $(this).find('input[name="squnit"]').val();;
+                myData["SQDepartmentId"] = $(this).find('input[name="requestorDepartmentSQ"]').val();
+            myData["SQDepartmentName"] = $(this).find('input[name="requestorDepartmentSQ"]').val();
+            myData["VisitorVehicleNo"] = $(this).find('input[name="visitorVehicleNo"]').val();
+            
+            //SQDepartmentName
+            //SQID,SQUnitId,SQDepartmentId
+                myData["Image"] = $(this).attr('data-image'); //document.getElementById('blah').src;
+                myData["ImagePath"] = $(this).attr('data-filepath');
+                myData["Chainavisit"] = $(this).find('input[name="travlechainaOrNot"]').val();
+                myData["PurposeOfVisitSQ"] = $(this).find('input[name="visitpurpose"]').val();
+                myData["Remarks"] = $(this).find('input[name="visitRemarks"]').val();
+                jsondataobj.push(myData);
+            });
+
+        jsonObj["VisitorList"] = jsondataobj;
+
+        var approverObj = []
+        var count = 1;
+        $("#ListOfApprover tr td input[type='checkbox']:checked").each(function () {
+
+            //var myData = {};
+           // alert($(this).data('approver'))
+            //if ($('#approverlist tr').length > 3) {
+            //    return false;
+            //  }
+
+            //alert($(this).attr('data-username'));
+            var approver = {};
+            //approver["ApproverId"] = $(this).val('approverid');
+            //approver["UserID"] = $(this).data('approverid');
+            //alert($(this).val());
+            approver["ApproverId"] = $(this).val();
+            approver["UserID"] = $(this).val();
+            approver["ApproverNo"] = count //$(this).find('p[name^="approverNo"]').html();
+            approver["UserName"] = $(this).attr('data-username');//$(this).find('p[name^="userName"]').html();
+            approver["DesignationName"] = $(this).attr('data-designation'); //$(this).find('p[name^="designation"]').html();
+
+           // myData["ApproverId"] = $(this).data('approver');
+           // myData["UserID"] = $(this).data('approver');
+            //myData["ApproverNo"] = $(this).find('td.countApprover').text();
+            //myData["DesignationName"] = $(this).find('td.approverDesignation').text();
+            //alert($(this).attr('data-designation'));
+            if (approver["ApproverNo"] == 1) {
+                approver["ApproverStatus"] = 1;
+                approver["ApproverStatusName"] = "First Approver"
+            } else {
+                approver["ApproverStatus"] = 2;
+                approver["ApproverStatusName"] = "Second Approver"
+            }
+
+            //myData["UserName"] = $(this).find('td.approverName').text();
+            //if ($(this).find('td.countApprover').text() != 0) {
+            //    approverObj.push(myData);
+            //}
+
+            //console.log($('#approverlist tr').length);
+            approverObj.push(approver);
+            count++;
+        })
+
+
+
+        jsonObj["VisitorApproverList"] = approverObj;
+
+
+        if (jsondataobj.length==0) {
+            swal({
+                title: 'Add At Least One Visitor',
+                type: 'error',
+                closeOnCancel: true
+            });
+        } else {
+            @*var urlpath = '@Url.Action("SaveVisitor", "Visitor")';
+                $.ajax({
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(jsonObj),
+                    dataType: 'json',
+                    url: urlpath,
+                    type: "Post",
+                    async: true,
+                    success: function(result) {
+                        if (result.isSuccess == true) {
+                            swal({
+                                title: 'Visitor Request Sent For Approval',
+                                type: 'success',
+                                closeOnCancel: true
+                            }, function () {
+                                  window.location.href = '@Url.Action("VisitorRequestForm", "Visitor")';
+                            });
+                        } else {
+                            swal({
+                                title: 'Some Error Occoured',
+                                type: 'error',
+                                closeOnCancel: true
+                            });
+                        }
+
+                    },
+                    error: function () {
+                       swal({
+                                title: 'Server Error Please Try again',
+                                type: 'error',
+                                closeOnCancel: true
+                            });
+                    }
+                });*@
+
+            return jsonObj;
+        }
+
+    }
+
+    function SubmitToDatabase() {
+        var jsondate = SaveVisitorRequest();
+         var urlpath = '@Url.Action("SaveVisitor", "Visitor")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsondate),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    swal({
+                        title: 'Requestor Submit Successfully',
+                        type: 'success',
+                        closeOnCancel: true
+                    },function () {
+                            $("#myModal").modal("hide");
+                            $("#iousubmenu").find('li').removeClass();
+                            $("#iousubmenu").find('li:nth-child(2)').addClass("active");
+                           // GetAllIOURequest(1, 0);
+                            GetAllVisitorRequest(1, 0);
+                    });
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+    }
+
+    function varifyInputElement() {
+        $('input').css({ "border-color": "#d3d3d3" });
+        $('select').css({ "border-color": "#d3d3d3" });
+       // alert('in')
+        //e.preventDefault();
+       // var check = true;
+        if ($("#location").val() == "0") {
+           // check = false;
+            //$('#location').css({ "border-color": "#FF0000" });
+
+            toastr.error("Please Select Location", " Location ",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+                
+            //$('#meetingWith').css({ "border-color": "#FF0000" });       
+        }
+        else if ($('#visit_mode').is(':visible') && $('#visit_mode').val() == "0") {
+            toastr.error("Please Select Visitor Mode", " Category ",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+        }
+        else if ($('#business_unit').is(':visible') && $('#business_unit').val() == "") {
+            toastr.error("Please Select Business Unit", " Business Unit ",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+        }
+        else if ($('#department_head').is(':visible') && $('#department_head').val() == "0") {
+            toastr.error("Please Select Department Head", " Department Head",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+        }
+        else if ($('#category').val() == "0") {
+            //alert('ok');
+            //$('#categroy').css({ "border-color": "#FF0000" });
+            toastr.error("Please Select Category", " Category ",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+        }
+        else if ($('#subcategory').val() == "0") {
+            //alert('ok');
+            //$('#categroy').css({ "border-color": "#FF0000" });
+            toastr.error("Please Select SubCategory", " SubCategory ",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+        }
+        //else if ($('#subcategroy').is(":visible")) {
+        //    if ($('#subcategroy').val() == '0') {
+        //        $('#subcategroy').css({ "border-color": "#FF0000" });
+        //    }
+        //}
+        else if ($("#requestorDepartment").val() == "0") {
+
+            toastr.error("Please Select Department", " Department ",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+
+            //check = false;
+            //$('#requestorDepartment').css({ "border-color": "#FF0000" });permission
+        }
+        else if ($("#permission").val().length < 1) {
+
+            toastr.error("Please Select Mode Of Visit", " Mode Of Visit ",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+
+            //check = false;
+            //$('#permission').css({ "border-color": "#FF0000" });
+        }
+        else if ($("#dateVisit").val().length < 1) {
+            toastr.error("Please Enter Date Of Visit", " Date Of Visit ",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+            //check = false;
+            //$('#dateVisit').css({ "border-color": "#FF0000" });
+        }
+        else if ($('#approverTable tr td input[type=checkbox]:checked').length < 1) {
+            //alert($('#approverTable tr td input[type=checkbox]:checked').length);
+            swal({
+                title: 'Approver Not Selected',
+                type: 'error',
+                closeOnCancel: true
+            });
+        }
+        else if ($('#approverTable tr td input[type=checkbox]:checked').length > 2) {
+            //alert($('#approverTable tr td input[type=checkbox]:checked').length);
+            swal({
+                title: 'Approver More Than 2 Selected',
+                type: 'error',
+                closeOnCancel: true
+            });
+        }
+        else if ($('#visitorTableBody  tr td').length < 1)
+        {
+            swal({
+                title: 'Visitor Not Found',
+                type: 'error',
+                closeOnCancel: true
+            });
+        }
+        else {
+
+            var jsondate = SaveVisitorRequest();
+            var urlpath = '@Url.Action("ModalBeforeVisitorSubmit", "Visitor")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsondate),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    //alert(data)
+                    if (data.requestor == null) {
+                        toastr.error(data.result, " Result ",
+                            {
+                                "progressBar": true,
+                                "positionClass": "toast-top-right",
+                                "showDuration": "300",
+                                "hideDuration": "1000",
+                                "timeOut": "5000",
+                                "closeButton": true
+                            });
+                    }
+                    //else {
+                        
+                    //}
+
+                    $("#modalbody").html("");
+                    $("#modalbody").append(data);
+                    $("#myModal").modal("show");
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+        }
+    }
+
+
+     function formatDate(date) {
+                var d = new Date(date),
+                    month = '' + (d.getMonth() + 1),
+                    day = '' + d.getDate(),
+                    year = d.getFullYear();
+
+                if (month.length < 2)
+                    month = '0' + month;
+                if (day.length < 2)
+                    day = '0' + day;
+                return [year, month, day].join('-');
+    }
+
+    @*function approverList(unitId) {
+        $('#approver').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadApprovers", "Visitor")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {unitId: unitId},
+            async: true,
+            success: function (data) {
+                $('#approver').empty();
+                $('#approver').append("<option value='0'>--Select Approver --</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#approver").append($("<option data-designation=\""+ data[i].DesignationName +"\"></option>").val(data[i].UserId)
+                        .html(data[i].UserName));
+                }
+            }
+        });
+    }*@
+
+    GetUserDepartment(0, 0, '#department_head');
+   // $('#requestorDepartment').attr('disabled', true);
+
+    function GetUserDepartment(status, departmentHead, divblock) {
+        $(divblock).css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("GetDepartmentId", "IOU")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {Status:status,DepartmentHeadID:departmentHead},
+            async: true,
+            success: function (data) {
+                $(divblock).empty();
+                $(divblock).append("<option value='0'>--Select Department Head --</option>");
+                for (var i = 0; i < data.length; i++) {
+                        $(divblock).append($("<option data-departmentId="+ data[i].DepartmentId +" data-department=\""+ data[i].DepartmentName +"\" data-designation=\""+ data[i].DesignationName +"\"></option>").val(data[i].UserInformationId)
+                            .html(data[i].UserInformationName));
+                    }
+                //if (status == 0) {
+                //    $(divblock).append($("<option></option>").val('0')
+                //            .html("--Select Department Head--"));
+                //    for (var i = 0; i < data.length; i++) {
+                //        $(divblock).append($("<option></option>").val(data[i].DepartmentId)
+                //            .html(data[i].UserInformationName + "(" + data[i].DepartmentName + ")"));
+                //    }
+                //} else {
+                //    for (var i = 0; i < data.length; i++) {
+                //        $(divblock).append($("<option></option>").val(data[i].UserInformationId)
+                //            .html(data[i].UserInformationName));
+                //    }
+                //}
+
+            }
+        });
+    }
+
+    $('#ListOfApprover').hide();
+
+    $('#department_head').change(function () {
+        //alert($(this).find(':selected').data('department'));
+        var department = $(this).find(':selected').data('department');
+        var departmentId = $(this).find(':selected').data('departmentid');
+        var designation = $(this).find(':selected').data('designation');
+        //$('#requestorDepartment').attr('disabled', true);
+        $('#requestorDepartment').data('departmentId', departmentId);
+        //alert($('#requestorDepartment').data('departmentId'));
+        var departmentUser = $(this).find(':selected').text();
+        //$("#requestorDepartment").val(department);
+        var catId = $('#category').val();
+        var subCatId = $('#subcategory').val();
+        var unitId = $('#business_unit').val();
+        var department_head = $('#department_head').val();
+        //alert(department_head);
+        //approverlist(catId, subCatId, unitId);
+        approverlistnew(0, 0, 0, department_head);
+
+        //$('#approverlist').show();
+
+        //alert(departmentUser);
+        //$('.mytable1 tr:eq(' + index + ')').fadeOut();
+        //$('#approverlist tr:eq(1)').data('approver', $(this).find(':selected').val());
+        //$('#approverlist tr').find('td').eq(0).text(1);
+        //$('#approverlist tr').find('td').eq(1).text(departmentUser);
+         //$('#approverlist tr').find('td').eq(2).text(designation);
+    //    $('#approverlist tr').each(function(){
+    //alert($(this).find('td').eq(1).text());
+    //});
+
+       // alert($('#approverlist tr:eq(1)').data('approver'));
+    })
+
+    $('#approver').change(function () {
+        $('#approverlist').show();
+        var approver = $(this).find(':selected').text();
+        var designation = $(this).find(':selected').data('designation');
+        //$('#approverlist tr:eq(2)').data('approver', $(this).find(':selected').val());
+        //$('#approverlist tr').find('td').eq(3).text(2);
+        //$('#approverlist tr').find('td').eq(4).text(approver);
+        //$('#approverlist tr').find('td').eq(5).text(designation);
+
+        //alert($('#approverlist tr:eq(2)').data('approver'));
+    })
+
+    //~/Images/user.png
+    $('#blah').attr('src', '/Images/user.png');
+
+    function readURL(input) {
+        var a = (input.files[0].size);
+       // alert(a);
+        if (a > 300000) {
+            alert('size must be less then 300kb');
+            $('#UploadImage').val('');
+
+            $('#blah').attr('src', '/Images/user.png');
+           // $('#blah').attr('src', '');
+            return false;
+        };
+          if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+              reader.onload = function (e) {
+              $('#blah').attr('src', e.target.result);
+            }
+
+            reader.readAsDataURL(input.files[0]); // convert to base64 string
+          }
+    }
+
+    $("#UploadImage").change(function() {
+        readURL(this);
+
+
+        //var fileUpload = $("#ioufileuploadbutton").prop('files');
+        var fileData = new FormData();
+        var fileUpload = $("#UploadImage").prop('files');
+            if (fileUpload.length>0) {
+                 for (var i = 0; i < fileUpload.length; i++) {
+                     fileData.append(fileUpload[i].name, fileUpload[i]);
+                 }
+        }
+        var urlpath = '@Url.Action("VisitorFileUpload", "Visitor")';
+        $.ajax({
+            url: urlpath,
+            type: "post",
+            processData: false,
+            contentType: false,
+            data: fileData  ,
+            success: function (result) {
+                $('#filename').val(result.fileName);
+                $('#filepath').val(result.ServerSavePath);
+
+                //alert(result.fileName + " " + result.ServerSavePath);
+
+                $("#UploadImage").val('');
+            },
+            error: function (err) {
+                alert(err.responseText);
+            }
+        });
+        //alert(document.getElementById('blah').src)
+        });
+
+    function PrintModal() {
+        var print_div = document.getElementById("printablearea");
+        var print_area = window.open();
+        print_area.document.write("<style>table{border-collapse:collapse;}</style><img width='20' height='20' src='../../Images/logo.png' /><img style='width:80px;' src='../../Images/logo.png' />");
+        print_area.document.write("<h1 style='text-align:center'>Visitor Preview</h1>");
+        print_area.document.write(print_div.innerHTML);
+        print_area.document.close();
+        print_area.focus();
+        print_area.print();
+        print_area.close();
+    }
+
+
+</script>

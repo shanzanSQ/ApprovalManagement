@@ -1,0 +1,3 @@
+- Take userId (PK) from userdetails table
+- See the list of modules and take the id(PK)
+- Give Access to the modules

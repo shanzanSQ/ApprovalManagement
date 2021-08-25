@@ -1,0 +1,754 @@
+﻿@*@{
+        ViewBag.Title = "VisitorRequestForm";
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }*@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+<link href="~/Content/LoadingModal.css" rel="stylesheet" />
+@Styles.Render("~/Content/capexform.css")
+<style type="text/css">
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+</style>
+<style type="text/css">
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    input, select {
+        width: 100%;
+    }
+
+    #visitorTable td, #visitorTable th {
+        text-align: center;
+    }
+
+        #visitorTable td input[type=text] {
+            all: initial;
+            all: unset;
+        }
+
+    input[type=text], input[type=button], select {
+        height: 30px;
+    }
+
+    #visitorinputtable {
+    }
+
+        #visitorinputtable td {
+            padding-right: 5px;
+            padding-left: 5px;
+        }
+
+    #loading-img {
+        background: url('../../Images/ajax-loader.gif') center center no-repeat;
+        height: 100%;
+        z-index: 20;
+    }
+
+    .overlay {
+        background: #463e3e;
+        display: none;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        opacity: 0.5;
+    }
+
+    .table > thead > tr > th {
+        vertical-align: top;
+        border-bottom: 2px solid #ddd;
+    }
+</style>
+
+@*<h3 style="text-align:center">Courier Request Form </h3>*@
+<div class="row">
+    <div class="col-md-6">
+        @*<h4 style="text-align: center; background-color: #9bb07e; padding: 5px"><strong>Courier Request Form</strong></h4>*@
+        <div class="row">
+            <div class="col-md-12">
+                <div class="col-md-4 customer">
+                    <label for="customer" class="customer">Location</label>
+                    <select id="location" class="form-control cke_required">
+                        <option value="0">--Select loction--</option>
+                        <option value="1">Central</option>
+                        <option value="2">Factory</option>
+                    </select>
+
+                </div>
+                <div class="col-md-4 receiver">
+                    <label for="business_unit" class="receiver">Unit</label>
+                    <select id="business_unit" class="form-control business_unit"></select>
+
+                </div>
+                <div class="col-md-4 country">
+                    <label for="department" class="department">Department</label>
+                    <select id="department" class="form-control department"></select>
+
+                </div>
+                <div class="col-md-4 customer">
+                    <label for="customer" class="customer">Customer</label>
+                    <select id="customer" class="form-control cke_required">
+                        <option value="0">--Select Customer--</option>
+                        <option value="1">a</option>
+                        <option value="2">b</option>
+                    </select>
+                </div>
+                <div class="col-md-4 receiver">
+                    <label for="receiver" class="receiver">Receiver</label>
+                    <input type="text" class="form-control receiver" id="receiver">
+                </div>
+                <div class="col-md-4 country">
+                    <label for="country" class="country">Country</label>
+                    <select id="country" class="form-control cke_required">
+                        <option value="0">--Select Country--</option>
+                        <option value="Bangladesh">Bangladesh</option>
+                        <option value="India">India</option>
+                        <option value="Hong Kong">Hong Kong</option>
+                    </select>
+
+                </div>
+                <div class="col-md-4">
+                    <label for="post_code" class="post_code">Post Code</label>
+                    <input type="text" class="form-control post_code" id="post_code">
+                </div>
+                <div class="col-md-8 address">
+                    <label for="project_description" class="address">Address</label>
+                    <textarea type="text" id="address" placeholder="Address" class="form-control"></textarea>
+                </div>
+                <div class="col-md-6 dispatch_date">
+                    <label for="dispatch_date" class="dispatch_date">Dispatch Date</label>
+                    <input type="date" id="dispatch_date" min="2020-12-12" class="form-control DateFrom" />
+                    @*<input class="datepicker" data-date-format="mm/dd/yyyy" placeholder="-- Select Dispatch Date--" id="dispatch_date" onchange="colorChange('#dispatch_date')">*@
+                </div>
+                <div class="col-md-6 delivery_date">
+                    <label for="delivery_date" class="delivery_date">Delivery Date</label>
+                    <input type="date" id="delivery_date" min="2020-12-12" class="form-control DateFrom" />
+                </div>
+
+                <div class="col-md-6 product_description">
+                    <label for="product_description" class="product_description<">Product Description</label>
+                    <input type="text" class="form-control product_description" id="product_description">
+                </div>
+
+                <div class="col-md-6 weight">
+                    <label for="weight" class="weight">Weight(KG)</label>
+                    <input type="number" class="form-control weight" id="weight">
+                </div>
+                <div class="col-md-6 volume">
+                    <label for="volume" class="volume">Volume</label>
+                    <input type="number" class="form-control volume" id="volume">
+                </div>
+                <div class="col-md-6 airway_bill_no">
+                    <label for="airway_bill_no" class="airway_bill_no">Airway Bill no.</label>
+                    <input type="text" class="form-control airway_bill_no" id="airway_bill_no">
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <br />
+        <br />
+
+    </div>
+    <div class="col-md-6">
+        <div class="row">
+            <div class="col-md-12 courier">
+                <label for="courier" class="courier">Courier</label>
+                <input type="text" class="form-control courier" id="courier">
+            </div>
+
+            <div class="col-md-6 proposed_date">
+                <label for="proposed_date" class="proposed_date">Proposed Date</label>
+                <input type="text" id="proposed_date" class="form-control DateFrom" />
+            </div>
+
+            <div class="col-md-6 cost">
+                <label for="cost" class="cost">Cost</label>
+                <input type="text" class="form-control form-inline" id="cost">
+            </div>
+            <div class="col-md-8 remarks">
+                <label for="remarks" class="remarks">Remarks</label>
+                <textarea type="text" id="remarks" placeholder="Remarks" class="form-control remarks"></textarea>
+            </div>
+            <div class="col-md-4" style=" margin-top:50px;">
+                <button id="save_button" class="btn btn-info">Submit</button>
+            </div>
+        </div>
+        <h4 style="text-align: center;  padding: 5px ;background-color: #9bb07e;"><strong>Approver List</strong></h4>
+        <table width="100%" id="ListOfApprover" class="table table-bordered table-responsive table-condensed table-hover">
+
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>SL</th>
+                    <th>Approver Name</th>
+                    <th>Approver Designation</th>
+                </tr>
+            </thead>
+            <tbody id="approverTable">
+            </tbody>
+
+        </table>
+    </div>
+    <!--<div class="col-md-6">
+    <h4 style="text-align: center; background-color: #9bb07e; padding: 5px"><strong>Courier Information</strong></h4>
+    <div class="row">
+        <div class="col-md-12" style="overflow-x:auto">
+            <table width="100%" cellpadding="5" cellspacing="0" border="1" id="visitorTable" class="table table-striped">
+                <caption>Courier Information</caption>
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Receiver</th>
+                        <th>Country</th>
+                        <th>Post Code</th>
+                        <th>Address</th>
+                        <th>Dispatch Date</th>
+                        <th>Delivery Date</th>
+                        <th>Product Description</th>
+                        <th>Weight</th>
+                        <th>Volume</th>
+                        <th>Airway Bill no</th>
+                        <th>Proposed Date</th>
+                        <th>Cost</th>
+                        <th>Remarks</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="visitorTableBody">
+                </tbody>
+            </table>
+        </div>
+        <br />
+        <br />
+        <br />
+        <div style="text-align:center">-->
+    @*<button class="btn btn-success btn-sm" style="width:40%;margin-top:5px;" id="submitTovisit"> SUBMIT</button>*@
+    @*<button class="btn btn-success btn-sm" style="width:40%;margin-top:5px;" id="save" onclick="varifyInputElement()"> SUBMIT</button>*@
+    <!--</div>
+
+
+
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h4 style="text-align: center;  padding: 5px ;background-color: #9bb07e;"><strong>Approver List</strong></h4>
+                <table width="100%" id="ListOfApprover" class="table table-bordered table-responsive table-condensed table-hover">
+
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>SL</th>
+                            <th>Approver Name</th>
+                            <th>Approver Designation</th>
+                        </tr>
+                    </thead>
+                    <tbody id="approverTable">
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>-->
+</div>
+
+
+
+<div class="modal" id="myModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" style="text-align: center">Courier Request Preview</h4>
+            </div>
+            <div id="modalbody" class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-sm" id="confirmCourierInfo" @*onclick="PrintModal()"*@>Confirm</button>
+                <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+@*<img src="http://i.giphy.com/13Xkz5sLdjGiQw.gif" id="loader">*@
+<div id="loader" style="margin-top:10px; display:none;">
+    <img src="~/Images/ajax-loader.gif" />
+</div>
+
+<div class="overlay">
+    <div id="loading-img"></div>
+</div>
+<div class="modal" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" style="text-align:center">Courier Preview</h4>
+            </div>
+            <div id="modalbody" class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="remove_button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-info" id="confirmCapexInfo">Submit</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+@*@Scripts.Render("~/bundles/jquery")*@
+<script type="text/javascript">
+$('#business_unit').prop('disabled', true);
+
+    onLoad();
+
+    function onLoad() {
+
+
+    }
+
+
+    function LoadLocation() {
+        $('#location').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadLocation", "Home")';
+        //
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
+            success: function (data) {
+                $('#location').empty();
+                $('#location').append("<option value='0'>--Select Location --</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#location").append($("<option></option>").val(data[i].LocationId)
+                        .html(data[i].LocatioName));
+                }
+            },
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+    }
+
+     function LoadBusinessUnit() {
+        $('#business_unit').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadBusinessUnit", "Admin")';
+        //$('#loader').show();
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
+            success: function (data) {
+                $('#business_unit').empty();
+                $("#visitorCompanySQ").empty();
+                $('#business_unit').append("<option value='0'>--Select Business Unit--</option>");
+                $('#visitorCompanySQ').append("<option value='0'>--Select Business Unit--</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#business_unit").append($("<option></option>").val(data[i].BusinessUnitId)
+                        .html(data[i].BusinessUnitName));
+                    $("#visitorCompanySQ").append($("<option></option>").val(data[i].BusinessUnitId)
+                        .html(data[i].BusinessUnitName));
+                }
+            },
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+    }
+
+    $("#location").change(function () {
+        if ($("#location").val() == 1) {
+
+            $(this).attr("selected", "selected");
+            $('#business_unit').prop('disabled', false);
+            LoadBusinessUnit();
+            LoadDepartment(1)
+        } else if ($("#location").val() == 2) {
+
+
+            $(this).attr("selected", "selected");
+            $('#business_unit').prop('disabled', false);
+
+            LoadBusinessUnit();
+            LoadDepartment(2);
+
+        } else {
+            $(this).attr("selected", "selected");
+            $('#business_unit').empty();
+        }
+
+
+    });
+
+    function LoadDepartment(location) {
+        $('#requestorDepartment').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("GetDepartmentList", "Visitor")';
+
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {location:location},
+            async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
+            success: function (data) {
+                $('#department').empty();
+                $('#requestorDepartmentSQ').empty();
+                $('#requestorDepartmentSQ').append("<option value='0'>-- Select Department --</option>");
+                $('#department').append("<option value='0'>-- Select Department --</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#department").append($("<option></option>").val(data[i].DeartmentName)
+                        .html(data[i].DeartmentName));
+                    $("#requestorDepartmentSQ").append($("<option></option>").val(data[i].DeartmentName)
+                        .html(data[i].DeartmentName));
+                }
+            }
+            ,
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+    }
+    $("#save_button").click(function () {
+        debugger;
+        modalView();
+    });
+
+    $("#confirmCourierInfo").click(function () {
+        debugger;
+        SaveCourierRequest();
+
+          var jsondate = SaveCourierRequest();
+           var urlpath = '@Url.Action("SaveCourierRequest", "Courier")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsondate),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    swal({
+                        title: 'Courier Request Submit Successfully',
+                        type: 'success',
+                        closeOnCancel: true
+                    },function () {
+                            $("#myModal").modal("hide");
+                            $("#iousubmenu").find('li').removeClass();
+                            $("#iousubmenu").find('li:nth-child(2)').addClass("active");
+
+                    });
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+    });
+
+    $("#save_button").click(function () {
+
+
+
+
+
+
+        @*else {
+            var jsondate = SaveCourierRequest();
+           var urlpath = '@Url.Action("SaveCourierRequest", "Courier")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsondate),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    swal({
+                        title: 'Courier Request Submit Successfully',
+                        type: 'success',
+                        closeOnCancel: true
+                    },function () {
+                            $("#myModal").modal("hide");
+                            $("#iousubmenu").find('li').removeClass();
+                            $("#iousubmenu").find('li:nth-child(2)').addClass("active");
+                            GetAllIOURequest(1, 0);
+                    });
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+        }*@
+
+    })
+
+    function modalView() {
+       // debugger;
+        if ($("#location").val() == "0") {
+            toastr.error("Please Select Location ", " Location ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+        }
+        if ($("#business_unit").val() == "0") {
+            toastr.error("Please Select Unit ", " Unit ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+        }
+        if ($("#department").val() == "0") {
+            toastr.error("Please Select Department ", " Department ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+        }
+        if ($("customer").val() == "0") {
+            toastr.error("Please Select Customer ", " Customer ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+        }
+        else if ($("#receiver").val().length < 1) {
+            toastr.error("Please Enter Receiver ", " Receiver ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+
+        }
+        if ($("country").val() == "0") {
+            toastr.error("Please Select Country ", " Country ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+        }
+        else if ($("#post_code").val().length < 1) {
+            toastr.error("Please Enter Post Code", "Post Code",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+
+        }
+         else if ($("#address").val().length < 1) {
+            toastr.error("Please Enter Address ", " Address ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+
+        }
+        if ($("#dispatch_date").val() == " ") {
+            toastr.error("Please Select Dispatch Date ", " Dispatch Date ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+        }
+        if ($("#delivery_date").val() == " ") {
+            toastr.error("Please Select Delivery Date ", " Delivery Date ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+        }
+        else {
+            var jsondate = SaveCourierRequest();
+            var urlpath = '@Url.Action("ShowPertialviewModal", "Courier")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsondate),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    $("#modalbody").html("");
+                    $("#modalbody").append(data);
+                    $("#myModal").modal("show");
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+        }
+
+
+    }
+
+    function SaveCourierRequest() {
+        var jsonData = {};
+        jsonData["Location"] = $("#location").val();
+        jsonData["locationName"] = $("#location").children("option:selected").html();
+        jsonData["BusinessUnitId"] = $("#business_unit").val();
+        jsonData["BusinessUnitName"] = $("#business_unit").children("option:selected").html();
+        jsonData["DepartmentID"] = $("#department").val();
+        jsonData["DepartmentName"] = $("#department").children("option:selected").html();
+        jsonData["Customer"] = $("#customer").val();
+        jsonData["Receiver"] = $("#receiver").val();
+        jsonData["Country"] = $("#country").val();
+        jsonData["PostCode"] = $("#post_code").val();
+        jsonData["Address"] = $("#address").val();
+        jsonData["DispatchDate"] = $("#dispatch_date").val();
+        jsonData["Deliverydate"] = $("#delivery_date").val();
+        jsonData["ProductDescription"] = $("#product_description").val();
+        jsonData["Weight"] = $("#weight").val();
+        jsonData["Volume"] = $("#volume").val();
+        jsonData["AirwayBillno"] = $("#airway_bill_no").val();
+        jsonData["Courier"] = $("#courier").val();
+        jsonData["ProposedDate"] = $("#proposed_date").val();
+        jsonData["Cost"] = $("#cost").val();
+        jsonData["Remarks"] = $("#remarks").val();
+        jsonData["RequesterId"] = "0";
+       // var jsonObj = [];
+
+
+        //var approverList = [];
+        //$('#Iouapproverlist tr').each(function () {
+        //    var approver = {};
+        //    approver["UserID"] = $(this).find('p[name^="userId"]').html();
+        //    approver["ApproverNo"] = $(this).find('p[name^="approverNo"]').html();
+        //    approver["UserName"] = $(this).find('p[name^="userName"]').html();
+        //    approver["DesignationName"] = $(this).find('p[name^="designationName"]').html();
+        //    approver["ApproverStatusName"] = $(this).find('p[name^="approverstatus"]').html();
+        //    approver["ApproverStatus"] = $(this).find('p[name^="apstatusid"]').html();
+        //    approverList.push(approver);
+        //});
+        //jsonData["IOUApproverList"] = approverList;
+        return jsonData;
+
+
+
+
+    }
+
+
+    $("#weight").change(function () {
+        var country = $('#country').val();
+        var delivery_date = $('#delivery_date ').val();
+        var weight = $('#weight ').val()
+
+          var urlpath = '@Url.Action("GetCourierProposedDate", "Courier")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+
+                url: urlpath,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify({
+                    country: country,
+                    delivery_date: delivery_date,
+                    weight: weight
+
+                }),
+                type: "POST",
+                async: true,
+                success: function (response) {
+                    //console.log(data);
+                    $("#courier").val(response.data[0].ServiceProvider);
+                    $("#proposed_date").val(response.data[0].CourierProposedDate);
+                    $("#cost").val(response.data[0].Rate);
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+
+        //$.ajax({
+        //    type: "POST",
+        //    url: "/Courier/GetCourierProposedDate",
+        //    contentType: "application/json; charset=utf-8",
+        //    dataType: "json",
+        //    data: JSON.stringify({
+        //        country: country,
+        //        delivery_date: delivery_date,
+        //          weight: weight
+
+        //    }),
+        //    success: function (response) {
+        //         console.log(response.data);
+
+        //       // $("#actual_Rent_Start_Date").val(response.data[0].DateAdd);
+
+        //    }
+        //})
+    });
+
+
+</script>
+

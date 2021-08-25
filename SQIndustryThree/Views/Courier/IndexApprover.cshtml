@@ -1,0 +1,260 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .modal-lg {
+        max-width: 80% !important;
+    }
+
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    #ioumenu {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #iousubmenu li a {
+        color: white;
+    }
+    /*#exceptionSubmrnu li:active{
+        color:white;
+        background-color:#0a0a22;
+
+    }*/
+    #iouNavigation {
+        background-color: #37474F;
+    }
+
+    #expmenu {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #exceptionSubmrnu li a {
+        color: white;
+    }
+    /*#exceptionSubmrnu li:active{
+        color:white;
+        background-color:#0a0a22;
+
+    }*/
+    #exceptionNavigaton {
+        background-color: #37474F;
+    }
+</style>
+<div class="container-fluid">
+    <h3 style="text-align: center;">
+        <b>Courier Management System</b>
+    </h3>
+    <hr style="margin: 0px" />
+    <div class="row">
+        <div id="iouNavigation" class="navbar navbar-default navbar-static-top">
+            <div id="ioumenu">
+                <div>
+                    <ul id="iousubmenu" class="nav navbar-nav">
+                        <li onclick="GetCourierApproverList(2,3)"><a href="#">Request Pending </a></li>
+                        <li onclick="GetCourierApproverList(2,1)"><a href="#">Request Approved </a></li>
+                        <li onclick="GetCourierApproverList(2,2)"><a href="#">Request Rejected</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="ioucreateDashboard" style="width:100%">
+
+        </div>
+    </div>
+    <div class="modal" id="myModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Courier Request Preview</h4>
+                </div>
+                <div id="modalbody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+<script type="text/javascript">
+
+
+
+      $("#iousubmenu").find('li:nth-child(1)').addClass("active");
+
+    $('#iousubmenu > li > a').click(function() {
+        $('li').removeClass();
+        $(this).parent().addClass('active');
+
+    });
+
+
+    function GetCourierApproverList(status,progress) {
+        var urlpath = '@Url.Action("GetAllCourierRequest", "Courier")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: { Status: status, ViewName: '_myCourierRequestorApprover',Progrss:progress},
+            async: true,
+            success: function (data) {
+
+                if (data) {
+                 /*   alert(data);*/
+                     $('#ioucreateDashboard').empty();
+                    $('#ioucreateDashboard').append(data);
+                    $('#VisitorRequestTable').DataTable();
+                }
+            }
+        });
+    }
+    function CourierDetailsApprover(masterID,status) {
+        var urlpath = '@Url.Action("CourierRequestDetails", "Courier")';
+        $.ajax({
+            data: { MasterID: masterID, ViewName:"_courierapproverModalView",Status:status},
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $("#modalbody").html("");
+                $("#modalbody").append(data);
+                $("#myModal").modal("show");
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+    function CourierApproveOrReject(progress, masterId, commentText) {
+        if (progress == 2 && commentText == "") {
+            swal({
+                title: 'Please Add comment Before Reject',
+                type: 'error',
+                closeOnCancel: true
+            });
+        } else {
+            var urlpath = '@Url.Action("CourierApproveOrReject", "Courier")';
+        $.ajax({
+            data: { CommentText: commentText, Progress: progress, CourierRequestId: masterId},
+            dataType: 'json',
+            url: urlpath,
+            type: "Post",
+            async: true,
+            success: function (result) {
+                if (result) {
+                    swal({
+                        title: 'Done Successfully',
+                        type: 'success',
+                        closeOnCancel: true
+                    },function () {
+                            $("#myModal").modal("hide");
+                            GetCourierApproverList(2, 3);
+                    });
+                }
+            }, error: function (xhr, status, error) {
+                swal({
+                    title: 'Error Occoured',
+                    type: 'error',
+                    closeOnCancel: true
+                });
+            }
+        });
+        }
+
+    }
+
+    function CourierRequestDetails(masterID,status,viewName) {
+        var urlpath = '@Url.Action("CourierRequestDetails", "Courier")';
+        $.ajax({
+            data: { MasterID: masterID, ViewName: viewName, Status: status },
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $("#modalbody").html("");
+                $("#modalbody").append(data);
+                $("#myModal").modal("show");
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+     function ReviewComment(masterID) {
+        if ($("#reviewMessage").val() == "") {
+            $("#reviewMessage").css({ "border-color": "#FF0000" });
+        } else {
+            var reviewTo = $("#reviewComment").val();
+            var reviewMessage = $("#reviewMessage").val();
+            var urlpath = '@Url.Action("SendCourieComments", "Courier")';
+            $.ajax({
+                    data: { MasterID: masterID, ReviewTo: reviewTo, ReviewMessage: reviewMessage },
+                    dataType: 'json',
+                    url: urlpath,
+                    type: "Post",
+                    async: true,
+                    success: function (result) {
+                        if (result) {
+                            swal({
+                                            title: 'Comment Added Successfully',
+                                            type: 'success',
+                                            closeOnCancel: true
+                                        },
+                                function () {
+                                    $("#myModal").modal("hide");
+                                    GetAllExceptionRequest(1,0);
+                                });
+                        }
+                    }
+                });
+        }
+
+    }
+     function ReviewComment(masterID,status) {
+        if ($("#reviewMessage").val() == "") {
+            $("#reviewMessage").css({ "border-color": "#FF0000" });
+        } else {
+            var reviewTo = $("#reviewComment").val();
+            var reviewMessage = $("#reviewMessage").val();
+            var urlpath = '@Url.Action("SendCourieComments", "Courier")';
+            $.ajax({
+                    data: { MasterID: masterID, ReviewTo: reviewTo, ReviewMessage: reviewMessage },
+                    dataType: 'json',
+                    url: urlpath,
+                    type: "Post",
+                    async: true,
+                    success: function (result) {
+                        if (result) {
+                            swal({
+                                            title: 'Comment Sent Successfully',
+                                            type: 'success',
+                                            closeOnCancel: true
+                                        },
+                                function () {
+
+                                        $("#myModal").modal("hide");
+                                        $("#iousubmenu").find('li').removeClass();
+                                        $("#iousubmenu").find('li:nth-child(2)').addClass("active");
+                                        GetAllCourierRequest(1, 0);
+                                  });
+                        }
+                    }
+                });
+        }
+
+    }
+</script>
+
+

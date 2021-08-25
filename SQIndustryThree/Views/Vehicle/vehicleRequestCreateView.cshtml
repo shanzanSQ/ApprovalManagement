@@ -1,0 +1,1013 @@
+﻿
+<style type="text/css">
+    #iourequestform td{
+        padding:2px;
+    }
+    #ammountInformationbody input[type="text"], #ammountInformationbody input[type="number"] {
+        width: 100%;
+        text-align: center;
+    }
+
+    #ammountInformationbody input[type="button"] {
+        height: 25px;
+        width: 25px;
+        border-radius: 50%;
+    }
+    #addrowbutton {
+        background-color: green;
+        color: white;
+        font-weight: bold;
+    }
+    .deletebutton {
+        background-color: red;
+        color: white;
+        font-weight: bold;
+    }
+
+    p {
+        border: 0;
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #departmentId, #business_unit, #ammount {
+        background-color: #ffffff;
+    }
+    th{
+        text-align:center;
+    }
+    .required:after {
+        content: "*";
+        color: red;
+    }
+</style>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-5">
+            <table id="iourequestform" width="100%">
+                <tr>
+                    <td><label class="required">Select Location</label></td>
+                    <td>
+                        <select id="location" class="form-control cke_required" onchange="OnChangeDepartmentHead(this)">
+                            <option value="0">--Select loction--</option>
+                            <option value="1">Central</option>
+                            <option value="2">Manufacturing Facility</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="required">Starting Point</label></td>
+                    <td>
+                        <select id="starting_point" class="form-control">
+                            <option value="0">--Select Starting Point--</option>
+                            <option value="1">Station</option>
+                            <option value="2">Mauna</option>
+                            <option value="3">Central</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="business_unit">Select Business Unit</label></td>
+                    <td>
+                        <select id="business_unit" name="business_unit" class="form-control" onchange="OnChangeDepartmentHead(this)"> </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="30%"><label class="required">Department Head</label></td>
+                    <td width="70%">
+                        <select id="departmentId" onchange="OnChangeDepartmentHead(this)" class="form-control">
+                        </select>
+                    </td>
+                </tr>
+                @*<tr>
+            <td><label>Date of Request</label></td>
+            <td><p id="current_date" class="form-control"></p></td>
+        </tr>*@
+                <tr>
+                    <td><label class="required">Travel Start Date</label></td>
+                    <td><input id="travel_start_date" type="date" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td><label class="required">Travel Start Time</label></td>
+                    <td><input id="travel_start_time" type="time" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td><label class="required">Travel End Date</label></td>
+                    <td><input id="travel_end_date" type="date" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td><label class="required">Travel End Time</label></td>
+                    <td><input id="travel_end_time" type="time" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td><label for="purpose_of_visit" class="required">Purpose of Visit</label></td>
+                    <td>
+                        <select id="purpose_of_visit" class="form-control">
+                            @*<option value="0">--Select Purpose of Visit--</option>
+                    <option value="1">Business Meeting</option>
+                    <option value="2">Medical Urgency</option>
+                    <option value="3">Dormitory Supply Purchase</option>
+                    <option value="4">QC Pick & Drop Service</option>
+                    <option value="5">Raw Material Collect</option>
+                    <option value="6">Internal Goods Transfer</option>
+                    <option value="7">External Goods Transfer</option>
+                    <option value="8">Recreation Visit</option>*@
+                        </select>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><label class="required">Route</label></td>
+                    <td>
+                        <select id="route" class="form-control">
+                            @*<option value="0">--Select Route--</option>
+                    <option value="1">SQ to Gazipur</option>
+                    <option value="2">Gazipur to SQ</option>*@
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="required">Trip Type</label></td>
+                    <td>
+                        <select id="trip_Type" class="form-control">
+                            <option value="0">--Select Type--</option>
+                            <option value="1">Round</option>
+                            <option value="2">Single</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="required">Number of User</label></td>
+                    <td><input type="number" disabled value=0 id="numberofUser" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td><label class="required">Number of Days</label></td>
+                    <td><input type="number" value=0 id="numberofDays" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td><label class="required">Preferred Vehicle</label></td>
+                    <td>
+                        <select id="preferred_vehicle" class="form-control">
+                            @*<option value="0">--Select Type--</option>
+                    <option value="1">Car</option>
+                    <option value="2">Bus</option>*@
+                        </select>
+                    </td>
+                </tr>
+                @*<tr>
+            <td><label class="required">Remarks</label></td>
+            <td>
+                <textarea type="text" id="remarks" placeholder="Remarks" class="form-control remarks"></textarea>
+
+            </td>
+        </tr>*@
+            </table>
+            @*<div class="col-md-2">
+            <label>Currency</label>
+            <select id="currency" class="form-control">
+            </select>
+        </div>*@
+            <div class="col-md-12" style="text-align:center">
+                <hr />
+                <input type="button" class="btn btn-success btn-sm " onclick="varifyInputElement()" value="Submit For Approve" />
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="col-md-12 remarks">
+                <label for="remarks" class="remarks">Remarks</label>
+                <textarea type="text" id="remarks" placeholder="Remarks" class="form-control remarks"></textarea>
+            </div>
+            <br />
+            <br>
+            @*<div class="col-md-7">
+                <button class="btn btn-success btn-sm" id="addrowbutton" onclick="addnewAmmount()">Add Row</button>
+            </div>*@
+                <table width="100%" style="text-align:center" border="1" id="genaralInformationTable">
+                    <caption style="text-align: center;  padding: 5px ;background-color: #9bb07e;margin-top:10px;margin-bottom:10px;"><strong>User Details</strong></caption>
+                    @*<h4 style="text-align: center;  padding: 5px ;background-color: #9bb07e;margin-top:10px;margin-bottom:10px;"><strong>User Details</strong></h4>*@
+                    <thead>
+                        <tr>
+                            <th class="required">User Name</th>
+                            <th style="display:none">User ID</th>
+                            <th class="required">Email</th>
+                            <th class="required">Contact No</th>
+                            <th>Designation</th>
+                            <th>Department</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="ammountInformationbody"  onchange="calculateGrandTotal()">
+                        <tr>
+                            <td><input type="text" id="tableUserName" name="tableUserName" placeholder="Enter User Name" /></td>
+                            @*<td><input type="text" id="tableUserID" name="tableUserID" placeholder="Enter User ID" /></td>*@
+                            <td><input type="text" id="tableEmail" name="tableEmail" placeholder="Enter Email" /></td>
+                            <td><input type="text" id="tableContactNo" name="tableContactNo" placeholder="Enter Contact No" /></td>
+                            <td><select type="text" style="width:100px;" id="tableDesignation" name="tableDesignation" placeholder="Enter Designation" /></td>
+                            <td><select type="text" style="width:100px;" id="tableDepartment" name="tableDepartment" placeholder="Enter Department" /></td>
+                            <td>
+                                <input type="button" id="addrowbutton" onclick="addnewAmmount()" value="+" />
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="2">Total</th>
+                            <th></th>
+                            <th></th>
+                            <th><input style="border:none;pointer-events:none;text-align:center" type="text" id="totalammount" /></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4 style="text-align: center;  padding: 5px ;background-color: #9bb07e;margin-top:10px;margin-bottom:10px;"><strong>Approver List</strong></h4>
+                        @*<h4 style="text-align: center; padding: 5px"><strong>Approver List</strong></h4>*@
+                        <table width="100%" id="ListOfApprover" class="table table-bordered table-responsive table-condensed table-hover">
+                            @*<caption>Approver List</caption>*@
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>SL</th>
+                                    <th>Approver Name</th>
+                                    <th>Approver Designation</th>
+                                </tr>
+                            </thead>
+                            <tbody id="approverTable">
+                            </tbody>
+                            @*<tr data-approver="">
+                <td class="countApprover"></td>
+                <td class="approverName"></td>
+                <td class="approverDesignation"></td>
+            </tr>
+            <tr data-approver="">
+                <td class="countApprover"></td>
+                <td class="approverName"></td>
+                <td class="approverDesignation"></td>
+            </tr>*@
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+</div>
+
+<script type="text/javascript">
+    //$("input.DateFrom").datepicker({
+    //    minDate: 0
+    //});
+    GetDate();
+    GetUserDepartment(0, 0, '#departmentId');
+   // LoadBusinessUnit();
+    LoadDesignation();
+    LoadDepartment();
+    LoadPreferredVehicle();
+    var travel_start_date = document.getElementById("travel_start_date");
+    var travel_end_date = document.getElementById("travel_end_date");
+    var today = new Date();
+    // Set month and day to string to add leading 0
+    var day = new String(today.getDate());
+    var mon = new String(today.getMonth() + 1); //January is 0!
+    var yr = today.getFullYear();
+
+    if (day.length < 2) { day = "0" + day; }
+    if (mon.length < 2) { mon = "0" + mon; }
+
+    var date = new String(yr + '-' + mon + '-' + day);
+
+
+    travel_start_date.setAttribute('min', date);
+    travel_end_date.setAttribute('min', date);
+   // $('#font_received_date').val(date);
+   // LoadPurposeofVisit();
+   // $('#genaralInformationTable').hide();
+
+
+    //function OnChangeUnit(deheadVal) {
+    //    var unitId = $('#business_unit').val();
+    //    approverlistnewUnit(unitId);
+    //}
+    //function OnChangeDepartmentHead(deheadVal) {
+    //    var department_head = $('#departmentId').val();
+    //    var unitId = $('#business_unit').val();
+    //    approverlistnewUnit(unitId);
+    //    approverlistnewdepartment_head(department_head);
+    //}
+    function OnChangeDepartmentHead(deheadVal) {
+        var unitId = $('#business_unit').val();
+        var department_head = $('#departmentId').val();
+        //alert(department_head);
+        var location = $("#location").val()
+        if (location==1) {
+            approverlistnew(0, department_head);
+        }
+        else {
+            approverlistnew(unitId, department_head);
+        }
+
+    }
+    function GetDate() {
+        var dt = new Date();
+        var dd;
+        dd = dt.getDate();
+        const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+                      "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
+        ];
+        /*document.getElementById('current_date').innerHTML = dd + '-' + monthNames[dt.getMonth()] + '-' + dt.getFullYear();*/
+    }
+    function LoadPurposeofVisit(location) {
+        $('#purpose_of_visit').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadPurposeofVisit", "Vehicle")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { LocationId: location},
+            async: true,
+            success: function (data) {
+                $('#purpose_of_visit').empty();
+                $('#purpose_of_visit').append("<option value='0'>--Select Purpose of Visit--</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#purpose_of_visit").append($("<option></option>").val(data[i].PurposeofVisitId)
+                        .html(data[i].PurposeofTravelName));
+                }
+            }
+        });
+    }
+    function LoadStartingPoint(location) {
+        $('#starting_point').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadStartingPoint", "Vehicle")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { LocationId: location},
+            async: true,
+            success: function (data) {
+                $('#starting_point').empty();
+                $('#starting_point').append("<option value='0'>--Select Starting Point--</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#starting_point").append($("<option></option>").val(data[i].StartingPointId)
+                        .html(data[i].StartingPointName));
+                }
+            }
+        });
+    }
+    function LoadRoute(starting_point) {
+        $('#route').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadRoute", "Vehicle")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { starting_point: starting_point},
+            async: true,
+            success: function (data) {
+                $('#route').empty();
+                $('#route').append("<option value='0'>--Select Route--</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#route").append($("<option></option>").val(data[i].RouteId)
+                        .html(data[i].RouteName));
+                }
+            }
+        });
+    }
+    function LoadBusinessUnit(starting_point) {
+        $('#business_unit').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadBusinessUnit", "Vehicle")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { starting_point: starting_point},
+            async: true,
+            success: function (data) {
+                $('#business_unit').empty();
+                $('#business_unit').append("<option value='0'>--Select Business Unit--</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#business_unit").append($("<option></option>").val(data[i].BusinessUnitId)
+                        .html(data[i].BusinessUnitName));
+                }
+            }
+        });
+    }
+    function LoadPreferredVehicle() {
+          $('#preferred_vehicle').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadPreferredVehicle", "Vehicle")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+                $('#preferred_vehicle').empty();
+                $('#preferred_vehicle').append("<option value='0'>--Select Preferred Vehicle--</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#preferred_vehicle").append($("<option></option>").val(data[i].VehicleId)
+                        .html(data[i].VehicleName));
+                }
+            }
+        });
+    }
+
+     function LoadDepartment() {
+        $('#requestorDepartment').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("GetDepartments", "Visitor")';
+
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
+            success: function (data) {
+                $('#requestorDepartment').empty();
+                $('#tableDepartment').empty();
+                $('#tableDepartment').append("<option value='0'>Select Department</option>");
+                $('#requestorDepartment').append("<option value='0'>-- Select Department --</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#requestorDepartment").append($("<option></option>").val(data[i].DepartmentId)
+                        .html(data[i].DeartmentName));
+                    $("#tableDepartment").append($("<option></option>").val(data[i].DepartmentId)
+                        .html(data[i].DeartmentName));
+                }
+            }
+            ,
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+    }
+    function LoadDesignation() {
+        var urlpath = '@Url.Action("LoadDesignation", "Admin")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+                $('#tableDesignation').empty();
+                $('#tableDesignation').append("<option value='0'>Select Designation Unit</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#tableDesignation").append($("<option></option>").val(data[i].DesignationId)
+                        .html(data[i].DesignationName));
+                }
+            }
+        });
+    }
+
+    $('#travel_start_date').change(function () {
+        debugger;
+        var travel_start_date = $('#travel_start_date').val();
+        var travel_end_date = $('#travel_end_date').val();
+        $('#travel_end_date').val(travel_start_date);
+        $('#numberofDays').val(1);
+        //var days = (travel_start_date - travel_end_date);
+        //alert(days);
+    })
+    $('#travel_end_date').change(function () {
+        debugger;
+        var travel_start_date = $('#travel_start_date').val();
+        var leaseExpiry = new Date(travel_start_date);
+        var yyyy = parseInt((leaseExpiry.getFullYear()).toString());
+        var mm = (leaseExpiry.getMonth() + 1).toString();
+        var dd = parseInt(leaseExpiry.getDate()).toString();
+        var travel_end_date = $('#travel_end_date').val();
+        var travel_end_date = new Date(travel_end_date);
+        var yyyye = parseInt((travel_end_date.getFullYear()).toString());
+        var mme = (travel_end_date.getMonth() + 1).toString();
+        var dde = parseInt(travel_end_date.getDate()).toString();
+        var days = ((dde) -(dd)+1);
+       // alert(days);
+        $('#numberofDays').val(days);
+    })
+    $("#starting_point").change(function () {
+        var starting_point = $("#starting_point").val();
+        LoadRoute(starting_point);
+        LoadBusinessUnit(starting_point);
+    });
+
+    $("#location").change(function () {
+        var location = $("#location").val();
+        LoadPurposeofVisit(location);
+        LoadStartingPoint(location);
+
+        if ($("#location").val() == 1) {
+
+            $(this).attr("selected", "selected");
+
+            $('#business_unit').prop('disabled', true);
+            $('#permission').prop('disabled', true);
+            $('#dateVisit').attr('readonly', 'readonly');
+            $('#business_unit').empty();
+            $(".business_unit").hide();
+            $("#business_unit").hide();
+
+            approverlistnew(0, 0);
+
+          //  LoadDepartment(1)
+
+        } else if ($("#location").val() == 2) {
+           $('#business_unit').prop('disabled', false);
+             LoadBusinessUnit();
+            $(".business_unit").show();
+            $("#business_unit").show();
+           // LoadDepartment(2);
+           /* OnChangeDepartmentHead();*/
+
+        } else {
+            $(this).attr("selected", "selected");
+            $('#business_unit').empty();
+
+        }
+
+        //alert($(this).val());
+    });
+    @*function approverlistnewUnit(unitId) {
+        debugger;
+        //alert(departmentHead);
+        $('#ListOfApprover').show();
+         var urlpath = '@Url.Action("approverlistnewUnitBased", "Vehicle")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { unit: unitId},
+            async: true,
+            success: function (data) {
+                console.log(data)
+                //$('#ListOfApprover').empty();
+                var result = "";
+                var count = 1;
+                $('#ListOfApprover tr').not(function () { return !!$(this).has('th').length; }).remove();
+               // $('#subcategory').append("<option value='0'>--Select Business Unit--</option>");
+                for (var i = 0; i < data.length; i++) {
+
+                    result += "<tr data-approverid=" + data[i].UserID + ">"
+                    //result += "<td>" + count + "<td>"Designation
+                    if (data.length > 3) {
+                        result += "<td style='text-align: center;width:25px'><input type='checkbox' checked class='approval' id='enableCheck' value=" + data[i].UserID + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].Designation + "\"></td>"
+                    }
+                    else {
+                        result += "<td style='text-align: center;width:25px'><input type='checkbox' checked disabled class='approval' id='enableCheck' value=" + data[i].UserID + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].Designation + "\"></td>"
+                    }
+
+                    result += '<td><p name="approverNo">' + count + '</p></td>';
+                    result += '<td><p name="userName">' + data[i].UserName + '</p></td>';
+                    result += '<td><p name="designation">' + data[i].Designation + '</p></td>';
+                    result += "</tr>"
+                    count++;
+                }
+
+                $('#ListOfApprover').append(result);
+            }
+        });
+    }
+    function approverlistnewdepartment_head(department_head) {
+        debugger;
+        //alert(departmentHead);
+        $('#ListOfApprover').show();
+         var urlpath = '@Url.Action("approverlistnewdepartment_head", "Vehicle")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {DepartmentHeadId: department_head},
+            async: true,
+            success: function (data) {
+                console.log(data)
+                //$('#ListOfApprover').empty();
+                var result = "";
+                var count = 1;
+                $('#ListOfApprover tr').not(function () { return !!$(this).has('th').length; }).remove();
+               // $('#subcategory').append("<option value='0'>--Select Business Unit--</option>");
+                for (var i = 0; i < data.length; i++) {
+
+                    result += "<tr data-approverid=" + data[i].UserID + ">"
+                    //result += "<td>" + count + "<td>"Designation
+                    if (data.length > 3) {
+                        result += "<td style='text-align: center;width:25px'><input type='checkbox' checked class='approval' id='enableCheck' value=" + data[i].UserID + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].Designation + "\"></td>"
+                    }
+                    else {
+                        result += "<td style='text-align: center;width:25px'><input type='checkbox' checked disabled class='approval' id='enableCheck' value=" + data[i].UserID + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].Designation + "\"></td>"
+                    }
+
+                    result += '<td><p name="approverNo">' + count + '</p></td>';
+                    result += '<td><p name="userName">' + data[i].UserName + '</p></td>';
+                    result += '<td><p name="designation">' + data[i].Designation + '</p></td>';
+                    result += "</tr>"
+                    count++;
+                }
+
+                $('#ListOfApprover').append(result);
+            }
+        });
+    }*@
+    function approverlistnew(unitId, department_head) {
+        debugger;
+        //alert(departmentHead);
+        $('#ListOfApprover').show();
+         var urlpath = '@Url.Action("ApproverListUnitBased", "Vehicle")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { unit: unitId, DepartmentHeadId: department_head},
+            async: true,
+            success: function (data) {
+                console.log(data)
+                //$('#ListOfApprover').empty();
+                var result = "";
+                var count = 1;
+                $('#ListOfApprover tr').not(function () { return !!$(this).has('th').length; }).remove();
+               // $('#subcategory').append("<option value='0'>--Select Business Unit--</option>");
+                for (var i = 0; i < data.length; i++) {
+
+                    result += "<tr data-approverid=" + data[i].UserId + ">"
+                    //result += "<td>" + count + "<td>"Designation
+                    if (data.length > 3) {
+                        result += "<td style='text-align: center;width:25px'><input type='checkbox' checked class='approval' id='enableCheck' value=" + data[i].UserId + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].Designation + "\"></td>"
+                    }
+                    else {
+                        result += "<td style='text-align: center;width:25px'><input type='checkbox' checked disabled class='approval' id='enableCheck' value=" + data[i].UserID + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].Designation + "\"></td>"
+                    }
+
+                    result += '<td><p name="approverNo">' + count + '</p></td>';
+                    result += '<td><p name="userName">' + data[i].UserName + '</p></td>';
+                    result += '<td><p name="designation">' + data[i].Designation + '</p></td>';
+                    result += "</tr>"
+                    count++;
+                }
+
+                $('#ListOfApprover').append(result);
+            }
+        });
+    }
+
+    function SaveVehicleRequest() {
+        debugger;
+        var jsonData = {};
+        jsonData["LocationId"] = $("#location").val();
+        jsonData["LocationName"] = $("#location").children("option:selected").html();
+
+        if (jsonData["LocationId"] == 1) {
+
+            jsonData["BusinessUnitId"] = "0";
+            jsonData["BusinessUnitName"] = "SQ Central";
+
+        } else {
+            jsonData["BusinessUnitId"] = $("#business_unit").val();
+            jsonData["BusinessUnitName"] = $("#business_unit").children("option:selected").html();
+        }
+
+
+        jsonData["DepartmentHeadId"] = $("#departmentId").val();
+        jsonData["DepartmentName"] = $("#departmentId").children("option:selected").html();
+        jsonData["TravelStratDate"] = $("#travel_start_date").val();
+        jsonData["StartTime"] = $("#travel_start_time").val();
+        jsonData["TravelEndDate"] = $("#travel_end_date").val();
+        jsonData["EndTime"] = $("#travel_end_time").val();
+        jsonData["PurposeofTravel"] = $("#purpose_of_visit").val();
+        jsonData["PurposeofTravelName"] = $("#purpose_of_visit").children("option:selected").html();
+        jsonData["StartingPoint"] = $("#starting_point").val();
+        jsonData["StartingPointName"] = $("#starting_point").children("option:selected").html();
+        jsonData["RouteType"] = $("#route").val();
+        jsonData["RouteTypeName"] = $("#route").children("option:selected").html();
+        jsonData["TripType"] = $("#trip_Type").val();
+        jsonData["TripTypeName"] = $("#trip_Type").children("option:selected").html();
+        jsonData["NoofUser"] = $("#numberofUser").val();
+        jsonData["NoofDays"] = $("#numberofDays").val();
+        jsonData["PreferredVehicle"] = $("#preferred_vehicle").val();
+        jsonData["PreferredVehicleName"] = $("#preferred_vehicle").children("option:selected").html();
+        jsonData["Remarks"] = $("#remarks").val();
+        jsonData["DateOfRequest"] = new Date();
+        jsonData["VehicleRequestId"] = "0";
+        jsonData["Status"] = "0";
+
+
+        var ammountList = [];
+        $('#ammountInformationbody tr').each(function () {
+            var myData = {};
+
+            myData["UserId"] = $(this).find('input[name^="tableUserID"]').val();
+            myData["UserName"] = $(this).find('input[name^="tableUserName"]').val();
+            myData["Designation"] = $(this).find('select[name^="tableDesignation"]').val();
+            myData["DesignationName"] = $(this).find('select[name^="tableDesignation"]').children("option:selected").html();
+            myData["Department"] = $(this).find('select[name^="tableDepartment"]').val();
+            myData["DeartmentName"] = $(this).find('select[name^="tableDepartment"]').children("option:selected").html();
+            myData["PhoneNo"] = $(this).find('input[name^="tableContactNo"]').val();
+            myData["Email"] = $(this).find('input[name^="tableEmail"]').val();
+                ammountList.push(myData);
+        });
+        jsonData["UserDetailsList"] = ammountList;
+        var approverObj = [];
+        var count = 1;
+        $("#ListOfApprover tr td input[type='checkbox']:checked").each(function () {
+
+
+            var approver = {};
+
+            approver["ApproverId"] = $(this).val();
+            approver["UserID"] = $(this).val();
+            approver["ApproverNo"] = count //$(this).find('p[name^="approverNo"]').html();
+            approver["UserName"] = $(this).attr('data-username');//$(this).find('p[name^="userName"]').html();
+            approver["DesignationName"] = $(this).attr('data-designation'); //$(this).find('p[name^="designation"]').html();
+
+
+            if (approver["ApproverNo"] == 1) {
+                approver["ApproverStatus"] = 1;
+                approver["ApproverStatusName"] = "First Approver"
+            } else if (approver["ApproverNo"] == 2){
+                approver["ApproverStatus"] = 2;
+                approver["ApproverStatusName"] = "Second Approver"
+            } else {
+                approver["ApproverStatus"] = 3;
+                approver["ApproverStatusName"] = "Third Approver"
+            }
+
+
+
+            approverObj.push(approver);
+            count++;
+        })
+
+
+
+        jsonData["VehicleApproverList"] = approverObj;
+
+        return jsonData;
+    }
+    var trrowNo = 0;
+    function deleterow(rowval) {
+        $('tr#' + rowval + '').remove();
+        calculateGrandTotal();
+    }
+    function addnewAmmount() {
+        $('#genaralInformationTable').show();
+        //if ($('#styleName').val() == "") {
+        //    ShowAlert();
+        //} else if ($('#colorName').val() == "") {
+        //    ShowAlert();
+        //} else if ($('#PoName').val() == "") {
+        //    ShowAlert();
+        //} else {
+            trrowNo++;
+        var col = '<tr id="' + trrowNo + '">'
+        col += '<td ><input type="text"  name="tableUserName" placeholder="Enter User Name"  /></td>';
+    /* col += '<td ><input type="text"  name="tableUserID" placeholder="Enter User ID"  /></td>';*/
+        col += '<td ><input type="text" name="tableEmail" placeholder="Enter Email"   /></td>';
+        col += '<td ><input type="text" name="tableContactNo" placeholder="Enter Contact No"   /></td>';
+        col += '<td ><select type="text" style="width:100px;" id="tableDesignation' + trrowNo + '" data-number="' + trrowNo + '" name="tableDesignation" placeholder="Enter Designation"   /></td>';
+        col += '<td ><select type="text" style="width:100px;" id="tableDepartment' + trrowNo + '"  data-number="' + trrowNo + '" onchange="calculateGrandTotal()"  placeholder="Enter Department"   name="tableDepartment"  /></td>';
+        col += '<td><input type="button" value="x" class="deletebutton" onclick="deleterow('+trrowNo+')" /></td></tr>';
+            $("#ammountInformationbody").append(col);
+            calculateGrandTotal();
+        //}
+        LoadDesignationa("#tableDesignation" + trrowNo);
+        LoadDepartmenta("#tableDepartment" + trrowNo)
+       // alert("#tableDesignation" + trrowNo);
+    }
+     function LoadDesignationa(ID) {
+        debugger;
+        var urlpath = '@Url.Action("LoadDesignation", "Admin")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            success: function (data) {
+               // console.log(data);
+                if (data.length > 0) {
+                    $(ID).html('');
+
+                    var result = '';
+                    result += "<option value=''>Select Designation</option>";
+                    for (var i = 0; data.length > i; i++) {
+                        result += "<option id='" + data[i].DesignationId + "' value='" + data[i].DesignationId + "' data-shortname='" + data[i].DesignationId + "'>" + data[i].DesignationName + "</option>";
+                    }
+                    $(ID).append(result);
+                    $('select.country').append(result);
+                }
+
+            }
+        });
+    }
+    function LoadDepartmenta(ID) {
+        $('#requestorDepartment').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("GetDepartments", "Visitor")';
+
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
+            success: function (data) {
+                if (data.length > 0) {
+                    $(ID).html('');
+
+                    var result = '';
+                    result += "<option value=''>Select Department</option>";
+                    for (var i = 0; data.length > i; i++) {
+                        result += "<option id='" + data[i].DepartmentId + "' value='" + data[i].DepartmentId + "' data-shortname='" + data[i].DepartmentId + "'>" + data[i].DeartmentName + "</option>";
+                    }
+                    $(ID).append(result);
+                    $('select.country').append(result);
+                }
+    }
+        });
+    }
+    function calculateGrandTotal() {
+        var grandTotal = 0;
+         $("#ammountInformationbody tr").each(function () {
+            var myammount = $(this).find('input[name^="tableammount"]').val();
+                grandTotal+=(1*1);
+        });
+        $("#totalammount").val(grandTotal);
+        $("#numberofUser").val(grandTotal);
+        // LoadApproverList();
+
+    }
+    function ShowAlert() {
+        swal({
+            title: 'Please Insert the input value Correctly',
+            type: 'warning',
+            closeOnCancel: true
+        });
+    }
+    function varifyInputElement() {
+        debugger
+        if ($("#location").val() == "0") {
+            swal({
+                title: 'Please Select Location ',
+                type: 'error',
+                closeOnCancel: true
+            });
+
+
+            return false;
+        }
+        if ($("#starting_point").val() == "0") {
+            swal({
+                title: 'Please Select Starting Point ',
+                type: 'error',
+                closeOnCancel: true
+            });
+
+
+            return false;
+        }
+        if ($("#departmentId").val() == "0") {
+            swal({
+                title: 'Please Select Department Head ',
+                type: 'error',
+                closeOnCancel: true
+            });
+
+
+            return false;
+        }
+        if ($("#travel_start_date").val() == '') {
+            swal({
+                title: 'Please Select Travel Start Date ',
+                type: 'error',
+                closeOnCancel: true
+            });
+
+
+            return false;
+        }
+        if ($("#travel_start_time").val() == '') {
+            swal({
+                title: 'Please Select Travel Start Time ',
+                type: 'error',
+                closeOnCancel: true
+            });
+
+
+            return false;
+        }
+        if ($("#travel_end_date").val() == '') {
+            swal({
+                title: 'Please Check Travel End Date ',
+                type: 'error',
+                closeOnCancel: true
+            });
+
+
+            return false;
+        }
+        if ($("#travel_end_time").val() == '') {
+            swal({
+                title: 'Please Select Travel End Time ',
+                type: 'error',
+                closeOnCancel: true
+            });
+
+
+            return false;
+        }
+        if ($("#purpose_of_visit").val() == "0") {
+            swal({
+                title: 'Please Select Purpose of Visit ',
+                type: 'error',
+                closeOnCancel: true
+            });
+
+
+            return false;
+        }
+        if ($("#route").val() == "0") {
+            swal({
+                title: 'Please Select Route ',
+                type: 'error',
+                closeOnCancel: true
+            });
+
+
+            return false;
+        }
+        if ($("#trip_Type").val() == "0") {
+            swal({
+                title: 'Please Select Trip Type ',
+                type: 'error',
+                closeOnCancel: true
+            });
+
+
+            return false;
+        }
+        if ($("#preferred_vehicle").val() == "0") {
+            swal({
+                title: 'Please Select Preferred Vehicle ',
+                type: 'error',
+                closeOnCancel: true
+            });
+
+
+            return false;
+        }
+        else  {
+            var cheval = true;
+            $("#ammountInformationbody tr").each(function () {
+                var UserId = $(this).find('input[name^="tableUserID"]').val();
+                var UserName = $(this).find('input[name^="tableUserName"]').val();
+                //var Designation = $(this).find('select[name^="tableDesignation"]').val();
+                //var Department = $(this).find('select[name^="tableDepartment"]').val();
+                var PhoneNo = $(this).find('input[name^="tableContactNo"]').val();
+                //if (UserId == "" || UserName == "" || Designation == "" || Department == "" || PhoneNo == "") {
+                //    cheval = false;
+                //}
+                if (UserId == "" || UserName == "" ||  PhoneNo == "") {
+                    cheval = false;
+                }
+            });
+
+
+        }
+          if ($('#ammount').val()< 1) {
+             $('#ammount').css({ "border-color": "#FF0000" });
+        }
+       else if ($('#approverTable tr td input[type=checkbox]:checked').length < 1) {
+           //alert($('#approverTable tr td input[type=checkbox]:checked').length);
+           swal({
+               title: 'Approver Not Selected',
+               type: 'error',
+               closeOnCancel: true
+           });
+          }
+        if (cheval == false) {
+            ShowAlert();
+        }
+        else {
+            var jsondate = SaveVehicleRequest();
+            var urlpath = '@Url.Action("ModalBeforeVehicleSubmit", "Vehicle")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsondate),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    $("#modalbody").html("");
+                    $("#modalbody").append(data);
+                    $("#myModal").modal("show");
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+        }
+    }
+</script>

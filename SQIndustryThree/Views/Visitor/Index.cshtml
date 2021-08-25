@@ -1,0 +1,299 @@
+﻿@{
+    ViewBag.Title = "Visitor Create";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+<!-- Include Required Prerequisites -->
+<!--<script type="text/javascript" src="//cdn.jsdelivr.net/jquery/1/jquery.min.js"></script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap/3/css/bootstrap.css" />-->
+
+<!-- Include Date Range Picker -->
+<!--<script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />-->
+
+
+
+<style type="text/css">
+    .modal-lg {
+        max-width: 80% !important;
+    }
+
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    #ioumenu {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #iousubmenu li a {
+        color: white;
+    }
+    /*#exceptionSubmrnu li:active{
+        color:white;
+        background-color:#0a0a22;
+
+    }*/
+    #iouNavigation {
+        background-color: #37474F;
+    }
+
+    #expmenu {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #exceptionSubmrnu li a {
+        color: white;
+    }
+    /*#exceptionSubmrnu li:active{
+        color:white;
+        background-color:#0a0a22;
+
+    }*/
+    #exceptionNavigaton {
+        background-color: #37474F;
+    }
+</style>
+<div class="container-fluid">
+    <h3 style="text-align: center;">
+        <b>Visitor Management System</b>
+    </h3>
+    <hr style="margin: 0px" />
+    <div class="row">
+        <div id="iouNavigation" class="navbar navbar-default navbar-static-top">
+            <div id="ioumenu">
+                <div>
+                    <ul id="iousubmenu" class="nav navbar-nav">
+                        <li><a href="#" onclick="GetWidgetPartial('VisitorRequestForm')">Visitor Requestor Form</a></li>
+                        <li><a href="#" onclick="GetAllVisitorRequest(1,0)">My Request So Far</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="ioucreateDashboard" style="width:100%">
+
+        </div>
+    </div>
+    <div class="modal" id="myModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Visitor Request Preview</h4>
+                </div>
+                <div id="modalbody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+<script type="text/javascript">
+
+   // var $ = jQuery.noConflict();
+
+        //    $(function () {
+
+        //    var start = moment().subtract(29, 'days');
+        //    var end = moment();
+
+        //    function cb(start, end) {
+        //        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        //    }
+
+        //    $('#reportrange').daterangepicker({
+        //        startDate: start,
+        //        endDate: end,
+        //        ranges: {
+        //            'Today': [moment(), moment()],
+        //            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+        //            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+        //            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+        //            'This Month': [moment().startOf('month'), moment().endOf('month')],
+        //            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        //        }
+        //    }, cb);
+
+        //    cb(start, end);
+
+        //});
+
+      $("#iousubmenu").find('li:nth-child(1)').addClass("active");
+    GetWidgetPartial('VisitorRequestForm');
+    $('#iousubmenu > li > a').click(function() {
+        $('li').removeClass();
+        $(this).parent().addClass('active');
+       // $("#spmenuid").html($(this).html());
+    });
+
+    function GetWidgetPartial(variable) {
+    var urlpath = '@Url.Action("GetVisitorPartial", "Visitor")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: {viewName:variable},
+            async: true,
+            success: function(data) {
+                    if (data) {
+                        $('#ioucreateDashboard').empty();
+                        $('#ioucreateDashboard').append(data);
+                    }
+                }
+            });
+    }
+
+        function GetAllVisitorRequest(status,progress) {
+        var urlpath = '@Url.Action("GetAllVisitorRequest", "Visitor")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: {Status: status,ViewName: '_myVisitorRequestor',Progrss:progress},
+            async: true,
+            success: function (data) {
+
+                if (data) {
+                     $('#ioucreateDashboard').empty();
+                    $('#ioucreateDashboard').append(data);
+                    $('#VisitorRequestTable').DataTable();
+                }
+            }
+        });
+    }
+
+        function VisitorRequestDetails(masterID,status,viewName) {
+        var urlpath = '@Url.Action("VisitorRequestDetails", "Visitor")';
+        $.ajax({
+            data: { MasterID: masterID, ViewName: viewName, Status: status },
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $("#modalbody").html("");
+                $("#modalbody").append(data);
+                $("#myModal").modal("show");
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+
+        function UpdateRejectedRequest(IouRequestId,status) {
+        var urlpath = '@Url.Action("VisitorRequestDetails", "Visitor")';
+        $.ajax({
+            data: { MasterID: IouRequestId, ViewName: "_VisitorRequestUpdateModal", Status:status },
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $('#ioucreateDashboard').empty();
+                $('#ioucreateDashboard').append(data);
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+
+    function UpdateVisitorRequest(requestid) {
+        var jsonData = {};
+        jsonData["BusinessUnitId"] = $("#upBusinessunit").val();
+        jsonData["BusinessUnitName"] = $("#unit").html();
+        jsonData["DepartmentName"] = $("#department").html();
+        jsonData["LocationName"] = $("#location").html();
+        jsonData["DepartmentID"] = $("#upDepartment").val();
+        jsonData["LocationId"] = $("#upLocation").val();
+        jsonData["RequiredDate"] = $("#revisedddate").val();
+        jsonData["Purpose"] = $("#purposeupdate").val();
+        jsonData["Ammount"] = $("#updateFinalAmmount").val();
+        jsonData["RequestorId"] = requestid;
+        jsonData["DateOfRequest"] = new Date();
+        jsonData["Status"] = "1";
+        jsonData["VisitDate"] = $('#visitingdate').html();
+
+        //var fileUpload = [];
+        //$('#attachedFileTable tr').each(function () {
+        //    var filedate = {};
+        //    filedate["CapexFileName"] = $(this).find('td[name^="fileName"]').html();
+        //    filedate["CapexFilePath"] = $(this).find('td[name^="filePath"]').html();
+        //        fileUpload.push(filedate);
+        //});
+        //jsonData["IOurequestfiles"] = fileUpload;
+        var visitorList = [];
+        $('#visitorTableBody tr').each(function () {
+            var visitor = {};
+            visitor["VisitorName"] = $(this).find('#visitor_name').val();
+            visitor["VisitorEmail"] = $(this).find('#visitor_email').val();
+            visitor["VisitorMobile"] = $(this).find('#visitor_mobile').val();
+            visitor["DesignationName"] = $(this).find('#visitor_designation').val();
+            visitor["VisitorDesignation"] = $(this).find('#visitor_designation').val();
+            visitor["VisitorCompany"] = $(this).find('#visitor_company').val();
+            visitor["VisitorNationality"] = $(this).find('#visitor_nationality').val();
+            visitor["Chainavisit"] = $(this).find('#chainavisit').val();
+            visitor["PurposeOfVisitSQ"] = $(this).find('#purpose_visit').val();
+            visitor["Remarks"] = $(this).find('#remarks').val();
+            visitorList.push(visitor);
+        });
+        jsonData["VisitorList"] = visitorList;
+
+        var approverList = [];
+        $('#approverlist tr').not(':first').each(function () {
+            var approver = {};
+            alert($(this).find('p[name^="userId"]').html())
+            approver["UserID"] = $(this).find('p[name^="userId"]').html();
+            approver["ApproverNo"] = $(this).find('p[name^="approverNo"]').html();
+            approver["UserName"] = $(this).find('p[name^="userName"]').html();
+            approver["DesignationName"] = $(this).find('p[name^="designationName"]').html();
+            approver["ApproverStatusName"] = $(this).find('p[name^="approverstatus"]').html();
+            approver["ApproverStatus"] = $(this).find('p[name^="apstatusid"]').html();
+            approverList.push(approver);
+        });
+        jsonData["VisitorApproverList"] = approverList;
+        return jsonData;
+    }
+    function UpdateToDataBase(requestid) {
+        var jsondate = UpdateVisitorRequest(requestid);
+         var urlpath = '@Url.Action("UpdateVisitorRequest", "Visitor")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsondate),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    swal({
+                        title: 'Visitor Request Updated Successfully',
+                        type: 'success',
+                        closeOnCancel: true
+                    },function () {
+                            $("#myModal").modal("hide");
+                            $("#iousubmenu").find('li').removeClass();
+                            $("#iousubmenu").find('li:nth-child(2)').addClass("active");
+                        GetAllVisitorRequest(1, 0);
+
+                        
+                    });
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+    }
+
+
+
+</script>
+

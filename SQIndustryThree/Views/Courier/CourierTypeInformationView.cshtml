@@ -1,0 +1,379 @@
+﻿
+@{
+    ViewBag.Title = "CourierTypeInformationView";
+}
+<style>
+   
+/*#container {
+  padding-left: 300px;
+}
+
+#content {
+  padding: 20px;
+}*/
+    #capNavigation {
+        background-color: #37474F;
+    }
+    #capsubmenu li a {
+        color: white;
+    }
+</style>
+<div class="container-fluid">
+    <h3 style="text-align:center;"><b>ALL COURIER TYPE INFORMATION</b></h3>
+    <hr />
+    <div class="row">
+        <div id="capNavigation" class="navbar navbar-default navbar-static-top">
+            <div >
+                <div >
+                    <ul id="capsubmenu" class="nav navbar-nav">
+                        @if (Convert.ToInt32(Session["Requestor"]) == 1)
+                        {
+                            <li><a href="#" onclick="getAllPendingCourierType(4)">My Courier Type</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="#" onclick="getAllPendingCapex(0)">All Pending Capex <span style="color:white;" id="pending_Capex"></span></a></li>
+                            <li><a href="#" onclick="getAllPendingCapex(1)">All Approved So Far </a></li>
+                            <li><a href="#" onclick="getAllPendingCapex(2)">All Rejected Capex So Far</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="pendingCapexTable"> </div>
+    </div>
+</div>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h5 class="modal-title" id="myModalLabel">Capex Information</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12 modal_body_map">
+                            <div class="location-map" id="location-map">
+                                <div style="text-align:left" id="update_canvas"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 modal_body_end">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="text-align:center">
+                    <label for="remarks_box">Enter Comments Here</label>
+                    <input type="text" placeholder="Enter Remarks " id="remarks_box" class="form-control" />
+                    <br />
+                    <button class="btn btn-success" id="approvedButton">APPROVE</button>
+                    <button class="btn btn-danger" id="rejectButton">REJECT</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="showmodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h5 class="modal-title" id="myModalLabel">Capex Information</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12 modal_body_map">
+                            <div class="location-map" id="location-map">
+                                <div style="text-align:left" id="showcanvas"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 modal_body_end">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="text-align:center">
+                    <button style="text-align:right" class="btn btn-success" id="printCapex">Print This Capex</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@section Scripts {
+    <script type="text/javascript">
+            $(function () {
+            $('#capsubmenu > li > a').click(function() {
+                $('li').removeClass();
+                $(this).parent().addClass('active');
+               // $("#spmenuid").html($(this).html());
+            });
+                getAllPendingCourierType(4);
+            });
+
+           // Re-init map before show modal
+        $('#myModal').on('show.bs.modal', function(event) {
+            var modalmap = $(event.relatedTarget);
+            approvedOrUpdateCapex(modalmap.data('idkey'));
+        });
+
+
+        $('#showmodal').on('show.bs.modal', function(event) {
+            var modalmap = $(event.relatedTarget);
+            ShowSelectedCapex(modalmap.data('idkey'));
+        });
+
+            function getAllPendingCourierType(status) {
+            var urlpath = '@Url.Action("showCourierTypeInformation", "Courier")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {status:status},
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $('#pendingCapexTable').empty();
+                            $('#pendingCapexTable').html(data);
+                            $("#capexshowTable").DataTable();
+                            if (status == 0) {
+                                $('#pending_Capex').show();
+                            } else {
+                                $('#pending_Capex').hide();
+                            }
+                        }
+                    }
+                });
+        }
+            @*function getPendingReview() {
+                var urlpath = '@Url.Action("showCapexInformation", "CapexApproval")';
+                $.ajax({
+                    url: urlpath,
+                    type: "Post",
+                    data: {status:5},
+                        async: true,
+                        success: function(data) {
+                            if (data) {
+                                $('#pendingCapexTable').empty();
+                                $('#pendingCapexTable').html(data);
+                                $("#capexshowTable").DataTable();
+                            }
+                        }
+                    });
+            }*@
+        //only show the capex
+        function ShowSelectedCapex(primarykey) {
+            var urlpath = '@Url.Action("IndividualCapexShow", "CapexApproval")';
+            $.ajax({
+                data: {primarykey:primarykey},
+                url: urlpath,
+                type: "Post",
+                async: true,
+                        success: function(data) {
+                            if (data) {
+                                $('#showcanvas').empty();
+                                $('#showcanvas').append(data);
+                            }
+                        }
+                    });
+        }
+        //from this modal update and approve can done
+        function approvedOrUpdateCapex(primarykey) {
+            var urlpath = '@Url.Action("IndividualCapexShow", "CapexApproval")';
+            $.ajax({
+                data: {primarykey:primarykey},
+                url: urlpath,
+                type: "Post",
+                async: true,
+                        success: function(data) {
+                            if (data) {
+                                $('#update_canvas').empty();
+                                $('#update_canvas').append(data);
+                            }
+                        }
+                });
+        }
+
+
+
+        function updateApprove(approve,status) {
+                var urlpath = '@Url.Action("UpdatedCapexInfo", "CapexApproval")';
+                $.ajax({
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(approve),
+                    dataType: 'json',
+                    url: urlpath,
+                    type: "Post",
+                    async: true,
+                    success: function (result) {
+                        if (result.isSuccess) {
+                            swal({
+                                            title:status,
+                                            type: 'success',
+                                            closeOnCancel: true
+                                        },
+                                function () {
+                                     window.location.href = '@Url.Action("CapexInformationView", "CapexApproval")';
+                                        });
+                        }
+                    }
+                });
+        }
+
+
+
+        $("#approvedButton").click(function () {
+            var jsonData = {};
+            jsonData["CapexInfoId"] = $('#primarykey').val();
+            if ($('#remarks_box').val() == "") {
+                jsonData["CapexReview"] = " ";
+            } else {
+                jsonData["CapexReview"] = $('#remarks_box').val();
+            }
+
+            jsonData["IsApproved"] = 1;
+            updateApprove(jsonData,'CAPEX APPROVED SUCCESSFULLY!!');
+        });
+
+        $("#rejectButton").click(function () {
+            var jsonData = {};
+            jsonData["CapexInfoId"] = $('#primarykey').val();
+            if ($('#remarks_box').val() == "") {
+                swal({
+                    title: 'Please Comment Before Reject',
+                    type: 'error',
+                    closeOnCancel: true
+                });
+            } else {
+                jsonData["CapexReview"] = $('#remarks_box').val();
+            }
+            jsonData["IsApproved"] = 2;
+            updateApprove(jsonData,'CAPEX REJECTED !!');
+        });
+
+        $("#printCapex").click(function () {
+            var print_div = document.getElementById("myprintmodal");
+            var print_area = window.open();
+
+            print_area.document.write("<img width='20' height='20' src='../../Images/logo.png' /><img style='width:80px;' src='../../Images/slogan.png' />");
+            print_area.document.write(print_div.innerHTML);
+            print_area.document.close();
+            print_area.focus();
+            print_area.print();
+            print_area.close();
+        });
+
+
+            function updateCourierType(courierTypeid) {
+                var courierTypeid = $("#update_primarykey").val();
+                var urlpath = '@Url.Action("EditcourierType", "Courier")';
+                $.ajax({
+                    data: { courierTypeid: courierTypeid},
+                    url: urlpath,
+                    type: "Post",
+                    async: true,
+                            success: function(data) {
+                                if (data) {
+                                     $('#pendingCapexTable').empty();
+                                    $('#pendingCapexTable').html(data);
+                                }
+                            }
+                        });
+            }
+            function LoadCountry(ID) {
+                debugger;
+                $.ajax({
+                    url: '/Courier/LoadCountry',
+                    type: 'POST',
+                    contentType: "application/json;charset=utf-8",
+
+                    dataType: "json",
+                    success: function (response) {
+                        console.log(response);
+                        if (response.length > 0) {
+                            $(ID).html('');
+
+                            var result = '';
+                            result += "<option value=''>Select One</option>";
+                            for (var i = 0; response.length > i; i++) {
+                                result += "<option id='" + response[i].CountryId + "' value='" + response[i].CountryId + "' data-shortname='" + response[i].CountryId + "'>" + response[i].CountryName + "</option>";
+                            }
+                            $(ID).append(result);
+                            $('select.country').append(result);
+                        }
+                    }
+                });
+            }
+            function LoadCourier(ID) {
+                debugger;
+                $.ajax({
+                    url: '/Courier/LoadCourier',
+                    type: 'POST',
+                    contentType: "application/json;charset=utf-8",
+
+                    dataType: "json",
+                    success: function (response) {
+                        console.log(response);
+                        if (response.length > 0) {
+                            $(ID).html('');
+
+                            var result = '';
+                            result += "<option value=''>Select One</option>";
+                            for (var i = 0; response.length > i; i++) {
+                                result += "<option id='" + response[i].ServiceProviderId + "' value='" + response[i].ServiceProviderId + "' data-shortname='" + response[i].ServiceProviderId + "'>" + response[i].ServiceProviderName + "</option>";
+                            }
+                            $(ID).append(result);
+                            $('select.service_provider').append(result);
+                        }
+                    }
+                });
+            }
+            function UpdateCourierType(couriertypeid) {
+                debugger;
+                var valid = false;
+                var jsonData = {};
+               // jsonData["DateOfRequest"] = new Date();
+                jsonData["CourierTypeId"] = $("#primarykey").val();
+                jsonData["Type"] = $("#type").children("option:selected").html();
+                jsonData["Country"] = $("#country").val();
+                jsonData["CountryName"] = $("#country").children("option:selected").html();
+                jsonData["ServiceProvider"] = $("#service_provider").val();
+                jsonData["ServiceProvider"] = $("#service_provider").children("option:selected").html();
+                jsonData["WeightRange"] = $("#weight").val();
+                jsonData["LeadTimeFrom"] = $("#leadTimeFrom").val();
+                jsonData["LeadTimeTo"] = $("#leadTimeTo").val();
+                jsonData["Rate"] = $("#rate").val();
+                jsonData["Currency"] = $("#currency").val();
+              //  jsonData["CourierTypeDetails"] = jsonData;
+               
+                    var urlpath = '@Url.Action("UpdateCourierType", "Courier")';
+                    $.ajax({
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(jsonData),
+                        url: urlpath,
+                        type: "POST",
+                        async: true,
+                        success: function (data) {
+                            swal({
+                                title: 'Courier Type Updated Successfully',
+                                type: 'success',
+                                closeOnCancel: true
+                            }, function () {
+                                $("#myModal").modal("hide");
+                                $("#iousubmenu").find('li').removeClass();
+                                $("#iousubmenu").find('li:nth-child(2)').addClass("active");
+                                getAllPendingCourierType(4);
+                            });
+                        },
+                        error: function () {
+                            alert("Error");
+                        }
+                    });
+               
+
+            }
+    </script>
+}

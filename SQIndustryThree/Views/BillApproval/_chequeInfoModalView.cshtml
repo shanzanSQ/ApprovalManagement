@@ -1,0 +1,530 @@
+﻿@model SQIndustryThree.Models.BillApproval.ChequeInfo
+
+<div class="">
+    <div id="printSection">
+        <div class="row">
+
+            <div class="col-md-4">
+                <label for="Bill_No">Bill No : <span id="InvoiceKey"> @Model.InvoiceKey </span></label> &nbsp; &nbsp;
+                <label for="Invoice_No">Invoice No : <span id="InvoiceNo">@Model.InvoiceNo</span></label><br /><br /><br />
+                @if (Model.BillInfoList != null)
+                {
+                    <div class="col-md-12">
+                        <table class="table table-bordered table-responsive">
+                            <thead>
+                                <tr>
+                                    <th>PO No</th>
+                                    <th>Value</th>
+                                    <th>Allocation &nbsp;<span style="color:red">*</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="allocationTable">
+                                @{ decimal TotalInvoiceValue = 0; }
+                                @foreach (var item in Model.BillInfoList)
+                                {
+                                <tr id="@item.PONo">
+                                    <td>@item.PONo</td>
+                                    
+                                    <td>@item.InvoiceValue</td>
+                                    <td><input class="form-control allocation" id="allocation_@item.PONo" type="text" placeholder="Allocation" value="@item.AllocatedValue" onkeypress="return isNumberKey(event)"></td>
+                                </tr>
+
+                                    TotalInvoiceValue += item.InvoiceValue;
+
+                                }
+                            @*<tr>
+                                <td></td>
+                                <td>@TotalInvoiceValue</td>
+                                <td><span id="totalAllocation"></span> </td>
+                            </tr>*@
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+            <div class="col-md-4">
+                <div class="col-md-12">
+                    <label for="invoice_amount">Invoice Amount: @Model.NetValue </label>
+                </div>
+                <div class="col-md-12">
+                    <label for="paid_amount">
+                        Paid Amount: @Model.PaidAmount
+                    </label>
+                </div>
+                <div class="col-md-12">
+                    <label for="balance_amount">
+                        Balance Amount: <span id="BalanceAmount">@Model.BalanceAmount</span>
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                @if (Model.ApproverList != null)
+                {
+                    <table border="1" width="100%" id="approverlist">
+
+                        <thead>
+                            <tr>
+
+                                <th>Approved By</th>
+                                <th>Date</th>
+                                <th>Status</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.ApproverList)
+                            {
+                                <tr>
+                                    <td><p style="display:none" name="userId">@item.UserID</p><p name="userName">@item.UserName</p></td>
+
+
+                                    <td>
+                                        <p style="display:none" name="apstatusid">@item.IsApprove</p>
+                                        @if (@item.UpdateDate != null)
+                                        {@DateTime.Parse(@item.UpdateDate).ToString("dd MMM yyyy")}
+                                    </td>
+                                    @if (item.IsApprove == 3)
+                                    {
+                                        <td style="color:red">Pending</td>
+                                    }
+                                    else if (item.IsApprove == 1)
+                                    {
+                                        <td style="color:green">Approved</td>
+                                    }
+                                    else if (item.IsApprove == 2)
+                                    {
+                                        <td style="color:red">Rejected</td>
+                                    }
+                                    else
+                                    {
+                                        <td style="color:darkblue">Not Sent</td>
+                                    }
+
+                                </tr>
+
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-md-12">
+                <div class="text-right">
+                    <input type="button" class="btn btn-success btn-sm add-row" value="Add Row">&nbsp;&nbsp;
+                    <a href="/BillApproval/BillPayment" class="btn btn-info btn-sm">Back</a>
+                </div>
+                <table class="table table-responsive">
+                    <thead>
+                        <tr>
+
+                            <th>Cheque No &nbsp;<span style="color:red">*</span></th>
+                            <th>Cheque Amount &nbsp;<span style="color:red">*</span></th>
+                            <th>Cheque Date &nbsp;<span style="color:red">*</span></th>
+                            <th>Status &nbsp;<span style="color:red">*</span></th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBodyQuality">
+                        <tr id="0">
+
+                            <td><input class="form-control cheque" id="cheque_0" type="text" placeholder="Cheque No"></td>
+                            <td>
+                                <input class="form-control amount" id="amount_0" type="text" placeholder="Amount" onkeypress="return isNumberKey(event)">
+                            </td>
+                            <td><input class="form-control date" id="date_0" type="date" placeholder="Date"></td>
+
+                            <td>
+                                <select class="form-control status" id="status_0" placeholder="Status">
+                                    @*<option value="pass">Pass</option>
+                                    <option value="fail">Fail</option>*@
+                                </select>
+                            </td>
+
+                            <td><button class="btn btn-danger ibtnDel" type="button"> <span class="glyphicon glyphicon-minus" aria-hidden="true"></span> </button></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="text-center">
+                    <button class="btn btn-info" id="POAdd" onclick="submitChequeInfo()">C O N F I R M</button> &nbsp;&nbsp;
+                </div>
+
+            </div>
+        </div>
+        <hr />
+        @if (Model.ChequeInfoDetails != null)
+        {
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-hover table-bordered table-responsive" id="chequeInfoDetailsTable">
+                        <caption style="text-align:center;font-weight:bold;font-size:20px">Cheque Information</caption>
+                        <thead>
+                            <tr>
+                                <th style="text-align:center">Bill No</th>
+                                <th style="text-align:center">Cheque No</th>
+                                <th style="text-align:center">Cheque Amount</th>
+                                <th style="text-align:center">Cheque Date</th>
+                                <th style="text-align:center">Status</th>
+                                <th style="text-align:center">Transaction Date</th>
+                                <th style="text-align:center">Transaction By</th>
+                                <th style="text-align:center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{ decimal TotalAmount = 0; }
+
+                            @foreach (var item in Model.ChequeInfoDetails)
+                            {
+                            <tr id="@item.ChequeInfoId">
+                                <td style="text-align:center">@item.InvoiceKey</td>
+                                <td style="text-align:center"><input type="text" class="form-control" id="chequeNo_@item.ChequeInfoId" disabled value="@item.ChequeNo" /> </td>
+                                <td style="text-align:center"> <input type="text" class="form-control" id="amount_@item.ChequeInfoId" disabled value="@item.Amount" onkeypress="return isNumberKey(event)" /></td>
+                                <td style="text-align:center"><input type="date" class="form-control" id="date_@item.ChequeInfoId" disabled value="@item.Date.ToString("yyyy-MM-dd")" /></td>
+                                <td style="text-align:center">@item.CheckStatus</td>
+                                <td style="text-align:center">@item.CreatedDate.ToString("yyyy-MM-dd hh:mm:ss tt")</td>
+                                <td style="text-align:center">@item.UserName</td>
+                                <td style="text-align:center">
+                                    <button class="btn btn-success chequeEdit" id="chequeEdit_@item.ChequeInfoId" onclick="chequeEdit(@item.ChequeInfoId)">Edit</button>
+                                    <button class="btn btn-success chequeUpdate" id="chequeUpdate_@item.ChequeInfoId" onclick="chequeUpdate(@item.ChequeInfoId)">Update</button>
+                                </td>
+                            </tr>
+                            TotalAmount += item.Amount;
+                            }
+
+                            
+                            <tr>x
+                                <td style="text-align:center"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+         }
+        </div>
+</div>
+
+<script>
+
+
+    //$('#chequeEdit').click(function () {
+    //    $('#chequeNo').attr('disabled', false);
+    //    $('#amount').attr('disabled', false);
+    //    $('#date').attr('disabled', false);
+    //    $(".chequeEdit").hide();
+    //    $(".chequeUpdate").show();
+    //})
+
+    ChequeStatusList();
+
+    function ChequeStatusList() {
+        $.ajax({
+            url: '/BillApproval/ChequeStatusList',
+            type: 'POST',
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                $('.status').empty();
+                //$('#supplier').append("<option value='0'>-- Select Qua --</option>");
+
+                if (response.length > 0) {
+
+                    for (let i = 0; response.length > i; i++) {
+
+                        $(".status").append($("<option></option>").val(response[i].ChequeStatusId)
+                            .html(response[i].CheckStatus));
+                    }
+                    //$('select#supplier').append(result);
+                }
+            }
+        });
+    }
+
+    $(".chequeUpdate").hide();
+
+    function chequeEdit(id) {
+            $('#chequeNo_'+id).attr('disabled', false);
+        $('#amount_' + id).attr('disabled', false);
+        $('#date_' + id).attr('disabled', false);
+        $("#chequeEdit_" + id).hide();
+        $("#chequeUpdate_"+ id).show();
+    }
+
+    function chequeUpdate(id) {
+        var chequeNo = $('#chequeNo_' + id).val();
+        var amount =  $('#amount_' + id).val();
+        var date = $('#date_' + id).val();
+
+        if (chequeNo == '') {
+            toastr.error("Please Enter ChequeNo", " ChequeNo ",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+        }
+
+        if (amount == '') {
+            toastr.error("Please Enter Amount", " Amount ",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+            return false;
+        }
+
+        if (date == '') {
+            toastr.error("Please Enter Date", " Date ",
+                {
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+            return false;
+        }
+
+       // alert(chequeNo + " " + amount + " " + date);
+
+        var urlpath = '@Url.Action("ChequeInfoUpdate", "BillApproval")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({
+                    chequeInfoId: id,
+                    chequeNo: chequeNo,
+                    amount: amount,
+                    date: date
+                }),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    if (data == true) {
+                        swal({
+                            title: "Cheque Info Updated Successfully!",
+                            type: 'success',
+                            closeOnConfirm: false,
+                            closeOnCancel: true
+                        }, function () {
+                            $('#chequeNo_' + id).attr('disabled', true);
+                                $('#amount_' + id).attr('disabled', true);
+                                $('#date_' + id).attr('disabled', true);
+                                $("#chequeEdit_" + id).show();
+                                $("#chequeUpdate_" + id).hide();
+                                //location.reload();
+                               // $("#chequeInfoDetailsTable").load();
+                                //$("#chequeInfoDetailsTable").load("BillPayment.html")
+                                location.replace('/BillApproval/BillPayment');
+                        });
+
+                    }
+                    else {
+                        swal({
+                            title: "Data Not Saved!",
+                            type: 'warning',
+                            closeOnConfirm: false,
+                            closeOnCancel: true
+                        }, function () {
+                            location.reload();
+                        });
+                    }
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+    }
+
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode != 46 && charCode > 31
+            && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+
+
+    var i = 0;
+    $(".add-row").click(function () {
+
+        i++;
+        var markup = "<tr id='" + i + "'><td><input class='form-control cheque' id='cheque_"+i+"' type='text' placeholder='Cheque No'></td>";
+        markup += "<td><input class='form-control amount' id='amount_" + i + "' type='text' placeholder='Amount' onkeypress='return isNumberKey(event)'></td>";
+        //markup += "<option value='pass'>Pass</option><option value='fail'>Fail</option>"
+        markup += "<td><input class='form-control date' id='date_"+i+"' type='date' placeholder='Date'></td>";
+
+        markup += "<td><select class='form-control status' id='status_"+i+"' placeholder='Status'></select></td>";
+        markup += "<td><button class='btn btn-danger ibtnDel' onclick='deleterow(" + i + ")' type='button'> <span class='glyphicon glyphicon-minus' aria-hidden='true'></span> </button></td>";
+        markup += "</tr>";
+        $("table tbody#tableBodyQuality").append(markup);
+        ChequeStatusList();
+        //isNumberKey(evt);
+    });
+
+    function deleterow(rowval) {
+        $('tr#' + rowval + '').remove();
+    }
+
+
+    
+
+    function submitChequeInfo() {
+
+       
+        var checkVal = false;
+
+        var invoiceKey = $('#InvoiceKey').html();
+        var invoiceNo = $('#InvoiceNo').html();
+
+        if (invoiceKey == '') {
+            toastr.error("Transaction Number Not Found", "Transaction Number", {
+                "positionClass": "toast-top-right",
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "closeButton": true
+            });
+
+            return false;
+        }
+
+
+        var vPO = "";
+        var vAllocation = "";
+        var vChequeNo = "";
+        var vAmount = "";
+        var vDate = "";
+        var vStatus = "";
+        var vTotalAmmount = 0;
+
+        $('#tableBodyQuality tr').each(function () {
+           
+            var Id = $(this).attr('id');
+            var cheque = $('#cheque_' + Id).val();
+            var amount = $('#amount_' + Id).val();
+            var date = $('#date_' + Id).val();
+            var status = $('#status_' + Id).val();
+
+            if (cheque == "" || amount == "" || amount == "0" || date == "") {
+
+                checkVal = false
+
+                return false;
+            } else {
+                checkVal = true;
+            }
+
+            vChequeNo += cheque + ',';
+            vAmount += amount + ',';
+            vDate += date + ',';
+            vStatus += status + ',';
+            vTotalAmmount += parseFloat(amount);
+        })
+
+        $('#allocationTable tr').each(function () {
+            var Id = $(this).attr('id');
+            var allocation = $('#allocation_' + Id).val();
+            vAllocation += allocation + ',';
+            vPO += Id + ',';
+        })
+
+        //alert(result);
+
+        var bAmount = $("#BalanceAmount").html();
+
+        if (checkVal == false) {
+            toastr.error("Please Insert the input value Correctly", "Input Value Correctly", {
+                "positionClass": "toast-top-right",
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "closeButton": true
+            });
+            return false;
+        } else {
+            if (parseFloat(bAmount) < parseFloat(vTotalAmmount)) {
+            toastr.error("Total Amount Greater Than BalanceAmount", "Balance Amount Exceed", {
+                "positionClass": "toast-top-right",
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "closeButton": true
+            });
+            return false;
+        } else {
+
+                var urlpath = '@Url.Action("SaveChequeInfo", "BillApproval")';
+                $.ajax({
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify({
+                        invoiceKey: invoiceKey,
+                        invoiceNo: invoiceNo,
+                        cheque: vChequeNo,
+                        amount: vAmount,
+                        date: vDate,
+                        status: vStatus,
+                        po: vPO,
+                        allocation: vAllocation
+                    }),
+                    url: urlpath,
+                    type: "POST",
+                    async: true,
+                    success: function (data) {
+                        if (data == true) {
+                            swal({
+                                title: "Cheque Info Submited Successfully!",
+                                type: 'success',
+                                closeOnConfirm: false,
+                                closeOnCancel: true
+                            }, function () {
+                                    //location.reload();
+                                    location.replace('/BillApproval/BillPayment');
+                            });
+
+                        }
+                        else {
+                            swal({
+                                title: "Data Not Saved!",
+                                type: 'warning',
+                                closeOnConfirm: false,
+                                closeOnCancel: true
+                            }, function () {
+                                location.reload();
+                            });
+                        }
+                    },
+                    error: function () {
+                        alert("Error");
+                    }
+                });
+
+            }
+        }
+
+
+
+
+
+
+           // alert(result);
+
+
+        //alert(invoiceKey + "  " + invoiceNo + "  " + vItem + "  " + vResult + "  " + vComment + "  " + vFileName + "  " + vFilePath);
+
+    }
+</script>

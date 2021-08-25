@@ -11,7 +11,7 @@
             budeget += item.Cost;
         }
         <h5>Total Approved : <span style="color:red">@Model.Count()</span> </h5>
-        <h5>Total Cost : <span style="color:red">@budeget</span> </h5>
+        <h5>Total Cost : <span style="color:red">@budeget.ToString("N")</span> </h5>
         <div class="col-xs-12" id="personlocdiv">
             <table id="capexshowTable" class="table-bordered table table-responsive">
                 <thead>
@@ -20,7 +20,7 @@
                         <th>Capex Number</th>
                         <th>Capex Name</th>
                         <th>Business Unit</th>
-                        <th>Created Date</th>
+                        <th>Approved Date</th>
                         <th>Capex Catagory</th>
                         <th>Created By</th>
                         <th>Cost</th>
@@ -41,7 +41,7 @@
                                 <td>@item.CapexCreateDate.ToString("dd MMM yyyy")</td>
                                 <td>@item.CapexCatagoryName</td>
                                 <td>@item.UserName</td>
-                                <td>@item.Cost</td>
+                                <td>@item.Cost.ToString("N")</td>
                                 <td><button type="button" class="btn  btn-block btn-success" data-toggle="modal" data-target="#showmodal" data-idkey="@item.CapexInfoId">Preview</button></td>
                             </tr>
                             count++;

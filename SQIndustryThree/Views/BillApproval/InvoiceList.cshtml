@@ -1,0 +1,192 @@
+﻿
+@{
+    ViewBag.Title = "InvoiceList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<style type="text/css">
+    .modal-lg {
+        max-width: 80% !important;
+    }
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    #billmenu {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #billsubmenu li a {
+        color: white;
+    }
+    /*#exceptionSubmrnu li:active{
+        color:white;
+        background-color:#0a0a22;
+
+    }*/
+    #billNavigation {
+        background-color: #37474F;
+    }
+
+    #expmenu {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #exceptionSubmrnu li a {
+        color: white;
+    }
+    /*#exceptionSubmrnu li:active{
+        color:white;
+        background-color:#0a0a22;
+
+    }*/
+    #exceptionNavigaton {
+        background-color: #37474F;
+    }
+</style>
+
+<div class="container-fluid">
+    <h3 style="text-align: center;">
+        <b>My Bill Information</b>
+    </h3>
+    <hr style="margin: 0px" />
+
+    <div class="row">
+        <div id="billNavigation" class="navbar navbar-default navbar-static-top">
+            <div id="billmenu">
+                <div>
+                    <ul id="billsubmenu" class="nav navbar-nav">
+                        @*<li><a href="#" onclick="GetWidgetPartial('VisitorRequestForm')">Visitor Requestor Form</a></li>*@
+                        <li><a href="#" onclick="GetAllBillRequest(1,0)">My Request So Far</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="billcreateDashboard" style="width:100%">
+
+        </div>
+
+    </div>
+
+    <div class="modal" id="myPreview">
+        <div class="modal-dialog modal-lg">
+            <div class="col-md-12 modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Bill Request Preview</h4>
+                </div>
+                <div id="previewmodalbody" class="previewmodal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    $("#billsubmenu").find('li:nth-child(1)').addClass("active");
+    //GetWidgetPartial('VisitorRequestForm');
+    $('#billsubmenu > li > a').click(function () {
+        $('li').removeClass();
+        $(this).parent().addClass('active');
+        // $("#spmenuid").html($(this).html());
+    });
+
+    GetAllBillRequest(1, 0);
+
+    function GetAllBillRequest(status, progress) {
+
+       // alert(status + "  " + progress);
+
+        var urlpath = '@Url.Action("GetAllBillRequest", "BillApproval")';
+        $.ajax({
+            url: "/BillApproval/GetAllBillRequest",
+            type: "POST",
+            contentType: "application/json;charset=utf-8",
+            data: JSON.stringify({ Status: status, ViewName: '_myBillRequest', Progrss: progress }),
+            //dataType: "json",
+            //data: {Status: status,ViewName: '_myBillRequest',Progrss:progress},
+            async: true,
+            success: function (data) {
+                //alert(data);
+                if (data) {
+                    $('#billcreateDashboard').empty();
+                    $('#billcreateDashboard').append(data);
+                    $('#BillRequestTable').DataTable();
+                }
+            }
+        });
+    }
+
+     function UpdateRejectedRequest(InvoiceKey,status) {
+        var urlpath = '@Url.Action("BillRequestDetails", "BillApproval")';
+        $.ajax({
+            data: { MasterID: InvoiceKey, ViewName: "_billRequestUpdateModal", Status:status },
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $("#previewmodalbody").html("");
+                $("#previewmodalbody").append(data);
+                $("#myPreview").modal("show");
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+
+    function BillRequestDetails(masterID,status,viewName) {
+        var urlpath = '@Url.Action("BillRequestDetails", "BillApproval")';
+        $.ajax({
+            data: { MasterID: masterID, ViewName: viewName, Status: status },
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $("#previewmodalbody").html("");
+                $("#previewmodalbody").append(data);
+                $("#myPreview").modal("show");
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+
+    function LoadQuality(invoice, invoiceNo) {
+
+        var urlpath = '@Url.Action("QualityExist", "BillApproval")';
+        $.ajax({
+            data: { InvoiceKey: invoice},
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                if (data == 0) {
+                    //$("#myQuality").modal("hide");
+                    location.replace('/BillApproval/UpdateQuality?InvoiceKey=' + invoice + '&InvoiceNo=' + invoiceNo );
+                } else {
+                    location.replace('/BillApproval/UpdateQuality?InvoiceKey=' + invoice + '&InvoiceNo=' + invoiceNo);
+                }
+
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+
+        //alert(invoice);
+    }
+
+
+</script>

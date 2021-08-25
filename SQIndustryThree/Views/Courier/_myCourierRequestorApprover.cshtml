@@ -1,0 +1,91 @@
+﻿@model IEnumerable<SQIndustryThree.Models.CourierRequestModel>
+<style>
+    #IourequestTable tr th, #IourequestTable tr td {
+        text-align: center;
+        padding: 5px;
+    }
+
+    button {
+        padding: 0;
+    }
+</style>
+<div class="box">
+    @*<h3 style="text-align:center">My Courier Request List</h3>*@
+    <!-- /.box-header -->
+    <div class="box-body">
+        <div class="col-xs-12" id="personlocdiv" style="overflow:scroll;">
+            <table id="VisitorRequestTable" class="table-bordered table table-striped" width="100%" style="overflow:scroll">
+                <thead>
+                    <tr>
+                        <th>SL</th>
+                        <th>Request #</th>
+                        <th>Request By</th>
+                        <th>Create Date</th>
+                        <th>Customer</th>
+                        <th>Receiver</th>
+                        <th>Country</th>
+                        <th>Post Code</th>
+                        <th>Address</th>
+                        <th>Dispatch Date</th>
+                        <th>Delivery Date</th>
+                        <th>Product Description</th>
+                        <th>Weight</th>
+                        @*<th>Volume</th>
+                        <th>Airway Bill no</th>*@
+                        <th>Courier</th>
+                        <th>Proposed Date</th>
+                        <th>Cost</th>
+                        <th>Remarks</th>
+                        <th>Action(Comments)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ int count = 1;}
+                    @foreach (var item in Model)
+                    {
+                    <tr>
+                        <td>@count</td>
+                        <td>@item.CourierRequestId</td>
+                        <td>@item.UserName</td>
+                        <td>@DateTime.Parse(@item.DateOfRequest).ToString("dd MMM yyyy")</td>
+                        <td>@item.BuyerName</td>
+                        <td>@item.Receiver</td>
+                        <td>@item.CountryName</td>
+                        <td>@item.PostCode</td>
+                        <td>@item.Address</td>
+                        <td>@item.DispatchDate</td>
+                        <td>@item.Deliverydate</td>
+                        <td>@item.ProductDescription</td>
+                        <td>@item.Weight</td>
+                        @*<td>@item.Volume</td>
+                        <td>@item.AirwayBillno</td>*@
+                        <td>@item.ServiceProvider</td>
+                        <td>@item.ProposedDate</td>
+                        <td>@item.Cost</td>
+                        <td>@item.Remarks</td>
+
+                        @if (item.IsApproved == 3)
+                        {
+                            @*@item.Pending*@
+                            <td> <button type="button" class="btn  btn-block btn-primary btn-sm" data-toggle="modal" data-target="#myModal" onclick="CourierDetailsApprover(@item.CourierRequestId,1)" data-idkey="@item.CourierRequestId">Pending(@item.Pending)</button></td>
+                        }
+                        else if (item.IsApproved == 1)
+                        {
+                            <td> <button type="button" class="btn  btn-block btn-success btn-sm" data-toggle="modal" data-target="#showmodal" onclick="CourierDetailsApprover(@item.CourierRequestId,0)" data-idkey="@item.CourierRequestId">Approved(@item.Pending)</button></td>
+
+                        }
+                        else if (item.IsApproved == 2)
+                        {
+                            <td> <button type="button" class="btn  btn-block btn-danger btn-sm" data-toggle="modal" data-target="#showmodal" onclick="CourierDetailsApprover(@item.CourierRequestId,0)" data-idkey="@item.CourierRequestId">Rejected(@item.Pending)</button></td>
+                        }
+                    </tr>
+                        count++;
+
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <!-- /.box-body -->
+</div>

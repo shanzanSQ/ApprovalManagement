@@ -1,0 +1,165 @@
+﻿
+@{
+    ViewBag.Title = "FactoryGateView";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style type="text/css">
+    .modal-lg {
+        max-width: 80% !important;
+    }
+
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    #ioumenu {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #iousubmenu li a {
+        color: white;
+    }
+    /*#exceptionSubmrnu li:active{
+        color:white;
+        background-color:#0a0a22;
+
+    }*/
+    #iouNavigation {
+        background-color: #37474F;
+    }
+
+    #expmenu {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #exceptionSubmrnu li a {
+        color: white;
+    }
+    /*#exceptionSubmrnu li:active{
+        color:white;
+        background-color:#0a0a22;
+
+    }*/
+    #exceptionNavigaton {
+        background-color: #37474F;
+    }
+</style>
+<div class="container-fluid">
+    <h3 style="text-align: center;">
+        <b>Visitor Management System</b>
+    </h3>
+    <hr style="margin: 0px" />
+    <div class="row">
+        <div id="iouNavigation" class="navbar navbar-default navbar-static-top">
+            <div id="ioumenu">
+                <div>
+                    <ul id="iousubmenu" class="nav navbar-nav">
+                        <li onclick="GetVisitorByFactoryDesk(3)"><a href="#">Approved Visitor </a></li>
+                        <li onclick="GetVisitorByFactoryDesk(4)"><a href="#">Arrived Visitor </a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-10" id="getallvisitor" style="width: 100%;overflow:scroll;height: 100%">
+
+        </div>
+    </div>
+    <div class="modal fade" id="showmodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h5 class="modal-title" id="myModalLabel">Visitor Information Request</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12 modal_body_map">
+                            <div class="location-map" id="location-map">
+                                <div style="text-align:left" id="showcanvas"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 modal_body_end">
+
+                        </div>
+                    </div>
+                </div>
+                @*<div class="modal-footer" style="text-align:center">
+                        <button style="text-align:right" class="btn btn-success" id="printCapex">Print This Capex</button>
+                    </div>*@
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade cameramodal" id="cameramodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h5 class="modal-title" id="myModalLabel">Visitor Information Request</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12 modal_body_map">
+                            <div class="location-map" id="location-map">
+                                <div style="text-align:left" id="cameracanvas"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 modal_body_end">
+
+                        </div>
+                    </div>
+                </div>
+                @*<div class="modal-footer" style="text-align:center">
+                        <button style="text-align:right" class="btn btn-success" id="printCapex">Print This Capex</button>
+                    </div>*@
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@*@Scripts.Render("~/bundles/jquery")*@
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script src="~/Assets/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="~/Assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript">
+    $("#iousubmenu").find('li:nth-child(1)').addClass("active");
+    $('#iousubmenu > li > a').click(function () {
+        $('li').removeClass();
+        $(this).parent().addClass('active');
+        // $("#spmenuid").html($(this).html());
+    });
+
+    //load();
+
+    //function load() {
+    //    setTimeout("window.open(self.location, '_self');", 300000);
+    //}
+
+    GetVisitorByFactoryDesk(3);
+    function GetVisitorByFactoryDesk(variable) {
+        var urlpath = '@Url.Action("GetFactoryVisitor", "Visitor")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {Status:variable},
+                async: true,
+                success: function(data) {
+                       if (data) {
+                            $('#getallvisitor').empty();
+                            $('#getallvisitor').html(data);
+                            $("#visitorTable").DataTable();
+                           
+                        }
+                    }
+                });
+    }
+
+</script>

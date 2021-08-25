@@ -1,0 +1,134 @@
+﻿
+@{
+    ViewBag.Title = "VisitorApproval";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+        <div class="container-fluid">
+            <h3 style="text-align:center">Visitor Approval </h3>
+            <div class="row">
+                <div class="navbar navbar-default navbar-static-top">
+                    <div class="container-fluid">
+                        <div class="navbar-collapse collapse">
+                            <ul class="nav navbar-nav" id="visitorSubmenu">
+                                <li onclick="getAllVisitorApproval(1)"><a href="#">Approval Pending</a></li>
+                                <li onclick="getAllVisitorApproval(2)"><a href="#">Approved Request</a></li>
+                                <li onclick="getAllVisitorApproval(3)"><a href="#">Rejected Request</a></li>
+                                <li onclick="getAllVisitorApproval(4)"><a href="#">All Visited</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div id="getallvisitor">
+
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="showmodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h5 class="modal-title" id="myModalLabel">Visitor Information Request</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12 modal_body_map">
+                                <div class="location-map" id="location-map">
+                                    <div style="text-align:left" id="showcanvas"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 modal_body_end">
+
+                            </div>
+                        </div>
+                    </div>
+                    @*<div class="modal-footer" style="text-align:center">
+                        <button style="text-align:right" class="btn btn-success" id="printCapex">Print This Capex</button>
+                    </div>*@
+                </div>
+            </div>
+        </div>
+        <script src="~/Scripts/jquery-3.3.1.min.js"></script>
+        <script src="~/Assets/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+        <script src="~/Assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+        <script type="text/javascript">
+
+    //$("#pending_approval").click(function () {
+    //     getAllVisitorApproval(0);
+    //});
+    //$("#alreadyApproved").click(function () {
+    //     getAllVisitorApproval(1);
+    //});
+    //$("#alreadyrejected").click(function () {
+    //     getAllVisitorApproval(2);
+    //});
+
+    $(function () {
+        //GetSubMenuBYUserPermission();
+         getAllVisitorApproval(1);
+    });
+    function UpdateOrReject(primarykey,isApproved) {
+         var urlpath = '@Url.Action("UpdateOrReject", "Visitor")';
+            $.ajax({
+                data: { PrimaryKey: primarykey, Status: isApproved },
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function(data) {
+                            if (data.isSuccess) {
+                               swal({
+                                  title: 'Successfully Done',
+                                  type: 'success',
+                                   closeOnCancel: true
+                               }, function () {
+                                   getAllVisitorApproval(1);
+                               });
+                            }
+                        }
+                });
+    }
+
+    function getAllVisitorApproval(variable) {
+        var urlpath = '@Url.Action("GetAllVisitorInformation", "Visitor")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {Status:variable},
+                async: true,
+                success: function(data) {
+                       if (data) {
+                            $('#getallvisitor').empty();
+                            $('#getallvisitor').html(data);
+                            $("#visitorTable").DataTable();
+
+                        }
+                    }
+                });
+    }
+
+    @*function GetSubMenuBYUserPermission() {
+        var urlpath = '@Url.Action("GetSubMenuBYUserPermission", "Visitor")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {},
+                    async: true,
+                    success: function(data) {
+                        if (data == 0) {
+                            $("#visitorSubmenu").empty();
+                            $("#visitorSubmenu").append('<li onclick="getAllVisitorApproval(5)" ><a href="#">Approved Visitors</a></li>');
+                            $("#visitorSubmenu").append('<li onclick="getAllVisitorApproval(3)" ><a href="#">Already Visited</a></li>');
+                            getAllVisitorApproval(5);
+                        } else {
+                            getAllVisitorApproval(0);
+                            $("#visitorSubmenu").empty();
+                            $("#visitorSubmenu").append('<li onclick="getAllVisitorApproval(0)" ><a href="#">Pending Approver</a></li>');
+                            $("#visitorSubmenu").append('<li onclick="getAllVisitorApproval(1)"><a href="#">Already Approved</a></li>');
+                            $("#visitorSubmenu").append('<li onclick="getAllVisitorApproval(2)"><a href="#">Already Rejected</a></li>');
+                        }
+                    }
+                });
+    }*@
+        </script>

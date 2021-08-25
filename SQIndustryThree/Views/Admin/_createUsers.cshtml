@@ -8,6 +8,7 @@
         font-weight: bold;
     }
 </style>
+<link href="~/Assets/bower_components/select2/dist/css/select2.min.css" rel="stylesheet" />
 <div id="total_div" class="container-fluid">
     <div class="row">
         <table style="text-align:left" class="table table-responsive table-bordered">
@@ -41,14 +42,14 @@
             <tr>
                 <td class="lable_table">Select Designation : </td>
                 <td>
-                    <select id="designation_select" name="designation_select" class="form-control">
+                    <select id="designation_select" name="designation_select" class="form-control select2">
                     </select>
                 </td>
             </tr>
             <tr>
                 <td class="lable_table">Select User Status </td>
                 <td>
-                    <select id="userstatus" name="userstatus" class="form-control">
+                    <select id="userstatus" name="userstatus" class="form-control select2">
                         <option value="1"> Active </option>
                         <option value="0"> InActive </option>
                     </select>
@@ -59,7 +60,9 @@
     <button id="saveInformation" class="btn btn-primary" >Register</button>
 </div>
 @Scripts.Render("~/bundles/jquery")
+<script src="~/Assets/bower_components/select2/dist/js/select2.min.js"></script>
 <script type="text/javascript">
+    $('.select2').select2();
     LoadBusinessUnit();
     LoadDesignation();
      function LoadBusinessUnit() {

@@ -1,13 +1,12 @@
 ﻿
 @{
-    ViewBag.Title = "Index";
+    //ViewBag.Title = "Index";
     Layout = null;
 
 }
 
 <!DOCTYPE html>
 <html>
-
 <head>
     <title> SQ GROUP</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -38,7 +37,9 @@
                 <input type="password" name="password" id="user_password" class="padding" placeholder="Password" required="" />
                 <input type="submit" class="btn btn-success" id="login_button" value="login">
         </div>
-        <div class="clear"> </div>
+        <div class="clear">
+            <a href="#" id="recoverypass">Forgot Password</a>
+        </div>
     </div>
 
     <div style="margin-bottom:30px" class="footer">
@@ -98,4 +99,61 @@
             }
         });
     }
+
+    function isEmail(email) {
+        var regex =/^([\w-\.]+@@([\w-]+\.)+[\w-]{2,4})?$/;
+        if(!regex.test(email)) {
+           return false;
+        }else{
+           return true;
+        }
+    }
+
+    $('#recoverypass').click(function () {
+        if (isEmail($("#user_email").val()) && $("#user_email").val().length>0) {
+            swal({
+                title: 'Are you sure?',
+                text: "This will Send your password to your mail",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes'
+            },function () {
+                RecoveryPassword($("#user_email").val());
+            });
+        } else {
+                            swal({
+                                title: 'Please Enter Email Address First',
+                                type: 'error',
+                                closeOnCancel: true
+                            });
+        }
+        });
+        function RecoveryPassword(email) {
+                var urlpath = '@Url.Action("RecoveryPassword", "Account")';
+                $.ajax({
+                    url: urlpath,
+                    dataType: 'json',
+                    type: "Post",
+                    data: {Email:email},
+                    async: true,
+                    success: function (data) {
+                        if (data) {
+                            swal({
+                                title: 'Password Sent to your email',
+                                type: 'success',
+                                closeOnCancel: true
+                            },
+                                function () {
+                                    window.location.href = '@Url.Action("Index", "Account")';
+                                });
+                        } else {
+                            swal({
+                                title: 'There are no account available with this email',
+                                type: 'error',
+                                closeOnCancel: true
+                            });
+                        }
+                    }
+                });
+        }
 </script>

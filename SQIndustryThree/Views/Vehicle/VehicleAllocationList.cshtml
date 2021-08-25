@@ -1,0 +1,183 @@
+﻿
+@{
+    ViewBag.Title = "VehicleAllocation";
+}
+
+<div style="min-height:550px; margin:0px 25px 0px 25px;">
+    <a href="/Vehicle/VehicleAllocation" class="btn btn-primary" style="float:right;"><i class="fa fa-plus"></i> Add New</a>
+    <table width="100%" cellpadding="5" cellspacing="0" border="1" id="vhAllocationListTable" class="table table-striped">
+        <caption>All Allocated Vehicle List</caption>
+        <thead>
+            <tr>
+                <th>Trip Id</th>
+                <th>Vehicle No</th>
+                <th>Driver Name</th>
+                <th>Driver Phone</th>
+                <th>Vehicle Type</th>
+                <th>Start Point</th>
+                <th>Trip Type</th>
+                <th>Route</th>
+                <th>Trip Cost (BDT)</th>
+                <th>Details</th>
+                <th>Cost Adjustment</th>
+            </tr>
+        </thead>
+        <tbody id="vhAllocationListTableBody">
+        </tbody>
+    </table>
+
+    <div class="modal" id="detailsModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Passengers Details</h4>
+                </div>
+                <div id="detailsModalBody" class="modal-body">
+                    <table width="100%" cellpadding="5" cellspacing="0" border="1" id="detailsModalTable" class="table table-striped">
+                        <caption>Allocated Passengers Information</caption>
+                        <thead>
+                            <tr>
+                                <th>Request Id</th>
+                                <th>Requestor</th>
+                                <th>Business Unit</th>
+                                <th>Travel Start Date</th>
+                                <th>Travel End Date</th>
+                                <th>Route</th>
+                                <th>No of User</th>
+                                <th>Allocated Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailsModalTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="modalCloseButton" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="costAdjustmentModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Trip Cost Adjustment</h4>
+                </div>
+                <div id="costAdjustmentModalBody" class="modal-body">
+                    <div class="row">
+                        <label class="col-sm-4">Adjustment Value :</label>
+                        <div class="col-sm-6">
+                            <input type="text" id="costAdjustmentValue" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" id="costAdjustmentModalFooter">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        loadVehicleAllocationListData();
+    });
+
+    function showModal(id) {
+        $("#detailsModal").modal("show");
+        $('#detailsModalTableBody').empty();
+        showDataOnModal(id);
+    }
+
+    function costAdjustmentModal(id) {
+        $("#costAdjustmentModal").modal("show");
+        $('#costAdjustmentModalFooter').empty();
+        $('#costAdjustmentModalFooter').append('<button type="button" onclick="saveChangeClickFunction(' + id +
+            ')" class="btn btn-success">Save Changes</button><button type="button" id="modalCloseButton" class="btn btn-danger" data-dismiss="modal">Close</button>');
+    }
+
+    function saveChangeClickFunction(id) {
+        var adVal = parseInt($('#costAdjustmentValue').val());
+        var urlPath = '@Url.Action("CostAdjustment", "Vehicle")';
+        $.ajax({
+            type: 'Post',
+            url: urlPath,
+            dataType: 'json',
+            data: {
+                TripId: id,
+                AdjustmentValue: adVal
+            },
+            success: function (data) {
+                $('#costAdjustmentValue').val('')
+                $("#costAdjustmentModal").modal('hide');
+                loadVehicleAllocationListData();
+            }
+        });
+    }
+
+    function loadVehicleAllocationListData() {
+        var urlPath = '@Url.Action("AllVehicleAllocationList", "Vehicle")';
+        $.ajax({
+            type: 'GET',
+            url: urlPath,
+            dataType: 'json',
+            success: function (datas) {
+                table = $('#vhAllocationListTableBody');
+                table.empty();
+                datas.forEach(function (data) {
+                    table.append(`<tr>
+                                            <td>`+ data.VehicleAllocationMasterId + `</td>
+                                            <td>`+ data.VehicleNo + `</td>
+                                            <td>`+ data.DriverName + `</td>
+                                            <td>`+ data.DriverPhone + `</td>
+                                            <td>`+ data.VehicleType + `</td>
+                                            <td>`+ data.StartPoint + `</td>
+                                            <td>`+ data.TripType + `</td>
+                                            <td>`+ data.Route + `</td>
+                                            <td>`+ data.TripCost + `</td>
+                                            <td><a href="#" onclick="showModal(` + data.VehicleAllocationMasterId + `)" class="btn btn-primary">Details</a></td>
+                                            <td><a href="#" onclick="costAdjustmentModal(` + data.VehicleAllocationMasterId + `)" class="btn btn-primary"><i class="fa fa-edit"></i></a></td>
+                                        </tr>`);
+                });
+            }
+        });
+    }
+
+    function showDataOnModal(aid) {
+        var urlPath = '@Url.Action("AllVehicleAllocationPassengerList", "Vehicle")';
+        $.ajax({
+            type: 'GET',
+            url: urlPath,
+            dataType: 'json',
+            data: { id: aid },
+            success: function (datas) {
+                table = $('#detailsModalTableBody');
+                table.empty();
+                datas.forEach(function (data) {
+                    table.append(`<tr>
+                                            <td>`+ data.VehicleRequestMasterId + `</td>
+                                            <td>`+ data.UserInformation.UserInformationName + `</td>
+                                            <td>`+ data.BusinessUnitName + `</td>
+                                            <td>`+ data.TravelStratDate + `</td>
+                                            <td>`+ data.TravelEndDate + `</td>
+                                            <td>`+ data.Route + `</td>
+                                            <td>`+ data.NoofUser + `</td>
+                                            <td>`+ data.AllocatedCost + `</td>
+                                        </tr>`);
+                });
+            }
+        });
+    }
+
+</script>

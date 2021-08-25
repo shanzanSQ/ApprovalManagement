@@ -1,0 +1,778 @@
+﻿@model SQIndustryThree.Models.CourierRequestModel
+<style>
+    th {
+        text-align: left;
+    }
+
+    td {
+        text-align: left;
+    }
+
+    #genaralInfodt tr th, #genaralInfodt tr td, #approverlist tr td, #approverlist tr th {
+        text-align: center;
+    }
+    .addbutton {
+        height: 25px;
+        width: 25px;
+        border-radius: 50%;
+    }
+    #ammountsummeryList input[type=text], #ammountsummeryList input[type=number] {
+        width: 100%;
+    }
+    select{width:80%;}
+    p{
+        margin:0px;padding:0px;
+    }
+</style>
+<div id="printablearea" class="col-md-12">
+    @if (Model.RivisionNo > 0)
+    {
+        <p style="color:red;text-align:center;font-weight:bold">Revised  No:  @Model.RivisionNo</p>
+    }
+    <div>
+        <span style="float:left;font-weight:bold;font-size:20px">@Model.BusinessUnitName</span>
+        <span style="float:right;font-weight:bold;font-size:20px">Courier Request No: @Model.CourierRequestId</span>
+    </div>
+    @if (Model.CourierApproverList != null)
+    {
+        <table border="1" width="100%" id="ListOfApprover">
+            <caption>Approver List</caption>
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Approver Name</th>
+                    <th>Approver Designation</th>
+                    <th>Approver Role</th>
+                    <th>Update Date</th>
+                    <th>Status</th>
+                    <th>Comment</th>
+                </tr>
+            </thead>
+            <tbody id="approverTable">
+                @foreach (var item in Model.CourierApproverList)
+                {
+                <tr>
+                    <td><p name="approverNo">@item.ApproverNo</p></td>
+                    <td><p style="display:none" name="userId">@item.UserID</p><p name="userName">@item.UserName</p></td>
+                    <td><p name="designation">@item.DesignationName</p></td>
+                    @if (item.ApproverStatus == 1)
+                    {
+                        var status1 = @item.ApproverStatusName = "First Approver";
+                        <td><p name="approverstatus">@status1</p></td>
+                    }
+                    else
+                    {
+                        var status2 = @item.ApproverStatusName = "Second Approver";
+                        <td><p name="approverstatus">@status2</p></td>
+                    }
+
+                    <td>
+                        <p style="display:none" name="apstatusid">@item.IsApprove</p>
+                        @if (@item.UpdateDate != null)
+                        {@DateTime.Parse(@item.UpdateDate).ToString("dd MMM yyyy")}
+                    </td>
+                    @{
+                        if (item.IsApprove == 3)
+                        {
+                            <td style="color:red">Pending</td>
+                        }
+                        else if (item.IsApprove == 1)
+                        {
+                            @*if (item.ApproverStatus == 3)
+                {
+                    <td style="color:green">Disbursed</td>
+                }
+                else
+                {
+                    <td style="color:green">Approved</td>
+                }*@
+                            <td style="color:green">Approved</td>
+                        }
+                        else if (item.IsApprove == 2)
+                        {
+                            <td style="color:red">Rejected</td>
+                        }
+                        else
+                        {
+                            <td style="color:darkblue">Not Sent</td>
+                        }
+                    }
+                    <td>@item.Comments</td>
+                </tr>
+
+                }
+            </tbody>
+        </table>
+    }
+<div class="row">
+    <div class="col-md-6">
+        <table border="1" width="100%">
+            <caption>Courier Request</caption>
+            <tr>
+                <th width="30%">Requestor Name</th>
+                <td width="70%">@Model.UserName</td>
+            </tr>
+            <tr>
+                <th>Request Date</th>
+                <td>@DateTime.Parse(Model.DateOfRequest).ToString("dd MMM yyyy")</td>
+            </tr>
+            <tr>
+                <th>Location Name</th>
+                <td>
+                    <select id="upLocation" onchange="LoadApproverList()">
+                        <option value="@Model.LocationId">@Model.LocationName</option>
+                        <option value="1">Central</option>
+                        <option value="1">Factory</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>Business Unit Name</th>
+                <td>
+                    <select id="upBusinessunit" onchange="LoadApproverList()">
+                        <option value="@Model.BusinessUnitId">@Model.BusinessUnitName</option>
+                    </select>
+                    <i style="width:10%;color:green;padding-left:2px;cursor:pointer" onclick="LoadBusinessUnit();" class="fa fa-refresh">Change</i>
+                </td>
+            </tr>
+            <tr>
+                <th>Department Name</th>
+                <td>
+                    <select id="upDepartment">
+                        <option value="@Model.DepartmentID">@Model.DepartmentName</option>
+                    </select>
+                    <i style="width:10%;color:green;padding-left:2px;cursor:pointer" @*onclick="LoadDepartment(1);"*@ class="fa fa-refresh">Change</i>
+                </td>
+            </tr>
+            <tr>
+                <th>Type</th>
+                <td>
+                    <select id="uptype" onblur="courierCheck()">
+                        <option value="@Model.CourierType">@Model.CourierType</option>
+                        @*<option value="I">Inbound</option>
+                        <option value="O">Outbound</option>*@
+                    </select>
+
+                </td>
+
+            </tr>
+            <tr>
+                <th>Customer</th>
+                <td>
+                    <select id="upCustomer">
+                        <option value="@Model.Customer">@Model.BuyerName</option>
+                    </select>
+                    <i style="width:10%;color:green;padding-left:2px;cursor:pointer" onclick="LoadCustomer();" class="fa fa-refresh">Change</i>
+                </td>
+            </tr>
+            <tr>
+                <th>Receiver</th>
+                <td><input type="text" style="width:100%" id="upReceiver" value="@Model.Receiver" /></td>
+            </tr>
+            <tr>
+                <th>Title</th>
+                <td><input type="text" style="width:100%" id="upTitle" value="@Model.Title" /></td>
+            </tr>
+            <tr>
+                <th>Contact No</th>
+                <td><input type="text" style="width:100%" id="upContactNo" value="@Model.ContactNo" /></td>
+            </tr>
+            <tr>
+                <th>Country</th>
+                <td>
+                    <select id="upCountry"  onblur="courierCheck()">
+                        <option value="@Model.Country">@Model.CountryName</option>
+                    </select>
+
+                    <i style="width:10%;color:green;padding-left:2px;cursor:pointer" onclick="LoadCountry();" class="fa fa-refresh">Change</i>
+                </td>
+            </tr>
+            <tr>
+                <th width="30%">Post Code</th>
+                <td><input type="text" style="width:100%" id="upPost_code" value="@Model.PostCode" /></td>
+            </tr>
+            <tr>
+                <th>Address</th>
+                <td style="word-wrap:break-word"><textarea id="upAddress" rows="3" style="width:100%;resize:none">@Model.Address</textarea></td>
+            </tr>
+
+        </table>
+
+
+        @if (Model.IsApproved != 0)
+        {
+            <div>
+                <br />
+                <table width="100%" align="center">
+                    <tr>
+                        <td>
+                            <button value="Comments" onclick="showComments()" class="btn btn-sm btn-primary">Comments</button>
+                        </td>
+                        <td style="padding:5px">
+                            <select id="reviewComment" class="approvalColumn form-control">
+                                @if (Model.CourierApproverList != null)
+                                {
+                                    foreach (var app in Model.CourierApproverList)
+                                    {
+                                        if (app.IsApprove != 0)
+                                        {
+                                            <option value="@app.UserID">@app.UserName</option>
+                                        }
+                                    }
+                                }
+
+                            </select>
+                        </td>
+                        <td style="padding:5px">
+                            <input type="text" id="reviewMessage" class="approvalColumn form-control" rows="3" style="resize:none" />
+                        </td>
+                        <td>
+                            <button style="text-align:center;align-content:center" class="btn btn-info btn-sm" onclick="ReviewComment(@Model.CourierRequestId,2)">Send Review</button>
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+        }
+        <div class="row">
+            <div id="comments_section" class="col-md-12" style="overflow-wrap:inherit; overflow-y: auto;height:200px;display:none">
+                <div>
+                    <p>Comment Section</p>
+                    @if (Model.CourierComments != null)
+                    {
+                        foreach (var app in Model.CourierComments)
+                        {
+                            <hr style="margin:unset;padding:unset;" />
+                            <p style="margin:unset;padding:unset" class="media-heading user_name"><strong style="color:blue">@app.ReviewerByName</strong>  To <strong>@app.ReviewerToName</strong></p>
+                            <p style="margin:unset;padding:unset">@app.UpdatedBY.ToString("MM/dd/yyyy hh:mm tt")</p>
+                            <p style="margin:unset;padding:unset">@app.ReviewMessage</p>
+                        }
+                    }
+                </div>
+                <div id="log_section" class="col-md-12" style="overflow-wrap:inherit; overflow-y: auto;height:200px;display:none">
+                    <p>Log Section</p>
+
+                    @if (Model.CourierLogSection != null)
+                    {
+                        <table width="100%">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Description</th>
+                                    <th>By</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var app in Model.CourierLogSection)
+                                {
+                                    <tr>
+                                        <th>@app.ActionDate</th>
+                                        <th>@app.ActionStatus</th>
+                                        <th>@app.Comments</th>
+                                        <th>@app.ActionBy</th>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="col-md-6">
+        <table border="1" width="100%">
+            <tr>
+                <th>Dispatch Date</th>
+                <td>
+                    @if (Model.DispatchDate != null)
+                    {
+                        <input type="date" id="upDispatch_date" style="width:100%" value='@DateTime.Parse(@Model.DispatchDate).ToString("yyyy-MM-dd")' />
+                    }
+                    else
+                    {
+                        <input type="date" id="upDispatch_date" style="width:100%" />
+                    }
+
+                </td>
+            </tr>
+            <tr>
+                <th>Deliverydate Date</th>
+                <td>
+                    @if (Model.Deliverydate != null)
+                    {
+                        <input type="date" id="upDelivery_date" style="width:100%" onblur="courierCheck()" value='@DateTime.Parse(@Model.Deliverydate).ToString("yyyy-MM-dd")' />
+                    }
+                    else
+                    {
+                        <input type="date" id="upDelivery_date" style="width:100%" onblur="courierCheck()" />
+                    }
+
+                </td>
+            </tr>
+            <tr>
+                <th>Product Description</th>
+                <td><input type="text" style="width:100%" id="upProduct_description" value="@Model.ProductDescription" /></td>
+            </tr>
+            <tr>
+                <th> Weight</th>
+                <td><input type="text" style="width:100%" id="upWeight" value="@Model.Weight" onblur="courierCheck()" /></td>
+            </tr>
+            @*<tr>
+            <th> Volume</th>
+            <td><input type="text" style="width:100%" id="upVolume" value="@Model.Volume" /></td>
+        </tr>
+        <tr>
+            <th>AirwayBillno</th>
+            <td><input type="text" style="width:100%" id="upAirway_bill_no" value="@Model.AirwayBillno" /></td>
+        </tr>*@
+            <tr>
+                <th> Courier</th>
+                <td>
+                    <select id="gupCourier" onblur="courierWiseCostDate()">
+                        <option value="@Model.Courier">@Model.ServiceProvider</option>
+                    </select>
+                    <input type="hidden" class="form-control form-inline" id="change_gupCourier">
+                    <input type="hidden" class="form-control form-inline" id="change_gupCourier_name">
+                    <i style="width:10%;color:green;padding-left:2px;cursor:pointer" class="fa fa-refresh">Change</i>
+
+                </td>
+            </tr>
+            
+
+            <tr>
+                <th>Proposed Date</th>
+                <td>
+                    @if (Model.ProposedDate != null)
+                    {
+                        <input type="date" id="gupProposed_date" style="width:100%" value='@DateTime.Parse(@Model.ProposedDate).ToString("yyyy-MM-dd")' />
+                        <input type="hidden" class="form-control form-inline" id="change_gupProposed_date">
+                        }
+                    else
+                    {
+                        <input type="date" id="gupProposed_date" style="width:100%" />
+                    }
+
+                </td>
+            </tr>
+            <tr>
+                <th>Cost</th>
+                <td>
+                    <input type="text" style="width:100%" id="gupCost" value="@Model.Cost" />
+                    <input type="hidden" class="form-control form-inline" id="change_gupCost">
+                </td>
+            </tr>
+        </table>
+        <div class="row">
+            <div class="col-md-12">
+                <table border="1" width="100%">
+                    <caption>Courier </caption>
+                    <tr>
+                        <th>Elements</th>
+                        <th>System Proposed</th>
+                        <th>User Proposed</th>
+                    </tr>
+                    <tr>
+                        <td>Generate Courier</td>
+                        
+                        <td>
+                            <select id="upGenerateCourier">
+                                <option value="@Model.GenerateCourier">@Model.GenerateCourierName</option>
+                            </select>
+                        </td>
+                      
+                        <td>
+                            <select id="upCourier">
+                                <option value="@Model.Courier">@Model.ServiceProvider</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Generate Cost</td>
+                        <td><input type="text" style="width:100%" id="upGenerateCost" value="@Model.GenerateCost" /></td>
+                        <td><input type="text" style="width:100%" id="upCost" value="@Model.Cost" /></td>
+
+                    </tr>
+                    <tr>
+                        <td>Proposed Date</td>
+                        <td>
+                            @if (Model.GenerateProposedDate != null)
+                            {
+                                <input type="date" id="upGenerateProposedDate" style="width:100%" value='@DateTime.Parse(@Model.GenerateProposedDate).ToString("yyyy-MM-dd")' />
+                            }
+                            else
+                            {
+                                <input type="date" id="upGenerateProposedDate" style="width:100%" />
+                            }
+                          
+                        </td>
+                        <td>
+                            @if (Model.ProposedDate != null)
+                            {
+                                <input type="date" id="upProposed_date" style="width:100%" value='@DateTime.Parse(@Model.ProposedDate).ToString("yyyy-MM-dd")' />
+                            }
+                            else
+                            {
+                                <input type="date" id="upProposed_date" style="width:100%" />
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Remarks</td>
+                        <td>@Model.Remarks</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div style="text-align:center">
+            <br />
+            <button type="button" style="width:30%" class="btn btn-primary btn-sm" @*onblur="courierCheck()"*@  onclick="Updatevarified(@Model.CourierRequestId)">Update Request</button>
+        </div>
+    </div>
+</div>
+    
+  
+    
+   
+
+</div>
+
+
+
+
+
+<script type="text/javascript">
+
+    onLoad();
+    function onLoad() {
+       
+       // courierCheck();
+    }
+    $("#upLocation").change(function () {
+        if ($("#upLocation").val() == 1) {
+
+            $(this).attr("selected", "selected");
+          
+            LoadDepartment(1)
+        } else if ($("#upLocation").val() == 2) {
+          $(this).attr("selected", "selected");
+         LoadDepartment(2);
+
+        } else {
+            $(this).attr("selected", "selected");
+            $('#business_unit').empty();
+        }
+
+
+    });
+     function LoadDepartment(location) {
+         $('#upDepartment').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("GetDepartmentList", "Courier")';
+             $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {location:location},
+            async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
+            success: function (data) {
+              
+                $('#upDepartment').empty();
+               
+                $('#upDepartment').append("<option value='0'>-- Select Department --</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#upDepartment").append($("<option></option>").val(data[i].DepartmentId)
+                        .html(data[i].DeartmentName));
+               
+                  
+                }
+            }
+            ,
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+    }
+    //$("#gupCost").change(function () {
+    //    debugger;
+    //    var cost = $('#gupCost').val();
+    //    var change_cost = $('#change_gupCost').val();
+
+    //    if (cost === change_cost) {
+    //        approverlist();
+    //    }
+    //    else {
+    //        approverlistnew();
+    //    }
+
+    //});
+    //$("#gupProposed_date").change(function () {
+    //    debugger;
+    //    var proposed_date = $('#gupProposed_date').val();
+    //    var change_proposed_date = $('#change_gupProposed_date').val();
+
+    //    if (proposed_date === change_proposed_date) {
+    //        approverlist();
+    //    }
+    //    else {
+    //        approverlistnew();
+    //    }
+
+    //});
+    //$("#gupCourier").change(function () {
+    //    debugger;
+    //    var courier = $('#gupCourier').val();
+    //    var change_courier = $('#change_gupCourier').val();
+
+    //    if (courier === change_courier) {
+    //        approverlist();
+    //    }
+    //    else {
+    //        approverlistnew();
+    //    }
+
+    //});
+
+     function courierCheck() {
+        debugger;
+     //  LoadCourier();
+         var country = $('#upCountry').val();
+         var delivery_date = $('#upDelivery_date').val();
+         var weight = $('#upWeight').val();
+         var type = $('#uptype').val();
+
+          var urlpath = '@Url.Action("GetCourierProposedDate", "Courier")';
+            $.ajax({
+                 url: urlpath,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                type: "Post",
+                data: JSON.stringify({
+                    country: country,
+                    delivery_date: delivery_date,
+                    weight: weight,
+                    type: type
+
+                }),
+                success: function (response) {
+                    $("#gupProposed_date").val(response.data[0].CourierProposedDate);
+                    $("#change_gupProposed_date").val(response.data[0].CourierProposedDate);
+                    $("#gupCost").val(response.data[0].Rate);
+                    $("#change_gupCost").val(response.data[0].Rate);
+                    $("#gupCourier").val(response.data[0].ServiceProvider);
+                    $("#change_gupCourier").val(response.data[0].CourierTypeId);
+                    $("#change_gupCourier_name").val(response.data[0].ServiceProvider);
+                    
+                    LoadCourier();
+
+                    approverlist();
+
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+
+    }
+      function courierWiseCostDate() {
+        debugger;
+     //  LoadCourier();
+          var courier = $('#gupCourier').val();
+          var delivery_date = $('#upDelivery_date').val();
+          var weight = $('#upWeight ').val();
+          var type = $('#uptype').val();
+
+          var urlpath = '@Url.Action("GetcourierWiseCostDate", "Courier")';
+            $.ajax({
+                 url: urlpath,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                type: "Post",
+                data: JSON.stringify({
+                    courier: courier,
+                    delivery_date: delivery_date,
+                    weight: weight,
+                    type: type
+                }),
+                success: function (response) {
+                    $("#gupProposed_date").val(response.data[0].CourierProposedDate);
+                    $("#gupCost").val(response.data[0].Rate);
+
+
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+
+    }
+
+    function LoadCourier() {
+        var country = $('#upCountry').val();
+        var delivery_date = $('#upDelivery_date').val();
+        var weight = $('#upWeight').val();
+        var type = $('#uptype').val();
+        $('#gupCourier').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("GetCourierList", "Courier")';
+
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { country: country, delivery_date: delivery_date, weight: weight, type: type},
+            async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
+            success: function (data) {
+                $('#gupCourier').empty();
+
+              //  $('#courier').append("<option value='0'>-- Select Courier --</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#gupCourier").append($("<option ></option>").val(data[i].CourierTypeId)
+                        .html(data[i].ServiceProvider));
+                  //  $("#change_courier").val(data[i].CourierTypeId);
+
+                }
+            }
+            ,
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+    }
+    function Updatevarified(courierreqid) {
+        $('input').css({ "border-color": "#d3d3d3" });
+        $('select').css({ "border-color": "#d3d3d3" });
+        if ($('#upDepartment').val() == 0) {
+            $('#upDepartment').css({ "border-color": "#FF0000" });
+        } else if ($('#upLocation').val() == 0 || $('#upLocation').val() == "") {
+             $('#upLocation').css({ "border-color": "#FF0000" });
+        } else if ($('#upBusinessunit').val() == 0 || $('#upBusinessunit').val() == "") {
+            $('#upBusinessunit').css({ "border-color": "#FF0000" });
+
+        //} else if ($('#CourierApproverList tr').length<1) {
+        //    swal({
+        //        title: 'No Approver Defined',
+        //        type: 'error',
+        //        closeOnCancel: true
+        //    });
+        } else {
+            var jsondate = UpdateCourierRequest(courierreqid);
+            var urlpath = '@Url.Action("ShowPertialviewModal", "Courier")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsondate),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    $("#modalbody").html("");
+                    $("#modalbody").append(data);
+                    $("#myModal").modal("show");
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+        }
+    }
+
+        function approverlist() {
+
+        $('#ListOfApprover').show();
+         var urlpath = '@Url.Action("ApproverList", "Courier")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { status: '1' },
+            async: true,
+            success: function (data) {
+                //console.log(data)
+                //$('#ListOfApprover').empty();
+                var result = "";
+                var count = 1;
+                $('#ListOfApprover tr').not(function () { return !!$(this).has('th').length; }).remove();
+               // $('#subcategory').append("<option value='0'>--Select Business Unit--</option>");
+                for (var i = 0; i < data.length; i++) {
+
+                    result += "<tr data-approverid=" + data[i].UserId + ">"
+                    //result += "<td>" + count + "<td>"Designation
+                    //if (data.length > 2) {
+                    //    result += "<td style='text-align: center;width:25px'><input type='checkbox' checked class='approval' id='enableCheck' value=" + data[i].UserId + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].Designation + "\"></td>"
+                    //}
+                    //else {
+                    //    result += "<td style='text-align: center;width:25px'><input type='checkbox' checked disabled class='approval' id='enableCheck' value=" + data[i].UserId + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].Designation + "\"></td>"
+                    //}
+
+                    result += '<td><p name="approverNo">' + count + '</p></td>';
+                    result += '<td><p name="userName">' + data[i].UserName + '</p></td>';
+                    result += '<td><p name="designation">' + data[i].Designation + '</p></td>';
+                   // result += '<td><p name="approverstatus">' + data[i].ApproverStatusName + '</p></td>';
+                    result += '<td><p style="display:none" name="userId">' + data[i].UserId + '</p></td>';
+                   // result += '<td><p name="apstatusid">' + data[i].ApproverStatus + '</p></td>';
+                    result += '<td ></td>';
+                    result += '<td ></td>';
+                    result += '<td ></td>';
+                    result += "</tr>"
+                    count++;
+                   
+                }
+
+                $('#ListOfApprover').append(result);
+            }
+        });
+    }
+    function approverlistnew() {
+
+        $('#ListOfApprover').show();
+         var urlpath = '@Url.Action("Approverlistnew", "Courier")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { status: '2' },
+            async: true,
+            success: function (data) {
+                console.log(data)
+                //$('#ListOfApprover').empty();
+                var result = "";
+                var count = 1;
+                $('#ListOfApprover tr').not(function () { return !!$(this).has('th').length; }).remove();
+               // $('#subcategory').append("<option value='0'>--Select Business Unit--</option>");
+                for (var i = 0; i < data.length; i++) {
+
+                    result += "<tr data-approverid=" + data[i].UserId + ">"
+                    //result += "<td>" + count + "<td>"Designation
+                    //if (data.length > 2) {
+                    //    result += "<td style='text-align: center;width:25px'><input type='checkbox' checked class='approval' id='enableCheck' value=" + data[i].UserId + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].Designation + "\"></td>"
+                    //}
+                    //else {
+                    //    result += "<td style='text-align: center;width:25px'><input type='checkbox' checked disabled class='approval' id='enableCheck' value=" + data[i].UserId + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].Designation + "\"></td>"
+                    //}
+
+                    result += '<td><p name="approverNo">' + count + '</p></td>';
+                    result += '<td><p name="userName">' + data[i].UserName + '</p></td>';
+                    result += '<td><p name="designation">' + data[i].Designation + '</p></td>';
+                   // result += '<td><p name="approverstatus">' + data[i].ApproverStatusName + '</p></td>';
+                    result += '<td ><p style="display:none" name="userId">' + data[i].UserId + '</p></td>';
+                   // result += '<td><p name="ApproverStatusName">' + data[i].ApproverStatusName + '</p></td>';
+                    result += '<td ></td>';
+                    result += '<td ></td>';
+                    result += '<td ></td>';
+                    result += "</tr>"
+                   count++;
+                }
+
+                $('#ListOfApprover').append(result);
+            }
+        });
+    }
+
+</script>

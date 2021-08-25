@@ -1,0 +1,117 @@
+﻿@model SQIndustryThree.Models.CourierType
+
+@{
+    ViewBag.Title = "_modalShowCourierTypeinfo";
+}
+<div>
+    <div style="margin:5px" class="row">
+        <table style="overflow: scroll;overflow: auto;" class="table table-bordered">
+            <tbody>
+                <tr>
+                    <td>Courier Type</td>
+                    <td style="width:100%;overflow-wrap:break-word">@Model.CourierTypeName</td>
+                </tr>
+                <tr>
+                    <td> Raised BY</td>
+                    <td>@Model.CreateBy</td>
+                </tr>
+              </tbody>
+        </table>
+        @if (Model.CourierTypeDetails != null)
+        {
+            <table id="capex_details" class="table details_list table-responsive table-bordered ">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Country</th>
+                        <th>Service Provider</th>
+                         <th>Weight</th>
+                        <th>Lead Time From</th>
+                        <th>Lead Time To</th>
+                        <th>Rate</th>
+                        <th>Currency</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ int count = 1;}
+                    @foreach (var item in Model.CourierTypeDetails)
+                    {
+                       // total += Convert.ToDouble(item.CapexEstimatedCost);
+                    <tr>
+                        <td width="5%">@count</td>
+                        <td width="15%">@item.CountryName</td>
+                        <td width="35%">@item.ServiceProviderName</td>
+                        <td width="15%">@item.WeightRange</td>
+                        <td width="15%">@item.LeadTimeFrom</td>
+                        <td width="15%">@item.LeadTimeTo</td>
+                        <td width="15%">@item.Rate</td>
+                        <td width="15%">@item.Currency</td>
+                     </tr>
+                        count++;
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        
+                    </tr>
+                </tfoot>
+            </table>
+        }
+       
+        </div>
+</div>
+<script type="text/javascript">
+
+    window.onload = function () {
+       // GetUserCountry();
+    };
+    function GetUserCountry(ID) {
+        debugger;
+        $.ajax({
+            url: '/Courier/LoadCountry',
+            type: 'POST',
+            contentType: "application/json;charset=utf-8",
+
+            dataType: "json",
+            success: function (response) {
+                console.log(response);
+                if (response.length > 0) {
+                    $(ID).html('');
+
+                    var result = '';
+                    result += "<option value=''>Select One</option>";
+                    for (var i = 0; response.length > i; i++) {
+                        result += "<option id='" + response[i].CountryId + "' value='" + response[i].CountryId + "' data-shortname='" + response[i].CountryId + "'>" + response[i].CountryName + "</option>";
+                    }
+                    $(ID).append(result);
+                    $('select.country').append(result);
+                }
+            }
+        });
+    }
+    function LoadCourier(ID) {
+        debugger;
+        $.ajax({
+            url: '/Courier/LoadCourier',
+            type: 'POST',
+            contentType: "application/json;charset=utf-8",
+
+            dataType: "json",
+            success: function (response) {
+                console.log(response);
+                if (response.length > 0) {
+                    $(ID).html('');
+
+                    var result = '';
+                    result += "<option value=''>Select One</option>";
+                    for (var i = 0; response.length > i; i++) {
+                        result += "<option id='" + response[i].ServiceProviderId + "' value='" + response[i].ServiceProviderId + "' data-shortname='" + response[i].ServiceProviderId + "'>" + response[i].ServiceProviderName + "</option>";
+                    }
+                    $(ID).append(result);
+                    $('select.service_provider').append(result);
+                }
+            }
+        });
+    }
+
+</script>

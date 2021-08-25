@@ -1,0 +1,116 @@
+﻿@model IEnumerable<SQIndustryThree.Models.BillApproval.BillRequestModel>
+
+
+<style>
+    #BillRequestTable tr th, #BillRequestTable tr td {
+        text-align: center;
+        padding: 5px;
+    }
+
+    button {
+        padding: 0;
+    }
+</style>
+<div class="box">
+    <!--<h3 style="text-align:center">My Visitor Request List</h3>
+    <!-- /.box-header -->
+    <div class="box-body">
+        <div class="col-xs-12" id="personlocdiv">
+            <table id="BillRequestTable" class="table-bordered table table-striped" width="100%" style="overflow:scroll">
+                <thead>
+                    <tr>
+                        <th style="text-align:center">SL</th>
+                        <th style="text-align:center">InvoiceKey</th>
+                        <th style="text-align:center; width:100px;">InvoiceNo</th>
+                        <th style="text-align:center">PO No</th>
+                        <th style="text-align:center">InvoiceDate</th>
+                        <th style="text-align:center">InvoiceType</th>
+                        <th style="text-align:center; width:200px;">Supplier</th>
+                        <th style="text-align:center">IsFinal Invoice</th>
+                        <th style="text-align:center">Total Invoice Qty</th>
+                        <th style="text-align:center">Currency</th>
+                        <th style="text-align:center">Total Invoice Value</th>
+                        <th style="text-align:center">Total Discount</th>
+                        <th style="text-align:center">Total Paid</th>
+                        <th style="text-align:center">Remarks</th>
+
+
+                        @if (ViewBag.ApproverNo == 1)
+                        {
+                            <th style="text-align:center">Add Quality</th>
+                            <th style="text-align:center">View Quality</th>
+
+                        }
+                        else
+                        {
+                            @*<th style="text-align:center">Add Quality</th>*@
+                            <th style="text-align:center">View Quality</th>
+                        }
+
+
+                        <th style="text-align:center">Action(Comments)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ int count = 1;}
+                    @foreach (var item in @ViewBag.BillList)
+                    {
+                    <tr id="@item["InvoiceKey"]">
+                        <td>@count</td>
+                        <td>@item["InvoiceKey"]</td>
+                        <td>@item["InvoiceNo"]</td>
+                        <td>@item["PONo"]</td>
+                        <td>@item["InvoiceDate"].ToString("dd MMM yyyy")</td>
+                        <td>@item["InvoiceType"]</td>
+                        <td>@item["Supplier"]</td>
+                        @if (item["IsFinalInvoice"] == true)
+                        {
+                            <td style="color:green;">Yes</td>
+                        }
+                        else
+                        {
+                            <td style="color:red;">No</td>
+                        }
+                        <td>@item["Total_InvoiceQty"]</td>
+                        <td>@item["CurrencyCode"]</td>
+                        <td>@item["Total_InvoiceValue"]</td>
+                        <td>@item["Total_DiscountAmt"]</td>
+                        <td>@item["Total_Paid"]</td>
+                        <td>@item["Remarks"]</td>
+
+
+                        @if (ViewBag.ApproverNo == 1)
+                        {
+                            <td> <button type="button" class="btn  btn-block btn-info btn-sm" onclick="LoadQuality(@item["InvoiceKey"],'@item["InvoiceNo"]')" data-idkey="@item["InvoiceKey"]">Add Quality</button></td>
+                            <td> <button type="button" class="btn  btn-block btn-info btn-sm" data-toggle="modal" data-target="#myQuality" onclick="CheckQuality(@item["InvoiceKey"])" data-idkey="@item["InvoiceKey"]">View Quality</button></td>
+                        }
+                        else
+                        {
+                            @*<td> <button type="button" class="btn  btn-block btn-info btn-sm" onclick="LoadQuality(@item["InvoiceKey"],'@item["InvoiceNo"]')" data-idkey="@item["InvoiceKey"]">Add Quality</button></td>*@
+                            <td> <button type="button" class="btn  btn-block btn-info btn-sm" data-toggle="modal" data-target="#myQuality" onclick="CheckQuality(@item["InvoiceKey"])" data-idkey="@item["InvoiceKey"]">View Quality</button></td>
+                        }
+
+                        @if (item["IsApproved"] == 3)
+                        {
+                            <td> <button type="button" class="btn  btn-block btn-primary btn-sm" data-toggle="modal" data-target="#myModal" onclick="BillDetailsApprover(@item["InvoiceKey"],1)" data-idkey="@item["InvoiceKey"]">Pending</button></td>
+                        }
+                        else if (item["IsApproved"] == 1)
+                        {
+                            <td> <button type="button" class="btn  btn-block btn-success btn-sm" data-toggle="modal" data-target="#showmodal" onclick="BillDetailsApprover(@item["InvoiceKey"],0)" data-idkey="@item["InvoiceKey"]">Approved</button></td>
+                        }
+                        else if (item["IsApproved"] == 2)
+                        {
+                            <td> <button type="button" class="btn  btn-block btn-danger btn-sm" data-toggle="modal" data-target="#showmodal" onclick="BillDetailsApprover(@item["InvoiceKey"],0)" data-idkey="@item["InvoiceKey"]">Rejected</button></td>
+                        }
+                    </tr>
+                        count++;
+
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <!-- /.box-body -->
+</div>
+

@@ -1,0 +1,1427 @@
+﻿@*@{
+        ViewBag.Title = "VisitorRequestForm";
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }*@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+<link href="~/Content/LoadingModal.css" rel="stylesheet" />
+@Styles.Render("~/Content/capexform.css")
+<style type="text/css">
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+</style>
+<style type="text/css">
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    input, select {
+        width: 100%;
+    }
+
+    #visitorTable td, #visitorTable th {
+        text-align: center;
+    }
+
+        #visitorTable td input[type=text] {
+            all: initial;
+            all: unset;
+        }
+
+    input[type=text], input[type=button], select {
+        height: 30px;
+    }
+
+    #visitorinputtable {
+    }
+
+        #visitorinputtable td {
+            padding-right: 5px;
+            padding-left: 5px;
+        }
+
+    #loading-img {
+        background: url('../../Images/ajax-loader.gif') center center no-repeat;
+        height: 100%;
+        z-index: 20;
+    }
+
+    .overlay {
+        background: #463e3e;
+        display: none;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        opacity: 0.5;
+    }
+
+    .table > thead > tr > th {
+        vertical-align: top;
+        border-bottom: 2px solid #ddd;
+    }
+</style>
+
+@*<h3 style="text-align:center">Courier Request Form </h3>*@
+<div class="row">
+    <div class="col-md-6">
+        @*<h4 style="text-align: center; background-color: #9bb07e; padding: 5px"><strong>Courier Request Form</strong></h4>*@
+        <div class="row">
+            <div class="col-md-12">
+                <div class="col-md-4 location">
+                    <label for="location" class="location">Location : <span style="color:red">*</span></label>
+                    <select id="location" class="form-control cke_required">
+                        <option value="0">Select Location</option>
+                        <option value="1">Central</option>
+                        @*<option value="1">Factory</option>*@
+                    </select>
+
+                </div>
+                <div class="col-md-4 business_unit">
+                    <label for="business_unit" class="receiver">Unit : <span style="color:red">*</span></label>
+                    <select id="business_unit" class="form-control business_unit"></select>
+
+                </div>
+                <div class="col-md-4 department">
+                    <label for="department" class="department">Department : <span style="color:red">*</span></label>
+                    <select id="department" class="form-control department" @*data-placeholder="--Select Department--"*@></select>
+
+                </div>
+                <div class="col-md-4 type">
+                    <label for="type" class="type">Type : <span style="color:red">*</span></label>
+                    <select id="type" class="form-control cke_required" onblur="courierCheck()">
+                        <option value="0">--Select Type--</option>
+                        <option value="I">Inbound</option>
+                        <option value="O">Outbound</option>
+                    </select>
+                </div>
+                <div class="col-md-4 customer">
+                    <label for="customer" class="customer">Customer : <span style="color:red">*</span></label>
+                    <select id="customer" class="form-control cke_required">
+                        @*<option value="0">--Select Customer--</option>
+                <option value="1">a</option>
+                <option value="2">b</option>*@
+                    </select>
+                </div>
+                <div class="col-md-4 country">
+                    <label for="country" class="country">Country : <span style="color:red">*</span></label>
+                    <select id="country" class="form-control cke_required" onblur="courierCheck()"> </select>
+
+                </div>
+                <br />
+                <br />
+                <div>
+                    <div class="col-md-12" id="ReceiverDiv">
+                        <h4 style="text-align:center;background-color:skyblue;padding:5px"><strong>Receiver Information</strong></h4>
+                    </div>
+                    <div class="col-md-12" id="SenderDiv">
+                        <h4 style="text-align:center;background-color:skyblue;padding:5px"><strong>Sender Information</strong></h4>
+                    </div>
+
+                    <div class="col-md-4 receiver">
+                        <label for="receiver" id="receiverLabel" class="receiver">Receiver Name : @*<span style="color:red">*</span>*@</label>
+                        <label for="receiver" id="senderLabel" class="receiver">Sender Name : @*<span style="color:red">*</span>*@</label>
+                        <input type="text" class="form-control receiver" id="receiver" autocomplete="off">
+                    </div>
+                    <div class="col-md-4 receiver">
+                        <label for="title" id="titleLabel" class="title">Title : @*<span style="color:red">*</span>*@</label>
+                        <input type="text" class="form-control title" id="title" autocomplete="off">
+                    </div>
+                    <div class="col-md-4 receiver">
+                        <label for="contactNo" id="contactNoLabel" class="receiver">Contact No : @*<span style="color:red">*</span>*@</label>
+                        <input type="text" class="form-control contactNo" id="contactNo" autocomplete="off">
+                    </div>
+                </div>
+             
+                <div class="col-md-6">
+                    <label for="post_code" class="post_code">Receiver Post Code : @*<span style="color:red">*</span>*@</label>
+                    <input type="text" class="form-control post_code" id="post_code" autocomplete="off">
+                </div>
+                <div class="col-md-6 address">
+                    <label for="project_description" class="address">Receiver Address : <span style="color:red">*</span></label>
+                    <textarea type="text" id="address" placeholder="Address" class="form-control"></textarea>
+                </div>
+                <div class="col-md-6 dispatch_date">
+                    <label for="dispatch_date" class="dispatch_date">Request Date : <span style="color:red">*</span></label>
+                    <input disabled type="date" id="dispatch_date" class="form-control DateFrom" />
+                </div>
+                <div class="col-md-6 delivery_date">
+                    <label for="delivery_date" class="delivery_date">Dispatch Date : <span style="color:red">*</span></label>
+                    <input type="date" id="delivery_date" class="form-control DateFrom" onblur="courierCheck()" />
+                </div>
+
+                <div class="col-md-6 product_description">
+                    <label for="product_description" class="product_description<">Product Description : <span style="color:red">*</span></label>
+                    <input type="text" class="form-control product_description" id="product_description" autocomplete="off">
+                </div>
+
+                <div class="col-md-6 weight">
+                    <label for="weight" class="weight">Weight(KG) : <span style="color:red">*</span> </label>
+                    <input type="number" class="form-control weight" autocomplete="off" onblur="courierCheck()" id="weight">
+                  
+                </div>
+                <div class="col-md-6 volume" style="display:none;">
+                    <label for="volume" class="volume">Volume</label>
+                    <input type="number" class="form-control volume" id="volume">
+                </div>
+                <div class="col-md-6 airway_bill_no" style="display:none;">
+                    <label for="airway_bill_no" class="airway_bill_no">Airway Bill no.</label>
+                    <input type="text" class="form-control airway_bill_no" id="airway_bill_no">
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <br />
+        <br />
+
+    </div>
+    <div class="col-md-6">
+        <div class="row">
+            <div class="col-md-12 courier">
+                <label for="courier" class="courier">Courier  <i style="width:10%;color:green;padding-left:2px;cursor:pointer" onclick="courierCheck();" class="fa fa-refresh">Refresh</i></label>
+                @*<select id="courier" class="form-control department"></select>*@
+                <select id="courier" class="form-control cke_required" onchange="courierWiseCostDate()"> </select>
+                @*<input type="text" class="form-control courier" id="courier">*@
+                <input type="hidden" class="form-control form-inline" id="change_courier">
+                <input type="hidden" class="form-control form-inline" id="change_courier_name">
+            </div>
+
+            <div class="col-md-6 proposed_date">
+                <label for="proposed_date" class="proposed_date">Proposed Delivery Date</label>
+                <input type="date" id="proposed_date" class="form-control DateFrom" onchange="proposedDateWisecourierCostDate()" />
+                <input type="hidden" class="form-control form-inline" id="change_proposed_date">
+            </div>
+
+            <div class="col-md-6 cost">
+                <label for="cost" class="cost">Cost(USD)</label>
+                <input type="text" class="form-control form-inline" id="cost">
+                <input type="hidden" disabled class="form-control form-inline" id="change_cost">
+            </div>
+            <div class="col-md-7 remarks">
+                <label for="remarks" class="remarks">Remarks</label>
+                <textarea type="text" id="remarks" placeholder="Remarks" class="form-control remarks"></textarea>
+            </div>
+            <div class="col-md-3" style=" margin-top:50px;">
+                <button id="save_button" class="btn btn-info" style="margin-left:-27px;">Submit</button>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-success" style="float:right;margin-top:-35px;margin-right:-18px;" id="showRate">SHOW RATE</button>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-success" style="float:left;margin-top:-37px; margin-left:140px;" id="showTable">RATE MATRIX </button>
+            </div>
+
+        </div>
+        <h4 style="text-align: center;  padding: 5px ;background-color: #9bb07e;"><strong>Approver List</strong></h4>
+        <table width="100%" id="ListOfApprover" class="table table-bordered table-responsive table-condensed table-hover">
+
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>SL</th>
+                    <th>Approver Name</th>
+                    <th>Approver Designation</th>
+                </tr>
+            </thead>
+            <tbody id="approverTable">
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+
+
+
+<div class="modal" id="myModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" style="text-align: center;font-weight:bold ;">Courier Request Preview</h4>
+            </div>
+            <div id="modalbody" class="modal-body">
+            </div>
+            <div class="modal-footer">
+                 <button type="button"  class="btn btn-primary btn-sm" onclick="PrintModal()" >Print</button>
+                @*<button type="button" class="btn btn-primary btn-sm" id="confirmCourierInfo">Confirm</button>*@
+                <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<div class="modal" id="courierTypeModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" style="text-align: center;font-weight:bold ;">Rate Matrix Preview</h4>
+            </div>
+            <div id="courierTypemodalbody" class="modal-body">
+            </div>
+            <div class="modal-footer">
+             
+                <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+@*<img src="http://i.giphy.com/13Xkz5sLdjGiQw.gif" id="loader">*@
+<div id="loader" style="margin-top:10px; display:none;">
+    <img src="~/Images/ajax-loader.gif" />
+</div>
+
+<div class="overlay">
+    <div id="loading-img"></div>
+</div>
+<div class="modal" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" style="text-align:center">Courier Preview</h4>
+            </div>
+            <div id="modalbody" class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="remove_button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-info" id="confirmCapexInfo">Submit</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+@*@Scripts.Render("~/bundles/jquery")*@
+<script type="text/javascript">
+  //  $('#business_unit').prop('disabled', true);
+    function PrintModal() {
+        var print_div = document.getElementById("printablearea");
+        var print_area = window.open();
+        print_area.document.write("<style>table{border-collapse:collapse;}</style><img width='20' height='20' src='../../Images/logo.png' /><img style='width:80px;' src='../../Images/logo.png' />");
+        print_area.document.write("<h1 style='text-align:center'>Courier Request Preview</h1>");
+        print_area.document.write(print_div.innerHTML);
+        print_area.document.close();
+        print_area.focus();
+        print_area.print();
+        print_area.close();
+    }
+      function approverlist() {
+
+        $('#ListOfApprover').show();
+         var urlpath = '@Url.Action("ApproverList", "Courier")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { status: '1' },
+            async: true,
+            success: function (data) {
+                //console.log(data)
+                //$('#ListOfApprover').empty();
+                var result = "";
+                var count = 1;
+                $('#ListOfApprover tr').not(function () { return !!$(this).has('th').length; }).remove();
+               // $('#subcategory').append("<option value='0'>--Select Business Unit--</option>");
+                for (var i = 0; i < data.length; i++) {
+
+                    result += "<tr data-approverid=" + data[i].UserId + ">"
+                    //result += "<td>" + count + "<td>"Designation
+                    if (data.length > 2) {
+                        result += "<td style='text-align: center;width:25px'><input type='checkbox' checked class='approval' id='enableCheck' value=" + data[i].UserId + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].Designation + "\"></td>"
+                    }
+                    else {
+                        result += "<td style='text-align: center;width:25px'><input type='checkbox' checked disabled class='approval' id='enableCheck' value=" + data[i].UserId + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].Designation + "\"></td>"
+                    }
+
+                    result += '<td><p name="approverNo">' + count + '</p></td>';
+                    result += '<td><p name="userName">' + data[i].UserName + '</p></td>';
+                    result += '<td><p name="designation">' + data[i].Designation + '</p></td>';
+                    result += "</tr>"
+                    count++;
+                }
+
+                $('#ListOfApprover').append(result);
+            }
+        });
+    }
+    function approverlistnew() {
+
+        $('#ListOfApprover').show();
+         var urlpath = '@Url.Action("Approverlistnew", "Courier")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { status: '2' },
+            async: true,
+            success: function (data) {
+                console.log(data)
+                //$('#ListOfApprover').empty();
+                var result = "";
+                var count = 1;
+                $('#ListOfApprover tr').not(function () { return !!$(this).has('th').length; }).remove();
+               // $('#subcategory').append("<option value='0'>--Select Business Unit--</option>");
+                for (var i = 0; i < data.length; i++) {
+
+                    result += "<tr data-approverid=" + data[i].UserId + ">"
+                    //result += "<td>" + count + "<td>"Designation
+                    if (data.length > 2) {
+                        result += "<td style='text-align: center;width:25px'><input type='checkbox' checked class='approval' id='enableCheck' value=" + data[i].UserId + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].Designation + "\"></td>"
+                    }
+                    else {
+                        result += "<td style='text-align: center;width:25px'><input type='checkbox' checked disabled class='approval' id='enableCheck' value=" + data[i].UserId + " data-username=\"" + data[i].UserName + "\" data-designation=\"" + data[i].Designation + "\"></td>"
+                    }
+
+                    result += '<td><p name="approverNo">' + count + '</p></td>';
+                    result += '<td><p name="userName">' + data[i].UserName + '</p></td>';
+                    result += '<td><p name="designation">' + data[i].Designation + '</p></td>';
+                    result += "</tr>"
+                    count++;
+                }
+
+                $('#ListOfApprover').append(result);
+            }
+        });
+    }
+
+    onLoad();
+
+    function onLoad() {
+        $('#ReceiverDiv').hide();
+        $('#SenderDiv').hide();
+        $('#receiverLabel').hide();
+        $('#senderLabel').hide();
+        $('#titleLabel').hide();
+        $('#contactNoLabel').hide();
+        $('#receiver').hide();
+        $('#title').hide();
+        $('#contactNo').hide();
+        $('#department').prop('disabled', true);
+        $('#business_unit').prop('disabled', true);
+        $('#type').prop('disabled', true);
+        $('#customer').prop('disabled', true);
+        $('#receiver').prop('disabled', true);
+        $('#country').prop('disabled', true);
+        $('#receiver').prop('disabled', true);
+        $('#title').prop('disabled', true);
+        $('#contactNo').prop('disabled', true);
+        $('#cost').prop('disabled', true);
+       // $('#customer').addClass('select2-dropdown--below');
+        LoadCustomer();
+      //  LoadCountry();
+        LoadBusinessUnit();
+        //if ($("#location").val() == 1) {
+
+        //    $(this).attr("selected", "selected");
+        //    $('#business_unit').prop('disabled', false);
+        //    LoadBusinessUnit();
+        //    LoadDepartment(1)
+        //}
+        var font_received_date = document.getElementById("dispatch_date");
+        var today = new Date();
+        // Set month and day to string to add leading 0
+        var day = new String(today.getDate());
+        var mon = new String(today.getMonth() + 1); //January is 0!
+        var yr = today.getFullYear();
+
+        if (day.length < 2) { day = "0" + day; }
+        if (mon.length < 2) { mon = "0" + mon; }
+
+        var date = new String(yr + '-' + mon + '-' + day);
+
+
+       // font_received_date.setAttribute('max', date);
+        $('#dispatch_date').val(date);
+    }
+
+
+    function LoadCustomer() {
+        debugger;
+        $('#upCustomer').css({ "border-color": "#d3d3d3" });
+        $('#customer').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadCustomer", "Courier")';
+
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
+            success: function (data) {
+                $('#upCustomer').empty();
+                $('#customer').empty();
+                $('#upCustomer').append("<option value='0'>--Select Customer --</option>");
+                $('#customer').append("<option value='0'>--Select Customer --</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#customer").append($("<option></option>").val(data[i].CustomerId)
+                        .html(data[i].CustomerName));
+                    $("#upCustomer").append($("<option></option>").val(data[i].CustomerId)
+                        .html(data[i].CustomerName));
+                }
+            },
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+    }
+
+    function LoadLocation() {
+        $('#location').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadLocation", "Home")';
+
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
+            success: function (data) {
+                $('#location').empty();
+                $('#location').append("<option value='0'>--Select Location --</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#location").append($("<option></option>").val(data[i].LocationId)
+                        .html(data[i].LocatioName));
+                }
+            },
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+    }
+
+     function LoadBusinessUnit() {
+        $('#business_unit').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadBusinessUnit", "Courier")';
+
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {},
+            async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
+            success: function (data) {
+                $('#upBusinessunit').empty();
+                $('#business_unit').empty();
+                $("#visitorCompanySQ").empty();
+                $('#business_unit').append("<option value='0'>--Select Business Unit--</option>");
+                $('#upBusinessunit').append("<option value='0'>--Select Business Unit--</option>");
+                $('#visitorCompanySQ').append("<option value='0'>--Select Business Unit--</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#business_unit").append($("<option></option>").val(data[i].BusinessUnitId)
+                        .html(data[i].BusinessUnitName));
+                    $("#visitorCompanySQ").append($("<option></option>").val(data[i].BusinessUnitId)
+                        .html(data[i].BusinessUnitName));
+                    $("#upBusinessunit").append($("<option></option>").val(data[i].BusinessUnitId)
+                        .html(data[i].BusinessUnitName));
+                }
+            },
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+    }
+
+
+    $("#location").change(function () {
+        var location = $(this).val();
+      /*  $(this).attr("selected", "selected");*/
+            $('#business_unit').prop('disabled', false);
+
+        LoadDepartment(location);
+
+    });
+    $("#upLocation").change(function () {
+        if ($("#upLocation").val() == 1) {
+
+            $(this).attr("selected", "selected");
+            $('#business_unit').prop('disabled', false);
+            LoadBusinessUnit();
+            LoadDepartment(1)
+        } else if ($("#upLocation").val() == 2) {
+
+
+            $(this).attr("selected", "selected");
+            $('#business_unit').prop('disabled', false);
+
+            LoadBusinessUnit();
+            LoadDepartment(2);
+
+        } else {
+            $(this).attr("selected", "selected");
+            $('#business_unit').empty();
+        }
+
+
+    });
+    $("#business_unit").change(function () {
+
+       $(this).attr("selected", "selected");
+        $('#department').prop('disabled', false);
+
+    });
+    $("#department").change(function () {
+
+        $(this).attr("selected", "selected");
+        $('#type').prop('disabled', false);
+
+    });
+    $("#type").change(function () {
+        debugger;
+
+        var type = $("#type option:selected").val();
+        LoadCountry(type)
+        if (type =='I') {
+            $('#SenderDiv').show();
+            $('#ReceiverDiv').hide();
+            $('#senderLabel').show();
+            $('#receiverLabel').hide();
+            $('#titleLabel').show();
+            $('#contactNoLabel').show();
+            $('#receiver').show();
+            $('#title').show();
+            $('#contactNo').show();
+        }
+        else {
+            $('#ReceiverDiv').show();
+            $('#SenderDiv').hide();
+            $('#senderLabel').hide();
+            $('#receiverLabel').show();
+            $('#titleLabel').show();
+            $('#contactNoLabel').show();
+            $('#receiver').show();
+            $('#title').show();
+            $('#contactNo').show();
+        }
+
+        //if (type ='I') {
+        //    $('#SenderDiv').show();
+        //}
+        //else {
+        //    $('#ReceiverDiv').show();
+        //}
+
+        //if (type = 'O') {
+
+        //}
+        //else {
+        //    $('#ReceiverDiv').hide();
+        //}
+        $(this).attr("selected", "selected");
+        $('#customer').prop('disabled', false);
+
+    });
+    function LoadCountry(type) {
+        $('#upCountry').css({ "border-color": "#d3d3d3" });
+        $('#country').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("LoadCountry", "Courier")';
+        //
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { type: type},
+            async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
+            success: function (data) {
+                $('#upCountry').empty();
+                $('#country').empty();
+                $('#upCountry').append("<option value='0'>--Select Country --</option>");
+                $('#country').append("<option value='0'>--Select Country --</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#country").append($("<option></option>").val(data[i].CountryId)
+                        .html(data[i].CountryName));
+                    $("#upCountry").append($("<option></option>").val(data[i].CountryId)
+                        .html(data[i].CountryName));
+                }
+            },
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+    }
+    $("#customer").change(function () {
+
+        $(this).attr("selected", "selected");
+       $('#country').prop('disabled', false);
+
+    });
+    $("#country").change(function () {
+
+        $(this).attr("selected", "selected");
+        $('#receiver').prop('disabled', false);
+        $('#title').prop('disabled', false);
+        $('#contactNo').prop('disabled', false);
+    });
+
+    function LoadCourier() {
+        var country = $('#country').val();
+        var delivery_date = $('#delivery_date').val();
+        var weight = $('#weight').val();
+        var type = $('#type').val();
+        $('#courier').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("GetCourierList", "Courier")';
+
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { country: country, delivery_date: delivery_date, weight: weight, type: type},
+            async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
+            success: function (data) {
+                $('#courier').empty();
+
+              //  $('#courier').append("<option value='0'>-- Select Courier --</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#courier").append($("<option ></option>").val(data[i].CourierTypeId)
+                        .html(data[i].ServiceProvider));
+                  //  $("#change_courier").val(data[i].CourierTypeId);
+
+                }
+            }
+            ,
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+    }
+    function LoadDepartment(location) {
+        $('#requestorDepartment').css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("GetDepartmentList", "Courier")';
+
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {location:location},
+            async: true,
+            beforeSend: function () {
+                $('.overlay').show();
+            },
+            success: function (data) {
+                $('#upDepartment').empty();
+                $('#department').empty();
+                $('#requestorDepartmentSQ').empty();
+                $('#requestorDepartmentSQ').append("<option value='0'>-- Select Department --</option>");
+                $('#upDepartment').append("<option value='0'>-- Select Department --</option>");
+                $('#department').append("<option value='0'>-- Select Department --</option>");
+                for (var i = 0; i < data.length; i++) {
+                    $("#upDepartment").append($("<option></option>").val(data[i].DepartmentId)
+                        .html(data[i].DeartmentName));
+                    $("#department").append($("<option></option>").val(data[i].DepartmentId)
+                        .html(data[i].DeartmentName));
+                    $("#requestorDepartmentSQ").append($("<option></option>").val(data[i].DepartmentId)
+                        .html(data[i].DeartmentName));
+                }
+            }
+            ,
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+    }
+    $('#showTable').on('click', function () {
+        debugger
+        var type = $('#type').val();
+        if ($("#type").val() == "0") {
+            swal({
+                title: 'Please Select Type ',
+                type: 'error',
+                closeOnCancel: true
+            });
+       
+
+            return false;
+        }
+        else {
+            var urlpath = '@Url.Action("showCourierTypeInformationPreview", "Courier")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {
+                    status: '4',
+                    type: type
+                },
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $("#courierTypemodalbody").html("");
+                            $("#courierTypemodalbody").append(data);
+                            $("#courierTypeModal").modal("show");
+                            $("#courierTypeshowTable").DataTable();
+                        }
+                    }
+                });
+        }
+       // alert(type);
+
+    });
+    $('#showRate').on('click', function () {
+        debugger
+        var type = $('#type').val();
+        var country = $('#country').val();
+        var weight = $('#weight').val();
+       // alert(type);
+        if ($("#type").val() == "0") {
+            swal({
+                title: 'Please Select Type ',
+                type: 'error',
+                closeOnCancel: true
+            });
+           
+
+            return false;
+        }
+        if ($("#country").val() == "0") {
+            swal({
+                title: 'Please Select Country ',
+                type: 'error',
+                closeOnCancel: true
+            });
+       
+            return false;
+        }
+        if ($("#weight").val() == '') {
+            swal({
+                title: 'Please Enter Product Weight ',
+                type: 'error',
+                closeOnCancel: true
+            });
+        
+            return false;
+        }
+
+        else {
+ var urlpath = '@Url.Action("showCourierTypeInformationPreviewByCountry", "Courier")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {
+                    status: '4',
+                    type: type,
+                    country: country,
+                    weight: weight
+                },
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $("#courierTypemodalbody").html("");
+                            $("#courierTypemodalbody").append(data);
+                            $("#courierTypeModal").modal("show");
+                            $("#courierTypeshowTable").DataTable();
+                        }
+                    }
+                });
+        }
+
+    });
+    $("#save_button").click(function () {
+
+        debugger;
+        modalView();
+    });
+
+    function SubmitToDatabase() {
+        debugger;
+           if ($('#approverTable tr td input[type=checkbox]:checked').length < 1) {
+            //alert($('#approverTable tr td input[type=checkbox]:checked').length);
+            swal({
+                title: 'Approver Not Selected',
+                type: 'error',
+                closeOnCancel: true
+            });
+        }
+        else if ($('#approverTable tr td input[type=checkbox]:checked').length > 2) {
+            //alert($('#approverTable tr td input[type=checkbox]:checked').length);
+            swal({
+                title: 'Approver More Than 2 Selected',
+                type: 'error',
+                closeOnCancel: true
+            });
+        }
+           else {
+                  SaveCourierRequest();
+
+          var jsondate = SaveCourierRequest();
+           var urlpath = '@Url.Action("SaveCourierRequest", "Courier")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsondate),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    swal({
+                        title: 'Courier Request Submit Successfully',
+                        type: 'success',
+                        closeOnCancel: true
+                    },function () {
+                            $("#myModal").modal("hide");
+                            $("#iousubmenu").find('li').removeClass();
+                            $("#iousubmenu").find('li:nth-child(2)').addClass("active");
+
+                    });
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+           }
+
+    };
+    @*$("#confirmCourierInfo").click(function () {
+        debugger;
+           if ($('#approverTable tr td input[type=checkbox]:checked').length < 1) {
+            //alert($('#approverTable tr td input[type=checkbox]:checked').length);
+            swal({
+                title: 'Approver Not Selected',
+                type: 'error',
+                closeOnCancel: true
+            });
+        }
+        else if ($('#approverTable tr td input[type=checkbox]:checked').length > 2) {
+            //alert($('#approverTable tr td input[type=checkbox]:checked').length);
+            swal({
+                title: 'Approver More Than 2 Selected',
+                type: 'error',
+                closeOnCancel: true
+            });
+        }
+           else {
+                  SaveCourierRequest();
+
+          var jsondate = SaveCourierRequest();
+           var urlpath = '@Url.Action("SaveCourierRequest", "Courier")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsondate),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    swal({
+                        title: 'Courier Request Submit Successfully',
+                        type: 'success',
+                        closeOnCancel: true
+                    },function () {
+                            $("#myModal").modal("hide");
+                            $("#iousubmenu").find('li').removeClass();
+                            $("#iousubmenu").find('li:nth-child(2)').addClass("active");
+
+                    });
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+           }
+
+    });*@
+
+
+    function modalView() {
+       // debugger;
+        if ($("#location").val() == "0") {
+            swal({
+                title: 'Please Select Location ',
+                type: 'error',
+                closeOnCancel: true
+            });
+
+            return false;
+        }
+        if ($("#business_unit").val() == "0") {
+            swal({
+                title: 'Please Select Unit ',
+                type: 'error',
+                closeOnCancel: true
+            });
+          
+
+            return false;
+        }
+        if ($("#department").val() == "0") {
+            swal({
+                title: 'Please Select Department ',
+                type: 'error',
+                closeOnCancel: true
+            });
+       
+
+            return false;
+        }
+        if ($("#type").val() == "0") {
+            swal({
+                title: 'Please Select Type ',
+                type: 'error',
+                closeOnCancel: true
+            });
+          
+            return false;
+        }
+        if ($("#customer").val() == "0") {
+            swal({
+                title: 'Please Select Customer ',
+                type: 'error',
+                closeOnCancel: true
+            });
+        
+
+            return false;
+        }
+        //else if ($("#receiver").val().length < 1) {
+        //    toastr.error("Please Enter Receiver ", " Receiver ",
+        //        {
+        //            "positionClass": "toast-top-right",
+        //            "showDuration": "300",
+        //            "hideDuration": "1000",
+        //            "timeOut": "5000",
+        //            "closeButton": true
+        //        });
+
+        //    return false;
+
+        //}
+        //else if ($("#title").val().length < 1) {
+        //    toastr.error("Please Enter Title ", " Title ",
+        //        {
+        //            "positionClass": "toast-top-right",
+        //            "showDuration": "300",
+        //            "hideDuration": "1000",
+        //            "timeOut": "5000",
+        //            "closeButton": true
+        //        });
+
+        //    return false;
+
+        //}
+        //else if ($("#contactNo").val().length < 1) {
+        //    toastr.error("Please Enter Contact No ", " Contact No ",
+        //        {
+        //            "positionClass": "toast-top-right",
+        //            "showDuration": "300",
+        //            "hideDuration": "1000",
+        //            "timeOut": "5000",
+        //            "closeButton": true
+        //        });
+
+        //    return false;
+
+        //}
+        if ($("#country").val() == "0") {
+            swal({
+                title: 'Please Select Country ',
+                type: 'error',
+                closeOnCancel: true
+            });
+         
+
+            return false;
+        }
+        //else if ($("#post_code").val().length < 1) {
+        //    toastr.error("Please Enter Post Code", "Post Code",
+        //        {
+        //            "positionClass": "toast-top-right",
+        //            "showDuration": "300",
+        //            "hideDuration": "1000",
+        //            "timeOut": "5000",
+        //            "closeButton": true
+        //        });
+
+        //    return false;
+
+        //}
+        else if ($("#address").val().length < 1) {
+            swal({
+                title: 'Please Enter Address ',
+                type: 'error',
+                closeOnCancel: true
+            });
+          
+
+            return false;
+
+        }
+        //if ($("#dispatch_date").val() == '') {
+        //    swal({
+        //        title: 'Please Select Dispatch Date ',
+        //        type: 'error',
+        //        closeOnCancel: true
+        //    });
+          
+
+        //    return false;
+        //}
+        if ($("#delivery_date").val() == '') {
+            swal({
+                title: 'Please Select Dispatch Date ',
+                type: 'error',
+                closeOnCancel: true
+            });
+         
+
+            return false;
+        }
+        if ($("#product_description").val() == '') {
+            swal({
+                title: 'Please Enter Product Description ',
+                type: 'error',
+                closeOnCancel: true
+            });
+           
+
+            return false;
+        }
+        if ($("#weight").val() == '') {
+            swal({
+                title: 'Please Enter Product Weightt ',
+                type: 'error',
+                closeOnCancel: true
+            });
+      
+
+            return false;
+        }
+        if ($("#courier").val() == '') {
+            swal({
+                title: 'Courier is empty ',
+                type: 'error',
+                closeOnCancel: true
+            });
+            
+            return false;
+        }
+        if ($("#proposed_date").val() == '') {
+            swal({
+                title: 'Proposed date is empty ',
+                type: 'error',
+                closeOnCancel: true
+            });
+        
+
+            return false;
+        }
+        if ($("#cost").val() == '') {
+            swal({
+                title: 'Cost date is empty ',
+                type: 'error',
+                closeOnCancel: true
+            });
+            toastr.error("Cost date is empty ", " Cost ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+        }
+        else {
+            var jsondate = SaveCourierRequest();
+            var urlpath = '@Url.Action("ShowPertialviewModal", "Courier")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsondate),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    $("#modalbody").html("");
+                    $("#modalbody").append(data);
+                    $("#myModal").modal("show");
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+        }
+
+
+    }
+
+    function SaveCourierRequest() {
+        debugger;
+        var jsonData = {};
+        jsonData["DateOfRequest"] = new Date();
+        jsonData["LocationId"] = $("#location").val();
+        jsonData["locationName"] = $("#location").children("option:selected").html();
+        jsonData["BusinessUnitId"] = $("#business_unit").val();
+        jsonData["BusinessUnitName"] = $("#business_unit").children("option:selected").html();
+        jsonData["DepartmentID"] = $("#department").val();
+        jsonData["DepartmentName"] = $("#department").children("option:selected").html();
+        jsonData["CourierType"] = $("#type").val();
+        jsonData["Customer"] = $("#customer").val();
+        jsonData["BuyerName"] = $("#customer").children("option:selected").html();
+        jsonData["Receiver"] = $("#receiver").val();
+        jsonData["Title"] = $("#title").val();
+        jsonData["ContactNo"] = $("#contactNo").val();
+        jsonData["Country"] = $("#country").val();
+        jsonData["CountryName"] = $("#country").children("option:selected").html();
+        jsonData["PostCode"] = $("#post_code").val();
+        jsonData["Address"] = $("#address").val();
+        jsonData["DispatchDate"] = $("#dispatch_date").val();
+        jsonData["Deliverydate"] = $("#delivery_date").val();
+        jsonData["ProductDescription"] = $("#product_description").val();
+        jsonData["Weight"] = $("#weight").val();
+        jsonData["Volume"] = $("#volume").val();
+       // jsonData["AirwayBillno"] = $("#airway_bill_no").val();
+        jsonData["Courier"] = $("#courier").val();
+        jsonData["ServiceProvider"] = $("#courier").children("option:selected").html();
+        jsonData["ProposedDate"] = $("#proposed_date").val();
+        jsonData["Cost"] = $("#cost").val();
+        jsonData["GenerateCourier"] = $("#change_courier").val();
+        jsonData["GenerateCourierName"] = $("#change_courier_name").val();
+       // jsonData["ServiceProvider"] = $("#courier").children("option:selected").html();
+        jsonData["GenerateProposedDate"] = $("#change_proposed_date").val();
+        jsonData["GenerateCost"] = $("#change_cost").val();
+        jsonData["Remarks"] = $("#remarks").val();
+        jsonData["Status"] = "0";
+       // jsonData["RequesterId"] = "0";
+       // var jsonObj = [];
+
+        var approverObj = []
+        var count = 1;
+        $("#ListOfApprover tr td input[type='checkbox']:checked").each(function () {
+
+
+            var approver = {};
+
+            approver["ApproverId"] = $(this).val();
+            approver["UserID"] = $(this).val();
+            approver["ApproverNo"] = count //$(this).find('p[name^="approverNo"]').html();
+            approver["UserName"] = $(this).attr('data-username');//$(this).find('p[name^="userName"]').html();
+            approver["DesignationName"] = $(this).attr('data-designation'); //$(this).find('p[name^="designation"]').html();
+
+
+            if (approver["ApproverNo"] == 1) {
+                approver["ApproverStatus"] = 1;
+                approver["ApproverStatusName"] = "First Approver"
+            } else {
+                approver["ApproverStatus"] = 2;
+                approver["ApproverStatusName"] = "Second Approver"
+            }
+
+            approverObj.push(approver);
+            count++;
+        })
+
+
+
+        jsonData["CourierApproverList"] = approverObj;
+
+
+        return jsonData;
+
+
+
+
+    }
+
+    $("#cost").change(function () {
+        debugger;
+        var cost = $('#cost').val();
+        var change_cost = $('#change_cost').val();
+
+        if (cost === change_cost) {
+            approverlist();
+        }
+        else {
+            approverlistnew();
+        }
+
+    });
+    $("#proposed_date").change(function () {
+        debugger;
+        var proposed_date = $('#proposed_date').val();
+        var change_proposed_date = $('#change_proposed_date').val();
+
+        if (proposed_date === change_proposed_date) {
+            approverlist();
+        }
+        else {
+            approverlistnew();
+        }
+
+    });
+    $("#courier").change(function () {
+        debugger;
+        var courier = $('#courier').val();
+        var change_courier = $('#change_courier').val();
+
+        if (courier === change_courier) {
+            approverlist();
+        }
+        else {
+            approverlistnew();
+        }
+
+    });
+
+
+    function courierCheck() {
+        debugger;
+     //  LoadCourier();
+        var country = $('#country').val();
+        var delivery_date = $('#delivery_date').val();
+        var weight = $('#weight').val();
+        var type = $('#type').val();
+
+          var urlpath = '@Url.Action("GetCourierProposedDate", "Courier")';
+            $.ajax({
+                 url: urlpath,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                type: "Post",
+                data: JSON.stringify({
+                    country: country,
+                    delivery_date: delivery_date,
+                    weight: weight,
+                    type: type
+
+                }),
+                success: function (response) {
+                    $('#save_button').prop('disabled', false);
+                   $("#proposed_date").val(response.data[0].CourierProposedDate);
+                    $("#cost").val(response.data[0].Rate);
+                    $("#change_courier").val(response.data[0].CourierTypeId);
+                    $("#change_courier_name").val(response.data[0].ServiceProvider);
+                    $("#change_cost").val(response.data[0].Rate);
+                    $("#change_proposed_date").val(response.data[0].CourierProposedDate);
+                    LoadCourier();
+
+                    approverlist();
+
+                },
+                //error: function () {
+                //    alert("Error");
+                //}
+            });
+
+    }
+    function courierWiseCostDate() {
+        debugger;
+     //  LoadCourier();
+        var courier = $('#courier').val();
+        var delivery_date = $('#delivery_date').val();
+        var weight = $('#weight ').val();
+        var type = $('#type').val();
+
+          var urlpath = '@Url.Action("GetcourierWiseCostDate", "Courier")';
+            $.ajax({
+                 url: urlpath,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                type: "Post",
+                data: JSON.stringify({
+                    courier: courier,
+                    delivery_date: delivery_date,
+                    weight: weight,
+                    type: type
+                }),
+                success: function (response) {
+                   $("#proposed_date").val(response.data[0].CourierProposedDate);
+                    $("#cost").val(response.data[0].Rate);
+                    //$("#change_courier").val(response.data[0].ServiceProvider);
+                    //$("#change_cost").val(response.data[0].Rate);
+                    //$("#change_proposed_date").val(response.data[0].CourierProposedDate);
+                    //approverlist();
+
+
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+
+    }
+
+
+
+    function proposedDateWisecourierCostDate() {
+        debugger;
+     //  LoadCourier();
+        var country = $('#country').val();
+        var delivery_date = $('#delivery_date').val();
+        var weight = $('#weight ').val();
+        var type = $('#type').val();
+        var proposed_date = $('#proposed_date').val();
+
+          var urlpath = '@Url.Action("GetproposedDateWisecourierCostDate", "Courier")';
+            $.ajax({
+                 url: urlpath,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                type: "Post",
+                data: JSON.stringify({
+                    country: country,
+                    delivery_date: delivery_date,
+                    weight: weight,
+                    type: type,
+                    proposed_date: proposed_date
+                }),
+
+                success: function (response) {
+                   // console.log(response);
+                    if (!$.trim(response.data[0])) {
+                        $('#save_button').prop('disabled', true);
+                       // alert("What follows is blank: " + response.data[0]);
+                        swal({
+                            title: 'Courier not found in this date ',
+                            type: 'error',
+                            closeOnCancel: true
+                        });
+                        //toastr.error("Courier not found of this date ", " Courier ",
+                        //    {
+                        //        "positionClass": "toast-top-right",
+                        //        "showDuration": "300",
+                        //        "hideDuration": "1000",
+                        //        "timeOut": "5000",
+                        //        "closeButton": true
+                        //    });
+
+                    }
+                    else {
+                        $('#save_button').prop('disabled', false);
+                        $("#courier option:selected").text(response.data[0].ServiceProvider);
+                        $("#cost").val(response.data[0].Rate);
+
+                    }
+
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+
+    }
+</script>
+

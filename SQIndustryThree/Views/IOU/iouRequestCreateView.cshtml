@@ -1,0 +1,359 @@
+﻿
+<style type="text/css">
+    #iourequestform td{
+        padding:2px;
+    }
+    #ammountInformationbody input[type="text"], #ammountInformationbody input[type="number"] {
+        width: 100%;
+        text-align: center;
+    }
+
+    #ammountInformationbody input[type="button"] {
+        height: 25px;
+        width: 25px;
+        border-radius: 50%;
+    }
+    #addrowbutton {
+        background-color: green;
+        color: white;
+        font-weight: bold;
+    }
+    .deletebutton {
+        background-color: red;
+        color: white;
+        font-weight: bold;
+    }
+
+    p {
+        border: 0;
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #departmentId, #business_unit, #ammount {
+        background-color: #ffffff;
+    }
+    th{
+        text-align:center;
+    }
+    .required:after {
+        content: "*";
+        color: red;
+    }
+</style>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-5">
+            <table id="iourequestform" width="100%">
+                <tr>
+                    <td width="30%"><label class="required">Department Head</label></td>
+                    <td width="70%">
+                        <select  id="departmentId" onchange="OnChangeDepartmentHead(this)" class="form-control">
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label>Date of Request</label></td>
+                    <td><p id="current_date" class="form-control"></p></td>
+                </tr>
+                <tr>
+                    <td><label>Required Date</label></td>
+                    <td><input id="required_Date" type="date"  class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td><label for="locationCheck" class="required">Select Location</label></td>
+                    <td>
+                        <select id="locationCheck" onchange="LoadApproverList()" class="form-control">
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="required">Select Business Unit</label></td>
+                    <td>
+                        <select id="business_unit" onchange="LoadApproverList()" class="form-control">
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="required">Amount (In BDT)</label></td>
+                    <td><input type="number" disabled value=0 id="ammount" class="form-control"  /></td>
+                </tr>
+                <tr>
+                    <td><label class="required">Purpose</label></td>
+                    <td><textarea type="text" id="purpose_iou" style="resize: none " placeholder="Purpose" class="form-control" rows="3" /></td>
+                </tr>
+            </table>
+            @*<div class="col-md-2">
+            <label>Currency</label>
+            <select id="currency" class="form-control">
+            </select>
+        </div>*@
+            <div class="col-md-12" style="text-align:center">
+                <hr />
+                <input type="button" class="btn btn-success btn-sm " onclick="varifyInputElement()" value="Submit For Approve" />
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="col-md-4">
+                <label>File Upload (if any)</label>
+                <input type="file" onchange="FileUploadOnChange()" class="form-control" id="ioufileuploadbutton" value="upload" />
+            </div>
+            <div class="col-md-8">
+                <label>Attached File</label>
+                <table style="width:100%" border="1" id="iouuploadedtable">
+                    <thead>
+                        <tr>
+                            <th>File Name</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attachedFileTable">
+                    </tbody>
+                </table>
+            </div>
+            <table width="100%" style="text-align:center" border="1" id="genaralInformationTable">
+                <caption>Ammount Table</caption>
+                <thead>
+                    <tr>
+                        <th class="required">Item Name</th>
+                        <th class="required">Remarks</th>
+                        <th class="required">Amount(In BDT)</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="ammountInformationbody">
+                    <tr>
+                        <td><input type="text" id="tableitemName" name="tableitemName" placeholder="Enter Item Name" /></td>
+                        <td><input type="text" id="tablepurpose" name="tablepurpose" placeholder="Enter Remarks" /></td>
+                        <td><input type="number" id="tableammount" onchange="calculateGrandTotal()" name="tableammount" placeholder="Amount in BDT" /></td>
+                        <td>
+                            <input type="button" id="addrowbutton" onclick="addnewAmmount()" value="+" />
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="2">Total</th>
+                        <th><input style="border:none;pointer-events:none;text-align:center" type="text" id="totalammount" /></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+            </table>
+            <table width="100%" border="1" class="table table-striped">
+                <caption>Approver List</caption>
+                <thead>
+                    <tr>
+                        <th width="5%">No</th>
+                        <th width="45%">Approver/Contoller Name</th>
+                        <th width="35%">Designation</th>
+                        <th width="15%">Role</th>
+                    </tr>
+                </thead>
+                <tbody id="Iouapproverlist">
+                </tbody>
+            </table>
+        </div>
+        
+    </div>
+</div>
+
+<script type="text/javascript">
+    //$("input.DateFrom").datepicker({
+    //    minDate: 0  
+    //});
+    GetDate();
+    GetUserDepartment(0, 0, '#departmentId');
+    
+
+    function OnChangeDepartmentHead(deheadVal) {
+        var department = $(deheadVal).val();
+        GetUserDepartment(1, department,'#locationCheck');
+        GetUserDepartment(2, department, '#business_unit');
+        LoadApproverList();
+    }
+    function GetDate() {
+        var dt = new Date();
+        var dd;
+        dd = dt.getDate();
+        const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+                      "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
+        ];
+        document.getElementById('current_date').innerHTML = dd + '-' + monthNames[dt.getMonth()] + '-' + dt.getFullYear();
+    }
+    
+    function LoadApproverList() {
+        var buid = $('#business_unit').val() || '0';
+        var locationId = $('#locationCheck').val() || '0';
+        var departmentId = $('#departmentId').val() || '0';
+        var ammount = $('#ammount').val() || 0 ;
+        //if (locationId == 2) {
+        //    if (ammount > 25000) {
+        //        swal({
+        //            title: 'You can not raise more than 25000 BDT by Select factory',
+        //            type: 'error',
+        //            closeOnCancel: true
+        //        });
+        //        $('#ammount').val("25000");
+        //    }
+        //}
+        var urlpath = '@Url.Action("GetApproverList", "IOU")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {
+                BusinessUnit: buid,
+                LocationId: locationId,
+                DepartmentId: departmentId,
+                Ammount:ammount
+            },
+            async: true,
+            success: function (data) {
+                $("#Iouapproverlist").empty();
+                 for (var i = 0; i < data.length; i++) {
+                    var newRow = $("<tr>");
+                     var cols = "";
+                     cols += '<td style="display:none"><p name="userId">' + data[i].UserID + '</p></td>';
+                     cols += '<td style="display:none"><p name="apstatusid">' + data[i].ApproverStatus + '</p></td>';
+                     cols += '<td><p name="approverNo">' + data[i].ApproverNo + '</p></td>';
+                     cols += '<td><p name="userName">' + data[i].UserName + '</p></td>';
+                     cols += '<td><p name="designationName">' + data[i].DesignationName + '</p></td>';
+                     cols += '<td><p name="approverstatus">' + data[i].ApproverStatusName + '</p></td></tr>';
+                    newRow.append(cols);
+                    $("#Iouapproverlist").append(newRow);
+                }
+            },
+            error: function () {
+                alert("error");
+            }
+        });    
+    }
+    function SaveIOuRequest() {
+        var jsonData = {};
+        jsonData["BusinessUnitId"] = $("#business_unit").val();
+        jsonData["BusinessUnitName"] = $("#business_unit").children("option:selected").html();
+        jsonData["DepartmentID"] = $("#departmentId").val();
+        jsonData["DepartmentName"] = $("#departmentId").children("option:selected").html();
+        jsonData["LocationId"] = $("#locationCheck").val();
+        jsonData["LocationName"] = $("#locationCheck").children("option:selected").html();
+        jsonData["RequiredDate"] = $("#required_Date").val();
+        jsonData["Ammount"] = $("#ammount").val();
+        jsonData["Purpose"] = $("#purpose_iou").val();
+        jsonData["DateOfRequest"] = new Date();
+        jsonData["IouRequestId"] = "0";
+        jsonData["Status"] = "0";
+        
+        var fileUpload = [];
+        $('#attachedFileTable tr').each(function () {
+            var filedate = {};
+            filedate["CapexFileName"] = $(this).find('td[name^="fileName"]').html();
+            filedate["CapexFilePath"] = $(this).find('td[name^="filePath"]').html();
+                fileUpload.push(filedate);
+        });
+        jsonData["IOurequestfiles"] = fileUpload; 
+        var ammountList = [];
+        $('#ammountInformationbody tr').each(function () {
+                var myData = {};
+                myData["ItemName"] = $(this).find('input[name^="tableitemName"]').val();
+                myData["Purpose"] = $(this).find('input[name^="tablepurpose"]').val();
+                myData["Ammount"] = $(this).find('input[name^="tableammount"]').val();
+                ammountList.push(myData);
+        });
+        jsonData["AmmountList"] = ammountList; 
+        var approverList = [];
+        $('#Iouapproverlist tr').each(function () {
+            var approver = {};
+            approver["UserID"] = $(this).find('p[name^="userId"]').html();
+            approver["ApproverNo"] = $(this).find('p[name^="approverNo"]').html();
+            approver["UserName"] = $(this).find('p[name^="userName"]').html();
+            approver["DesignationName"] = $(this).find('p[name^="designationName"]').html();
+            approver["ApproverStatusName"] = $(this).find('p[name^="approverstatus"]').html();
+            approver["ApproverStatus"] = $(this).find('p[name^="apstatusid"]').html();
+            approverList.push(approver);
+        });
+        jsonData["IOUApproverList"] = approverList; 
+        return jsonData;
+    }
+    var trrowNo = 0;
+    function deleterow(rowval) {
+        $('tr#' + rowval + '').remove();
+        calculateGrandTotal();
+    }
+    function addnewAmmount() {
+        //if ($('#styleName').val() == "") {
+        //    ShowAlert();
+        //} else if ($('#colorName').val() == "") {
+        //    ShowAlert();
+        //} else if ($('#PoName').val() == "") {
+        //    ShowAlert();
+        //} else {
+            trrowNo++;
+            var col = '<tr id="' + trrowNo + '">'
+         col += '<td ><input type="text"  name="tableitemName" placeholder="Enter Item Name"  /></td>';
+         col += '<td ><input type="text" name="tablepurpose" placeholder="Enter Remarks"   /></td>';
+         col += '<td ><input type="number" onchange="calculateGrandTotal()"  placeholder="In BDT"   name="tableammount"  /></td>';
+                
+                col += '<td><input type="button" value="x" class="deletebutton" onclick="deleterow('+trrowNo+')" /></td></tr>';
+            $("#ammountInformationbody").append(col);
+            calculateGrandTotal();
+        //}   
+    }
+    function calculateGrandTotal() {
+        var grandTotal = 0;
+         $("#ammountInformationbody tr").each(function () {
+            var myammount = $(this).find('input[name^="tableammount"]').val();
+                grandTotal+=(myammount*1);
+        });
+        $("#totalammount").val(grandTotal);
+         $("#ammount").val(grandTotal);
+         LoadApproverList();
+
+    }
+    function varifyInputElement() {
+        $('input').css({ "border-color": "#d3d3d3" });
+        $('select').css({ "border-color": "#d3d3d3" });
+
+        if ($('#departmentId').val() == 0) {
+            $('#departmentId').css({ "border-color": "#FF0000" });
+        } else if ($('#locationCheck').val() == 0 || $('#locationCheck').val() == "") {
+             $('#locationCheck').css({ "border-color": "#FF0000" });
+        } else if ($('#business_unit').val() == 0 || $('#business_unit').val() == "") {
+            $('#business_unit').css({ "border-color": "#FF0000" });
+        } else if ($('#required_Date').val() == '') {
+            $('#required_Date').css({ "border-color": "#FF0000" });
+        } else if ($('#ammount').val()< 1) {
+             $('#ammount').css({ "border-color": "#FF0000" });
+        }else if ($('#locationCheck').val() == 2 && parseFloat($('#ammount').val()) > 25000) {
+            swal({
+                title: 'From Factory You can not raise more than 25K',
+                type: 'error',
+                closeOnCancel: true
+            });
+        } else if ($('#Iouapproverlist tr').length<1) {
+            swal({
+                title: 'No Approver Defined',
+                type: 'error',
+                closeOnCancel: true
+            });
+        }else {
+            var jsondate = SaveIOuRequest();
+            var urlpath = '@Url.Action("ModalBeforeIOUSubmit", "IOU")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsondate),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    $("#modalbody").html("");
+                    $("#modalbody").append(data);
+                    $("#myModal").modal("show");
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+        }
+    }
+</script>

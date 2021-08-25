@@ -4,35 +4,43 @@
 }
 <style>
    
-#container {
+/*#container {
   padding-left: 300px;
 }
 
 #content {
   padding: 20px;
-}
+}*/
+    #capNavigation {
+        background-color: #37474F;
+    }
+    #capsubmenu li a {
+        color: white;
+    }
 </style>
 <div class="container-fluid">
-    <h2 style="text-align:center;"><b>ALL CAPEX INFORMATION</b></h2>
+    <h3 style="text-align:center;"><b>ALL CAPEX INFORMATION</b></h3>
     <hr />
     <div class="row">
-        <div class="sidebar" style="width:15%;float:left">
-            <ul class="nav">
-                @if (Convert.ToInt32(Session["Requestor"]) == 1)
-                {
-                    <li><a href="#" onclick="getAllPendingCapex(4)">My Capex</a></li>
-                }
-                else
-                {
-                    <li><a href="#" onclick="getAllPendingCapex(0)">All Pending Capex <span style="color:red;" id="pending_Capex"></span></a></li>
-                    <li><a href="#" onclick="getAllPendingCapex(1)">All Approved So Far </a></li>
-                    <li><a href="#" onclick="getAllPendingCapex(2)">All Rejected Capex So Far</a></li>
-                }
-            </ul>
+        <div id="capNavigation" class="navbar navbar-default navbar-static-top">
+            <div >
+                <div >
+                    <ul id="capsubmenu" class="nav navbar-nav">
+                        @if (Convert.ToInt32(Session["Requestor"]) == 1)
+                        {
+                            <li><a href="#" onclick="getAllPendingCapex(4)">My Capex</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="#" onclick="getAllPendingCapex(0)">All Pending Capex <span style="color:white;" id="pending_Capex"></span></a></li>
+                            <li><a href="#" onclick="getAllPendingCapex(1)">All Approved So Far </a></li>
+                            <li><a href="#" onclick="getAllPendingCapex(2)">All Rejected Capex So Far</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
         </div>
-        <div style="text-align:center;width:85%;float:right">
-            <div id="pendingCapexTable"> </div>
-        </div>
+        <div id="pendingCapexTable"> </div>
     </div>
 </div>
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -98,7 +106,12 @@
 
 @section Scripts {
         <script type="text/javascript">
-        $(function () {
+            $(function () {
+            $('#capsubmenu > li > a').click(function() {
+                $('li').removeClass();
+                $(this).parent().addClass('active');
+               // $("#spmenuid").html($(this).html());
+            });
             getAllPendingCapex(0);
             });
 
@@ -135,7 +148,22 @@
                     }
                 });
         }
-
+            @*function getPendingReview() {
+                var urlpath = '@Url.Action("showCapexInformation", "CapexApproval")';
+                $.ajax({
+                    url: urlpath,
+                    type: "Post",
+                    data: {status:5},
+                        async: true,
+                        success: function(data) {
+                            if (data) {
+                                $('#pendingCapexTable').empty();
+                                $('#pendingCapexTable').html(data);
+                                $("#capexshowTable").DataTable();
+                            }
+                        }
+                    });
+            }*@
         //only show the capex
         function ShowSelectedCapex(primarykey) {
             var urlpath = '@Url.Action("IndividualCapexShow", "CapexApproval")';
@@ -239,11 +267,11 @@
         });
 
 
-            function updateCapex() {
+            function updateCapex(capexid) {
                  var primarykey = $("#update_primarykey").val();
                 var urlpath = '@Url.Action("Editcapexmodal", "CapexApproval")';
                 $.ajax({
-                    data: {primarykey:primarykey},
+                    data: {primarykey:capexid},
                     url: urlpath,
                     type: "Post",
                     async: true,

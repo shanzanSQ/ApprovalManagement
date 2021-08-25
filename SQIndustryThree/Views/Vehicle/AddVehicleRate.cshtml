@@ -1,0 +1,237 @@
+﻿
+@{
+    ViewBag.Title = "VehicleAllocation";
+}
+
+<style type="text/css">
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    input, select {
+        width: 100%;
+    }
+
+        input[type=text], input[type=button], select {
+            height: 30px;
+        }
+
+    .overlay {
+        background: #463e3e;
+        display: none;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        opacity: 0.5;
+    }
+
+    .mt {
+        margin-top: 8px;
+    }
+
+    .vhRequestTableDiv {
+        margin-top: 20px;
+    }
+
+    #submitButton {
+        margin-top: 15px;
+    }
+
+    .custom-checkbox {
+        height: 22px;
+    }
+</style>
+
+
+<div class="container-fluid">
+    <h3 style="text-align: center;">
+        <b>Add Vehicle Rate</b>
+    </h3>
+    <hr style="margin: 0px" />
+    <div class="row" style="margin-top:20px;">
+        <div class="col-md-4">
+            <div class="row">
+                <label class="col-sm-4">Vendor Name</label>
+                <div class="col-sm-6">
+                    <select id="vhVehicleVendor" onchange="vehicleVendorSelectFunction()" class="form-control">
+                        <option value="0">--Select Vendor--</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt">
+                <label class="col-sm-4">Vehicle Type</label>
+                <div class="col-sm-6">
+                    <select id="vhVehicleType" onchange="vehicleTypeSelectFunction()" class="form-control">
+                        <option value="0">--Select Vehicle Type--</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt">
+                <label class="col-sm-4">Route</label>
+                <div class="col-sm-6">
+                    <select id="vhRoute" onchange="routeSelectFunction()" class="form-control">
+                        <option value="0">--Select Route--</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt">
+                <label class="col-sm-4">Trip Type</label>
+                <div class="col-sm-6">
+                    <select id="vhTripType" onchange="tripTypeSelectFunction()" class="form-control">
+                        <option value="0">--Select Trip Type--</option>
+                        <option value="1">Round-Trip</option>
+                        <option value="2">One-Way</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt">
+                <label class="col-sm-4">Rate</label>
+                <div class="col-sm-6">
+                    <input type="text" id="vhRate" class="form-control" />
+                </div>
+            </div>
+            <a href="#" id="submitButton" class="btn btn-success mt"><i class="fa fa-plus"></i> Add</a>
+        </div>
+
+        <div class="col-md-8">
+            <table width="100%" cellpadding="5" cellspacing="0" border="1" id="table_id" class="table table-striped">
+                <caption>Vehicle Rates Table</caption>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Vendor</th>
+                        <th>Vehicle Type</th>
+                        <th>Route</th>
+                        <th>Trip Type</th>
+                        <th>Rate</th>
+                    </tr>
+                </thead>
+                <tbody id="vhAllocationTableBody">
+                </tbody>
+                <tfoot id="totalAllocatedSeats">
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+<script type="text/javascript">
+    var table;
+    $(document).ready(function () {
+        loadDataTable();
+        loadVehicleVendorDropDownOptions();
+        loadVehicleTypeDropDownOptions();
+        loadRouteDropDownOptions();
+    });
+
+    function loadDataTable() {
+        var urlPath = '@Url.Action("AllRateMatrix", "Vehicle")';
+        table = $('#table_id').DataTable({
+            "ajax": {
+                "url": urlPath,
+                "type": "GET",
+                "datatype" : "json"
+            },
+            "columns": [
+                { "data": "RateMatrixId" },
+                { "data": "Vendor" },
+                { "data": "VehicleType" },
+                { "data": "Route" },
+                { "data": "TripType" },
+                { "data": "Rate" }
+            ]
+        });
+    }
+
+    function loadVehicleVendorDropDownOptions() {
+        var urlPath = '@Url.Action("loadVehicleVendorDropDownOptionsForRate", "Vehicle")';
+        $.ajax({
+            type: 'GET',
+            url: urlPath,
+            dataType: 'json',
+            success: function (datas) {
+                select = $('#vhVehicleVendor');
+                select.empty();
+                select.append('<option value="0">--Select Vendor--</option>');
+                datas.forEach(function (data) {
+                    select.append(`<option value="` + data.Value + `">` + data.Text + `</option>`);
+                });
+            }
+        });
+    }
+
+    function loadVehicleTypeDropDownOptions() {
+        var urlPath = '@Url.Action("loadVehicleTypeDropDownOptions1", "Vehicle")';
+        $.ajax({
+            type: 'GET',
+            url: urlPath,
+            dataType: 'json',
+            success: function (datas) {
+                select = $('#vhVehicleType');
+                select.empty();
+                select.append('<option value="0">--Select Vehicle Type--</option>');
+                datas.forEach(function (data) {
+                    select.append(`<option value="` + data.Value + `">` + data.Text + `</option>`);
+                });
+            }
+        });
+    }
+
+    function loadRouteDropDownOptions() {
+        var urlPath = '@Url.Action("loadRouteDropDownOptions1", "Vehicle")';
+        $.ajax({
+            type: 'GET',
+            url: urlPath,
+            dataType: 'json',
+            success: function (datas) {
+                select = $('#vhRoute');
+                select.empty();
+                select.append('<option value="0">--Select Route--</option>');
+                datas.forEach(function (data) {
+                    select.append(`<option value="` + data.Value + `">` + data.Text + `</option>`);
+                });
+            }
+        });
+    }
+
+    $('#submitButton').click(function () {
+        console.log('asjfhskbfjksbfjksjkfsjk');
+        var urlPath = '@Url.Action("AddRateMatrix", "Vehicle")';
+        $.ajax(
+            {
+                type: 'POST',
+                url: urlPath,
+                data: {
+                    VendorId: $("#vhVehicleVendor").val(),
+                    VehicleTypeId: $("#vhVehicleType").val(),
+                    RouteId: $("#vhRoute").val(),
+                    TripTypeId: $("#vhTripType").val(),
+                    Rate: $("#vhRate").val(),
+                },
+                success: function (result) {
+                    if (result.isSuccess) {
+                        toastr.success("New information added!");
+                        initialState();
+                    } else {
+                        toastr.error("An error occured, try again!");
+                    }
+                }
+            }
+        );
+    });
+
+    function initialState() {
+        $('#vhRate').val('');
+        $('#vhTripType').val(0);
+        table.ajax.reload();
+        loadVehicleVendorDropDownOptions();
+        loadVehicleTypeDropDownOptions();
+        loadRouteDropDownOptions();
+    }
+
+</script>
+
+

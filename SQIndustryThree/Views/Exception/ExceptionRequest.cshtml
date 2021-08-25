@@ -1,0 +1,258 @@
+﻿
+@{
+    ViewBag.Title = "ExceptionRequest";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/Content/bootstrap4-toggle.min.css" rel="stylesheet" />
+<style type="text/css">
+    .modal-lg {
+        max-width: 80% !important;
+    }
+
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    #expmenu {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #exceptionSubmrnu li a {
+        color: white;
+    }
+    /*#exceptionSubmrnu li:active{
+        color:white;
+        background-color:#0a0a22;
+
+    }*/
+    #exceptionNavigaton {
+        background-color: #37474F;
+    }
+
+    #radioBtn a {
+        margin: 1px;
+    }
+
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    .required:after {
+        content: "*";
+        color: red;
+    }
+
+    .inputhidegroup {
+        border: none;
+        pointer-events: none;
+        text-align: center;
+    }
+
+    input[type=text] {
+        margin: 2px;
+        padding: 2px;
+    }
+
+    #genaralInformationTable td input[type=text], #genaralInformationTable td input[type=date], #genaralInformationTable td input[type=number] {
+        text-align: center;
+        width: 95%;
+        height: 25px;
+    }
+
+
+    #genaralInformationTable td input[type=button] {
+        height: 25px;
+        width: 25px;
+        border-radius: 50%;
+        background-color: green;
+        color: white;
+    }
+
+    #genaralInformationTable th, #genaralInformationTable td {
+        margin: 0px;
+        padding: 0px;
+        text-align: center;
+    }
+
+    .leftlable {
+        text-align: left;
+    }
+
+    #airfreight td {
+        width: 12%;
+        padding: 2px;
+    }
+
+    #disclaimCancel td, #otherexception td {
+        padding: 2px;
+    }
+
+        #disclaimCancel td input[type=text], #airfreight td input[type=text], #otherexception td input[type=text] {
+            text-align: center;
+        }
+
+    .airfreightDisplay {
+        display: none;
+    }
+</style>
+<div class="container-fluid">
+    <h3 style="text-align: center;
+    ">
+        <b>Exception Request Management System</b>
+    </h3>
+    <hr style="margin: 0px" />
+    <div class="row">
+        <div id="exceptionNavigaton" class="navbar navbar-default navbar-static-top">
+            <div id="expmenu">
+                <div class="navbar-collapse collapse">
+                    <ul id="exceptionSubmrnu" class="nav navbar-nav">
+                        <li><a href="#" onclick="GetWidgetPartial('_exceptionRequestForm')">Exception Request Form</a></li>
+                        <li><a href="#" onclick="GetAllExceptionRequest(1,0)">My Request So Far</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        @*  style="height:400px;width:100%;overflow:scroll"*@
+        <div id="excpetionDashboard">
+
+        </div>
+    </div>
+    <div class="modal" id="myModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Exception Request Preview</h4>
+                </div>
+                <div id="modalbody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+</div>
+@Scripts.Render("~/bundles/jquery")
+<script type="text/javascript">
+    $('#exceptionSubmrnu > li > a').click(function() {
+        $('li').removeClass();
+        $(this).parent().addClass('active');
+       // $("#spmenuid").html($(this).html());
+    });
+    function GetWidgetPartial(variable) {
+        var urlpath = '@Url.Action("GetWidgetPartial", "Exception")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {viewName:variable},
+                async: true,
+                success: function(data) {
+                       if (data) {
+                           $('#excpetionDashboard').empty();
+                           $('#excpetionDashboard').append(data);
+                        }
+                    }
+                });
+    }
+    function GetAllExceptionRequest(status,progress) {
+        var urlpath = '@Url.Action("GetAllExceptionRequest", "Exception")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: {Status: status,ViewName: '_MyExceptionRequest',Progrss:progress},
+            async: true,
+            success: function (data) {
+                if (data) {
+                    $('#excpetionDashboard').empty();
+                    $('#excpetionDashboard').append(data);
+                    $('#exceptionTable').DataTable();
+                }
+            }
+        });
+    }
+    function IndividualExceptionRequest(masterID) {
+        var urlpath = '@Url.Action("IndividualExceptionRequest", "Exception")';
+        $.ajax({
+            data: { MasterID: masterID,ViewName:"_ReviewExceptionModal",UserType:0},
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    $("#modalbody").html("");
+                    $("#modalbody").append(data);
+                    $("#myModal").modal("show");
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+    }
+    function UpdateExceptionRequest(masterID) {
+        var urlpath = '@Url.Action("IndividualExceptionRequest", "Exception")';
+        $.ajax({
+            data: { MasterID: masterID,ViewName:"_UpdateExceptionRequest",UserType:0},
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    $('#excpetionDashboard').empty();
+                    $('#excpetionDashboard').append(data);
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+    }
+    function showComments() {
+        $("#comments_section").toggle();
+    }
+    function ReviewComment(masterID) {
+        if ($("#reviewMessage").val() == "") {
+            $("#reviewMessage").css({ "border-color": "#FF0000" });
+        } else {
+            var reviewTo = $("#reviewComment").val();
+            var reviewMessage = $("#reviewMessage").val();
+            var urlpath = '@Url.Action("SendComments", "Exception")';
+            $.ajax({
+                    data: { MasterID: masterID, ReviewTo: reviewTo, ReviewMessage: reviewMessage },
+                    dataType: 'json',
+                    url: urlpath,
+                    type: "Post",
+                    async: true,
+                    success: function (result) {
+                        if (result) {
+                            swal({
+                                            title: 'Comment Added Successfully',
+                                            type: 'success',
+                                            closeOnCancel: true
+                                        },
+                                function () {
+                                    $("#myModal").modal("hide");
+                                    GetAllExceptionRequest(1,0);
+                                });
+                        }
+                    }
+                });
+        }
+
+    }
+    function PrintModal() {
+            var print_div = document.getElementById("printablearea");
+            var print_area = window.open();
+            print_area.document.write("<style>table{border-collapse:collapse;}</style><img width='20' height='20' src='../../Images/logo.png' /><img style='width:80px;' src='../../Images/logo.png' />");
+            print_area.document.write("<h1 style='text-align:center'>Exception Request Preview</h1>");
+            print_area.document.write(print_div.innerHTML);
+            print_area.document.close();
+            print_area.focus();
+            print_area.print();
+            print_area.close();
+    }
+</script>
+
+

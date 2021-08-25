@@ -33,5 +33,6 @@ namespace SQIndustryThree.Models
         public List<QueryModel> ApproverQueryModelList { get; set; }
         public List<CommentsTable> CommentsTables { get; set; }
         public List<CapexFileUploadDetails> CapexFileUpload { get; set; }
+        public List<LogSection> LogSections { get; set; }
     }
 }

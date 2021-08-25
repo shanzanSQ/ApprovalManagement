@@ -1,0 +1,74 @@
+﻿
+<style type="text/css">
+    #visitorTable td, th {
+        text-align: center;
+    }
+
+    .btn, .form-control {
+        border-radius: 0px;
+    }
+</style>
+
+<div class="box">
+    <table width="100%" class="table table-striped table-bordered" id="billTable" style="overflow:scroll">
+        <thead>
+            <tr>
+                <th style="text-align:center">SL</th>
+                <th style="text-align:center; width:50px">Unit</th>
+                <th style="text-align:center">Invoice No</th>
+                <th style="text-align:center">Invoice Date</th>
+                <th style="text-align:center">PO#</th>
+                <th style="text-align:center">PO Amount</th>
+                <th style="text-align:center">Bill Submitted Amount</th>
+                <th style="text-align:center">Bill Submitted Date</th>
+                <th style="text-align:center">Approved Bill Ammount</th>
+                <th style="text-align:center">Paid Amount</th>
+                <th style="text-align:center">Due Amount</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @{ int count = 1; decimal poAmt = 0; decimal billSubmittedAmt = 0;
+                decimal approvedBillAmt = 0; decimal paidAmt = 0; decimal dueAmt = 0;}
+            @if (ViewBag.Billdashboard != null)
+            {
+                foreach (var item in ViewBag.Billdashboard)
+                {
+                    <tr>
+                        <td style="text-align:center">@count</td>
+                        <td style="text-align:center">@item["Unit"]</td>
+                        <td style="text-align:center">@item["InvoiceNo"]</td>
+                        <td style="text-align:center">@item["InvoiceDate"].ToString("dd-MMM-yyyy")</td>
+                        <td style="text-align:center">@item["PO#"]</td>
+                        <td style="text-align:center">@item["PO_Amount"].ToString("N")</td>
+                        <td style="text-align:center">@item["BillSubmittedAmount"].ToString("N")</td>
+                        <td style="text-align:center">@item["CreatedDate"].ToString("dd-MMM-yyyy")</td>
+                        <td style="text-align:center">@item["ApprovedBillAmmount"].ToString("N")</td>
+                        <td style="text-align:center">@item["PaidAmount"].ToString("N")</td>
+                        <td style="text-align:center">@item["DueAmount"].ToString("N")</td>
+                    </tr>
+                    count++;
+                    poAmt += item["PO_Amount"];
+                    billSubmittedAmt += item["BillSubmittedAmount"];
+                    approvedBillAmt += item["ApprovedBillAmmount"];
+                    paidAmt += item["PaidAmount"];
+                    dueAmt += item["DueAmount"];
+                }
+
+                <tr>
+                    <td style="text-align: center; font-weight: bold;">Total:</td>
+                    <td style="text-align:center"></td>
+                    <td style="text-align:center"></td>
+                    <td style="text-align:center"></td>
+                    <td style="text-align:center"></td>
+                    <td style="text-align:center; font-weight:bold;">@poAmt.ToString("N")</td>
+                    <td style="text-align: center; font-weight: bold; ">@billSubmittedAmt.ToString("N")</td>
+                    <td style="text-align:center"></td>
+                    <td style="text-align: center; font-weight: bold;">@approvedBillAmt.ToString("N")</td>
+                    <td style="text-align: center; font-weight: bold;">@paidAmt.ToString("N")</td>
+                    <td style="text-align: center; font-weight: bold;">@dueAmt.ToString("N")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

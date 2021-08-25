@@ -1,0 +1,50 @@
+﻿@model IEnumerable<SQIndustryThree.Models.BillApproval.BillAprrovalPoDetails>
+<div class="row">
+    <div class="col-md-12">
+        @{ var count = 1;}
+        <table class="table table-responsive table-striped" id="POUploadTable">
+            <thead>
+                <tr>
+                    <th style="text-align:center">PONumber</th>
+                    <th style="text-align:center">Supplier</th>
+                    <th style="text-align:center">Article</th>
+                    <th style="text-align:center">Article Code</th>
+                    <th style="text-align:center">Color</th>
+                    <th style="text-align:center">Size</th>
+                    <th style="text-align:center">UOM</th>
+                    <th style="text-align:center">POType</th>
+                    <th style="text-align:center">POQty</th>
+                    <th style="text-align:center">Rate</th>
+                    <th style="text-align:center">PoValue</th>
+                    <th style="text-align:center">Date In house</th>
+                    <th style="text-align:center">Status</th>
+                    <th style="text-align:center">Created By</th>
+                    <th style="text-align:center">Creation Date</th>
+                </tr>
+            </thead>
+            <tbody id="uploadtbl_body">
+                @foreach (var item in Model)
+                {
+                <tr id="@count">
+                    <td style="text-align:center" id="ponumber_@count">@item.PONumber</td>
+                    <td style="text-align:center" id="supplier_@count">@item.SupllierName</td>
+                    <td style="text-align:center" id="articlename_@count">@item.ArticleName</td>
+                    <td style="text-align:center" id="articlecode_@count">@item.ArticleCode</td>
+                    <td style="text-align:center" id="colorname_@count">@item.ColorName</td>
+                    <td style="text-align:center" id="sizename_@count">@item.SizeName</td>
+                    <td style="text-align:center" id="uom_@count">@item.UOM</td>
+                    <td style="text-align:center" id="potype_@count">@item.POType</td>
+                    <td style="text-align:center" id="poqty_@count">@item.POQty</td>
+                    <td style="text-align:center" id="rate_@count">@item.Rate</td>
+                    <td style="text-align:center" id="povalue_@count">@item.PoValue</td>
+                    <td style="text-align:center" id="dateinhouse_@count">@item.DateInhouse.ToString("dd MMMM yyyy")</td>
+                    <td style="text-align:center" id="status_@count">@item.Status</td>
+                    <td style="text-align:center" id="createdby_@count">@item.POCreatedBy</td>
+                    <td style="text-align:center" id="creationdate_@count">@item.POCreationDate.ToString("dd MMMM yyyy")</td>
+                </tr>
+                    count++;
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

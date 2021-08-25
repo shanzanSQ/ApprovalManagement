@@ -1,0 +1,69 @@
+﻿@model IEnumerable<SQIndustryThree.Models.ExceptionRequestMaster>
+@{
+    ViewBag.Title = "_pendingPertialView";
+}
+<style>
+    th {
+        text-align: center;
+    }
+
+    td {
+        text-align: center;
+    }
+</style>
+<font size="2" face="Calibri">
+    <div class="box">
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="col-xs-12" id="personlocdiv">
+                <table id="approvalPartailTable" class="table-bordered table table-responsive">
+                    <thead>
+                        <tr>
+                            <th>SL</th>
+                            <th>Request Number</th>
+                            <th>Exception Type</th>
+                            <th>Business Unit</th>
+                            <th>Buyer Name</th>
+                            <th>Exception Reason</th>
+                            <th>Request By</th>
+                            <th>Create Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{ int count = 1;}
+                        @foreach (var item in Model)
+                        {
+                        <tr>
+                            <td>@count</td>
+                            <td>@item.ExceptionMasterId</td>
+                            <td>@item.ExceptionTypeName</td>
+                            <td>@item.BusinessUnitName</td>
+                            <td>@item.BuyerName</td>
+                            <td>@item.ExceptionReasonName</td>
+                            <td>@item.RequestBy</td>
+                            <td>@DateTime.Parse(@item.CreateDate).ToString("dd MMM yyyy")</td>
+                            <td>
+                                @if (item.IsHrInteraction == 1)
+                                {
+                                    <button type="button" class="btn  btn-block btn-primary btn-sm" data-toggle="modal" data-target="#showmodal" onclick="ExceptionDetailsHr(@item.ExceptionMasterId,3)" data-idkey="@item.ExceptionMasterId">Take Action</button>
+
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn  btn-block btn-success btn-sm" data-toggle="modal" data-target="#showmodal" onclick="ExceptionDetailsHr(@item.ExceptionMasterId,3)" data-idkey="@item.ExceptionMasterId">Action Taken</button>
+                                }
+                                </td>
+                            </tr>
+                            count++;
+
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+        <!-- /.box-body -->
+    </div>
+</font>
+

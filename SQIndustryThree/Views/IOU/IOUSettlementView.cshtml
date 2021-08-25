@@ -1,0 +1,218 @@
+﻿
+@{
+    ViewBag.Title = "IouApproverView";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .modal-lg {
+        max-width: 80% !important;
+    }
+
+    .sweet-alert {
+        background-color: #DAF7A6;
+    }
+
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    #iouappmenu {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #iouexceptionsubmenu li a {
+        color: white;
+    }
+
+    #iounavigarion {
+        background-color: #37474F;
+    }
+    /*#exceptionNavigaton{
+            padding:0px;
+            margin:0px;
+        }*/
+</style>
+<div class="container-fluid">
+    <h3 style="text-align: center;"><b>IOU Settlement</b></h3>
+    <hr style="margin:0px" />
+    <div class="row">
+        <div id="iounavigarion" class="navbar navbar-inverse navbar-static-top">
+            <div id="iouappmenu">
+                <div >
+                    <ul id="iouexceptionsubmenu" class="nav navbar-nav">
+                        <li onclick="GetIouSettlementList(4,3)"><a href="#">Settlement Pending </a></li>
+                        <li onclick="GetIouSettlementList(4,1)"><a href="#">Settlement Approved </a></li>
+                        <li onclick="GetIouSettlementList(4,2)"><a href="#">Settlement Rejected</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        @*  style="height:400px;width:100%;overflow:scroll"*@
+        <div id="iousettlementdashboard">
+
+        </div>
+    </div>
+    <div class="modal" id="myModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">IOU Request Preview</h4>
+                </div>
+                <div id="modalbody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+</div>
+@Scripts.Render("~/bundles/jquery")
+<script type="text/javascript">
+    $('#iouexceptionsubmenu > li > a').click(function() {
+        $('li').removeClass();
+        $(this).parent().addClass('active');
+       // $("#spmenuid").html($(this).html());
+    });
+    function GetIouSettlementList(status,progrss) {
+        var urlpath = '@Url.Action("GetAllIOURequest", "IOU")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: {Status: status,ViewName: '_iouApproverSettlementList',Progrss:progrss},
+            async: true,
+            success: function (data) {
+                if (data) {
+                    $('#iousettlementdashboard').empty();
+                    $('#iousettlementdashboard').append(data);
+                    $('#iousettlementApproverTable').DataTable();
+                }
+            }
+        });
+    }
+    function IouDetailsSettlement(masterID,status) {
+        var urlpath = '@Url.Action("IouRequestDetails", "IOU")';
+        $.ajax({
+            data: { MasterID: masterID, ViewName:"_approversettlementModal",Status:status},
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $("#modalbody").html("");
+                $("#modalbody").append(data);
+                $("#myModal").modal("show");
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+    function showComments() {
+        $("#comments_section").toggle();
+    }
+    function IouSettlementApprove(progress, masterId, commentText) {
+        if (progress == 2 && commentText=="") {
+            swal({
+                title: 'Please Add comment Before Reject',
+                type: 'error',
+                closeOnCancel: true
+            });
+        } else {
+            var urlpath = '@Url.Action("IouSettlementApprove", "IOU")';
+            $.ajax({
+                data: { CommentText: commentText, Progress: progress, IOuRequestId: masterId },
+                dataType: 'json',
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function (result) {
+                    if (result) {
+                        swal({
+                            title: 'Done Successfully',
+                            type: 'success',
+                            closeOnCancel: true
+                        },function () {
+                                $("#myModal").modal("hide");
+                                GetIouSettlementList(4, 3);
+                        });
+                    }
+                }, error: function (xhr, status, error) {
+                    swal({
+                        title: 'Error Occoured',
+                        type: 'error',
+                        closeOnCancel: true
+                    });
+                }
+            });
+        }
+        
+    }
+    function ReviewComment(masterID) {
+        if ($("#reviewMessage").val() == "") {
+            $("#reviewMessage").css({ "border-color": "#FF0000" });
+        } else {
+            var reviewTo = $("#reviewComment").val();
+            var reviewMessage = $("#reviewMessage").val();
+            var urlpath = '@Url.Action("SendIOUComments", "IOU")';
+            $.ajax({
+                    data: { MasterID: masterID, ReviewTo: reviewTo, ReviewMessage: reviewMessage },
+                    dataType: 'json',
+                    url: urlpath,
+                    type: "Post",
+                    async: true,
+                    success: function (result) {
+                        if (result) {
+                            swal({
+                                            title: 'Comment Sent Successfully',
+                                            type: 'success',
+                                            closeOnCancel: true
+                                        },
+                                function () {
+                                    $("#myModal").modal("hide");
+                                    $("#iouexceptionsubmenu").find('li').removeClass();
+                                    $("#iouexceptionsubmenu").find('li:nth-child(1)').addClass("active");
+                                    GetIouApproverList(4, 3);
+                                });
+                        }
+                    }
+                });
+        }
+
+    }
+     function PrintModal() {
+            var print_div = document.getElementById("printablearea");
+            var print_area = window.open();
+            print_area.document.write("<style>table{border-collapse:collapse;}</style><img width='20' height='20' src='../../Images/logo.png' /><img style='width:80px;' src='../../Images/logo.png' />");
+            print_area.document.write("<h1 style='text-align:center'>IOU Preview</h1>");
+            print_area.document.write(print_div.innerHTML);
+            print_area.document.close();
+            print_area.focus();
+            print_area.print();
+            print_area.close();
+    }
+
+    function UpdateIouSettlement() {
+        var urlpath = '@Url.Action("IouRequestDetails", "IOU")';
+        $.ajax({
+            data: { MasterID: masterID, ViewName:"_approversettlementModal",Status:status},
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $("#modalbody").html("");
+                $("#modalbody").append(data);
+                $("#myModal").modal("show");
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+</script>

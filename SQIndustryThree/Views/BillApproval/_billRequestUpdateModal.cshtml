@@ -1,0 +1,1315 @@
+﻿@model SQIndustryThree.Models.BillApproval.BillRequestMaster
+
+<style>
+    th {
+        text-align: left;
+    }
+
+    td {
+        text-align: left;
+    }
+
+    #genaralInfodt tr th, #genaralInfodt tr td, #approverlist tr td, #approverlist tr th {
+        text-align: center;
+    }
+</style>
+
+<div class="">
+    <div id="printablearea">
+        <div>
+            <span style="float:left;font-weight:bold;font-size:20px">@Model.InvoiceNo</span>
+            <span style="float:right;font-weight:bold;font-size:20px" id=""> InvoiceKey: @Model.InvoiceKey</span>
+            <input id="update_invoiceKey" type="hidden" value="@Model.InvoiceKey" />
+        </div>
+        @if (Model.ApproverList != null)
+        {
+            <table border="1" width="100%" id="approverlist">
+                <caption>Approver List</caption>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Approver Name</th>
+                        <th>Approver Designation</th>
+                        <th>Approver Role</th>
+                        <th>Update Date</th>
+                        <th>Status</th>
+                        <th>Comment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.ApproverList)
+                    {
+                        <tr>
+                            <td><p name="approverNo">@item.ApproverNo</p></td>
+                            <td><p style="display:none" name="userId">@item.UserID</p><p name="userName">@item.UserName</p></td>
+
+                            <td><p name="designationName">@item.DesignationName</p></td>
+
+                            <td><p name="approverstatus">@item.ApproverStatusName</p></td>
+                            <td>
+                                <p style="display:none" name="apstatusid">@item.IsApprove</p>
+                                @if (@item.UpdateDate != null)
+                                {@DateTime.Parse(@item.UpdateDate).ToString("dd MMM yyyy")}
+                            </td>
+                            @if (item.IsApprove == 3)
+                            {
+                                <td style="color:red">Pending</td>
+                            }
+                            else if (item.IsApprove == 1)
+                            {
+                                <td style="color:green">Approved</td>
+                            }
+                            else if (item.IsApprove == 2)
+                            {
+                                <td style="color:red">Rejected</td>
+                            }
+                            else
+                            {
+                                <td style="color:darkblue">Not Sent</td>
+                            }
+
+                            <td>@item.Comments</td>
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+        }
+
+        <div class="row">
+            <div class="col-md-6">
+                <table border="1" width="100%">
+                    <caption>Invoice Information</caption>
+                    <tr>
+                        <th width="30%">Create Date</th>
+                        <td width="70%">@DateTime.Parse(Model.CreateDate).ToString("dd MMM yyyy")</td>
+                    </tr>
+                    <tr>
+                        <th width="30%">Business Unit</th>
+                        <td width="70%">@Model.BusinessUnitName</td>
+                    </tr>
+                    <tr>
+                        <th width="30%">InvoiceType</th>
+                        <td width="70%">@Model.InvoiceTypeName</td>
+                    </tr>
+                    <tr>
+                        <th width="30%">Supplier</th>
+                        <td width="70%">@Model.SupplierName</td>
+                    </tr>
+                    <tr>
+                        <th width="30%">Invoice No</th>
+                        <td width="70%">@Model.InvoiceNo</td>
+                    </tr>
+                    <tr>
+                        <th width="30%">Invoice Date</th>
+                        <td width="70%">@Model.InvoiceDate</td>
+                    </tr>
+                    @if (Model.FinalInvoice == 1)
+                    {
+                        <tr>
+                            <th width="50%">Final Invoice</th>
+                            <td width="50%">Yes</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <th width="50%">Final Invoice</th>
+                            <td width="50%">No</td>
+                        </tr>
+                    }
+                    <tr>
+                        <th width="30%">Remarks: </th>
+                        <td width="70%">@Model.Remarks</td>
+                    </tr>
+                    <tr>
+                        <th width="30%">Notes: </th>
+                        <td width="70%">@Model.Notes</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+
+                <div class="row">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <strong> PO Upload </strong>
+                        </div>
+
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table width="100%">
+                                        <caption>Attach File <span style="color:red">*</span></caption>
+                                        <tr>
+                                            <td style="padding-right:2PX;"><input type="file" multiple class="form-control" id="poFileUpload" onchange="POFileUploadOnChange()" /></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table style="width:98%" class="table table-bordered table-responsive table-condensed table-hover" border="1" id="poFileTable">
+                                        <caption>Attached File</caption>
+                                        <thead>
+                                            <tr>
+                                                <th>File Name</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="poAttachedFileTable">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        @*<div class="panel-footer text-right">
+                <button class="btn btn-info btn-sm" id="POAdd" onclick="POAdd()">Add PO</button>
+            </div>*@
+
+                    </div>
+                    @if (Model.POFilesList != null)
+                    {
+                        <table border="1" width="100%" id="deletePOFileTable">
+                            <caption>PO Upload File</caption>
+                            <thead>
+                                <tr>
+                                    <th style="text-align:center">File Name</th>
+                                    <th style="text-align:center">Download</th>
+                                    <th style="text-align:center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.POFilesList)
+                                {
+                                <tr>
+                                    <td style="text-align:center">@item.POFileName</td>
+                                    <td style="text-align:center">@Html.ActionLink("Download", "PODownloadFile", "BillApproval", new { filepath = item.POFilePath.ToString(), filename = item.POFileName.ToString() }, new { @target = "_blank", @class = "btn btn-info btn-block" })</td>
+                                    @{ var billpath = item.POFilePath.Replace("\\", "/"); }
+                                    <td style="text-align:center"><button class="btn btn-danger btn-block" onclick="DeletePOFileFromDatatbase(this,@item.PoFileUploadId, '@item.POFileName', '@billpath')">Delete</button></td>
+                                </tr>
+
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+                <br />
+                <div class="row">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <strong> Attachment </strong>
+                        </div>
+
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table width="100%">
+                                        <caption>Attach File <span style="color:red">*</span></caption>
+                                        <tr>
+                                            <td style="padding-right:2PX;"><input type="file" multiple class="form-control" id="billFileUpload" onchange="FileUploadOnChange()" /></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table style="width:98%" class="table table-bordered table-responsive table-condensed table-hover" border="1" id="billFileTable">
+                                        <caption>Attached File</caption>
+                                        <thead>
+                                            <tr>
+                                                <th>File Name</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="attachedFileTable">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        @*<div class="panel-footer text-right">
+                <button class="btn btn-info btn-sm" id="POAdd" onclick="POAdd()">Add PO</button>
+            </div>*@
+
+                    </div>
+
+                    @if (Model.BillFilesList != null)
+                    {
+                        <table border="1" width="100%" id="deleteBillFileTable">
+                            <caption>Bill Uploaded File</caption>
+                            <thead>
+                                <tr>
+                                    <th style="text-align:center">File Name</th>
+                                    <th style="text-align:center">Download</th>
+                                    <th style="text-align:center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.BillFilesList)
+                                {
+                                <tr>
+                                    <td style="text-align:center">@item.BillFileName</td>
+                                    <td style="text-align:center">@Html.ActionLink("Download", "DownloadFile", "BillApproval", new { filepath = item.BillFilePath.ToString(), filename = item.BillFileName.ToString() }, new { @target = "_blank", @class = "btn btn-info btn-block" })</td>
+                                    <td style="text-align:center"><button class="btn btn-danger btn-block" onclick="DeleteBillFileFromDatatbase(this,@item.BillFileUploadId, '@item.BillFileName', '@item.BillFilePath.ToString()')">Delete</button></td>
+                                </tr>
+
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <table border="1" width="100%" id="genaralInfodt">
+            @{float countFob = 1;}
+            <caption>Invoice Details</caption>
+            <thead>
+                <tr>
+                    <th>SL</th>
+                    <th>PO No</th>
+                    <th>Article</th>
+                    <th>Color</th>
+                    <th>Size</th>
+                    <th>UoM</th>
+                    <th>PO Qty</th>
+                    <th>Rate</th>
+                    <th>PO Value</th>
+                    @*<th>Already Invoiced Qty</th>
+                        <th>Invoice Balance Qty</th>*@
+                    <th>Current Invoice Qty</th>
+                    <th>Verify Qty</th>
+                    <th>Invoice Value</th>
+                    <th>Verify Value</th>
+                    <th>Discount</th>
+                    <th>Total Payable</th>
+                </tr>
+            </thead>
+            <tbody id="update_details">
+
+                @{ decimal TotalCheckQty = 0, TotalCheckValue = 0; decimal TotalDiscount = 0; 
+                    decimal TotalInvoiceQty = 0; decimal TotalInvoiceValue = 0; decimal TotalRate = 0; decimal Total = 0;}
+
+                @foreach (var item in Model.BillInfoList)
+                {
+                    if (@item.InvoiceQty != 0)
+                    {
+                        <tr id ="@item.PODetailsKey">
+                            <td>@countFob</td>
+                            <td>@item.PONo</td>
+                            <td>@item.Article</td>
+                            <td>@item.Color </td>
+                            <td>@item.Size </td>
+                            @*<td><input id="update_unit" style="width:50px;" value="@item.Unit" /></td>*@
+                            <td>@item.Unit</td>
+                            <td>@item.POQty.ToString()</td>
+                            <td><span id="update_rate_@item.PODetailsKey">@item.Rate</span></td>
+                            <td>@item.POValue.ToString()</td>
+                            @*<td>@item.InitialQty.ToString()</td>
+                                <td>@item.InvoiceBalance.ToString()</td>*@
+                            <td width="50"><span><input id="update_invoiceQty_@item.PODetailsKey" onkeyup="updateQty(@item.PODetailsKey)" style="width:50px;" value="@item.InvoiceQty.ToString()" /> </span></td>
+                            <td width="50">@item.CheckedQty.ToString()</td>
+                            <td width="50"><input id="update_invoiceValue_@item.PODetailsKey" onkeyup="updateValue(@item.PODetailsKey)" style="width:70px;" value="@item.InvoiceValue" /></td>
+                            <td width="50">@item.CheckedValue.ToString()</td>
+                            <td width="50"><span id="update_discount_@item.PODetailsKey">@item.Discount.ToString()</span></td>
+                            <td width="50"><span id="update_total_@item.PODetailsKey">@item.Total.ToString()</span></td>
+                        </tr>
+                        countFob++;
+                    }
+
+                    TotalRate += item.Rate;
+                    TotalCheckQty += item.CheckedQty;
+                    TotalCheckValue += item.CheckedValue;
+                    TotalDiscount += item.Discount;
+                    TotalInvoiceQty += item.InvoiceQty;
+                    TotalInvoiceValue += item.InvoiceValue;
+                    Total += item.Total;
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="6">Total </th>
+                    <th>@Model.TotalQty.ToString()</th>
+                    <th>@TotalRate</th>
+                    <th>@Model.TotalValue.ToString()</th>
+                    @*<th>@Model.AlreadyQty.ToString()</th>
+                        <th>@Model.TotalBalanceQty.ToString()</th>*@
+                    <th><span id="update_totalInvoiceQty">@TotalInvoiceQty</span></th>
+                    <th>@TotalCheckQty</th>
+                    <th><span id="update_totalInvoiceValue">@TotalInvoiceValue</span></th>
+                    <th>@TotalCheckValue</th>
+                    <th>@TotalDiscount</th>
+                    <th><span id="update_totalPayable">@Total</span></th>
+                </tr>
+            </tfoot>
+        </table>
+        <br />
+        <div class="row">
+            <div class="col-md-4" style='float:right;'>
+                <div style='border: 1px solid black;'>
+                    <table class='table table-striped'>
+                        <tr><th style=''>Total</th><th></th><th><span id='update_totalPaid'>@Model.TotalPaid</span></th></tr>
+                        <tr><th>Discount</th><th style='width:100px;'><input type='text' class='form-control' value='@Model.DiscountPercent' id='update_discountPercent' onkeyup='updateDiscountKeyUp()' /> </th><th><span id='update_discountAmt'>@Model.DiscountAmt</span></th></tr>
+
+                        <tr><th style='width:100px;'>Sub Total</th><th></th><th><span id='update_totalAmount'>@Model.TotalAmount</span></th></tr>
+
+                        @*<tr><th style='min-width:100px;'>Sub Total</th><th></th><th style='min-width:150px;text-align: center;'><span id='total_amount'>0</span></th></tr>*@
+
+                        <tr><th style='min-width:100px'>Adjustment %</th><th><input type='text' class='form-control' value='@Model.AdjustmentPercent' id='update_adjustmentPercent' onkeyup='updateaAjustmentKeyUp()' /></th><th><span id='update_adjustment'>@Model.AdjustmentAmt</span></th></tr>
+
+                        <tr><th style='min-width:100px'>Retaintion %</th><th><input type='text' class='form-control' value='@Model.RetaintionPercent' id='update_retaintionPercent' onkeyup='updateRetaintionKeyUp()' /></th><th><span id='update_retaintion'>@Model.RetaintionAmt</span></th></tr>
+                        <tr><th style='min-width:100px;'>Total</th><th></th><th><span id='update_total_abj_retain_amount'>@Model.AdvTotal</span></th></tr>
+
+                        <tr><th>VAT %</th><th><span id=''><input type='text' class='form-control' value='@Model.VATPercent' id='update_vat' onkeyup='updateVatKeyUp()' /></span></th><th><span id='update_vatAmt'>@Model.VATAmt</span></th></tr>
+                        <tr><th style='min-width:100px'>AIT %</th><th><input type='text' class='form-control' value='@Model.AITPercent' id='update_tax' onkeyup='updateTaxKeyUp()' /></th><th><span id='update_taxAmt'>@Model.AITAmt</span></th></tr>
+
+                        <tr><th>Net Value</th><th></th><th><span id='update_net_value'>@Model.NetValue</span></th></tr>
+
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    @if (Model.IsApproved == 0)
+    {
+        <div style="text-align:center">
+            <br />
+            <button type="button" style="width:30%" class="btn btn-primary btn-sm" onclick="SubmitToDatabase()">Submit</button>
+        </div>
+
+    }
+    else
+    {
+        <div>
+            <br />
+            <table width="80%" align="center">
+                <tr>
+                    <td>
+                        <button value="Comments" onclick="showComments()" class="btn btn-sm btn-primary">Comments</button>
+                    </td>
+                    <td style="padding:5px">
+                        <select id="reviewComment" class="approvalColumn form-control">
+                            @if (Model.ApproverList != null)
+                            {
+                                foreach (var app in Model.ApproverList)
+                                {
+                                    if (app.IsApprove != 0)
+                                    {
+                                        if (app.UserID != Convert.ToInt32(Session["SQuserId"].ToString()))
+                                        {
+                                            <option value="@app.UserID">@app.UserName</option>
+                                        }
+
+                                    }
+
+                                }
+                            }
+
+                        </select>
+                    </td>
+                    <td style="padding:5px">
+                        <input type="text" id="reviewMessage" class="approvalColumn form-control" rows="3" style="resize:none" />
+                    </td>
+                    <td>
+                        <button style="text-align:center;align-content:center" class="btn btn-info btn-sm" onclick="ReviewComment(@Model.InvoiceKey)">Send Review</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br />
+        @*<button value="Comments" onclick="showComments()" class="btn btn-sm btn-primary">Comments</button>*@
+        <div id="comments_section" class="row" style="display:none">
+            <div class="col-md-9" style="overflow-wrap:inherit; overflow-y: auto;height:200px;">
+                <p>Comment Section</p>
+                @if (Model.BillComments != null)
+                {
+                    foreach (var app in Model.BillComments)
+                    {
+                        <hr style="margin:unset;padding:unset;" />
+                        <p style="margin:unset;padding:unset" class="media-heading user_name"><strong style="color:blue">@app.ReviewerByName</strong>  To <strong>@app.ReviewerToName</strong></p>
+                        <p style="margin:unset;padding:unset">@app.UpdatedBY.ToString("MM/dd/yyyy hh:mm tt")</p>
+                        <p style="margin:unset;padding:unset">@app.ReviewMessage</p>
+                    }
+                }
+            </div>
+            @*<div class="col-md-3">
+                    <label for="reviewComment">Select Reviwer</label>
+                    <select id="reviewComment" class="form-control">
+                        @if (Model.ApproverList != null)
+                        {
+                            foreach (var app in Model.ApproverList)
+                            {
+                                if (app.IsApproved != 0)
+                                {
+                                    <option value="@app.ApproverUserId">@app.ApproverName</option>
+                                }
+
+                            }
+                        }
+
+                    </select>
+                    <br />
+                    <textarea type="text" id="reviewMessage" class="form-control" rows="3" style="resize:none" />
+                    <br />
+                    <button style="text-align:center;align-content:center" class="btn btn-success btn-sm" onclick="ReviewComment(@Model.ExceptionMasterId)">Send Comment</button>
+                </div>*@
+        </div>
+
+        <div style="text-align:center">
+            <br />
+            <button type="button" style="width:30%" class="btn btn-primary btn-sm" onclick="Updatevarified()">Update Request</button>
+        </div>
+        <br/>
+    }
+</div>
+
+<script>
+
+    function updateQty(invoiceDetails) {
+
+
+        var id = $(this).attr('id');
+        var rate = parseFloat($("#update_rate_" + invoiceDetails).html());
+        var qty = parseFloat($("#update_invoiceQty_" + invoiceDetails).val());
+        var value = parseFloat($("#update_invoiceValue_" + invoiceDetails).val());
+        var discount = parseFloat($("#update_discount_" + invoiceDetails).html());
+        var total = parseFloat($("#update_total_" + invoiceDetails).html());
+        var valueV = parseFloat(rate * qty);
+        //alert(discount + " " + valueV);
+        //var valueV = rate * qty;
+        var Tpaid = parseFloat(valueV - discount);
+
+        $("#update_invoiceValue_" + invoiceDetails).val(valueV.toFixed(2));
+        $("#update_total_" + invoiceDetails).html(Tpaid.toFixed(2));
+        //alert($("#update_total_" + invoiceDetails).html())
+
+        var q = 0;
+        var v = 0;
+        var t = 0;
+
+        $('#update_details tr').each(function () {
+            var id = $(this).attr('id');
+            var rate = $("#update_rate_" + id).val();
+            var qty = parseFloat($("#update_invoiceQty_" + id).val());
+            var value = parseFloat($("#update_invoiceValue_" + id).val());
+            var discount = $("#update_discount_" + id).html();
+            var total = parseFloat($("#update_total_" + id).html());
+
+            q += qty;
+            v += value;
+            t += total
+
+        })
+
+        $('#update_totalInvoiceQty').html(q.toFixed(2));
+        $('#update_totalInvoiceValue').html(v.toFixed(2));
+        $('#update_totalPayable').html(t.toFixed(2));
+        $('#update_totalPaid').html(t.toFixed(2));
+
+        var total = parseFloat($("#update_totalPaid").html());
+        var discount = parseFloat($('#update_discountPercent').val());
+        var discountAmt = (total / 100 * discount);
+        var total_discount = parseFloat(total - discountAmt);
+        //alert(discount);
+        $("#update_discountAmt").html(discountAmt.toFixed(2));
+        // var total_discount = $("#total_discount").html(total_discount);
+
+        $("#update_totalAmount").html(total_discount.toFixed(2));
+
+        var total_amount = Number($("#update_totalAmount").html());
+
+        var adjustment = parseFloat($('#update_adjustmentPercent').val());
+        var adjustmentAmt = parseFloat(total_amount / 100 * adjustment);
+
+        var retaintion = parseFloat($('#update_retaintionPercent').val());
+        var retaintionAmt = parseFloat(total_amount / 100 * retaintion);
+
+        var total_abj_retain_amount = parseFloat(total_amount - adjustmentAmt - retaintionAmt);
+
+
+        var vat = parseFloat($('#update_vat').val());
+        var vatAmt = parseFloat((total_abj_retain_amount / 100 * vat));
+
+        var tex = parseFloat($('#update_tax').val());
+        var taxAmt = parseFloat((total_abj_retain_amount / 100 * tex));
+
+        var total_value = parseFloat((total_abj_retain_amount + vatAmt + taxAmt));
+
+        //alert(total_amount + " " + vatAmt + " = " + (total_amount + vatAmt));
+        //alert(total_vat);
+
+        $('#update_adjustment').html(adjustmentAmt.toFixed(2));
+        $('#update_retaintion').html(retaintionAmt.toFixed(2));
+
+        $('#update_total_abj_retain_amount').html(total_abj_retain_amount.toFixed(2));
+
+        $('#update_vatAmt').html(vatAmt.toFixed(2));
+        $('#update_taxAmt').html(taxAmt.toFixed(2));
+
+        $('#update_net_value').html(total_value.toFixed(2));
+    }
+
+    function updateValue(invoiceDetails) {
+
+        var id = $(this).attr('id');
+        var rate = parseFloat($("#update_rate_" + invoiceDetails).html());
+        var qty = parseFloat($("#update_invoiceQty_" + invoiceDetails).val());
+        var value = parseFloat($("#update_invoiceValue_" + invoiceDetails).val());
+        var discount = parseFloat($("#update_discount_" + invoiceDetails).html());
+        var total = parseFloat($("#update_total_" + invoiceDetails).html());
+        var qtyV = parseFloat(value / rate);
+        //alert(discount + " " + valueV);
+        //var valueV = rate * qty;
+        var Tpaid = parseFloat(value - discount);
+
+        $("#update_invoiceQty_" + invoiceDetails).val(qtyV.toFixed(2));
+        $("#update_total_" + invoiceDetails).html(Tpaid.toFixed(2));
+        //alert($("#update_total_" + invoiceDetails).html())
+
+        var q = 0;
+        var v = 0;
+        var t = 0;
+
+        $('#update_details tr').each(function () {
+            var id = $(this).attr('id');
+            var rate = $("#update_rate_" + id).val();
+            var qty = parseFloat($("#update_invoiceQty_" + id).val());
+            var value = parseFloat($("#update_invoiceValue_" + id).val());
+            var discount = $("#update_discount_" + id).html();
+            var total = parseFloat($("#update_total_" + id).html());
+
+            q += qty;
+            v += value;
+            t += total
+
+        })
+
+        $('#update_totalInvoiceQty').html(q.toFixed(2));
+        $('#update_totalInvoiceValue').html(v.toFixed(2));
+        $('#update_totalPayable').html(t.toFixed(2));
+        $('#update_totalPaid').html(t.toFixed(2));
+
+        var total = parseFloat($("#update_totalPaid").html());
+        var discount = parseFloat($('#update_discountPercent').val());
+        var discountAmt = (total / 100 * discount);
+        var total_discount = parseFloat(total - discountAmt);
+        //alert(discount);
+        $("#update_discountAmt").html(discountAmt.toFixed(2));
+        // var total_discount = $("#total_discount").html(total_discount);
+
+        $("#update_totalAmount").html(total_discount.toFixed(2));
+
+        var total_amount = parseFloat($("#update_totalAmount").html());
+
+
+        var adjustment = parseFloat($('#update_adjustmentPercent').val());
+        var adjustmentAmt = parseFloat(total_amount / 100 * adjustment);
+
+        var retaintion = parseFloat($('#update_retaintionPercent').val());
+        var retaintionAmt = parseFloat(total_amount / 100 * retaintion);
+
+        var total_abj_retain_amount = parseFloat(total_amount - adjustmentAmt - retaintionAmt);
+
+
+        var vat = parseFloat($('#update_vat').val());
+        var vatAmt = parseFloat((total_abj_retain_amount / 100 * vat));
+
+        var tex = parseFloat($('#update_tax').val());
+        var taxAmt = parseFloat((total_abj_retain_amount / 100 * tex));
+
+        var total_value = parseFloat((total_abj_retain_amount + vatAmt + taxAmt));
+
+        //alert(total_amount + " " + vatAmt + " = " + (total_amount + vatAmt));
+        //alert(total_vat);
+
+        $('#update_adjustment').html(adjustmentAmt.toFixed(2));
+        $('#update_retaintion').html(retaintionAmt.toFixed(2));
+
+        $('#update_total_abj_retain_amount').html(total_abj_retain_amount.toFixed(2));
+
+        $('#update_vatAmt').html(vatAmt.toFixed(2));
+        $('#update_taxAmt').html(taxAmt.toFixed(2));
+
+        $('#update_net_value').html(total_value.toFixed(2));
+
+    }
+
+    function updateDiscountKeyUp() {
+
+        if ($('#update_discountPercent').val() == '') {
+            $('#update_discountPercent').val('0');
+        } else {
+            $('#update_discountPercent').val();
+        }
+
+        if (!$.isNumeric($('#update_discountPercent').val())) {
+            $('#update_discountPercent').val('0');
+            $('#update_discountPercent').val();
+        }
+
+        if ($('#update_discountPercent').val() > 100) {
+
+            toastr.error("Discount can not be more than 100 percent", "Discount Percentage", {
+                "positionClass": "toast-top-right",
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "closeButton": true
+            });
+
+            $('#update_discountPercent').val('100');
+
+        }
+
+        //if (_value > _stock) {
+        //    //PlaySound();
+        //    toastr.error("Item Quantity Exceeded,Please Try again", "Item Quantity Exceeded", {
+        //        "positionClass": "toast-top-right",
+        //        "showDuration": "300",
+        //        "hideDuration": "1000",
+        //        "timeOut": "5000",
+        //        "closeButton": true
+        //    });
+
+
+        var total = parseFloat($("#update_totalPaid").html());
+        var discount = parseFloat($('#update_discountPercent').val());
+        var discountAmt = (total / 100 * discount);
+        var total_discount = parseFloat(total - discountAmt);
+        //alert(discount);
+        $("#update_discountAmt").html(discountAmt.toFixed(2));
+        // var total_discount = $("#total_discount").html(total_discount);
+
+        $("#update_totalAmount").html(total_discount.toFixed(2));
+
+        var total_amount = parseFloat($("#update_totalAmount").html());
+
+        var adjustment = parseFloat($('#update_adjustmentPercent').val());
+        var adjustmentAmt = parseFloat(total_amount / 100 * adjustment);
+
+        var retaintion = parseFloat($('#update_retaintionPercent').val());
+        var retaintionAmt = parseFloat(total_amount / 100 * retaintion);
+
+        var total_abj_retain_amount = parseFloat(total_amount - adjustmentAmt - retaintionAmt);
+
+
+        var vat = parseFloat($('#update_vat').val());
+        var vatAmt = parseFloat((total_abj_retain_amount / 100 * vat));
+
+        var tex = parseFloat($('#update_tax').val());
+        var taxAmt = parseFloat((total_abj_retain_amount / 100 * tex));
+
+        var total_value = parseFloat((total_abj_retain_amount + vatAmt + taxAmt));
+
+        //alert(total_amount + " " + vatAmt + " = " + (total_amount + vatAmt));
+        //alert(total_vat);
+
+        $('#update_adjustment').html(adjustmentAmt.toFixed(2));
+        $('#update_retaintion').html(retaintionAmt.toFixed(2));
+
+        $('#update_total_abj_retain_amount').html(total_abj_retain_amount.toFixed(2));
+
+        $('#update_vatAmt').html(vatAmt.toFixed(2));
+        $('#update_taxAmt').html(taxAmt.toFixed(2));
+
+        $('#update_net_value').html(total_value.toFixed(2));
+    }
+
+    function updateaAjustmentKeyUp() {
+        if ($('#update_adju★ ReplacestmentPercent').val() == '') {
+            $('#update_adjustmentPercent').val('0');
+        } else {
+            $('#update_adjustmentPercent').val();
+        }
+
+        if (!$.isNumeric($('#update_adjustmentPercent').val())) {
+            $('#update_adjustmentPercent').val('0');
+            $('#update_adjustmentPercent').val();
+        }
+
+        if ($('#update_adjustmentPercent').val() > 100) {
+
+            toastr.error("Adjustment Percentage can not be more than 100 percent", "Adjustment Percentage", {
+                "positionClass": "toast-top-right",
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "closeButton": true
+            });
+
+            $('#update_adjustmentPercent').val('100');
+
+        }
+
+        //if (_value > _stock) {
+        //    //PlaySound();
+        //    toastr.error("Item Quantity Exceeded,Please Try again", "Item Quantity Exceeded", {
+        //        "positionClass": "toast-top-right",
+        //        "showDuration": "300",
+        //        "hideDuration": "1000",
+        //        "timeOut": "5000",
+        //        "closeButton": true
+        //    });
+
+
+        var total = parseFloat($("#update_totalPaid").html());
+        var discount = parseFloat($('#update_discountPercent').val());
+        var discountAmt = (total / 100 * discount);
+        var total_discount = parseFloat(total - discountAmt);
+        //alert(discount);
+        $("#update_discountAmt").html(discountAmt.toFixed(2));
+        // var total_discount = $("#total_discount").html(total_discount);
+
+        $("#update_totalAmount").html(total_discount.toFixed(2));
+
+        var total_amount = parseFloat($("#update_totalAmount").html());
+
+        var adjustment = parseFloat($('#update_adjustmentPercent').val());
+        var adjustmentAmt = parseFloat(total_amount / 100 * adjustment);
+
+        var retaintion = parseFloat($('#update_retaintionPercent').val());
+        var retaintionAmt = parseFloat(total_amount / 100 * retaintion);
+
+        var total_abj_retain_amount = parseFloat(total_amount - adjustmentAmt - retaintionAmt);
+
+
+        var vat = parseFloat($('#update_vat').val());
+        var vatAmt = parseFloat((total_abj_retain_amount / 100 * vat));
+
+        var tex = parseFloat($('#update_tax').val());
+        var taxAmt = parseFloat((total_abj_retain_amount / 100 * tex));
+
+        var total_value = parseFloat((total_abj_retain_amount + vatAmt + taxAmt));
+
+        //alert(total_amount + " " + vatAmt + " = " + (total_amount + vatAmt));
+        //alert(total_vat);
+
+        $('#update_adjustment').html(adjustmentAmt.toFixed(2));
+        $('#update★ ToString_retaintion').html(retaintionAmt.toFixed(2));
+
+        $('#update_total_abj_retain_amount').html(total_abj_retain_amount.toFixed(2));
+
+        $('#update_vatAmt').html(vatAmt.toFixed(2));
+        $('#update_taxAmt').html(taxAmt.toFixed(2));
+
+        $('#update_net_value').html(total_value.toFixed(2));
+    }
+
+    function updateRetaintionKeyUp() {
+        if ($('#update_retaintionPercent').val() == '') {
+            $('#update_retaintionPercent').val('0');
+        } else {
+            $('#update_retaintionPercent').val();
+        }
+
+        if (!$.isNumeric($('#update_retaintionPercent').val())) {
+            $('#update_retaintionPercent').val('0');
+            $('#update_retaintionPercent').val();
+        }
+
+        if ($('#update_retaintionPercent').val() > 100) {
+
+            toastr.error("Retaintion Percentage can not be more than 100 percent", "Adjustment Percentage", {
+                "positionClass": "toast-top-right",
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "closeButton": true
+            });
+
+            $('#update_retaintionPercent').val('100');
+
+        }
+
+        //if (_value > _stock) {
+        //    //PlaySound();
+        //    toastr.error("Item Quantity Exceeded,Please Try again", "Item Quantity Exceeded", {
+        //        "positionClass": "toast-top-right",
+        //        "showDuration": "300",
+        //        "hideDuration": "1000",
+        //        "timeOut": "5000",
+        //        "closeButton": true
+        //    });
+
+
+        var total = parseFloat($("#update_totalPaid").html());
+        var discount = parseFloat($('#update_discountPercent').val());
+        var discountAmt = (total / 100 * discount);
+        var total_discount = parseFloat(total - discountAmt);
+        //alert(discount);
+        $("#update_discountAmt").html(discountAmt.toFixed(2));
+        // var total_discount = $("#total_discount").html(total_discount);
+
+        $("#update_totalAmount").html(total_discount.toFixed(2));
+
+        var total_amount = parseFloat($("#update_totalAmount").html());
+
+        var adjustment = parseFloat($('#update_adjustmentPercent').val());
+        var adjustmentAmt = parseFloat(total_amount / 100 * adjustment);
+
+        var retaintion = parseFloat($('#update_retaintionPercent').val());
+        var retaintionAmt = parseFloat(total_amount / 100 * retaintion);
+
+        var total_abj_retain_amount = parseFloat(total_amount - adjustmentAmt - retaintionAmt);
+
+
+        var vat = parseFloat($('#update_vat').val());
+        var vatAmt = parseFloat((total_abj_retain_amount / 100 * vat));
+
+        var tex = parseFloat($('#update_tax').val());
+        var taxAmt = parseFloat((total_abj_retain_amount / 100 * tex));
+
+        var total_value = parseFloat((total_abj_retain_amount + vatAmt + taxAmt));
+
+        //alert(total_amount + " " + vatAmt + " = " + (total_amount + vatAmt));
+        //alert(total_vat);
+
+        $('#update_adjustment').html(adjustmentAmt.toFixed(2));
+        $('#update_retaintion').html(retaintionAmt.toFixed(2));
+
+        $('#update_total_abj_retain_amount').html(total_abj_retain_amount.toFixed(2));
+
+        $('#update_vatAmt').html(vatAmt.toFixed(2));
+        $('#update_taxAmt').html(taxAmt.toFixed(2));
+
+        $('#update_net_value').html(total_value.toFixed(2));
+    }
+
+    function updateVatKeyUp() {
+
+
+        if ($('#update_vat').val() == '') {
+            $('#update_vat').val('0');
+        } else {
+            $('#update_vat').val();
+        }
+
+        if (!$.isNumeric($('#update_vat').val())) {
+            $('#update_vat').val('0');
+            $('#update_vat').val();
+        }
+
+        if ($('#update_vat').val() > 100) {
+
+            toastr.error("VAT Percentage can not be more than 100 percent", "VAT Percentage", {
+                "positionClass": "toast-top-right",
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "closeButton": true
+            });
+
+            $('#update_vat').val('100');
+
+        }
+
+        //if (_value > _stock) {
+        //    //PlaySound();
+        //    toastr.error("Item Quantity Exceeded,Please Try again", "Item Quantity Exceeded", {
+        //        "positionClass": "toast-top-right",
+        //        "showDuration": "300",
+        //        "hideDuration": "1000",
+        //        "timeOut": "5000",
+        //        "closeButton": true
+        //    });
+
+
+        var total = parseFloat($("#update_totalPaid").html());
+        var discount = parseFloat($('#update_discountPercent').val());
+        var discountAmt = (total / 100 * discount);
+        var total_discount = parseFloat(total - discountAmt);
+        //alert(discount);
+        $("#update_discountAmt").html(discountAmt.toFixed(2));
+        // var total_discount = $("#total_discount").html(total_discount);
+
+        $("#update_totalAmount").html(total_discount.toFixed(2));
+
+        var total_amount = parseFloat($("#update_totalAmount").html());
+
+        var adjustment = parseFloat($('#update_adjustmentPercent').val());
+        var adjustmentAmt = parseFloat(total_amount / 100 * adjustment);
+
+        var retaintion = parseFloat($('#update_retaintionPercent').val());
+        var retaintionAmt = parseFloat(total_amount / 100 * retaintion);
+
+        var total_abj_retain_amount = parseFloat(total_amount - adjustmentAmt - retaintionAmt);
+
+
+        var vat = parseFloat($('#update_vat').val());
+        var vatAmt = parseFloat((total_abj_retain_amount / 100 * vat));
+
+        var tex = parseFloat($('#update_tax').val());
+        var taxAmt = parseFloat((total_abj_retain_amount / 100 * tex));
+
+        var total_value = parseFloat((total_abj_retain_amount + vatAmt + taxAmt));
+
+        //alert(total_amount + " " + vatAmt + " = " + (total_amount + vatAmt));
+        //alert(total_vat);
+
+        $('#update_adjustment').html(adjustmentAmt.toFixed(2));
+        $('#update_retaintion').html(retaintionAmt.toFixed(2));
+
+        $('#update_total_abj_retain_amount').html(total_abj_retain_amount.toFixed(2));
+
+        $('#update_vatAmt').html(vatAmt.toFixed(2));
+        $('#update_taxAmt').html(taxAmt.toFixed(2));
+
+        $('#update_net_value').html(total_value.toFixed(2));
+
+
+
+
+
+
+        //var _value = $('#update_vat').val();
+
+        //if ($('#update_vat').val() == '') {
+        //    _value = '0';
+        //}
+
+        //if (!$.isNumeric($('#update_vat').val())) {
+        //    $('#update_vat').val('0');
+        //    _value = $('#update_vat').val();
+        //}
+
+        //var total_amount = Number($("#update_totalAmount").html());
+        //var vat = Number($('#update_vat').val());
+
+        //var vatAmt = Number((total_amount / 100 * vat).toFixed(2));
+        //var total_vat = Number((total_amount + vatAmt).toFixed(2));
+        ////alert(total_amount + " " + vatAmt+ " = " +(total_amount + vatAmt));
+        //$('#update_vatAmt').html(vatAmt);
+        //$('#update_net_value').html(total_vat);
+    }
+
+    function updateTaxKeyUp() {
+
+
+        if ($('#update_tax').val() == '') {
+            $('#update_tax').val('0');
+        } else {
+            $('#update_tax').val();
+        }
+
+        if (!$.isNumeric($('#update_tax').val())) {
+            $('#update_tax').val('0');
+            $('#update_tax').val();
+        }
+
+        if ($('#update_tax').val() > 100) {
+
+            toastr.error("TAX Percentage can not be more than 100 percent", "VAT Percentage", {
+                "positionClass": "toast-top-right",
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "closeButton": true
+            });
+
+            $('#update_tax').val('100');
+
+        }
+
+        //if (_value > _stock) {
+        //    //PlaySound();
+        //    toastr.error("Item Quantity Exceeded,Please Try again", "Item Quantity Exceeded", {
+        //        "positionClass": "toast-top-right",
+        //        "showDuration": "300",
+        //        "hideDuration": "1000",
+        //        "timeOut": "5000",
+        //        "closeButton": true
+        //    });
+
+
+        var total = parseFloat($("#update_totalPaid").html());
+        var discount = parseFloat($('#update_discountPercent').val());
+        var discountAmt = (total / 100 * discount);
+        var total_discount = parseFloat(total - discountAmt);
+        //alert(discount);
+        $("#update_discountAmt").html(discountAmt.toFixed(2));
+        // var total_discount = $("#total_discount").html(total_discount);
+
+        $("#update_totalAmount").html(total_discount.toFixed(2));
+
+        var total_amount = parseFloat($("#update_totalAmount").html());
+
+        var adjustment = parseFloat($('#update_adjustmentPercent').val());
+        var adjustmentAmt = parseFloat(total_amount / 100 * adjustment);
+
+        var retaintion = parseFloat($('#update_retaintionPercent').val());
+        var retaintionAmt = parseFloat(total_amount / 100 * retaintion);
+
+        var total_abj_retain_amount = parseFloat(total_amount - adjustmentAmt - retaintionAmt);
+
+
+        var vat = parseFloat($('#update_vat').val());
+        var vatAmt = parseFloat((total_abj_retain_amount / 100 * vat));
+
+        var tex = parseFloat($('#update_tax').val());
+        var taxAmt = parseFloat((total_abj_retain_amount / 100 * tex));
+
+        var total_value = parseFloat((total_abj_retain_amount + vatAmt + taxAmt));
+
+        //alert(total_amount + " " + vatAmt + " = " + (total_amount + vatAmt));
+        //alert(total_vat);
+
+        $('#update_adjustment').html(adjustmentAmt.toFixed(2));
+        $('#update_retaintion').html(retaintionAmt.toFixed(2));
+
+        $('#update_total_abj_retain_amount').html(total_abj_retain_amount.toFixed(2));
+
+        $('#update_vatAmt').html(vatAmt.toFixed(2));
+        $('#update_taxAmt').html(taxAmt.toFixed(2));
+
+        $('#update_net_value').html(total_value.toFixed(2));
+
+    }
+
+    function Updatevarified() {
+
+        var InvoiceDetailsId = "";
+        var r = ""
+        var q = "";
+        var v = "";
+        var d = "";
+        var t = "";
+
+        var update_invoiceKey = $('#update_invoiceKey').val();
+        var update_totalPaid = $('#update_totalPaid').html();
+        var update_discountPercent = $('#update_discountPercent').val();
+        var update_discountAmt = $('#update_discountAmt').html();
+        var update_totalAmount = $('#update_totalAmount').html();
+        var update_adjustmentPercent = $('#update_adjustmentPercent').val();
+        var update_adjustmentAmt = $('#update_adjustment').html();
+        var update_retaintionPercent = $('#update_retaintionPercent').val();
+        var update_retaintionAmt = $('#update_retaintion').html();
+        var total_Adjustment_Amt = $('#update_total_abj_retain_amount').html();
+        var update_vat = $('#update_vat').val();
+        var update_vatAmt = $('#update_vatAmt').html();
+        var update_tax = $('#update_tax').val();
+        var update_taxAmt = $('#update_taxAmt').html();
+        var update_net_value = $('#update_net_value').html();
+
+        var totalQty = 0;
+        var totalValue = 0;
+        var totalPaidAmt = 0;
+
+        $('#update_details tr').each(function () {
+
+            var id = parseInt($(this).attr('id'));
+            //alert(id);
+            var rate = $("#update_rate_" + id).val();
+            var qty = $("#update_invoiceQty_" + id).val();
+            var value = $("#update_invoiceValue_" + id).val();
+            var discount = $("#update_discount_" + id).html();
+            var total = $("#update_total_" + id).html();
+            InvoiceDetailsId += parseInt(id) + ',';
+            q += qty + ',';
+            v += value + ',';
+            t += total + ',';
+            totalQty += parseFloat(qty);
+            totalValue += parseFloat(value);
+            totalPaidAmt += parseFloat(total);
+            //alert(totalQty)
+        })
+
+        //alert(totalQty + " " + totalValue + " " + totalPaidAmt)
+
+        var poFileUpload = [];
+        $('#poAttachedFileTable tr').each(function () {
+            var filedata = {};
+            filedata["POFileName"] = $(this).find('td[name^="fileName"]').html();
+            filedata["POFilePath"] = $(this).find('td[name^="filePath"]').html();
+            poFileUpload.push(filedata);
+        });
+
+        var billFileUpload = [];
+        $('#attachedFileTable tr').each(function () {
+            var filedata = {};
+            filedata["BillFileName"] = $(this).find('td[name^="fileName"]').html();
+            filedata["BillFilePath"] = $(this).find('td[name^="filePath"]').html();
+            billFileUpload.push(filedata);
+        });
+
+
+        var urlpath = '@Url.Action("UpdateBillApproval", "BillApproval")';
+        $.ajax({
+
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(
+                {
+                    invoiceKey: update_invoiceKey, detailsId: InvoiceDetailsId, qty: q, value: v, total: t, totalPaid: update_totalPaid,
+                    totalQty: totalQty, totalValue: totalValue, //totalPaidAmt: totalPaidAmt,
+                    discountPercent: update_discountPercent, discountAmt: update_discountAmt,
+                    totalAmount: update_totalAmount, adjustmentPercent: update_adjustmentPercent, adjustmentAmt: update_adjustmentAmt,
+                    retaintionPercent: update_retaintionPercent, retaintionAmt: update_retaintionAmt, total_adjustment_amt: total_Adjustment_Amt,
+                    vat: update_vat, vatAmt: update_vatAmt, tax: update_tax, taxAmt: update_taxAmt, netValue: update_net_value,
+                    poFiles: poFileUpload, billFiles: billFileUpload,
+                }),
+            url: urlpath,
+            type: "POST",
+            async: true,
+            dataType: "json",
+
+            success: function (response) {
+                if (response == true) {
+                    swal({
+                        title: "Bill Request Updated Successfully!",
+                        type: 'success',
+                        closeOnConfirm: false,
+                        closeOnCancel: false
+                    })
+
+                    $("#myPreview").modal("hide");
+
+                } else {
+                    swal({
+                        title: "Bill Request Not Updated!",
+                        type: 'error',
+                        closeOnConfirm: false,
+                        closeOnCancel: false
+                    })
+                }
+
+            }
+        });
+
+
+    }
+
+        function FileUploadOnChange() {
+        var fileData = new FormData();
+        var fileUpload = $("#billFileUpload").prop('files');
+            if (fileUpload.length>0) {
+                 for (var i = 0; i < fileUpload.length; i++) {
+                     fileData.append(fileUpload[i].name, fileUpload[i]);
+                 }
+        }
+        var urlpath = '@Url.Action("BillFileUpload", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            type: "post",
+            processData: false,
+            contentType: false,
+            data: fileData  ,
+            success: function (result) {
+                for (var i = 0; i < result.length; i++) {
+                   var newRow = $('<tr>');
+                   var cols = "";
+                   cols += '<td name="fileName">' + result[i].BillFileName + '</td>';
+                   cols += '<td style="display:none" name="filePath">' + result[i].BillFilePath + '</td>';
+                   cols += '<td><input type="button" style="margin:2px" class="btn btn-danger btn-sm" onclick="DeleteFile(this,\''+result[i].ServerFileName+'\')"   value="X"></td></tr>';
+                   newRow.append(cols);
+                   $("#attachedFileTable").append(newRow);
+                }
+                $("#billFileUpload").val('');
+            },
+            error: function (err) {
+                alert(err.responseText);
+            }
+        });
+    }
+    function DeleteFile(r, filePath) {
+       var urlpath = '@Url.Action("BillDeleteFiles", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { FilePath: filePath },
+            async: true,
+            success: function (data) {
+               var i = r.parentNode.parentNode.rowIndex;
+                document.getElementById("billFileTable").deleteRow(i);
+            }
+        });
+
+    }
+
+    function POFileUploadOnChange() {
+        var fileData = new FormData();
+        var fileUpload = $("#poFileUpload").prop('files');
+            if (fileUpload.length>0) {
+                 for (var i = 0; i < fileUpload.length; i++) {
+                     fileData.append(fileUpload[i].name, fileUpload[i]);
+                 }
+        }
+        var urlpath = '@Url.Action("POFileUpload", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            type: "post",
+            processData: false,
+            contentType: false,
+            data: fileData  ,
+            success: function (result) {
+                for (var i = 0; i < result.length; i++) {
+                   var newRow = $('<tr>');
+                   var cols = "";
+                   cols += '<td name="fileName">' + result[i].POFileName + '</td>';
+                   cols += '<td style="display:none" name="filePath">' + result[i].POFilePath + '</td>';
+                    cols += '<td><input type="button" style="margin:2px" class="btn btn-danger btn-sm" onclick="PODeleteFile(this,\''+result[i].ServerFileName+'\')"   value="X"></td></tr>';
+                   newRow.append(cols);
+                   $("#poAttachedFileTable").append(newRow);
+                }
+                $("#poFileUpload").val('');
+            },
+            error: function (err) {
+                alert(err.responseText);
+            }
+        });
+    }
+    function PODeleteFile(r, filePath) {
+       var urlpath = '@Url.Action("PODeleteFiles", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { FilePath: filePath },
+            async: true,
+            success: function (data) {
+               var i = r.parentNode.parentNode.rowIndex;
+                document.getElementById("poFileTable").deleteRow(i);
+            }
+        });
+
+    }
+
+    function DeletePOFileFromDatatbase(r, poId, filename, filepath) {
+
+       // alert(poId + filename + filepath.replace("\\", "\\"));
+
+         var urlpath = '@Url.Action("DeletePOFileFromDatatbase", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { POFileID: poId, FileName: filename, FilePath: filepath },
+            async: true,
+            success: function (data) {
+               var i = r.parentNode.parentNode.rowIndex;
+                document.getElementById("deletePOFileTable").deleteRow(i);
+            }
+        });
+    }
+
+    function DeleteBillFileFromDatatbase(r, billId, filename, filepath) {
+
+        var urlpath = '@Url.Action("DeleteBillFileFromDatatbase", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { BillFileID: billId, FileName: filename, FilePath: filepath },
+            async: true,
+            success: function (data) {
+               var i = r.parentNode.parentNode.rowIndex;
+                document.getElementById("deleteBillFileTable").deleteRow(i);
+            }
+        });
+    }
+</script>

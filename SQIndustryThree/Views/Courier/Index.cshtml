@@ -1,0 +1,393 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .modal-lg {
+        max-width: 80% !important;
+    }
+
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    #ioumenu {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #iousubmenu li a {
+        color: white;
+    }
+    /*#exceptionSubmrnu li:active{
+        color:white;
+        background-color:#0a0a22;
+
+    }*/
+    #iouNavigation {
+        background-color: #37474F;
+    }
+
+    #expmenu {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #exceptionSubmrnu li a {
+        color: white;
+    }
+    /*#exceptionSubmrnu li:active{
+        color:white;
+        background-color:#0a0a22;
+
+    }*/
+    #exceptionNavigaton {
+        background-color: #37474F;
+    }
+</style>
+<div class="container-fluid">
+    <h3 style="text-align: center;">
+        <b>Courier Management System</b>
+    </h3>
+    <hr style="margin: 0px" />
+    <div class="row">
+        <div id="iouNavigation" class="navbar navbar-default navbar-static-top">
+            <div id="ioumenu">
+                <div>
+                    <ul id="iousubmenu" class="nav navbar-nav">
+                        <li><a href="#" onclick="GetWidgetPartial('CourierRequestForm')">Courier Requestor Form</a></li>
+                        <li><a href="#" onclick="GetAllCourierRequest(1,0)">My Request So Far</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="ioucreateDashboard" style="width:100%">
+
+        </div>
+    </div>
+    <div class="modal" id="myModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Courier Request Preview</h4>
+                </div>
+                <div id="modalbody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+<script type="text/javascript">
+
+
+
+      $("#iousubmenu").find('li:nth-child(1)').addClass("active");
+    GetWidgetPartial('CourierRequestForm');
+    $('#iousubmenu > li > a').click(function() {
+        $('li').removeClass();
+        $(this).parent().addClass('active');
+
+    });
+
+    function GetWidgetPartial(variable) {
+    var urlpath = '@Url.Action("GetCourierPartial", "Courier")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: {viewName:variable},
+            async: true,
+            success: function(data) {
+                    if (data) {
+                        $('#ioucreateDashboard').empty();
+                        $('#ioucreateDashboard').append(data);
+                    }
+                }
+            });
+    }
+    function GetAllCourierRequest(status,progress) {
+        var urlpath = '@Url.Action("GetAllCourierRequest", "Courier")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: { Status: status, ViewName: '_myCourierRequestor',Progrss:progress},
+            async: true,
+            success: function (data) {
+
+                if (data) {
+                 /*   alert(data);*/
+                     $('#ioucreateDashboard').empty();
+                    $('#ioucreateDashboard').append(data);
+                    $('#VisitorRequestTable').DataTable();
+                }
+            }
+        });
+    }
+
+    function CourierRequestDetails(masterID,status,viewName) {
+        var urlpath = '@Url.Action("CourierRequestDetails", "Courier")';
+        $.ajax({
+            data: { MasterID: masterID, ViewName: viewName, Status: status },
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $("#modalbody").html("");
+                $("#modalbody").append(data);
+                $("#myModal").modal("show");
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+    function CourierDispatchedRequestDetails(masterID,status,viewName) {
+        var urlpath = '@Url.Action("CourierDispatchedRequestDetails", "Courier")';
+        $.ajax({
+            data: { MasterID: masterID, ViewName: viewName, Status: status },
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $("#modalbody").html("");
+                $("#modalbody").append(data);
+                $("#myModal").modal("show");
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+    function CourierReceivedRequestDetails(masterID,status,viewName) {
+        var urlpath = '@Url.Action("CourierReceivedRequestDetails", "Courier")';
+        $.ajax({
+            data: { MasterID: masterID, ViewName: viewName, Status: status },
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $("#modalbody").html("");
+                $("#modalbody").append(data);
+                $("#myModal").modal("show");
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+     function ReviewComment(masterID) {
+        if ($("#reviewMessage").val() == "") {
+            $("#reviewMessage").css({ "border-color": "#FF0000" });
+        } else {
+            var reviewTo = $("#reviewComment").val();
+            var reviewMessage = $("#reviewMessage").val();
+            var urlpath = '@Url.Action("SendCourieComments", "Courier")';
+            $.ajax({
+                    data: { MasterID: masterID, ReviewTo: reviewTo, ReviewMessage: reviewMessage },
+                    dataType: 'json',
+                    url: urlpath,
+                    type: "Post",
+                    async: true,
+                    success: function (result) {
+                        if (result) {
+                            swal({
+                                            title: 'Comment Added Successfully',
+                                            type: 'success',
+                                            closeOnCancel: true
+                                        },
+                                function () {
+                                    $("#myModal").modal("hide");
+                                    GetAllExceptionRequest(1,0);
+                                });
+                        }
+                    }
+                });
+        }
+
+    }
+     function ReviewComment(masterID,status) {
+        if ($("#reviewMessage").val() == "") {
+            $("#reviewMessage").css({ "border-color": "#FF0000" });
+        } else {
+            var reviewTo = $("#reviewComment").val();
+            var reviewMessage = $("#reviewMessage").val();
+            var urlpath = '@Url.Action("SendCourieComments", "Courier")';
+            $.ajax({
+                    data: { MasterID: masterID, ReviewTo: reviewTo, ReviewMessage: reviewMessage },
+                    dataType: 'json',
+                    url: urlpath,
+                    type: "Post",
+                    async: true,
+                    success: function (result) {
+                        if (result) {
+                            swal({
+                                            title: 'Comment Sent Successfully',
+                                            type: 'success',
+                                            closeOnCancel: true
+                                        },
+                                function () {
+
+                                        $("#myModal").modal("hide");
+                                        $("#iousubmenu").find('li').removeClass();
+                                        $("#iousubmenu").find('li:nth-child(2)').addClass("active");
+                                        GetAllCourierRequest(1, 0);
+                                  });
+                        }
+                    }
+                });
+        }
+
+    }
+    function UpdateRejectedRequest(CourierRequestId,status) {
+        var urlpath = '@Url.Action("CourierRequestDetails", "Courier")';
+        $.ajax({
+            data: { MasterID: CourierRequestId, ViewName: "_CourierRequestUpdateModal", Status:status },
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $('#ioucreateDashboard').empty();
+                $('#ioucreateDashboard').append(data);
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+    function UpdateCourierRequest(courierreqid) {
+        if ($("#upDepartment").val() == "0") {
+            toastr.error("Please Select Department ", " Department ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+        }
+        debugger;
+        var jsonData = {};
+        jsonData["CourierRequestId"] = courierreqid;
+        jsonData["DateOfRequest"] = new Date();
+        jsonData["LocationId"] = $("#upLocation").val();
+        jsonData["locationName"] = $("#upLocation").children("option:selected").html();
+        jsonData["BusinessUnitId"] = $("#upBusinessunit").val();
+        jsonData["BusinessUnitName"] = $("#upBusinessunit").children("option:selected").html();
+        jsonData["DepartmentID"] = $("#upDepartment").val();
+        jsonData["DepartmentName"] = $("#upDepartment").children("option:selected").html();
+        jsonData["CourierType"] = $("#uptype").val();
+        jsonData["Customer"] = $("#upCustomer").val();
+        jsonData["BuyerName"] = $("#upCustomer").children("option:selected").html();
+        jsonData["Receiver"] = $("#upReceiver").val();
+        jsonData["Title"] = $("#upTitle").val();
+        jsonData["ContactNo"] = $("#upContactNo").val();
+        jsonData["Country"] = $("#upCountry").val();
+        jsonData["CountryName"] = $("#upCountry").children("option:selected").html();
+        jsonData["PostCode"] = $("#upPost_code").val();
+        jsonData["Address"] = $("#upAddress").val();
+        jsonData["DispatchDate"] = $("#upDispatch_date").val();
+        jsonData["Deliverydate"] = $("#upDelivery_date").val();
+        jsonData["ProductDescription"] = $("#upProduct_description").val();
+        jsonData["Weight"] = $("#upWeight").val();
+        jsonData["Volume"] = $("#upVolume").val();
+        jsonData["AirwayBillno"] = $("#upAirway_bill_no").val();
+        //jsonData["Courier"] = $("#gupCourier").val();
+        //jsonData["ServiceProvider"] = $("#gupCourier").children("option:selected").html();
+        //jsonData["ProposedDate"] = $("#gupProposed_date").val();
+        //jsonData["Cost"] = $("#gupCost").val();
+        //jsonData["GenerateCourier"] = $("#change_gupCourier").val();
+        //jsonData["GenerateCourierName"] = $("#change_gupCourier_name").val();
+        //jsonData["GenerateProposedDate"] = $("#change_gupProposed_date").val();
+        //jsonData["GenerateCost"] = $("#change_gupCost").val();
+        jsonData["Courier"] = $("#upCourier").val();
+        jsonData["ServiceProvider"] = $("#upCourier").children("option:selected").html();
+        jsonData["ProposedDate"] = $("#upProposed_date").val();
+        jsonData["Cost"] = $("#upCost").val();
+        jsonData["GenerateCourier"] = $("#upGenerateCourier").val();
+        jsonData["GenerateCourierName"] = $("#upGenerateCourier").children("option:selected").html();
+        jsonData["GenerateProposedDate"] = $("#upGenerateProposedDate").val();
+        jsonData["GenerateCost"] = $("#upGenerateCost").val();
+        jsonData["Remarks"] = $("#remarks").val();
+        jsonData["Status"] = "1";
+        // jsonData["RequesterId"] = "0";
+        // var jsonObj = [];
+
+        var approverObj = []
+       /* var count = 1;*/
+        $("#ListOfApprover tr").not(':first').each(function () {
+
+
+            var approver = {};
+            approver["UserID"] = $(this).find('p[name^="userId"]').html();
+            approver["ApproverNo"] = $(this).find('p[name^="approverNo"]').html();
+            approver["UserName"] = $(this).find('p[name^="userName"]').html();
+            approver["DesignationName"] = $(this).find('p[name^="designation"]').html();
+            approver["ApproverStatusName"] = $(this).find('p[name^="approverstatus"]').html();
+            approver["ApproverStatus"] = $(this).find('p[name^="approverNo"]').html();
+
+            //if ($(this).find('p[name^="approverNo"]') == 1) {
+            //    approver["ApproverStatus"] = 1;
+            //    approver["ApproverStatusName"] = "First Approver"
+            //} else {
+            //    approver["ApproverStatus"] = 2;
+            //    approver["ApproverStatusName"] = "Second Approver"
+            //}
+
+            approverObj.push(approver);
+           /* count++;*/
+        })
+
+
+
+        jsonData["CourierApproverList"] = approverObj;
+
+
+        return jsonData;
+
+
+
+
+    }
+    function UpdateToDataBase(CourierRequestId) {
+        debugger;
+        var jsondate = UpdateCourierRequest(CourierRequestId);
+         var urlpath = '@Url.Action("UpdateCourierRequest", "Courier")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsondate),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    swal({
+                        title: 'Courier Request Updated Successfully',
+                        type: 'success',
+                        closeOnCancel: true
+                    },function () {
+                            $("#myModal").modal("hide");
+                            $("#iousubmenu").find('li').removeClass();
+                            $("#iousubmenu").find('li:nth-child(2)').addClass("active");
+                            GetAllCourierRequest(1, 0);
+                    });
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+    }
+
+</script>
+
+

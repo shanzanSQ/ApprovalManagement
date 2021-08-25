@@ -1,0 +1,1575 @@
+﻿@model SQIndustryThree.Models.BillApproval.BillRequestMaster
+
+<style>
+    th {
+        text-align: left;
+    }
+
+    td {
+        text-align: left;
+    }
+
+    #genaralInfodt tr th, #genaralInfodt tr td, #approverlist tr td, #approverlist tr th {
+        text-align: center;
+    }
+</style>
+
+<div class="">
+    <div id="printablearea">
+        <div>
+            <span style="float:left;font-weight:bold;font-size:20px">@Model.InvoiceNo</span>
+            <span style="float:right;font-weight:bold;font-size:20px"> InvoiceKey: @Model.InvoiceKey</span>
+        </div>
+        @if (Model.ApproverList != null)
+        {
+
+
+            <table border="1" width="100%" id="approverlist">
+                <caption>Approver List</caption>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Approver Name</th>
+                        <th>Approver Designation</th>
+                        <th>Approver Role</th>
+                        <th>Update Date</th>
+                        <th>Status</th>
+                        <th>Comment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.ApproverList)
+                    {
+                        <tr>
+                            <td><p name="approverNo">@item.ApproverNo</p></td>
+                            <td><p style="display:none" name="userId">@item.UserID</p><p name="userName">@item.UserName</p></td>
+
+                            <td><p name="designationName">@item.DesignationName</p></td>
+
+                            <td><p name="approverstatus">@item.ApproverStatusName</p></td>
+                            <td>
+                                <p style="display:none" name="apstatusid">@item.IsApprove</p>
+                                @if (@item.UpdateDate != null)
+                                {@DateTime.Parse(@item.UpdateDate).ToString("dd MMM yyyy")}
+                            </td>
+                            @if (item.IsApprove == 3)
+                            {
+                                <td style="color:red">Pending</td>
+                            }
+                            else if (item.IsApprove == 1)
+                            {
+                                <td style="color:green">Approved</td>
+                            }
+                            else if (item.IsApprove == 2)
+                            {
+                                <td style="color:red">Rejected</td>
+                            }
+                            else
+                            {
+                                <td style="color:darkblue">Not Sent</td>
+                            }
+
+                            <td>@item.Comments</td>
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+        }
+
+        <br />
+
+        <div class="row">
+            <div class="col-md-6">
+                @if (Model.ApproverList.Where(s => s.ApproverNo == 1).Single().UserID == (int)Session["SQuserId"] && Model.InvoiceTypeID == 1)
+                {
+                    <div class="row col-md-12">
+                        <label for="general_procurement" class="general_procurement">General Procurement: <span style="color:red">*</span></label>
+                        <select id="general_procurement" class="general_procurement"></select>
+                    </div>
+                }
+
+                <div class="row col-md-12">
+                    <table border="1" width="100%">
+                        <caption><strong>Invoice Information </strong></caption>
+                        <tr>
+                            <th width="30%">Requestor</th>
+                            <td width="70%">@Model.Requestor</td>
+                        </tr>
+                        <tr>
+                            <th width="30%">Create Date</th>
+                            <td width="70%">@DateTime.Parse(Model.CreateDate).ToString("dd MMM yyyy")</td>
+                        </tr>
+                        <tr>
+                            <th width="30%">Business Unit</th>
+                            <td width="70%">@Model.BusinessUnitName</td>
+                        </tr>
+                        <tr>
+                            <th width="30%">InvoiceType</th>
+                            <td width="70%">@Model.InvoiceTypeName</td>
+                        </tr>
+                        <tr>
+                            <th width="30%">SubCategory</th>
+                            <td width="70%">@Model.SubCategoryName</td>
+                        </tr>
+                        <tr>
+                            <th width="30%">Supplier</th>
+                            <td width="70%">@Model.SupplierName</td>
+                        </tr>
+                        <tr>
+                            <th width="30%">Invoice No</th>
+                            <td width="70%">@Model.InvoiceNo</td>
+                        </tr>
+                        <tr>
+                            <th width="30%">Invoice Date</th>
+                            <td width="70%">@Model.InvoiceDate</td>
+                        </tr>
+                        @if (Model.FinalInvoice == 1)
+                        {
+                            <tr>
+                                <th width="50%">Final Invoice</th>
+                                <td width="50%">Yes</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <th width="50%">Final Invoice</th>
+                                <td width="50%">No</td>
+                            </tr>
+                        }
+                        <tr>
+                            <th width="30%">Remarks: </th>
+                            <td width="70%">@Model.Remarks</td>
+                        </tr>
+                        <tr>
+                            <th width="30%">Notes: </th>
+                            <td width="70%">@Model.Notes</td>
+                        </tr>
+                    </table>
+                </div>
+
+            </div>
+            <div class="col-md-6">
+                @if (Model.ApproverList.Where(s => s.ApproverNo == 1).Single().UserID == (int)Session["SQuserId"])
+                {
+                    <div class="row col-md-12">
+                        <label for="cost_center" class="cost_center">Cost Center: <span style="color:red">*</span></label>
+                        <select id="cost_center" class="cost_center"></select>
+                    </div>
+
+                    if (!string.IsNullOrEmpty(Model.CostCenter))
+                    {
+                        <div class="row col-md-12">
+                            <table class="table table-bordered table-hover table-responsive table-striped">
+                                <caption><b>Cost Center Info</b></caption>
+                                <thead>
+                                    <tr>
+                                        <th>CostCenter</th>
+                                        <th>CostCenterOwner</th>
+                                        <th>Designation</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>@Model.CostCenter</td>
+                                        <td>@Model.CostCenterOwner</td>
+                                        <td>@Model.CostCenterDesignation</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+
+
+                }
+                else
+                {
+                    <div class="row col-md-12">
+                        <table class="table table-bordered table-hover table-responsive table-striped">
+                            <caption><b>Cost Center Info</b></caption>
+                            <thead>
+                                <tr>
+                                    <th>CostCenter</th>
+                                    <th>CostCenterOwner</th>
+                                    <th>Designation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>@Model.CostCenter</td>
+                                    <td>@Model.CostCenterOwner</td>
+                                    <td>@Model.CostCenterDesignation</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+                <br />
+                <br />
+
+                @if (Model.ApproverList.Where(s => s.ApproverNo == 1).Single().UserID == (int)Session["SQuserId"])
+                {
+                    <div class="row">
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <strong> PO Document </strong>
+                            </div>
+
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <table width="100%">
+                                            <caption>Attach File <span style="color:red">*</span></caption>
+                                            <tr>
+                                                <td style="padding-right:2PX;"><input type="file" multiple class="form-control" id="poFileUpload" onchange="POFileUploadOnChange()" /></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <table style="width:98%" class="table table-bordered table-responsive table-condensed table-hover" border="1" id="poFileTable">
+                                            <caption>Attached File</caption>
+                                            <thead>
+                                                <tr>
+                                                    <th>File Name</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="poAttachedFileTable">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            @*<div class="panel-footer text-right">
+                        <button class="btn btn-info btn-sm" id="POAdd" onclick="POAdd()">Add PO</button>
+                    </div>*@
+
+                        </div>
+
+                    </div>
+                    if (Model.POFilesList != null)
+                    {
+                        <table border="1" width="100%" id="deletePOFileTable">
+                            <caption>PO Documents</caption>
+                            <thead>
+                                <tr>
+                                    <th>File Name</th>
+                                    <th>Download</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.POFilesList)
+                                {
+                                    <tr>
+                                        <td>@item.POFileName</td>
+                                        <td style="text-align:center">@Html.ActionLink("Download", "PODownloadFile", "BillApproval", new { filepath = item.POFilePath.ToString(), filename = item.POFileName.ToString() }, new { @target = "_blank", @class = "btn btn-info btn-block" })</td>
+                                        @{ var billpath = item.POFilePath.Replace("\\", "/"); }
+                                        <td style="text-align:center"><button class="btn btn-danger btn-block" onclick="DeletePOFileFromDatatbase(this,@item.PoFileUploadId, '@item.POFileName', '@billpath')">Delete</button></td>
+                                    </tr>
+
+                                }
+                            </tbody>
+                        </table>
+                    }
+                }
+                else
+                {
+                    <div class="row">
+                        @if (Model.POFilesList != null)
+                        {
+                            <table border="1" width="100%">
+                                <caption>PO Documents</caption>
+                                <thead>
+                                    <tr>
+                                        <th>File Name</th>
+                                        <th>Download</th>
+                                        @*<th>Action</th>*@
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.POFilesList)
+                                    {
+                                        <tr>
+                                            <td>@item.POFileName</td>
+                                            <td style="text-align:center">@Html.ActionLink("Download", "PODownloadFile", "BillApproval", new { filepath = item.POFilePath.ToString(), filename = item.POFileName.ToString() }, new { @target = "_blank", @class = "btn btn-info btn-block" })</td>
+                                            @{ var billpath = item.POFilePath.Replace("\\", "/"); }
+                                            @*<td style="text-align:center"><button class="btn btn-danger btn-block" onclick="DeletePOFileFromDatatbase(this,@item.PoFileUploadId, '@item.POFileName', '@billpath')">Delete</button></td>*@
+                                        </tr>
+
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                }
+
+                <br />
+                @if (Model.ApproverList.Where(s => s.ApproverNo == 1).Single().UserID == (int)Session["SQuserId"])
+                {
+                    <div class="row">
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <strong> Bill Document </strong>
+                            </div>
+
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <table width="100%">
+                                            <caption>Attach File <span style="color:red">*</span></caption>
+                                            <tr>
+                                                <td style="padding-right:2PX;"><input type="file" multiple class="form-control" id="billFileUpload" onchange="FileUploadOnChange()" /></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <table style="width:98%" class="table table-bordered table-responsive table-condensed table-hover" border="1" id="billFileTable">
+                                            <caption>Attached File</caption>
+                                            <thead>
+                                                <tr>
+                                                    <th>File Name</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="attachedFileTable">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            @*<div class="panel-footer text-right">
+                        <button class="btn btn-info btn-sm" id="POAdd" onclick="POAdd()">Add PO</button>
+                    </div>*@
+
+                        </div>
+
+                    </div>
+
+                    if (Model.BillFilesList != null)
+                    {
+                        <table border="1" width="100%" id="deleteBillFileTable">
+                            <caption>
+                                Bill Documents
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th>File Name</th>
+                                    <th>Download</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.BillFilesList)
+                                {
+                                    <tr>
+                                        <td>@item.BillFileName</td>
+                                        <td style="text-align:center">@Html.ActionLink("Download", "DownloadFile", "BillApproval", new { filepath = item.BillFilePath.ToString(), filename = item.BillFileName.ToString() }, new { @target = "_blank", @class = "btn btn-info btn-block" })</td>
+                                        <td style="text-align:center"><button class="btn btn-danger btn-block" onclick="DeleteBillFileFromDatatbase(this,@item.BillFileUploadId, '@item.BillFileName', '@item.BillFilePath.ToString()')">Delete</button></td>
+                                    </tr>
+
+                                }
+                            </tbody>
+                        </table>
+                    }
+                }
+
+                else
+                {
+                    <div class="row">
+                        @if (Model.BillFilesList != null)
+                        {
+                            <table border="1" width="100%">
+                                <caption>
+                                    Bill Documents
+                                </caption>
+                                <thead>
+                                    <tr>
+                                        <th>File Name</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.BillFilesList)
+                                    {
+                                        <tr>
+                                            <td>@item.BillFileName</td>
+                                            <td>@Html.ActionLink("Download", "DownloadFile", "BillApproval", new { filepath = item.BillFilePath.ToString(), filename = item.BillFileName.ToString() }, new { @target = "_blank" })</td>
+                                        </tr>
+
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                }
+
+
+
+                <br />
+
+                @if (Model.ApproverList.Where(s => s.ApproverNo == 1).Single().UserID == (int)Session["SQuserId"])
+                {
+                    <div class="row">
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <strong> GRN File Upload </strong><span style="color:red">*</span>
+                            </div>
+
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <table width="100%">
+                                            <caption>Attach File <span style="color:red">*</span></caption>
+                                            <tr>
+                                                <td style="padding-right:2PX;"><input type="file" multiple class="form-control" id="grnFileUpload" onchange="grnFileUploadOnChange()" /></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <table style="width:98%" class="table table-bordered table-responsive table-condensed table-hover" border="1" id="grnFileTable">
+                                            <caption>Attached File</caption>
+                                            <thead>
+                                                <tr>
+                                                    <th>File Name</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="grnAttachedFileTable">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            @*<div class="panel-footer text-right">
+                        <button class="btn btn-info btn-sm" id="POAdd" onclick="POAdd()">Add PO</button>
+                    </div>*@
+
+                        </div>
+
+                    </div>
+
+
+                    if (Model.GRNFilesList != null)
+                    {
+                        <table border="1" width="100%">
+                            <caption>
+                                GRN Documents
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th>File Name</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.GRNFilesList)
+                                {
+                                    <tr>
+                                        <td>@item.GRNFileName</td>
+                                        <td>@Html.ActionLink("Download", "GRNDownloadFile", "BillApproval", new { filepath = item.GRNFilePath.ToString(), filename = item.GRNFileName.ToString() }, new { @target = "_blank", @class = "btn btn-info btn-block" })</td>
+                                    </tr>
+
+                                }
+                            </tbody>
+                        </table>
+                    }
+
+
+                }
+                else
+                {
+                    <div class="row">
+                        @if (Model.GRNFilesList != null)
+                        {
+                            <table border="1" width="100%">
+                                <caption>GRN File Upload</caption>
+                                <thead>
+                                    <tr>
+                                        <th>File Name</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.GRNFilesList)
+                                    {
+                                        <tr>
+                                            <td>@item.GRNFileName</td>
+                                            <td>@Html.ActionLink("Download", "GRNDownloadFile", "BillApproval", new { filepath = item.GRNFilePath.ToString(), filename = item.GRNFileName.ToString() }, new { @target = "_blank" })</td>
+                                        </tr>
+
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                }
+                <br />
+
+
+
+
+
+<!--
+
+
+
+
+
+
+
+
+
+                @if (Model.ApproverList.Where(s => s.ApproverNo == 1).Single().UserID == (int)Session["SQuserId"])
+                {
+                    <div class="row">
+                        @if (Model.BillDocList != null)
+                        {
+                            <div class="">
+                                @*<div class="text-right">
+                            <input type="button" class="btn btn-success btn-sm add-row" onclick="getData()" value="Add Row">&nbsp;&nbsp;
+                        </div>*@
+                                <table class="" border="1" width="100%">
+                                    <caption style="font-weight:bold">Document Center <span style="color:red">*</span></caption>
+                                    <colgroup>
+                                        <col style="width: 10%;">
+                                        <col style="width: 40%;">
+                                        <col style="width: 20%;">
+                                        <col style="width: 20%;">
+                                        <col style="width: 10%;">
+                                    </colgroup>
+                                    <thead>
+                                        <tr>
+                                            <th>SL</th>
+                                            <th>Document Name</th>
+                                            <th>Attachment</th>
+                                            <th>Remarks</th>
+                                            @*<th>Uploaded By</th>
+                                    <th>Uploaded Date</th>
+                                                <th>Action</th>*@
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBody">
+                                        @{ var count = 1;}
+                                        @foreach (var item in Model.BillDocList)
+                                        {
+                                            <tr id="@count">
+                                                <td style="text-align:center">@count</td>
+                                                <td style="text-align:center"><input class="parameter" id="document_name_@count" type="text" placeholder="Purchase Order" value="@item.DocumentName" disabled style="width: 120px;"></td>
+                                                <td>@(item.FileName.Substring(0,5)+ "...")</td>
+                                                <td style="text-align:center"><input class="remarks" id="remarks_@count" type="text" placeholder="Remarks" disabled value="@item.Remarks" style="width:159px"></td>
+                                                <td>@Html.ActionLink("Download", "DcDownloadFile", "BillApproval", new { filepath = item.FilePath.ToString(), filename = item.FileName.ToString() }, new { @target = "_blank" })</td>
+                                                @*<td><input class="comment" id="uploaded_by_1" type="text" placeholder="Uploaded By"></td>
+                                        <td><input class="comment" id="uploaded_date_1" type="text" placeholder="Uploaded Date"></td>*@
+
+
+                                                @*<td style="text-align:center"><button class="btn btn-danger ibtnDel" type="button"> <span class="glyphicon glyphicon-minus" aria-hidden="true"></span> </button></td>*@
+                                            </tr>
+                                            count++;
+                                        }
+
+
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        }
+
+                    </div>
+
+                    <div class="row" style="border: 1px solid black;">
+
+                        <div class="">
+                            @*<div class="text-right">
+                        <input type="button" class="btn btn-success btn-sm add-row" onclick="getData()" value="Add Row">&nbsp;&nbsp;
+                    </div>*@
+                            <table class="" border="1" width="100%">
+                                <caption style="font-weight:bold">Document Center <span style="color:red">*</span></caption>
+                                <colgroup>
+                                    <col style="width: 10%;">
+                                    <col style="width: 20%;">
+                                    <col style="width: 20%;">
+                                    <col style="width: 20%;">
+                                    <col style="width: 10%;">
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th>SL</th>
+                                        <th>Document Name</th>
+                                        <th>Attachment</th>
+                                        <th>Remarks</th>
+                                        @*<th>Uploaded By</th>
+                                <th>Uploaded Date</th>
+                                            <th>Action</th>*@
+                                    </tr>
+                                </thead>
+                                <tbody id="tableDocument">
+                                    <tr id="1">
+                                        <td style="text-align:center">1</td>
+                                        <td style="text-align:center"><input class="parameter" id="document_1" type="text" placeholder="Purchase Order" value="Purchase Order" disabled style="width: 120px;"></td>
+                                        <td style="text-align:center">
+                                            <input type="file" multiple class="qualityFileUpload" id="qualityFileUpload_1" onchange="FileUpload(1)" style="width: 187px;" />
+                                            <span style="display:none" id="attachedFileTable_1" class="attachedFileTable"></span>
+                                        </td>
+                                        <td style=""><input class="remarks" id="remarks_1" type="text" placeholder="Remarks" style="width: 122px;"></td>
+                                        @*<td><input class="comment" id="uploaded_by_1" type="text" placeholder="Uploaded By"></td>
+                                <td><input class="comment" id="uploaded_date_1" type="text" placeholder="Uploaded Date"></td>*@
+
+
+                                        @*<td style="text-align:center"><button class="btn btn-danger ibtnDel" type="button"> <span class="glyphicon glyphicon-minus" aria-hidden="true"></span> </button></td>*@
+                                    </tr>
+                                    <tr id="2">
+                                        <td style="text-align:center">2</td>
+                                        <td style="text-align:center"><input class="parameter" id="document_2" type="text" placeholder="Invoice" value="Invoice" disabled style="width: 120px;"></td>
+                                        <td style="text-align:center">
+                                            <input type="file" multiple class="qualityFileUpload" id="qualityFileUpload_2" onchange="FileUpload(2)" style="width: 187px;" />
+                                            <span id="attachedFileTable_2" class="attachedFileTable"></span>
+                                        </td>
+                                        <td style=""><input class="remarks" id="remarks_2" type="text" placeholder="Remarks" value="" style="width: 122px;"></td>
+                                        @*<td><input class="comment" id="uploaded_by_2" type="text" placeholder="Uploaded By"></td>
+                                <td><input class="comment" id="uploaded_date_2" type="text" placeholder="Uploaded Date"></td>*@
+
+
+                                        @*<td style="text-align:center"><button class="btn btn-danger ibtnDel" type="button"> <span class="glyphicon glyphicon-minus" aria-hidden="true"></span> </button></td>*@
+                                    </tr>
+                                    <tr id="3">
+                                        <td style="text-align:center">3</td>
+                                        <td style="text-align:center"><input class="parameter" id="document_3" type="text" placeholder="MR" value="MR" disabled style="width: 120px;"></td>
+                                        <td style="text-align:center">
+                                            <input type="file" multiple class="qualityFileUpload" id="qualityFileUpload_3" onchange="FileUpload(3)" style="width: 187px;" />
+                                            <span id="attachedFileTable_3" class="attachedFileTable"></span>
+                                        </td>
+                                        <td style=""><input class="remarks" id="remarks_3" type="text" placeholder="Remarks" style="width: 122px;"></td>
+                                        @*<td><input class="comment" id="uploaded_by_3" type="text" placeholder="Uploaded By"></td>
+                                <td><input class="comment" id="uploaded_date_3" type="text" placeholder="Uploaded Date"></td>*@
+
+
+                                        @*<td style="text-align:center"><button class="btn btn-danger ibtnDel" type="button"> <span class="glyphicon glyphicon-minus" aria-hidden="true"></span> </button></td>*@
+                                    </tr>
+                                    <tr id="4">
+                                        <td style="text-align:center">4</td>
+                                        <td style="text-align:center"><input class="parameter" id="document_4" type="text" placeholder="GRN" value="GRN" disabled style="width: 120px;"></td>
+                                        <td style="text-align:center">
+                                            <input type="file" multiple class="qualityFileUpload" id="qualityFileUpload_4" onchange="FileUpload(4)" style="width: 187px;" />
+                                            <span id="attachedFileTable_4" class="attachedFileTable"></span>
+                                        </td>
+                                        <td style=""><input class="remarks" id="remarks_4" type="text" placeholder="Remarks" style="width: 122px;"></td>
+                                        @*<td><input class="uploaded_by" id="uploaded_by_4" type="text" placeholder="Uploaded By"></td>
+                                <td><input class="uploaded_date" id="uploaded_date_4" type="text" placeholder="Uploaded Date"></td>*@
+
+                                        @*<td style="text-align:center"><button class="btn btn-danger ibtnDel" type="button"> <span class="glyphicon glyphicon-minus" aria-hidden="true"></span> </button></td>*@
+                                    </tr>
+                                    <tr id="5">
+                                        <td style="text-align:center">5</td>
+                                        <td style="text-align:center"><input class="parameter" id="document_5" type="text" placeholder="Other Documents" value="Other Documents" disabled style="width: 120px;"></td>
+                                        <td style="text-align:center">
+                                            <input type="file" multiple class="qualityFileUpload" id="qualityFileUpload_5" onchange="FileUpload(5)" style="width: 187px;" />
+                                            <span id="attachedFileTable_5" class="attachedFileTable"></span>
+                                        </td>
+                                        <td style=""><input class="remarks" id="remarks_5" type="text" placeholder="Remarks" style="width: 122px;"></td>
+                                        @*<td><input class="uploaded_by" id="uploaded_by_5" type="text" placeholder="Uploaded By"></td>
+                                <td><input class="uploaded_date" id="uploaded_date_5" type="text" placeholder="Uploaded Date"></td>*@
+
+                                        @*<td style="text-align:center"><button class="btn btn-danger ibtnDel" type="button"> <span class="glyphicon glyphicon-minus" aria-hidden="true"></span> </button></td>*@
+                                    </tr>
+                                </tbody>
+                            </table>
+
+
+
+                        </div>
+                    </div>
+                }
+                else if (Model.ApproverList.Where(s => s.ApproverNo == 3).Single().UserID == (int)Session["SQuserId"])
+                {
+                    <div class="row">
+                        @if (Model.BillDocList != null)
+                        {
+                            <div class="">
+                                @*<div class="text-right">
+                            <input type="button" class="btn btn-success btn-sm add-row" onclick="getData()" value="Add Row">&nbsp;&nbsp;
+                        </div>*@
+                                <table class="" border="1" width="100%">
+                                    <caption style="font-weight:bold">Document Center <span style="color:red">*</span></caption>
+                                    <colgroup>
+                                        <col style="width: 10%;">
+                                        <col style="width: 40%;">
+                                        <col style="width: 20%;">
+                                        <col style="width: 20%;">
+                                        <col style="width: 10%;">
+                                    </colgroup>
+                                    <thead>
+                                        <tr>
+                                            <th>SL</th>
+                                            <th>Document Name</th>
+                                            <th>Attachment</th>
+                                            <th>Remarks</th>
+                                            @*<th>Uploaded By</th>
+                                    <th>Uploaded Date</th>
+                                                <th>Action</th>*@
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBody">
+                                        @{ var count = 1;}
+                                        @foreach (var item in Model.BillDocList)
+                                        {
+                                            <tr id="@count">
+                                                <td style="text-align:center">@count</td>
+                                                <td style="text-align:center"><input class="parameter" id="document_name_@count" type="text" placeholder="Purchase Order" value="@item.DocumentName" disabled style="width: 120px;"></td>
+                                                <td>@(item.FileName.Substring(0,5)+ "...")</td>
+                                                <td style="text-align:center"><input class="remarks" id="remarks_@count" type="text" placeholder="Remarks" disabled value="@item.Remarks" style="width:159px"></td>
+                                                <td>@Html.ActionLink("Download", "DcDownloadFile", "BillApproval", new { filepath = item.FilePath.ToString(), filename = item.FileName.ToString() }, new { @target = "_blank" })</td>
+                                                @*<td><input class="comment" id="uploaded_by_1" type="text" placeholder="Uploaded By"></td>
+                                        <td><input class="comment" id="uploaded_date_1" type="text" placeholder="Uploaded Date"></td>*@
+
+
+                                                @*<td style="text-align:center"><button class="btn btn-danger ibtnDel" type="button"> <span class="glyphicon glyphicon-minus" aria-hidden="true"></span> </button></td>*@
+                                            </tr>
+                                            count++;
+                                        }
+
+
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        }
+
+                    </div>
+
+                    <div class="row" style="border: 1px solid black;">
+
+                        <div class="">
+                            @*<div class="text-right">
+                        <input type="button" class="btn btn-success btn-sm add-row" onclick="getData()" value="Add Row">&nbsp;&nbsp;
+                    </div>*@
+                            <table class="" border="1" width="100%">
+                                <caption style="font-weight:bold">Document Center <span style="color:red">*</span></caption>
+                                <colgroup>
+                                    <col style="width: 10%;">
+                                    <col style="width: 20%;">
+                                    <col style="width: 20%;">
+                                    <col style="width: 20%;">
+                                    <col style="width: 10%;">
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th>SL</th>
+                                        <th>Document Name</th>
+                                        <th>Attachment</th>
+                                        <th>Remarks</th>
+                                        @*<th>Uploaded By</th>
+                                <th>Uploaded Date</th>
+                                            <th>Action</th>*@
+                                    </tr>
+                                </thead>
+                                <tbody id="tableDocument">
+                                    <tr id="1">
+                                        <td style="text-align:center">1</td>
+                                        <td style="text-align:center"><input class="parameter" id="document_1" type="text" placeholder="Purchase Order" value="Purchase Order" disabled style="width: 120px;"></td>
+                                        <td style="text-align:center">
+                                            <input type="file" multiple class="qualityFileUpload" id="qualityFileUpload_1" onchange="FileUpload(1)" style="width: 187px;" />
+                                            <span style="display:none" id="attachedFileTable_1" class="attachedFileTable"></span>
+                                        </td>
+                                        <td style=""><input class="remarks" id="remarks_1" type="text" placeholder="Remarks" style="width: 122px;"></td>
+                                        @*<td><input class="comment" id="uploaded_by_1" type="text" placeholder="Uploaded By"></td>
+                                <td><input class="comment" id="uploaded_date_1" type="text" placeholder="Uploaded Date"></td>*@
+
+
+                                        @*<td style="text-align:center"><button class="btn btn-danger ibtnDel" type="button"> <span class="glyphicon glyphicon-minus" aria-hidden="true"></span> </button></td>*@
+                                    </tr>
+                                    <tr id="2">
+                                        <td style="text-align:center">2</td>
+                                        <td style="text-align:center"><input class="parameter" id="document_2" type="text" placeholder="Invoice" value="Invoice" disabled style="width: 120px;"></td>
+                                        <td style="text-align:center">
+                                            <input type="file" multiple class="qualityFileUpload" id="qualityFileUpload_2" onchange="FileUpload(2)" style="width: 187px;" />
+                                            <span id="attachedFileTable_2" class="attachedFileTable"></span>
+                                        </td>
+                                        <td style=""><input class="remarks" id="remarks_2" type="text" placeholder="Remarks" value="" style="width: 122px;"></td>
+                                        @*<td><input class="comment" id="uploaded_by_2" type="text" placeholder="Uploaded By"></td>
+                                <td><input class="comment" id="uploaded_date_2" type="text" placeholder="Uploaded Date"></td>*@
+
+
+                                        @*<td style="text-align:center"><button class="btn btn-danger ibtnDel" type="button"> <span class="glyphicon glyphicon-minus" aria-hidden="true"></span> </button></td>*@
+                                    </tr>
+                                    <tr id="3">
+                                        <td style="text-align:center">3</td>
+                                        <td style="text-align:center"><input class="parameter" id="document_3" type="text" placeholder="MR" value="MR" disabled style="width: 120px;"></td>
+                                        <td style="text-align:center">
+                                            <input type="file" multiple class="qualityFileUpload" id="qualityFileUpload_3" onchange="FileUpload(3)" style="width: 187px;" />
+                                            <span id="attachedFileTable_3" class="attachedFileTable"></span>
+                                        </td>
+                                        <td style=""><input class="remarks" id="remarks_3" type="text" placeholder="Remarks" style="width: 122px;"></td>
+                                        @*<td><input class="comment" id="uploaded_by_3" type="text" placeholder="Uploaded By"></td>
+                                <td><input class="comment" id="uploaded_date_3" type="text" placeholder="Uploaded Date"></td>*@
+
+
+                                        @*<td style="text-align:center"><button class="btn btn-danger ibtnDel" type="button"> <span class="glyphicon glyphicon-minus" aria-hidden="true"></span> </button></td>*@
+                                    </tr>
+                                    <tr id="4">
+                                        <td style="text-align:center">4</td>
+                                        <td style="text-align:center"><input class="parameter" id="document_4" type="text" placeholder="GRN" value="GRN" disabled style="width: 120px;"></td>
+                                        <td style="text-align:center">
+                                            <input type="file" multiple class="qualityFileUpload" id="qualityFileUpload_4" onchange="FileUpload(4)" style="width: 187px;" />
+                                            <span id="attachedFileTable_4" class="attachedFileTable"></span>
+                                        </td>
+                                        <td style=""><input class="remarks" id="remarks_4" type="text" placeholder="Remarks" style="width: 122px;"></td>
+                                        @*<td><input class="uploaded_by" id="uploaded_by_4" type="text" placeholder="Uploaded By"></td>
+                                <td><input class="uploaded_date" id="uploaded_date_4" type="text" placeholder="Uploaded Date"></td>*@
+
+                                        @*<td style="text-align:center"><button class="btn btn-danger ibtnDel" type="button"> <span class="glyphicon glyphicon-minus" aria-hidden="true"></span> </button></td>*@
+                                    </tr>
+                                    <tr id="5">
+                                        <td style="text-align:center">5</td>
+                                        <td style="text-align:center"><input class="parameter" id="document_5" type="text" placeholder="Other Documents" value="Other Documents" disabled style="width: 120px;"></td>
+                                        <td style="text-align:center">
+                                            <input type="file" multiple class="qualityFileUpload" id="qualityFileUpload_5" onchange="FileUpload(5)" style="width: 187px;" />
+                                            <span id="attachedFileTable_5" class="attachedFileTable"></span>
+                                        </td>
+                                        <td style=""><input class="remarks" id="remarks_5" type="text" placeholder="Remarks" style="width: 122px;"></td>
+                                        @*<td><input class="uploaded_by" id="uploaded_by_5" type="text" placeholder="Uploaded By"></td>
+                                <td><input class="uploaded_date" id="uploaded_date_5" type="text" placeholder="Uploaded Date"></td>*@
+
+                                        @*<td style="text-align:center"><button class="btn btn-danger ibtnDel" type="button"> <span class="glyphicon glyphicon-minus" aria-hidden="true"></span> </button></td>*@
+                                    </tr>
+                                </tbody>
+                            </table>
+
+
+
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="row">
+                        @if (Model.BillDocList != null)
+                        {
+                            <div class="">
+                                @*<div class="text-right">
+                            <input type="button" class="btn btn-success btn-sm add-row" onclick="getData()" value="Add Row">&nbsp;&nbsp;
+                        </div>*@
+                                <table class="" border="1" width="100%">
+                                    <caption style="font-weight:bold">Document Center <span style="color:red">*</span></caption>
+                                    <colgroup>
+                                        <col style="width: 10%;">
+                                        <col style="width: 40%;">
+                                        <col style="width: 20%;">
+                                        <col style="width: 20%;">
+                                        <col style="width: 10%;">
+                                    </colgroup>
+                                    <thead>
+                                        <tr>
+                                            <th>SL</th>
+                                            <th>Document Name</th>
+                                            <th>Attachment</th>
+                                            <th>Remarks</th>
+                                            @*<th>Uploaded By</th>
+                                    <th>Uploaded Date</th>
+                                                <th>Action</th>*@
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBody">
+                                        @{ var count = 1;}
+                                        @foreach (var item in Model.BillDocList)
+                                        {
+                                            <tr id="@count">
+                                                <td style="text-align:center">@count</td>
+                                                <td style="text-align:center"><input class="parameter" id="document_name_@count" type="text" placeholder="Purchase Order" value="@item.DocumentName" disabled style="width: 120px;"></td>
+                                                <td>@(item.FileName.Substring(0,5)+ "...")</td>
+                                                <td style="text-align:center"><input class="remarks" id="remarks_@count" type="text" placeholder="Remarks" disabled value="@item.Remarks" style="width:159px"></td>
+                                                <td>@Html.ActionLink("Download", "DcDownloadFile", "BillApproval", new { filepath = item.FilePath.ToString(), filename = item.FileName.ToString() }, new { @target = "_blank" })</td>
+                                                @*<td><input class="comment" id="uploaded_by_1" type="text" placeholder="Uploaded By"></td>
+                                        <td><input class="comment" id="uploaded_date_1" type="text" placeholder="Uploaded Date"></td>*@
+
+
+                                                @*<td style="text-align:center"><button class="btn btn-danger ibtnDel" type="button"> <span class="glyphicon glyphicon-minus" aria-hidden="true"></span> </button></td>*@
+                                            </tr>
+                                            count++;
+                                        }
+
+
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        }
+
+                    </div>
+                }
+
+
+
+                -->
+
+
+                <br />
+
+
+                <div class="row">
+                    @if (Model.ApproverList.Where(s => s.ApproverNo == 1).Single().UserID == (int)Session["SQuserId"])
+                    {
+                        <label for="capexNumber"> Capex Number</label>
+                        <input type="text" id="capex_number" name="capex_number" value="@Model.CapexInfoId">
+                        <button type="button" class="btn btn-primary capexBtn" data-toggle="modal" data-target=".bd-example-modal-lg" data-idkey="">Capex Preview</button>
+                        @*<button type="button" class="btn btn-success capexBtn" data-toggle="modal" data-target="#showmodal" data-idkey="">Capex Link</button>*@
+                    }
+                    else
+                    {
+                        <label for="capexNumber"> Capex Number</label>
+                        <input type="text" id="capex_number" name="capex_number_readonly_value" disabled value="@Model.CapexInfoId">
+                        <button type="button" class="btn btn-primary capexBtn" data-toggle="modal" data-target=".bd-example-modal-lg" data-idkey="">Capex Preview</button>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <table border="1" width="100%" id="genaralInfodt">
+            @{float countFob = 1;}
+            <caption>Invoice Details</caption>
+            <thead>
+                <tr>
+                    <th>SL</th>
+                    <th>PO No</th>
+                    <th>Article</th>
+                    <th>Color</th>
+                    <th>Size</th>
+                    <th>UoM</th>
+                    <th>Rate</th>
+                    @if (Model.ApproverList.Where(s => s.ApproverNo == 2).Single().UserID == (int)Session["SQuserId"])
+                    {
+                        <th>Initial Invoice Value</th>
+                    }
+                    <th>Invoice Qty</th>
+                    @*@if (Model.ApproverList.Where(s => s.ApproverNo == 1).Single().UserID == (int)Session["SQuserId"])
+                    {*@
+                    <th>Verified Qty</th>
+                    @*}*@
+                    <th>Invoice Value</th>
+                    <th>Verified Value</th>
+                    <th>Discount</th>
+                    <th>Total Paid</th>
+                </tr>
+            </thead>
+            <tbody id="invoiceDetails">
+                @{ decimal r = 0; decimal TotalQty = 0; decimal checkQty = 0; decimal inputQty = 0; decimal TotalDiscount = 0; decimal IQty = 0; decimal TotalInvoiceValue = 0; decimal TotalVerifiedValue = 0;}
+                @foreach (var item in Model.BillInfoList)
+                {
+                    <tr id='@item.PODetailsKey'>
+                        <td>@countFob</td>
+                        <td>@item.PONo</td>
+                        <td>@item.Article</td>
+                        <td>@item.Color</td>
+                        <td>@item.Size</td>
+                        <td>@item.Unit</td>
+                        <td><span id="apporver_Rate_@item.PODetailsKey">@item.Rate.ToString("N")</span></td>
+                        @if (Model.ApproverList.Where(s => s.ApproverNo == 2).Single().UserID == (int)Session["SQuserId"])
+                        {
+                            <td>@item.FirstEntryQty.ToString("N")</td>
+                        }
+                        <td><span id="apporver_InvoiceQty_@item.PODetailsKey"> @item.InvoiceQty </span></td>
+                        @if (Model.ApproverList.Where(s => s.ApproverNo == 1).Single().UserID == (int)Session["SQuserId"])
+                        {
+                            <td><input class="checked_qty" id="checked_qty_@item.PODetailsKey" value="@item.InvoiceQty" onkeyup="chengeVerifyQty()" /></td>
+                        }
+                        else
+                        {
+                            <td>@item.CheckedQty.ToString("N")</td>
+                        }
+                        <td><span id="apporver_invoiceValue_@item.PODetailsKey">@item.InvoiceValue.ToString("N")</span></td>
+                        <td><span id="apporver_verifyValue_@item.PODetailsKey">@item.CheckedValue.ToString("N")</span></td>
+                        <td>@item.Discount.ToString("N")</td>
+                        <td>@item.Total.ToString("N")</td>
+                    </tr>
+
+                    r += @item.Rate;
+                    TotalQty += item.InvoiceQty;
+                    checkQty += item.CheckedQty;
+                    inputQty += item.InvoiceQty;
+                    TotalInvoiceValue += item.InvoiceValue;
+                    TotalVerifiedValue += item.CheckedValue;
+                    TotalDiscount += item.Discount;
+                    IQty += item.FirstEntryQty;
+                    countFob++;
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="6">Total </th>
+                    <th>@r.ToString("N")</th>
+                    @if (Model.ApproverList.Where(s => s.ApproverNo == 2).Single().UserID == (int)Session["SQuserId"])
+                    {
+                        <th>@IQty.ToString("N")</th>
+                    }
+                    <th>@TotalQty.ToString("N")</th>
+                    @if (Model.ApproverList.Where(s => s.ApproverNo == 1).Single().UserID == (int)Session["SQuserId"])
+                    {
+                        <th><span id="input_Qty"> @inputQty.ToString("N") </span></th>
+                    }
+                    else
+                    {
+                        <th>@checkQty.ToString("N")</th>
+                    }
+                    <th>@TotalInvoiceValue.ToString("N")</th>
+                    <th><span id="verify_value">@TotalVerifiedValue.ToString("N")</span></th>
+                    @*@if (Model.ApproverList.Where(s => s.ApproverNo == 2).Single().UserID == (int)Session["SQuserId"])
+                    {
+                        <th></th>
+                    }*@
+                    <th>@TotalDiscount.ToString("N")</th>
+                    <th>@Model.TotalPaid.ToString("N")</th>
+                </tr>
+            </tfoot>
+        </table>
+
+        <br />
+        <div class="row">
+            <div class="col-md-7">
+                @if (Model.ChequeInfoDetails != null)
+                {
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="table table-hover table-bordered table-responsive">
+                                <caption style="text-align:center;font-weight:bold;font-size:20px">Cheque Information</caption>
+                                <thead>
+                                    <tr>
+                                        <th style="text-align:center">Bill No</th>
+                                        <th style="text-align:center">Cheque No</th>
+                                        <th style="text-align:center">Cheque Amount</th>
+                                        <th style="text-align:center">Cheque Date</th>
+                                        <th style="text-align:center">Status</th>
+                                        <th style="text-align:center">Transaction Date</th>
+                                        <th style="text-align:center">Transaction By</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{ decimal TotalAmount = 0; }
+
+                                    @foreach (var item in Model.ChequeInfoDetails)
+                                    {
+                                        <tr>
+                                            <td style="text-align:center">@item.InvoiceKey</td>
+                                            <td style="text-align:center">@item.ChequeNo</td>
+                                            <td style="text-align:center">@item.Amount.ToString("N")</td>
+                                            <td style="text-align:center">@item.Date.ToString("yyyy-MM-dd")</td>
+                                            <td style="text-align:center">@item.CheckStatus</td>
+                                            <td style="text-align:center">@item.CreatedDate.ToString("yyyy-MM-dd hh:mm:ss tt")</td>
+                                            <td style="text-align:center">@item.UserName</td>
+
+                                        </tr>
+                                        TotalAmount += item.Amount;
+                                    }
+
+
+                                    <tr>
+                                        <td style="text-align:right; font-weight:bold;" colspan="2">Total Amount :</td>
+                                        <td style="text-align:center;font-weight:bold;">@TotalAmount.ToString("N")</td>
+                                        <td style="text-align:center"></td>
+                                        <td style="text-align:center"></td>
+                                        <td style="text-align:center"></td>
+                                        <td style="text-align:center"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="col-md-5" style='float:right;'>
+                <div style='border: 1px solid black;'>
+                    <table class='table table-striped'>
+                        <tr><th style=''>PO Total</th><th></th><th><span id=''>@Model.TotalPaid.ToString("N")</span></th></tr>
+                        @if (Model.DiscountPercent != 0)
+                        {
+                            <tr><th>Discount</th><th style='width:100px;'><span id=''>@Model.DiscountPercent % </span></th><th><span id=''>@Model.DiscountAmt.ToString("N")</span></th></tr>
+                        }
+
+
+                        <tr><th style='width:100px;'>Sub Total </th><th></th><th><span id=''>@Model.TotalAmount.ToString("N")</span></th></tr>
+
+                        @if (Model.AdjustmentPercent != 0)
+                        {
+                            <tr><th>Adv Adjustment</th><th><span id=''>@Model.AdjustmentPercent %</span></th><th><span id='vat'>@Model.AdjustmentAmt.ToString("N")</span></th></tr>
+                        }
+
+                        @if (Model.RetaintionPercent != 0)
+                        {
+                            <tr><th>Retaintion</th><th><span id=''>@Model.RetaintionPercent %</span></th><th><span id='vat'>@Model.RetaintionAmt.ToString("N") </span></th></tr>
+                        }
+
+
+                        <tr><th style='width:100px;'>Total </th><th></th><th><span id=''>@Model.AdvTotal.ToString("N")</span></th></tr>
+
+                        @if (Model.VATPercent != 0)
+                        {
+                            <tr><th>VAT</th><th><span id=''>@Model.VATPercent %</span></th><th><span id='vat'>@Model.VATAmt.ToString("N")</span></th></tr>
+                        }
+
+                        @if (Model.AITPercent != 0)
+                        {
+
+                            <tr><th>AIT</th><th><span id=''>@Model.AITPercent %</span></th><th><span id='vat'>@Model.AITAmt.ToString("N") </span></th></tr>
+                        }
+
+                         <tr><th>Net Value</th><th></th><th><span id='net_value'>@Model.NetValue.ToString("N")</span></th></tr>
+
+                        </table>
+
+                </div>
+            </div>
+        </div>
+
+        <br />
+        @if (Model.ApproverList != null)
+        {
+            foreach (var item in Model.ApproverList)
+            {
+                if (item.CertifyingCompleted == 1 && item.UserID == (int)Session["SQuserId"])
+                {
+                    <div class="row text-center">
+                        <input type="checkbox" id="certifying" checked disabled name="certifying" value="certifying">&nbsp;
+                        <label for="certifying"> we are certifying that above mentioned work is completed</label><br>
+                    </div>
+                }
+                else if (item.CertifyingCompleted == 0 && item.UserID == (int)Session["SQuserId"])
+                {
+                    <div class="row text-center">
+                        <input type="checkbox" id="certifying" name="certifying" value="certifying">&nbsp;
+                        <label for="certifying"> we are certifying that above mentioned work is completed</label><br>
+                    </div>
+                }
+
+            }
+
+            @*<div class="row text-center">
+                <input type="checkbox" id="certifying" disabled name="certifying" value="certifying">&nbsp;
+                <label for="certifying"> we are certifying that above mentioned work is completed</label><br>
+            </div>*@
+
+        }
+
+
+
+    </div>
+
+    @if (Model.Status == 1)
+    {
+        <div style="text-align:center;width:100%">
+            <br />
+            <table align="center" width="50%">
+                <tr>
+
+                    <td>
+                        <input type="text" class="approvalColumn form-control" id="commentText" />
+                    </td>
+                    <td>
+                        <button type="button" class="approvalColumn btn btn-success " id="approverBtn" disabled onclick="BillApproveOrReject(1,@Model.InvoiceKey, $('#commentText').val())">Approve</button>
+                    </td>
+                    <td>
+                        <button type="button" class="approvalColumn btn btn-danger " onclick="BillApproveOrReject(2,@Model.InvoiceKey,$('#commentText').val())">Reject</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    }
+</div>
+
+
+
+@if (Model.IsApproved != 0)
+{
+    <div>
+        <br />
+        <table width="80%" align="center">
+            <tr>
+                <td>
+                    <button value="Comments" onclick="showComments()" class="btn btn-sm btn-primary">Comments</button>
+                </td>
+                <td style="padding:5px">
+                    <select id="reviewComment" class="approvalColumn form-control">
+                        <option value="@Model.CreatedBy">@Model.Requestor</option>
+                        @if (Model.ApproverList != null)
+                        {
+                            foreach (var app in Model.ApproverList)
+                            {
+
+                                if (app.IsApprove != 0)
+                                {
+                                    if (app.UserID != Convert.ToInt32(Session["SQuserId"].ToString()))
+                                    {
+                                        <option value="@app.UserID">@app.UserName</option>
+                                    }
+
+                                }
+
+                            }
+                        }
+
+                    </select>
+                </td>
+                <td style="padding:5px">
+                    <input type="text" id="reviewMessage" class="approvalColumn form-control" rows="3" style="resize:none" />
+                </td>
+                <td>
+                    <button style="text-align:center;align-content:center" class="btn btn-info btn-sm" onclick="ReviewComment(@Model.InvoiceKey)">Send Review</button>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+}
+
+
+@*else
+    {*@
+@*<br />*@
+@*<button value="Comments" onclick="showComments()" class="btn btn-sm btn-primary">Comments</button>*@
+<div id="comments_section" class="row" style="display:none">
+    <div class="col-md-6" style="overflow-wrap:inherit; overflow-y: auto;height:200px;">
+        <p>Comment Section</p>
+        @if (Model.BillComments != null)
+        {
+            foreach (var app in Model.BillComments)
+            {
+                <hr style="margin:unset;padding:unset;" />
+                <p style="margin:unset;padding:unset" class="media-heading user_name"><strong style="color:blue">@app.ReviewerByName</strong>  To <strong>@app.ReviewerToName</strong></p>
+                <p style="margin:unset;padding:unset">@app.UpdatedBY.ToString("MM/dd/yyyy hh:mm tt")</p>
+                <p style="margin:unset;padding:unset">@app.ReviewMessage</p>
+            }
+        }
+    </div>
+    <div id="log_section" class="col-md-6" style="overflow-wrap:inherit; overflow-y: auto;height:200px;">
+        <p>Log Section</p>
+
+        @if (Model.BillLogSection != null)
+        {
+            <table width="100%" border="1">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Description</th>
+                        <th>By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var app in Model.BillLogSection)
+                    {
+                        <tr>
+                            <td>@app.ActionDate</td>
+                            <td>@app.ActionStatus</td>
+                            <td>@app.Comments</td>
+                            <td>@app.ActionBy</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        }
+    </div>
+</div>
+
+
+
+
+
+<script>
+    $('.checked_qty').keypress(function (event) {
+        return isNumber(event, this)
+    });
+
+    $('#certifying').change(function () {
+        if ($("#certifying").prop('checked') == true) {
+            $("#approverBtn").attr('disabled', false);
+        } else {
+            $("#approverBtn").attr('disabled', true);
+        }
+    })
+
+
+    $('#capex_number').keyup(function () {
+        $('.capexBtn').html($(this).val() + " Capex Link");
+    })
+
+    $('#general_procurement').change(function () {
+        var invoiceType = $('#invoiceType').val();
+        var subcategory = $("#subCategory").val();
+        var general_pro = $(this).val();
+
+        approverlist(invoiceType, subcategory);
+    })
+
+    //$('.capexBtn').click(function () {
+
+    //    $('#myModal').modal('hide');
+    //    //$('#showmodal').modal('show');
+    //    $(this).data('idkey', $('#capex_number').val());
+    //    //alert($('#capex_number').val());
+
+
+
+    //   // $('#showcanvas').html($('#capex_number').val());
+    //})
+
+    $('.bd-example-modal-lg').on('show.bs.modal', function (event) {
+        //var modalmap = $(event.relatedTarget);
+        ShowSelectedCapex($('#capex_number').val());
+    });
+
+    ProcurementUserList();
+
+    function ProcurementUserList() {
+        $.ajax({
+            url: '/BillApproval/ProcurementUserList',
+            type: 'POST',
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                $('#general_procurement').empty();
+                //$('#supplier').append("<option value='0'>-- Select Qua --</option>");
+
+                if (response.length > 0) {
+
+                    for (let i = 0; response.length > i; i++) {
+
+                        $("#general_procurement").append($("<option data-designation=\"" + response[i].Designation + "\" data-username=\"" + response[i].UserName + "\"></option>").val(response[i].UserId)
+                            .html(response[i].UserName));
+                    }
+                    //$('select#supplier').append(result);
+                }
+            }
+        });
+    }
+
+    CostCenterList();
+
+    function CostCenterList() {
+
+        var UnitId = @Model.BusinessUnitId
+
+        $.ajax({
+            url: '/BillApproval/CostCenterList',
+            type: 'POST',
+            contentType: "application/json;charset=utf-8",
+            data: JSON.stringify({ unitId: UnitId }),
+            dataType: "json",
+            success: function (response) {
+                $('#cost_center').empty();
+                //$('#supplier').append("<option value='0'>-- Select Qua --</option>");
+
+                if (response.length > 0) {
+
+                    for (let i = 0; response.length > i; i++) {
+
+                        $("#cost_center").append($("<option></option>").val(response[i].CCID)
+                            .html(response[i].CostCenter));
+                    }
+                    //$('select#supplier').append(result);
+                }
+            }
+        });
+    }
+
+    //function checkNumeric(podetails) {
+    //    return isNumber(event, this);
+    //}
+
+    // THE SCRIPT THAT CHECKS IF THE KEY PRESSED IS A NUMERIC OR DECIMAL VALUE.
+    function isNumber(evt, element) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+        if (
+            (charCode != 46 || $(element).val().indexOf('.') != -1) &&      // “.” CHECK DOT, AND ONLY ONE.
+            (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+
+    $('#invoiceDetails tr').each(function () {
+        var PODetails = $(this).attr('id');
+
+        var checkQty = $('#checked_qty_' + PODetails).val();
+
+    })
+
+    function chengeVerifyQty() {
+        var qty = 0;
+        var value = 0;
+        $('#invoiceDetails tr').each(function () {
+            var PODetails = $(this).attr('id');
+            var abc = $('#checked_qty_' + PODetails).val();
+            var IValue = $('#apporver_Rate_' + PODetails).html();
+            var checkValue = parseFloat(abc) * parseFloat(IValue)
+            //alert(parseInt(abc))apporver_InvoiceValue_  apporver_verifyValue_
+            // alert(checkValue);
+            var q = parseInt(abc);
+            var checkQty = parseFloat(abc);
+            //alert(checkQty);
+            //qty += checkQty;
+
+            $('#apporver_verifyValue_' + PODetails).html(checkValue);
+
+            qty += checkQty;
+            value += checkValue;
+        })
+        //alert(qty);
+        $("#input_Qty").html(qty);
+        $("#verify_value").html(value);
+    }
+
+        function FileUploadOnChange() {
+        var fileData = new FormData();
+        var fileUpload = $("#billFileUpload").prop('files');
+            if (fileUpload.length>0) {
+                 for (var i = 0; i < fileUpload.length; i++) {
+                     fileData.append(fileUpload[i].name, fileUpload[i]);
+                 }
+        }
+        var urlpath = '@Url.Action("BillFileUpload", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            type: "post",
+            processData: false,
+            contentType: false,
+            data: fileData  ,
+            success: function (result) {
+                for (var i = 0; i < result.length; i++) {
+                   var newRow = $('<tr>');
+                   var cols = "";
+                   cols += '<td name="fileName">' + result[i].BillFileName + '</td>';
+                   cols += '<td style="display:none" name="filePath">' + result[i].BillFilePath + '</td>';
+                   cols += '<td><input type="button" style="margin:2px" class="btn btn-danger btn-sm" onclick="DeleteFile(this,\''+result[i].ServerFileName+'\')"   value="X"></td></tr>';
+                   newRow.append(cols);
+                   $("#attachedFileTable").append(newRow);
+                }
+                $("#billFileUpload").val('');
+            },
+            error: function (err) {
+                alert(err.responseText);
+            }
+        });
+    }
+    function DeleteFile(r, filePath) {
+       var urlpath = '@Url.Action("BillDeleteFiles", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { FilePath: filePath },
+            async: true,
+            success: function (data) {
+               var i = r.parentNode.parentNode.rowIndex;
+                document.getElementById("billFileTable").deleteRow(i);
+            }
+        });
+
+    }
+
+    function POFileUploadOnChange() {
+        var fileData = new FormData();
+        var fileUpload = $("#poFileUpload").prop('files');
+            if (fileUpload.length>0) {
+                 for (var i = 0; i < fileUpload.length; i++) {
+                     fileData.append(fileUpload[i].name, fileUpload[i]);
+                 }
+        }
+        var urlpath = '@Url.Action("POFileUpload", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            type: "post",
+            processData: false,
+            contentType: false,
+            data: fileData  ,
+            success: function (result) {
+                for (var i = 0; i < result.length; i++) {
+                   var newRow = $('<tr>');
+                   var cols = "";
+                   cols += '<td name="fileName">' + result[i].POFileName + '</td>';
+                   cols += '<td style="display:none" name="filePath">' + result[i].POFilePath + '</td>';
+                    cols += '<td><input type="button" style="margin:2px" class="btn btn-danger btn-sm" onclick="PODeleteFile(this,\''+result[i].ServerFileName+'\')"   value="X"></td></tr>';
+                   newRow.append(cols);
+                   $("#poAttachedFileTable").append(newRow);
+                }
+                $("#poFileUpload").val('');
+            },
+            error: function (err) {
+                alert(err.responseText);
+            }
+        });
+    }
+    function PODeleteFile(r, filePath) {
+       var urlpath = '@Url.Action("PODeleteFiles", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { FilePath: filePath },
+            async: true,
+            success: function (data) {
+               var i = r.parentNode.parentNode.rowIndex;
+                document.getElementById("poFileTable").deleteRow(i);
+            }
+        });
+
+    }
+
+    function grnFileUploadOnChange() {
+        var fileData = new FormData();
+        var fileUpload = $("#grnFileUpload").prop('files');
+            if (fileUpload.length>0) {
+                 for (var i = 0; i < fileUpload.length; i++) {
+                     fileData.append(fileUpload[i].name, fileUpload[i]);
+                 }
+        }
+        var urlpath = '@Url.Action("GRNFileUpload", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            type: "post",
+            processData: false,
+            contentType: false,
+            data: fileData  ,
+            success: function (result) {
+                for (var i = 0; i < result.length; i++) {
+                   var newRow = $('<tr>');
+                   var cols = "";
+                   cols += '<td name="fileName">' + result[i].GRNFileName + '</td>';
+                   cols += '<td style="display:none" name="filePath">' + result[i].GRNFilePath + '</td>';
+                    cols += '<td><input type="button" style="margin:2px" class="btn btn-danger btn-sm" onclick="grnDeleteFile(this,\''+result[i].ServerFileName+'\')"   value="X"></td></tr>';
+                   newRow.append(cols);
+                    $("#grnAttachedFileTable").append(newRow);
+                }
+                $("#grnFileUpload").val('');
+            },
+            error: function (err) {
+                alert(err.responseText);
+            }
+        });
+    }
+    function grnDeleteFile(r, filePath) {
+       var urlpath = '@Url.Action("GRNDeleteFiles", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { FilePath: filePath },
+            async: true,
+            success: function (data) {
+               var i = r.parentNode.parentNode.rowIndex;
+                document.getElementById("grnFileTable").deleteRow(i);
+            }
+        });
+
+    }
+
+</script>

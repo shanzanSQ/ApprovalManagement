@@ -1,0 +1,450 @@
+﻿<style type="text/css">
+    .modal-lg {
+        max-width: 80% !important;
+    }
+
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    #ioumenu SubmitToDatabase
+    margin: 0px;
+    padding: 0px;
+    }
+
+    #iousubmenu li a {
+        color: white;
+    }
+    /*#exceptionSubmrnu li:active{
+        color:white;
+        background-color:#0a0a22;
+
+    }*/
+    #iouNavigation {
+        background-color: #37474F;
+    }
+</style>
+<div class="container-fluid">
+    <h3 style="text-align: center;">
+        <b>Vehicle Management System</b>
+    </h3>
+    <hr style="margin: 0px" />
+    <div class="row">
+        <div id="iouNavigation" class="navbar navbar-default navbar-static-top">
+            <div id="ioumenu">
+                <div>
+                    <ul id="iousubmenu" class="nav navbar-nav">
+                        <li><a href="#" onclick="GetWidgetPartial('vehicleRequestCreateView')">Vehicle Request Form</a></li>
+                        <li><a href="#" onclick="GetAllVehicleRequest(1,0)">My Request So Far</a></li>
+                        @*<li><a href="#" onclick="GetAllIOUSettlement(1,3)">Apply IOU Settlement</a></li>
+                        <li><a href="#" onclick="GetAllIOUSettlement(5,0)">My Settlement So Far</a></li>*@
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="ioucreateDashboard">
+
+        </div>
+    </div>
+    <div class="modal" id="myModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Vehicle Request Preview</h4>
+                </div>
+                <div id="modalbody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button"  class="btn btn-primary btn-sm" onclick="PrintModal()" >Print</button>
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+</div>
+@Scripts.Render("~/bundles/jquery")
+<script type="text/javascript">
+    $("#iousubmenu").find('li:nth-child(1)').addClass("active");
+    GetWidgetPartial('vehicleRequestCreateView');
+    $('#iousubmenu > li > a').click(function() {
+        $('li').removeClass();
+        $(this).parent().addClass('active');
+       // $("#spmenuid").html($(this).html());
+    });
+
+    function GetWidgetPartial(variable) {
+        var urlpath = '@Url.Action("GetVehiclePartial", "Vehicle")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {viewName:variable},
+                async: true,
+                success: function(data) {
+                       if (data) {
+                           $('#ioucreateDashboard').empty();
+                           $('#ioucreateDashboard').append(data);
+                        }
+                    }
+                });
+    }
+    function GetAllVehicleRequest(status, progress) {
+        debugger;
+        var urlpath = '@Url.Action("GetAllVehicleRequest", "Vehicle")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: {Status: status,ViewName: '_myVehicleRequestor',Progrss:progress},
+            async: true,
+            success: function (data) {
+
+                if (data) {
+                     $('#ioucreateDashboard').empty();
+                    $('#ioucreateDashboard').append(data);
+                    $('#IourequestTable').DataTable();
+                }
+            }
+        });
+    }
+ 
+    function SubmitToDatabase() {
+        var jsondate = SaveVehicleRequest();
+         var urlpath = '@Url.Action("SaveVehicleRequest", "Vehicle")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsondate),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    swal({
+                        title: 'Vehicle Request Submit Successfully',
+                        type: 'success',
+                        closeOnCancel: true
+                    },function () {
+                            $("#myModal").modal("hide");
+                            $("#iousubmenu").find('li').removeClass();
+                            $("#iousubmenu").find('li:nth-child(2)').addClass("active");
+                            GetAllVehicleRequest(1, 0);
+                    });
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+    }
+    function VehicleRequestDetails(masterID,status,viewName) {
+        var urlpath = '@Url.Action("VehicleRequestDetails", "Vehicle")';
+        $.ajax({
+            data: { MasterID: masterID, ViewName: viewName, Status: status },
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $("#modalbody").html("");
+                $("#modalbody").append(data);
+                $("#myModal").modal("show");
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+    function IOUSettlementRequestForm(masterID,status) {
+        var urlpath = '@Url.Action("IouRequestDetails", "IOU")';
+        $.ajax({
+            data: { MasterID: masterID, ViewName: "_iouSettlementRequest", Status:status },
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $('#ioucreateDashboard').empty();
+                $('#ioucreateDashboard').append(data);
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+    function UpdateRejectedRequest(IouRequestId,status) {
+        var urlpath = '@Url.Action("VehicleRequestDetails", "Vehicle")';
+        $.ajax({
+            data: { MasterID: IouRequestId, ViewName: "_VehicleRequestUpdateModal", Status:status },
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $('#ioucreateDashboard').empty();
+                $('#ioucreateDashboard').append(data);
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+    function FileUploadOnChange() {
+        var fileData = new FormData();
+        var fileUpload = $("#ioufileuploadbutton").prop('files');
+            if (fileUpload.length>0) {
+                 for (var i = 0; i < fileUpload.length; i++) {
+                     fileData.append(fileUpload[i].name, fileUpload[i]);
+                 }
+        }
+        var urlpath = '@Url.Action("IOUFileUpload", "IOU")';
+        $.ajax({
+            url: urlpath,
+            type: "post",
+            processData: false,
+            contentType: false,
+            data: fileData  ,
+            success: function (result) {
+                for (var i = 0; i < result.length; i++) {
+                   var newRow = $('<tr id="">');
+                   var cols = "";
+                   cols += '<td name="fileName">' + result[i].CapexFileName + '</td>';
+                   cols += '<td style="display:none" name="filePath">' + result[i].CapexFilePath + '</td>';
+                   cols += '<td><input type="button" style="margin:2px;" class="deletebutton"   onclick="DeleteFile(this,\''+result[i].ServerFileName+'\')"   value="X"></td></tr>';
+                   newRow.append(cols);
+                   $("#attachedFileTable").append(newRow);
+                }
+                $("#ioufileuploadbutton").val('');
+            },
+            error: function (err) {
+                alert(err.responseText);
+            }
+        });
+    }
+    function DeleteFile(r, filePath) {
+       var urlpath = '@Url.Action("DeleteFiles", "IOU")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { FilePath: filePath },
+            async: true,
+            success: function (data) {
+               var i = r.parentNode.parentNode.rowIndex;
+               document.getElementById("iouuploadedtable").deleteRow(i);
+            }
+        });
+    }
+    function showComments() {
+        $("#comments_section").toggle();
+        $("#log_section").toggle();
+    }
+    function ReviewComment(masterID,status) {
+        if ($("#reviewMessage").val() == "") {
+            $("#reviewMessage").css({ "border-color": "#FF0000" });
+        } else {
+            var reviewTo = $("#reviewComment").val();
+            var reviewMessage = $("#reviewMessage").val();
+            var urlpath = '@Url.Action("SendIOUComments", "IOU")';
+            $.ajax({
+                    data: { MasterID: masterID, ReviewTo: reviewTo, ReviewMessage: reviewMessage },
+                    dataType: 'json',
+                    url: urlpath,
+                    type: "Post",
+                    async: true,
+                    success: function (result) {
+                        if (result) {
+                            swal({
+                                            title: 'Comment Sent Successfully',
+                                            type: 'success',
+                                            closeOnCancel: true
+                                        },
+                                function () {
+                                    if (status == 1) {
+                                        IOUSettlementRequestForm(masterID, 0);
+                                    } else {
+                                        $("#myModal").modal("hide");
+                                        $("#iousubmenu").find('li').removeClass();
+                                        $("#iousubmenu").find('li:nth-child(2)').addClass("active");
+                                        GetAllIOURequest(1, 0);
+                                    }
+
+                                });
+                        }
+                    }
+                });
+        }
+
+    }
+    function PrintModal() {
+            var print_div = document.getElementById("printablearea");
+            var print_area = window.open();
+            print_area.document.write("<style>table{border-collapse:collapse;}</style><img width='20' height='20' src='../../Images/logo.png' /><img style='width:80px;' src='../../Images/logo.png' />");
+            print_area.document.write("<h1 style='text-align:center'>IOU Preview</h1>");
+            print_area.document.write(print_div.innerHTML);
+            print_area.document.close();
+            print_area.focus();
+            print_area.print();
+            print_area.close();
+    }
+     function GetUserDepartment(status, departmentHead, divblock) {
+        $(divblock).css({ "border-color": "#d3d3d3" });
+        var urlpath = '@Url.Action("GetDepartmentId", "IOU")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {Status:status,DepartmentHeadID:departmentHead},
+            async: true,
+            success: function (data) {
+                $(divblock).empty();
+                $(divblock).append("<option value='0'>--Select Department Head --</option>");
+                for (var i = 0; i < data.length; i++) {
+                        $(divblock).append($("<option data-departmentId="+ data[i].DepartmentId +" data-department=\""+ data[i].DepartmentName +"\" data-designation=\""+ data[i].DesignationName +"\"></option>").val(data[i].UserInformationId)
+                            .html(data[i].UserInformationName));
+                    }
+                //if (status == 0) {
+                //    $(divblock).append($("<option></option>").val('0')
+                //            .html("--Select Department Head--"));
+                //    for (var i = 0; i < data.length; i++) {
+                //        $(divblock).append($("<option></option>").val(data[i].DepartmentId)
+                //            .html(data[i].UserInformationName + "(" + data[i].DepartmentName + ")"));
+                //    }
+                //} else {
+                //    for (var i = 0; i < data.length; i++) {
+                //        $(divblock).append($("<option></option>").val(data[i].UserInformationId)
+                //            .html(data[i].UserInformationName));
+                //    }
+                //}
+
+            }
+        });
+    }
+
+  
+    function UpdateVehicleRequest(vehiclereqid) {
+        debugger;
+        var jsonData = {};
+        jsonData["VehicleRequesMastertId"] = vehiclereqid;
+        jsonData["LocationId"] = $("#upLocation").val();
+        jsonData["LocationName"] = $("#upLocation").children("option:selected").html();
+
+        if (jsonData["LocationId"] == 1) {
+
+            jsonData["BusinessUnitId"] = "0";
+            jsonData["BusinessUnitName"] = "SQ Central";
+
+        } else {
+            jsonData["BusinessUnitId"] = $("#upBusinessunit").val();
+            jsonData["BusinessUnitName"] = $("#upBusinessunit").children("option:selected").html();
+        }
+
+
+        jsonData["DepartmentHeadId"] = $("#upDepartmentId").val();
+        jsonData["DepartmentName"] = $("#upDepartmentId").children("option:selected").html();
+        jsonData["TravelStratDate"] = $("#upTravelStratDate").val();
+        jsonData["StartTime"] = $("#upStartTime").val();
+        jsonData["TravelEndDate"] = $("#upTravelEndDate").val();
+        jsonData["EndTime"] = $("#updEndTime").val();
+        jsonData["PurposeofTravel"] = $("#uppurpose_of_visit").val();
+        jsonData["PurposeofTravelName"] = $("#uppurpose_of_visit").children("option:selected").html();
+        jsonData["StartingPoint"] = $("#upstarting_point").val();
+        jsonData["StartingPointName"] = $("#upstarting_point").children("option:selected").html();
+        jsonData["RouteType"] = $("#uproute").val();
+        jsonData["RouteTypeName"] = $("#uproute").children("option:selected").html();
+        jsonData["TripType"] = $("#uptrip_Type").val();
+        jsonData["TripTypeName"] = $("#uptrip_Type").children("option:selected").html();
+        jsonData["NoofUser"] = $("#upNoofUser").val();
+        jsonData["PreferredVehicle"] = $("#uppreferred_vehicle").val();
+        jsonData["Remarks"] = $("#upremarks").val();
+        jsonData["DateOfRequest"] = new Date();
+        jsonData["VehicleRequestId"] = "0";
+        jsonData["Status"] = "1";
+
+      
+        var ammountList = [];
+        $('#ammountInformationbody tr').each(function () {
+            var myData = {};
+
+            myData["UserId"] = $(this).find('input[name^="tableUserID"]').val();
+            myData["UserName"] = $(this).find('input[name^="tableUserName"]').val();
+            myData["Designation"] = $(this).find('input[name^="tableDesignationId"]').val();
+            myData["DesignationName"] = $(this).find('input[name^="tableDesignation"]').val();
+            myData["Department"] = $(this).find('input[name^="tableDepartmentId"]').val();
+            myData["DeartmentName"] = $(this).find('input[name^="tableDepartment"]').val();
+            myData["PhoneNo"] = $(this).find('input[name^="tableContactNo"]').val();
+
+            ammountList.push(myData);
+        });
+        jsonData["UserDetailsList"] = ammountList;
+        var approverObj = [];
+        var count = 1;
+        $("#ListOfApprover tr").not(':first').each(function () {
+
+
+            var approver = {};
+            approver["UserID"] = $(this).find('p[name^="userId"]').html();
+            approver["ApproverNo"] = $(this).find('p[name^="approverNo"]').html();
+            approver["UserName"] = $(this).find('p[name^="userName"]').html();
+            approver["DesignationName"] = $(this).find('p[name^="designation"]').html();
+            approver["ApproverStatusName"] = $(this).find('p[name^="approverstatus"]').html();
+            approver["ApproverStatus"] = $(this).find('p[name^="approverNo"]').html();
+
+            //if ($(this).find('p[name^="approverNo"]') == 1) {
+            //    approver["ApproverStatus"] = 1;
+            //    approver["ApproverStatusName"] = "First Approver"
+            //} else {
+            //    approver["ApproverStatus"] = 2;
+            //    approver["ApproverStatusName"] = "Second Approver"
+            //}
+
+            approverObj.push(approver);
+            /* count++;*/
+        })
+
+
+
+        jsonData["VehicleApproverList"] = approverObj;
+
+        return jsonData;
+    }
+    function UpdateToDataBase(Vehiclereqid) {
+        var jsondate = UpdateVehicleRequest(Vehiclereqid);
+         var urlpath = '@Url.Action("UpdateVehicleRequest", "Vehicle")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsondate),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    swal({
+                        title: 'Vehicle Request Updated Successfully',
+                        type: 'success',
+                        closeOnCancel: true
+                    },function () {
+                            $("#myModal").modal("hide");
+                            $("#iousubmenu").find('li').removeClass();
+                            $("#iousubmenu").find('li:nth-child(2)').addClass("active");
+                            GetAllVehicleRequest(1, 0);
+                    });
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+    }
+
+    function UpdateSettlement(IouRequestId,status) {
+        var urlpath = '@Url.Action("IouRequestDetails", "IOU")';
+        $.ajax({
+            data: { MasterID: IouRequestId, ViewName: "_updateIouSettlement", Status:status },
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $('#ioucreateDashboard').empty();
+                $('#ioucreateDashboard').append(data);
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+</script>

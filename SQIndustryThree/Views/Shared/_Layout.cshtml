@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -9,55 +10,125 @@
     <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
     @Styles.Render("~/Content/bootstrap.min.css")
     @Scripts.Render("~/bundles/modernizr")
+    <link href="~/Content/customcss.css" rel="stylesheet" />
+    <link href="~/Assets/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/Content/toastr.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    @*<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">*@
+    @*<link rel="preconnect" href="https://fonts.gstatic.com">*@
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
+    <div id="viewport">
+        <!-- Sidebar -->
+        <div id="sidebar">
+
+            <ul class="nav" id="top_menu">
+            </ul>
+        </div>
+        <!-- Content -->
+        <div id="content">
+            <nav id="mainnavbar" class="navbar navbar-inverse navbar-dark bg-primary navbar-fixed-top">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <p class="site-title">
-                    <a href="@Url.Action("Index", "Home")">
-                        <img style="padding-top:12px;width:30px;height:40px;" src="../../Images/logo.png" alt="" />
-                        <img style="padding-top:20px;width:80px;" src="../../Images/slogan.png" alt="" />
-                    </a>
-                </p>
-
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav navbar-left">
-                    <li>@Html.ActionLink("Dashboard", "DashboardCapex", "Dashboard")</li>
-                    <li>@Html.ActionLink("All Capex View", "CapexInformationView", "CapexApproval")</li>
-                    <li>@Html.ActionLink("Create Capex", "CreateCapex", "CapexApproval")</li>
-                    <li>@Html.ActionLink("Survey", "AdminPanel", "CapexApproval")</li>
-                </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    <li>@Html.ActionLink(@Session["SQuserName"].ToString(), "Index", "Home")</li>
-                    <li id="logoutButton">
-                        <a>
-                            Log off
-                            <span class="glyphicon glyphicon-log-out"></span>
+                <a style="color:white" href="#" onclick="HideSidebar()" id="menu-toggle" class="navbar-brand"><i class="fa fa-bars"></i> Menu<span class="navbar-toggler-icon"></span></a>
+                <a href="#" style="display:none;color:white" onclick="ShowSideBar()" id="menu-toggle2" class="navbar-brand"><i class="fa fa-bars"></i> Menu<span class="navbar-toggler-icon"></span></a>
+                @*<p class="site-title">
+                        <a href="@Url.Action("Index", "Home")">
+                            <img style="padding-top:12px;width:30px;height:40px;" src="../../Images/logo.png" alt="" />
+                            <img style="padding-top:20px;width:80px;" src="../../Images/slogan.png" alt="" />
                         </a>
-                    </li>
-                </ul>
+                    </p>*@
+                <div class="container-fluid navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-right" style="padding-right:20px">
+                        <li style="color:white">@Html.ActionLink(@Session["SQuserName"].ToString(), "Index", "Home")</li>
+                        @*<li >
+                                <a style="color:white" href="#" class="notification">
+                                    <span>Notification</span>
+                                    <span class="badge">3</span>
+                                </a>
+                            </li>*@
+                        <li id="logoutButton">
+                            <a style="color:white">
+                                Log off
+                                <span class="glyphicon glyphicon-log-out"></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            <div class="container-fluid" style="margin-top:52px;padding:5px">
+                @RenderBody()
+                <hr />
+                <footer>
+                    <p>&copy; @DateTime.Now.Year - SQ Group IT </p>
+                </footer>
             </div>
         </div>
-    </div>
-    <div class="container-fluid body-content" style="margin-top:60px">
-        @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - SQ Group IT </p>
-        </footer>
     </div>
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
     <script>
+        function HideSidebar() {
+            $("#sidebar").css('width', '0%');
+            $("#viewport ").css('padding-left', '0px');
+            $("#menu-toggle").hide();
+            $("#menu-toggle2").show();
+        }
+        function ShowSideBar() {
+            $("#sidebar").css('width', '150px');
+            $("#menu-toggle2").hide();
+            $("#menu-toggle").show();
+            $("#viewport ").css('padding-left', '150px');
+        }
+        ModuleWiseMenu();
+        function ModuleWiseMenu() {
+            var urlpath = '@Url.Action("LoadProjectMenu", "Account")';
+            $.ajax({
+                url: urlpath,
+                dataType: 'json',
+                type: "Post",
+                data: {},
+                async: true,
+                success: function (data) {
+                    $('#top_menu').empty();
+                    for (var i = 0; i < data.length; i++) {
+                       $("#top_menu").append('<li class="navlia" style="cursor:pointer" onclick=submenuAppend(a_'+data[i].ModuleKey+','+data[i].ModuleKey+')><a><i class="iconclass fa fa-plus"></i> ' + data[i].ModuleName + '</a><ul style="display:none;" id="a_'+data[i].ModuleKey+'"></ul></li>');
+                        //$("#top_menu").append('<li onclick=submenuAppend(a_'+data[i].ModuleValue+') id="a_'+data[i].ModuleValue+'" >' + data[i].ModuleName + '<ul><ul></li>');
+                    }
+                }
+            });
+        }
+        function submenuAppend(id,projectId) {
+            var origin = window.location.origin;
+            if ($(id).is(":visible")) {
+                $(id).empty();
+                $(id).hide();
+               // $(id).find('.iconclass').toggleClass('fa-plus fa-minus');
+            } else {
+                $(id).empty();
+                $(id).show();
+                //$(id).find('.iconclass').toggleClass('fa-plus fa-minus');
+                var urlpath = '@Url.Action("LoadPermissionMenu", "Account")';
+                $.ajax({
+                    url: urlpath,
+                    dataType: 'json',
+                    type: "Post",
+                    data: {ProjectId:projectId},
+                    async: true,
+                    success: function (data) {
+                        for (var i = 0; i < data.length; i++) {
+                            $(id).append('<li class="customli"><a  href="' + origin+'/'+data[i].ModuleController +'/'+data[i].ModuleValue+ '">' + data[i].ModuleName + '</a></li>');
+                        }
+                    }
+                });
+            }
+        }
         $("#logoutButton").click(function () {
         var urlpath = '@Url.Action("Logout", "Account")';
             $.ajax({
@@ -86,5 +157,7 @@
     <script src="~/Assets/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
     <script src="~/Assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
     <script src="~/Scripts/sweetalert.min.js"></script>
+    
+    <script src="~/Scripts/toastr.js"></script>
 </body>
 </html>

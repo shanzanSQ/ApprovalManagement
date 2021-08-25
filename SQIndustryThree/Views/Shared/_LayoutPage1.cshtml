@@ -1,0 +1,115 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+
+    <link href="~/Content/sweetalert.css" rel="stylesheet" />
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+
+    @Styles.Render("~/Content/bootstrap.min.css")
+    @Scripts.Render("~/bundles/modernizr")
+    <link href="~/Content/customcss.css" rel="stylesheet" />
+    <link href="~/Assets/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div id="viewport">
+        <!-- Sidebar --> 
+        <div id="sidebar" >
+            <header>
+                <p class="site-title">
+                    <a href="@Url.Action("Index", "Home")">
+                        <img style="padding-top:12px;width:30px;height:40px;" src="../../Images/logo.png" alt="" />
+                        <img style="padding-top:20px;width:80px;" src="../../Images/slogan.png" alt="" />
+                    </a>
+                </p>
+            </header>
+            <ul class="nav">
+                <li>
+                    <a href="#">
+                         Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                         Shortcuts
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        Overview
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                         Events
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                         About
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        Services
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                         Contact
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <!-- Content -->
+        <div id="content">
+            <nav class="navbar navbar-inverse navbar-dark bg-primary">
+                <div class="container-fluid">
+                    <a href="#" onclick="HideSidebar()" id="menu-toggle" class="navbar-brand"><i class="fa fa-bars"></i> Menu<span class="navbar-toggler-icon"></span></a>
+                    <a href="#" style="display:none" onclick="ShowSideBar()" id="menu-toggle2" class="navbar-brand"><i class="fa fa-bars"></i> Menu<span class="navbar-toggler-icon"></span></a>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#">
+                                Shanzan Khan
+                            </a>
+                        </li>
+                        <li><a href="#">Test User</a></li>
+                    </ul>
+                </div>
+            </nav>
+            <div class="container-fluid">
+                @RenderBody()
+                <h1>Simple Sidebar</h1>
+                <p>
+                    Make sure to keep all page content within the
+                    <code>#content</code>.
+                </p>
+            </div>
+        </div>
+    </div>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+    <script>
+        function HideSidebar() {
+            $("#sidebar").css('width', '0%');
+            $("#viewport ").css('padding-left', '0px');
+            $("#menu-toggle").hide();
+            $("#menu-toggle2").show();
+        }
+        function ShowSideBar() {
+            $("#sidebar").css('width', '150px');
+            $("#menu-toggle2").hide();
+            $("#menu-toggle").show();
+            $("#viewport ").css('padding-left', '150px');
+        }
+    </script>
+        <script src="~/Assets/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="~/Scripts/sweetalert.min.js"></script>
+</body>
+
+</html>

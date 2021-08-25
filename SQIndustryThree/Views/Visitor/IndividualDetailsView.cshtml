@@ -1,0 +1,344 @@
+﻿
+@{
+    ViewBag.Title = "IndividualDetailsView";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model SQIndustryThree.Models.VisitorRequestModel
+<style type="text/css">
+    th {
+        text-align: left;
+    }
+</style>
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+
+<h2 class="modal-title" id="myModalLabel" style="text-align:center">Visitor Information Request</h2>
+<br />
+
+<input value="@Model.VisitorId" type="hidden" id="visitorId" />
+<table width="100%" border="1">
+    <caption>Requestor Information</caption>
+    <tr>
+        <td>Request ID </td>
+        <td>@Model.RequestorId</td>
+    </tr>
+    <tr>
+        <td>Business Unit</td>
+        <td>@Model.BusinessUnitName</td>
+    </tr>
+    <tr>
+        <td>Requestor Name : </td>
+        <td>@Model.RequestorName</td>
+    </tr>
+    <tr>
+        <td>Requestor Email : </td>
+        <td>@Model.RequestorEmail</td>
+    </tr>
+    <tr>
+        <td>Requestor Department : </td>
+        <td>@Model.RequestorDepartment</td>
+    </tr>
+    <tr>
+        <td>Requestor Designation : </td>
+        <td>@Model.RequestorDesignation</td>
+    </tr>
+    <tr>
+        <td>Requestor Mobile : </td>
+        <td>@Model.RequerstorMobile</td>
+    </tr>
+    <tr>
+        <td>Date Of Visit : </td>
+        <td>@Model.VisitDate.ToString("dd MMM yyyy")</td>
+    </tr>
+</table>
+<table width="100%" border="1">
+    <caption>Visitor Information</caption>
+    <tr>
+        <td>Purpose of visit SQ: </td>
+        <td>@Model.PurposeOfVisitSQ</td>
+    </tr>
+    <tr>
+        <td>Remarks : </td>
+        <td>@Model.Remarks</td>
+    </tr>
+    <tr>
+        <td>Visitor Name : </td>
+        <td>@Model.VisitorName</td>
+    </tr>
+    <tr>
+        <td>Visitor Email : </td>
+        <td>@Model.VisitorEmail</td>
+    </tr>
+    <tr>
+        <td>Visitor Designation : </td>
+        <td>@Model.VisitorDesignation</td>
+    </tr>
+    <tr>
+        <td>Visitor Company : </td>
+        <td>@Model.VisitorCompany</td>
+    </tr>
+    <tr>
+        <td>Visitor Mobile : </td>
+        <td>@Model.VisitorMobile</td>
+    </tr>
+    <tr>
+        <td>Visitor Nationality: </td>
+        <td>@Model.VisitorNationality</td>
+    </tr>
+    <tr>
+        <td>China Visit: </td>
+        <td>@Model.Chainavisit</td>
+    </tr>
+</table>
+@*@if (Model.IsApproved == 1)
+    {
+        <table style="text-align:center" width="100%" class="table">
+            <tr>
+                <td><button class="btn btn-success" onclick="UpdateFromModal(@Model.VisitorId,2)">Approved</button></td>
+                <td><button class="btn btn-danger" onclick="UpdateFromModal(@Model.VisitorId,3)">Rejected</button></td>
+            </tr>
+        </table>
+    }*@
+
+<br />
+<br />
+
+<div class="panel panel-primary" style="padding:10px;">
+
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="text-right">
+                <input type="button" class="btn btn-success btn-sm add-row" value="Add Row">&nbsp;&nbsp;
+                <a href="/BillApproval/BillEntry" class="btn btn-info btn-sm">Back</a>
+            </div>
+            <table class="table table-responsive">
+                <thead>
+                    <tr>
+
+                        <th>Card No</th>
+                        <th>Image</th>
+                        <th>Check In</th>
+                        <th>Check Out</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBodyQuality">
+                    <tr id="0">
+
+                        <td><input class="form-control parameter" id="card_no_0" type="text" placeholder="Card No"></td>
+                        <td>
+                            @if (Session["Imagename"] != null)
+                            {
+                                <img src="~/Images/Visitors/@Session["Imagename"].ToString()" height="50" width="50" id="image_0" />
+                            }
+                            else 
+                            { 
+                                <img src="~/Images/user.png" height="50" width="50" id="image_0" />
+                            }
+                            
+                        </td>
+                        <td><input type="checkbox" class="" value="yes" id="checkIn_0"></td>
+                        <td><input type="checkbox" class="" value="yes" id="checkOut_0"></td>
+                        <td><a href="/Camera/Capture?RequestId=@Model.RequestorId" class="btn btn-info btn-sm" id="capture_0">Capture Image</a></td>
+
+                        <td><button class='btn btn-danger' type='button'> <span class='glyphicon glyphicon-minus' aria-hidden='true'></span> </button></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="text-center">
+                <button class="btn btn-success" id="submitVisitor" onclick="submitVisitor()">S U B M I T</button> &nbsp;&nbsp;
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+    <!--<div class="row">
+        <div class="col-md-12" style="margin-bottom:10px;">
+            <div class="form-inline">
+                <div class="form-group col-md-3">
+                    <input type="hidden" class="form-control col-md-6" id="requestorId" value="@Model.RequestorId" name="visitor_card_Id" placeholder="Requestor ID" />
+                    <label for="" class="col-md-6">Card No</label>
+                    <input type="text" class="form-control col-md-6" id="visitor_card_Id" value="@Model.VisitorCardNo" name="visitor_card_Id" placeholder="Visitor ID" />
+                </div>-->
+    @*<div class="form-group col-md-2">
+            <label for="" class="col-md-6">Vehicle</label>
+            <input type="text" class="form-control col-md-6" id="vehicle_no" value="@Model.VehicleNo" name="vehicle_no" placeholder="Vehicle No" style="width:100px;" />
+        </div>*@
+
+    <!--<div class="form-group col-md-2" style="">-->
+    @*<label class="col-md-6" for="exampleCheck1">Check IN</label>
+        <input type="checkbox" class="col-md-6" id="checkIN">*@
+
+
+    <!--<label for="" class="col-md-7">Check In</label>
+    <div>
+        @if (Model.CheckIn == "Yes")
+        {
+            <input type="checkbox" class="col-md-6" value="yes" checked id="checkIn">
+        }
+        else
+        {
+            <input type="checkbox" class="col-md-6" value="yes" id="checkIn">
+        }-->
+    @*<input type="text" class="form-control col-md-6" id="visitorId" name="visitorId" placeholder="Visitor ID" />*@
+    <!--</div>
+    </div>
+
+
+
+
+    <div class="form-group col-md-2" style="">-->
+    @* <label class="col-md-6" for="exampleCheck1">Check OUT</label>
+        <input type="checkbox" class="col-md-6" id="checkOUT">*@
+
+    <!--<label for="" class="col-md-7">Check Out</label>
+    <div>
+        @if (Model.CheckOut == "Yes")
+        {
+            <input type="checkbox" class="col-md-6" value="yes" checked id="checkOut">
+        }
+        else
+        {
+            <input type="checkbox" class="col-md-6" value="yes" id="checkOut">
+        }-->
+    @*<input type="checkbox" class="form-control col-md-6" id="checkOUT" name="checkOUT" placeholder="Check OUT" />*@
+    @*<input type="text" class="form-control col-md-6" id="visitorId" name="visitorId" placeholder="Visitor ID" />*@
+    <!--</div>
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label for="" class="col-md-6">Remarks</label>
+                    <input type="text" class="form-control col-md-6" id="remarks" value="@Model.GateRemarks" name="remarks" placeholder="Remarks" />
+                </div>
+
+            </div>
+        </div>
+        <br />
+        <div class="text-center">
+            <input class="btn btn-success" value="Submit" id="submitUserInfo" type="button" />
+        </div>
+    </div>-->
+</div>
+
+<script type="text/javascript">
+
+
+
+
+    var i = 0;
+    $(".add-row").click(function () {
+
+        i++;
+        var markup = '<tr id="' + i + '"><td><input class="form-control parameter" id="card_no_'+i+'" type="text" placeholder="Card No"></td>';
+
+        markup += '<td><img src="/Images/user.png" height="50" width="50" id="image_'+ i +'" /></td>';
+
+        markup += '<td><input type="checkbox" class="" value="yes" id="checkIn_' + i +'"></td>';
+        markup += '<td><input type="checkbox" class="" value="yes" id="checkOut_' + i + '"></td>';
+        markup += '<td><a href="/Camera/Capture?RequestId='+@Model.RequestorId+i+'" class="btn btn-info btn-sm" id="capture_' + i + '">Capture Image</a></td>';
+        markup += "<td><button class='btn btn-danger ibtnDel' onclick='deleterow(" + i + ")' type='button'> <span class='glyphicon glyphicon-minus' aria-hidden='true'></span> </button></td>";
+        markup += "</tr>";
+        $("table tbody#tableBodyQuality").append(markup);
+
+        //QualityResultList();
+    });
+
+    function deleterow(rowval) {
+        $('tr#' + rowval + '').remove();
+    }
+
+    $('#submitUserInfo').click(function () {
+
+        var visitorId = $('#visitorId').val();
+        var visitorCardNo = $('#visitor_card_Id').val();
+        var vehicleNo = "";//$('#vehicle_no').val();
+        var remarks = $('#remarks').val();
+
+        if (visitorCardNo  == "") {
+            swal({
+                title: 'Please Enter Visitor Card No',
+                type: 'warning',
+                closeOnCancel: true
+            });
+            return true;
+        }
+
+        if ($('#checkIn').prop("checked") == false) {
+            swal({
+                title: 'Please Select CheckIn Box',
+                type: 'warning',
+                closeOnCancel: true
+            });
+            return true;
+        }
+
+        var checkin = "";
+
+        if ($('#checkIn').prop("checked")) {
+            checkin = 'Yes';
+        } else {
+            checkin = 'No';
+        }
+
+        var checkout = "";
+
+        if ($('#checkOut').prop("checked")) {
+            checkout = 'Yes';
+        } else {
+            checkout = 'No';
+        }
+
+            var urlpath = '@Url.Action("GateInfoUpdate", "Visitor")';
+        $.ajax({
+            data: { requestorId: @Model.RequestorId, visitorId: visitorId, visitorCardNo: visitorCardNo, vehicleNo: vehicleNo, remarks: remarks, checkin: checkin, checkout: checkout },
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function(data) {
+                    if (data == 'Updated Data Successfully') {
+                               $('#showmodal').modal('toggle');
+                            swal({
+                                title: 'Successfully Done',
+                                type: 'success',
+                                closeOnCancel: true
+                            }, function () {
+                                $('#showmodal').hide();
+                                location.reload();
+                                //getAllVisitorApproval(1);
+                            });
+                           }
+                        }
+                });
+    })
+
+    function UpdateFromModal(primarykey,isApproved) {
+         var urlpath = '@Url.Action("UpdateOrReject", "Visitor")';
+            $.ajax({
+                data: { PrimaryKey: primarykey, Status: isApproved },
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function(data) {
+                    if (data.isSuccess) {
+                               $('#showmodal').modal('toggle');
+                               swal({
+                                  title: 'Successfully Done',
+                                  type: 'success',
+                                   closeOnCancel: true
+                               }, function () {
+                                   getAllVisitorApproval(1);
+                               });
+                            }
+                        }
+                });
+    }
+
+</script>
+

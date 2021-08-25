@@ -17,8 +17,11 @@ namespace SQIndustryThree.Models
         public int BusinessUnitId { get; set; }
         public int CreateBY { get; set; }
         public int DesignationId { get; set; }
+        public int DepartmentId { get; set; }
         public int ApproverNo { get; set; }
         public String DesignationName { get; set; }
+        public String DepartmentName { get; set; }
+        public int IsSupplier { get; set; }
         public bool Empty
         {
             get

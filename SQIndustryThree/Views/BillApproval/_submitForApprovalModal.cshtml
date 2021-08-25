@@ -1,0 +1,109 @@
+﻿@model SQIndustryThree.Models.BillApproval.BillApprovalPOMasterTable
+<div class="row">
+    <div class="col-md-12">
+        <div class="col-md-6">
+            <br />
+            <table width="100%" border="1">
+                <tr>
+                    <th width="50%">Po Number</th>
+                    <td>
+                        @Model.SupplierName
+                    </td>
+                </tr>
+                <tr>
+                    <th width="50%">Supplier Name</th>
+                    <td>
+                        @Model.SupplierName
+                    </td>
+                </tr>
+                <tr>
+                    <th>Po Qty</th>
+                    <td>
+                        $@Model.POQty
+                    </td>
+                </tr>
+                <tr>
+                    <th>Advanced Payment</th>
+                    <td>
+                        @Model.AdvancedPayment
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="col-md-12">
+            <br />
+            <table width="100%" class="moredetails" style="text-align:center" border="1">
+                <caption>More Details</caption>
+                <thead id="detailshead">
+                    <tr>
+                        <th width="25%">Article </th>
+                        @*<th>Color Name </th>
+                    <th>Size  </th>*@
+                        <th>PO Qty</th>
+                        <th>Rate </th>
+                        <th>PO Value </th>
+                        <th>PI Raised Qty </th>
+                        <th>Balance To Raised QTY </th>
+                        <th>PI QTY </th>
+                        <th>PI Value </th>
+                        <th>Discount </th>
+                        <th>Total </th>
+                    </tr>
+                </thead>
+                <tbody id="calculationbody">
+                    @{float totalpo = 0, totalrate = 0, totalraise = 0, totalpiq = 0, discount = 0; }
+                    @foreach (var i in Model.Polist)
+                    {
+                        <tr>
+                            <td>@i.ArticleName </td>
+                            @*<td>@i.ColorName </td>
+                        <td>@i.SizeName  </td>*@
+                            <td>@i.POQty</td>
+                            <td>$@i.Rate</td>
+                            <td>$@i.PoValue</td>
+                            <td>@i.PIRaised</td>
+                            <td>$@i.PIBalance</td>
+                            <td>@i.PIQty</td>
+                            <td>$@i.PIValue</td>
+                            <td>$@i.Discount</td>
+                            <td>$@i.TotalPayment</td>
+                        </tr>
+                        totalpiq += i.PIQty;
+                        totalpo += i.POQty;
+                        totalrate += i.Rate;
+                        totalraise += i.PIRaised;
+                        discount += i.Discount;
+                    }
+                </tbody>
+                <tfoot>
+                    @{var tp = (totalpiq * totalrate) - discount; float totalval = totalpo * totalrate; float tpirate = totalpiq * totalrate; float tr = totalraise * totalrate;}
+                    <tr>
+                        <th>Total</th>
+                        <th>@totalpo</th>
+                        <th>$@totalrate</th>
+                        <th>@totalval</th>
+                        <th>@totalraise</th>
+                        <th>@tr</th>
+                        <th>@totalpiq</th>
+                        <th>$@tpirate</th>
+                        <th>$@discount</th>
+                        <th>$@tp</th>
+                    </tr>
+                </tfoot>
+            </table>
+            <br />
+        </div>
+    </div>
+    <div style="text-align:center">
+        @if (Model.Status == 1)
+        {
+            <input type="button" onclick="SubmitForApproval()" value="Submit Form Approval" class="btn btn-primary btn-sm" />
+        }
+
+    </div>
+</div>
+<script type="text/javascript">
+    
+</script>

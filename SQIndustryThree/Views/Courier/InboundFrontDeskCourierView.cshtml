@@ -1,0 +1,540 @@
+﻿<font size="2" face="Calibri">
+    <div class="container-fluid">
+        <h3 style="text-align:center"> Inbound Courier Request </h3>
+        <div class="row">
+            <div class="col-md-2">
+                <ul class="nav" id="visitorSubmenu">
+                    <li onclick="GetCourierByFrontDesk(2)"><a href="#">Approved Courier </a></li>
+                    @*<li onclick="GetVisitorByFrontDesk(2)"><a href="#">Arrived Courier </a></li>*@
+                </ul>
+            </div>
+            <div class="col-md-4" style="margin-top:50px; margin-left:1050px; margin-top:-50px;">
+                <button id="save_button" class="btn btn-info">RECEIVED</button>
+            </div>
+            
+            <div class="col-md-10" id="getallvisitor" style="width: 100%;overflow:scroll;height: 100%">
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="showmodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h5 class="modal-title" id="myModalLabel">Courier Information Request</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12 modal_body_map">
+                            <div class="location-map" id="location-map">
+                                <div style="text-align:left" id="showcanvas"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 modal_body_end">
+
+                        </div>
+                    </div>
+                </div>
+                @*<div class="modal-footer" style="text-align:center">
+                        <button style="text-align:right" class="btn btn-success" id="printCapex">Print This Capex</button>
+                    </div>*@
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="myModalD">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center;font-weight:bold ;">Inbound Courier Request Received View</h4>
+                </div>
+                <div id="Dmodalbody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    @*<button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>*@
+                    <button type="button" class="btn btn-primary btn-sm" id="confirmCourierInfo" @*onclick="PrintModal()"*@>Confirm</button>
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div>
+</font>
+@*<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script src="~/Assets/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="~/Assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>*@
+
+<script type="text/javascript">
+    function PrintModal() {
+        var print_div = document.getElementById("printablearea");
+        var print_area = window.open();
+        print_area.document.write("<style>table{border-collapse:collapse;}</style><img width='20' height='20' src='../../Images/logo.png' /><img style='width:80px;' src='../../Images/logo.png' />");
+        print_area.document.write("<h1 style='text-align:center'>Inbound Courier Request Received View</h1>");
+        print_area.document.write(print_div.innerHTML);
+        print_area.document.close();
+        print_area.focus();
+        print_area.print();
+        print_area.close();
+    }
+    $(function () {
+
+        //GetSubMenuBYUserPermission();
+        GetCourierByFrontDesk(2);
+
+    });
+
+    load();
+
+    function load() {
+
+
+    }
+
+
+    function UpdateFrontDesk(primarykey,isApproved) {
+         var urlpath = '@Url.Action("UpdateOrReject", "Visitor")';
+            $.ajax({
+                data: { PrimaryKey: primarykey, Status: isApproved },
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function(data) {
+                            if (data.isSuccess) {
+                               swal({
+                                  title: 'Successfully Done',
+                                  type: 'success',
+                                   closeOnCancel: true
+                               }, function () {
+                                       GetVisitorByFrontDesk(2);
+                               });
+                            }
+                        }
+                });
+    }
+
+    function GetCourierByFrontDesk(variable) {
+        var urlpath = '@Url.Action("GetFrontDeskCourier", "Courier")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {Status:variable},
+                async: true,
+                success: function(data) {
+                       if (data) {
+                            $('#getallvisitor').empty();
+                            $('#getallvisitor').html(data);
+                           $("#fontDeskCourierTable").DataTable();
+                           //var val = 0;
+                           //$('tr:gt(0)').each(function (rowNumber) {
+                           //    const row = document.getElementsByClassName('rowclass');
+                           //    var $cells = $(this).find('td'),
+                           //        val = +$cells.eq(8).text();
+
+                           //    //val == parseFloat(val);
+                           //    ratio = val / val;
+                           //    var color = 'green';
+                           //    if (ratio == 1) {
+                           //        color = ratio == 1 ? 'aqua' : 'yellow';
+                           //    }
+
+
+                           //    $cells.eq(8).css('background', color)
+
+                           //});
+
+
+                        }
+                    }
+                });
+    }
+
+
+
+    function calculateTotal(rowNumber) {
+
+        debugger
+       const row = document.getElementsByClassName('rowclass');
+        const checkboxes = document.getElementsByClassName('approval');
+       // var value = checkboxes[rowNumber - 1].$(this).val();
+        //alert(value);
+        // check the checkbox and color the row
+        if (checkboxes.checked = true) {
+            row[rowNumber - 1].style = "background-color: skyblue;";
+            if (checkboxes.checked = false) {
+                row[rowNumber - 1].style = "background-color: white;";
+            }
+           //style = "background-color: skyblue;";
+        }
+         else if (checkboxes.checked = false) {
+            row[rowNumber - 1].style = "background-color: white;";
+        }
+
+
+        //else if (checkboxes[rowNumber - 1].checked = false) {
+        //    row[rowNumber - 1].style = "background-color: white;";
+        //}
+
+        //var Colors = ["red", "yellow", "purple", "skyblue", "gray", "green"];
+
+        //if (row.value == row.value) {
+        //    for (var i = 0; i < $("tr").length; i++) {
+        //        $("tr:eq(" + i + ")").children().css("background-color", Colors[i]);
+        //    }
+        //};
+
+        //var $checky = '';
+        //if ($checky = $("input[type=checkbox].approval")) {
+        //  //  var $checky = $("input[type=checkbox].checky");
+
+        //    var total = 0;
+
+        //    $checky.filter(":checked").each(function () {
+        //        parseFloat($(this).val()) == parseFloat($(this).val())
+        //       // alert(parseFloat$(this).val());
+        //      total = parseFloat(total) + parseFloat($(this).val());
+        //        $("#total").val(total);
+        //    });
+
+        //    //$("#leadTimeFrom").parent("td").siblings("td:last").text(total);
+
+        //}
+        //else if ($checky = $("input[type=checkbox].approval")) {
+        //    var total = 0;
+
+        //    $checky.filter(":unchecked").each(function () {
+        //        total = parseFloat(total) + parseFloat($(this).val());
+
+        //    });
+        //}
+        //else {
+        //    $("#leadTimeFrom").val($(this).val());
+        //}
+
+    }
+     function getWeightByCourierDispatchId() {
+        debugger;
+            var urlpath = '@Url.Action("GetWeightByCourierDispatchId", "Courier")';
+
+        $.ajax({
+            url: urlpath,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            type: "Post",
+            data: JSON.stringify({
+
+            }),
+            success: function (response) {
+                //alert(response.data[0].Weight);
+                $("#font_received_weight").val(response.data[0].Weight);
+               
+            },
+            complete: function () {
+                $('.overlay').hide();
+            }
+        });
+
+    }
+    $("#save_button").click(function () {
+
+        debugger;
+        if ($('#fontDeskCourierTable tr td input[type=checkbox]:checked').length < 1) {
+            //alert($('#approverTable tr td input[type=checkbox]:checked').length);
+            swal({
+                title: 'Select At least one courier ',
+                type: 'error',
+                closeOnCancel: true
+            });
+        }
+
+       else if ($('#fontDeskCourierTable tr td input[type=checkbox]:checked').length >1) {
+            //alert($('#approverTable tr td input[type=checkbox]:checked').length);
+            swal({
+                title: 'Select Only 1 Row For Received ',
+                type: 'error',
+                closeOnCancel: true
+            });
+        }
+        else {
+            modalView();
+        }
+
+
+    });
+       function modalView() {
+           var jsonData = SaveCourieFontDeskrRequest();
+           var urlpath = '@Url.Action("InboundShowPertialviewModalType", "Courier")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(jsonData),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    $("#Dmodalbody").html("");
+                    $("#Dmodalbody").append(data);
+                    $("#myModalD").modal("show");
+                    var font_received_date = document.getElementById("font_received_date");
+                    var today = new Date();
+                    // Set month and day to string to add leading 0
+                    var day = new String(today.getDate());
+                    var mon = new String(today.getMonth() + 1); //January is 0!
+                    var yr = today.getFullYear();
+
+                    if (day.length < 2) { day = "0" + day; }
+                    if (mon.length < 2) { mon = "0" + mon; }
+
+                    var date = new String(yr + '-' + mon + '-' + day);
+
+
+                    font_received_date.setAttribute('max', date);
+                    $('#font_received_date').val(date);
+
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+    }
+
+    function calculateGrandTotalWeight() {
+        debugger;
+        var grandTotalWeight = 0;
+        $("#ammountInformationbody tr").each(function () {
+            var myammount = $(this).find('input[name^="weight"]').val();
+            //grandTotalWeight = $(this).find('input[name^="weight"]').val();
+            grandTotalWeight = parseFloat(grandTotalWeight) + parseFloat(myammount);
+        });
+        $("#netWeight").val(grandTotalWeight);
+        courierWiseCostDate();
+    }
+    function courierWiseCostDate() {
+        debugger;
+        var jsonData = {};
+        var $checky = '';
+        if ($checky = $("input[type=checkbox].approval")) {
+            //  var $checky = $("input[type=checkbox].checky");
+            var CountryName ="";
+            var PostCode ="";
+            var Courier ="";
+            var total = 0;
+            var weight = 0;
+            $checky.filter(":checked").each(function () {
+                parseFloat($(this).val()) == parseFloat($(this).val())
+                // alert(parseFloat$(this).val());
+                total = parseFloat(total) + parseFloat($(this).val());
+                weight = parseFloat(weight) + parseFloat($(this).attr('data-Weight'));
+                //$("#total").val(total);
+                CountryName = $(this).attr('data-CountryName');
+                PostCode = $(this).attr('data-PostCode');
+                Courier = $(this).attr('data-ServiceProvider');
+
+            });
+        }
+
+        jsonData["Courier"] =(Courier);
+        jsonData["CountryName"] = CountryName
+        jsonData["Weight"] = Weight;
+        var Courier =(Courier);
+        var CountryName =(CountryName);
+        var Weight =$("#netWeight").val();
+
+
+          var urlpath = '@Url.Action("GetcourierWiseConsolidateCostDate", "Courier")';
+            $.ajax({
+                 url: urlpath,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                type: "Post",
+                data: JSON.stringify({
+                    Courier:Courier,
+                    CountryName:CountryName,
+                    Weight:Weight,
+                 }),
+                success: function (response) {
+                    $("#consolidate_value").val(response.data[0].Rate);
+
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+
+    }
+    $("#confirmCourierInfo").click(function () {
+        debugger;
+        if ($("#courier_number").val() == '') {
+            toastr.error("Please Enter Courier Number ", "Courier Number ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+        }
+        if ($("#font_airway_bill_no").val() == '') {
+            toastr.error("Please Enter Airway Bill No ", "Airway Bill No ",
+                {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+
+            return false;
+        }
+
+        else {
+             var jsonData = SaveCourieFontDeskrRequest();
+        var urlpath = '@Url.Action("SaveCourierReceived", "Courier")';
+        $.ajax({
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(jsonData),
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                swal({
+                    title: 'Courier Received Successfully',
+                    type: 'success',
+                    closeOnCancel: true
+                }, function () {
+                        $("#myModalD").modal("hide");
+                    $("#iousubmenu").find('li').removeClass();
+                    $("#iousubmenu").find('li:nth-child(2)').addClass("active");
+                        GetCourierByFrontDesk(2);
+                });
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+        }
+
+    });
+
+
+
+    function SaveCourieFontDeskrRequest() {
+
+        var td1 = 0;
+        $("input[type=checkbox].approval").filter(":checked").each(function () {
+            const trs = $("#fontDeskCourierTable tr ").not(':first');
+            const checkboxes = document.getElementsByClassName('approval');
+            if (jQuery(this).is(':checked')) {
+                var val = jQuery(this).val();
+                trs.each(function () {
+                    var tr = jQuery(this);
+                    var td = tr.find('td:nth-child(9)').text();
+                    //if (td.text() === val) {
+                    //    tr.show();
+                    //    showAll = false;
+                    //}
+
+                    td1 += td;
+                    if (td1 != td) {
+                       // alert('value is not equal');
+                    }
+                });
+            }
+
+
+        });
+
+        debugger;
+        var jsonData = {};
+        var $checky = '';
+        if ($checky = $("input[type=checkbox].approval")) {
+            //  var $checky = $("input[type=checkbox].checky");
+            var CourierRequestId = "";
+            var CountryName = "";
+            var PostCode = "";
+            var ServiceProvider = "";
+            var total = 0;
+            var weight = 0;
+            $checky.filter(":checked").each(function () {
+                parseFloat($(this).val()) == parseFloat($(this).val())
+                // alert(parseFloat$(this).val());
+                total = parseFloat(total) + parseFloat($(this).val());
+                weight = parseFloat(weight) + parseFloat($(this).attr('data-Weight'));
+                //$("#total").val(total);
+                CourierRequestId = $(this).attr('data-CourierRequestId');
+                CountryName = $(this).attr('data-CountryName');
+                PostCode = $(this).attr('data-PostCode');
+                ServiceProvider = $(this).attr('data-ServiceProvider');
+
+
+
+            });
+        }
+        jsonData["Netweight"] =$("#netWeight").val();
+        jsonData["total"] = (total.toFixed(2));
+        jsonData["CourierRequestId"] = CourierRequestId;
+        jsonData["CountryName"] = CountryName;
+        jsonData["PostCode"] = PostCode;
+        jsonData["ServiceProvider"] = ServiceProvider;
+        jsonData["CourierNumber"] = $("#courier_number").val();
+        jsonData["FontReceivedDate"] = $("#font_received_date").val();
+        jsonData["FontReceivedWeight"] = $("#font_received_weight").val();
+        jsonData["HandOverTo"] = $("#font_handover_to").val();
+        jsonData["FontAirwayBillno"] = $("#font_airway_bill_no").val();
+        jsonData["ReferenceNo"] = $("#referance_no").val();
+        jsonData["FontRemarks"] = $("#font_remarks").val();
+        var FontapproverObj = []
+        var count = 1;
+        $("#fontDeskCourierTable tr td input[type='checkbox']:checked").each(function () {
+
+            var jsonData = {};
+            var Fontapprover = {};
+
+            Fontapprover["CourierRequestId"] = $(this).attr('data-CourierRequestId');
+            Fontapprover["UserName"] = $(this).attr('data-UserName');
+            Fontapprover["DeartmentName"] = $(this).attr('data-DeartmentName');
+            Fontapprover["PostCode"] = $(this).attr('data-PostCode');
+            Fontapprover["Cost"] = $(this).attr('data-Cost');
+            Fontapprover["Receiver"] = $(this).attr('data-Receiver');
+            Fontapprover["CountryName"] = $(this).attr('data-CountryName');
+            Fontapprover["PostCode"] = $(this).attr('data-PostCode');
+            Fontapprover["Address"] = $(this).attr('data-Address');
+            Fontapprover["DispatchDate"] = $(this).attr('data-DispatchDate');
+            Fontapprover["Deliverydate"] = $(this).attr('data-Deliverydate');
+            Fontapprover["ProductDescription"] = $(this).attr('data-ProductDescription');
+            Fontapprover["Weight"] = $(this).attr('data-Weight');
+            Fontapprover["Volume"] = $(this).attr('data-Volume');
+            Fontapprover["AirwayBillno"] = $(this).attr('data-AirwayBillno');
+            Fontapprover["ServiceProvider"] = $(this).attr('data-ServiceProvider');
+            Fontapprover["ProposedDate"] = $(this).attr('data-ProposedDate');
+            Fontapprover["Remarks"] = $(this).attr('data-Remarks');
+
+            FontapproverObj.push(Fontapprover);
+            count++;
+
+        })
+
+        jsonData["CourierFontDeskModelList"] = FontapproverObj;
+        var ammountList = [];
+        $('#ammountInformationbody tr').each(function () {
+            var myData = {};
+            myData["CourierRequestId"] = $(this).find('input[name^="actualCourierRequestId"]').val();
+            myData["ActualWeight"] = $(this).find('input[name^="weight"]').val();
+            ammountList.push(myData);
+        });
+        jsonData["CourierAmmountList"] = ammountList;
+
+
+        return jsonData;
+
+        }
+
+
+</script>

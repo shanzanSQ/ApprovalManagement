@@ -1,0 +1,322 @@
+﻿@model SQIndustryThree.Models.CourierRequestModel
+<style>
+    th {
+        text-align: left;
+    }
+
+    td {
+        text-align: left;
+    }
+
+    #genaralInfodt tr th, #genaralInfodt tr td, #approverlist tr td, #approverlist tr th {
+        text-align: center;
+    }
+</style>
+<div id="printablearea">
+
+    <div>
+        <span style="float:left;font-weight:bold;font-size:20px">@Model.BusinessUnitName</span>
+        <span style="float:right;font-weight:bold;font-size:20px">Courier Request No: @Model.CourierRequestId</span>
+    </div>
+    @if (Model.CourierApproverList != null)
+    {
+        <table border="1" width="100%" id="ListOfApprover">
+            <caption>Approver List</caption>
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Approver Name</th>
+                    <th>Approver Designation</th>
+                    <th>Approver Role</th>
+                    <th>Update Date</th>
+                    <th>Status</th>
+                    <th>Comment</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.CourierApproverList)
+                {
+                    <tr>
+                        <td>@item.ApproverNo</td>
+                        <td>@item.UserName</td>
+                        <td>@item.DesignationName</td>
+                        <td>@item.ApproverStatusName</td>
+                        <td>
+                            @if (@item.UpdateDate != null)
+                            {@DateTime.Parse(@item.UpdateDate).ToString("dd MMM yyyy")}
+                        </td>
+                        @{
+                            if (item.IsApprove == 3)
+                            {
+                                <td style="color:red">Pending</td>
+                            }
+                            else if (item.IsApprove == 1)
+                            {
+                                if (item.ApproverStatus == 3)
+                                {
+                                    <td style="color:green">Disbursed</td>
+                                }
+                                else
+                                {
+                                    <td style="color:green">Approved</td>
+                                }
+                            }
+                            else if (Model.IsApproved == 4)
+                            {
+                                <td style="color:red">Dispatched</td>
+                            }
+                            else if (item.IsApprove == 2)
+                            {
+                                <td style="color:red">Rejected</td>
+                            }
+                            else
+                            {
+                                <td style="color:darkblue">Not Sent</td>
+                            }
+                        }
+                        <td>@item.Comments</td>
+                    </tr>
+
+                }
+            </tbody>
+        </table>
+    }
+    <div class="row">
+        <div class="col-md-12">
+            <table border="1" width="100%">
+                <caption>Courier Request</caption>
+                <tr>
+                    <th width="25%">Requestor Name</th>
+                    <td width="25%">@Model.UserName</td>
+                    <th width="25%">Request Date</th>
+                    <td width="25%">@DateTime.Parse(Model.DateOfRequest).ToString("dd MMM yyyy")</td>
+                </tr>
+                <tr>
+                    @*<th width="25%">Requestor Name</th>
+                        <td width="25%">@Model.RequesterId</td>*@
+                    <th width="25%">Location Name</th>
+                    <td width="25%">
+                        @Model.LocationName
+
+                </td>
+                <th>Business Unit</th>
+                <td>@Model.BusinessUnitName</td>
+            </tr>
+            <tr>
+                <th>Department Name</th>
+                <td>@Model.DepartmentName</td>
+                <th>Customer</th>
+                <td>@Model.BuyerName</td>
+            </tr>
+            <tr>
+                <th>Receiver</th>
+                <td>
+                    @Model.Receiver
+                </td>
+                <th>Title</th>
+                <td>
+                    @Model.Title
+                </td>
+            </tr>
+            <tr>
+                <th>Contact No</th>
+                <td>
+                    @Model.ContactNo
+                </td>
+                <th>Country</th>
+                <td>
+                    @Model.CountryName
+                </td>
+            </tr>
+            <tr>
+                <th>Post Code</th>
+                <td>@Model.PostCode</td>
+                <th>Address</th>
+                <td>@Model.Address</td>
+            </tr>
+            <tr>
+                <th>Dispatch Date</th>
+                <td>@Model.DispatchDate</td>
+                <th>Delivery Date</th>
+                <td>@Model.Deliverydate</td>
+            </tr>
+            <tr>
+                <th>Product Description</th>
+                <td>@Model.ProductDescription</td>
+                <th>Weight(KG)</th>
+                <td>@Model.Weight</td>
+            </tr>
+            @*<tr>
+                <th>Volume</th>
+                <td>@Model.Volume</td>
+                <th>Airway Bill no.</th>
+                <td>@Model.AirwayBillno</td>
+            </tr>*@
+           
+
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <table border="1" width="100%">
+            <caption>Courier </caption>
+            <tr>
+                <th>Elements</th>
+                <th>System Proposed</th>
+                <th>User Proposed</th>
+            </tr>
+            <tr>
+                <td>Generate Courier</td>
+                <td>@Model.GenerateCourierName</td>
+                <td>@Model.ServiceProvider</td>
+
+            </tr>
+            <tr>
+                <td>Generate Cost</td>
+                <td>@Model.GenerateCost</td>
+                <td>@Model.Cost</td>
+
+            </tr>
+            <tr>
+                <td>Proposed Date</td>
+                <td>@Model.GenerateProposedDate</td>
+                <td>@Model.ProposedDate</td>
+            </tr>
+            <tr>
+                <td>Remarks</td>
+                <td>@Model.Remarks</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <table border="1" width="100%">
+            <caption>Dispatched Info</caption>
+            <tr>
+                <th width="25%">Courier Number</th>
+                <td width="25%">@Model.CourierNumber</td>
+                <th width="25%">Dispatch No</th>
+                <td width="25%">@Model.CourierDispatchNo</td>
+
+            </tr>
+            <tr>
+                <th width="25%">Dispatch Date</th>
+                <td width="25%">@DateTime.Parse(Model.FontDispatchDate).ToString("dd MMM yyyy")</td>
+                <th width="25%">Reference No</th>
+                <td width="25%">
+                    @Model.ReferenceNo
+                </td>
+
+            </tr>
+      
+            <tr>
+                <th>Airway Bill no</th>
+                <td>@Model.FontAirwayBillno</td>
+                <th>Remarks</th>
+                <td>@Model.FontRemarks</td>
+            </tr>
+       
+    </table>
+</div>
+</div>
+
+@*@if (Model.IsApproved != 0)
+{
+    <div>
+        <br />
+        <table width="80%" align="center">
+            <tr>
+                <td>
+                    <button value="Comments" onclick="showComments()" class="btn btn-sm btn-primary">Comments</button>
+                </td>
+                <td style="padding:5px">
+                    <select id="reviewComment" class="approvalColumn form-control">
+                        @if (Model.CourierApproverList != null)
+                        {
+                            foreach (var app in Model.CourierApproverList)
+                            {
+                                if (app.IsApprove != 0)
+                                {
+                                    <option value="@app.UserID">@app.UserName</option>
+                                }
+
+                            }
+                        }
+
+                    </select>
+                </td>
+                <td style="padding:5px">
+                    <input type="text" id="reviewMessage" class="approvalColumn form-control" rows="3" style="resize:none" />
+                </td>
+                <td>
+                    <button style="text-align:center;align-content:center" class="btn btn-info btn-sm" onclick="ReviewComment(@Model.CourierRequestId,2)">Send Review</button>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+}*@
+<div class="row">
+    <div id="comments_section" class="col-md-6" style="overflow-wrap:inherit; overflow-y: auto;height:200px;display:none">
+        <p>Comment Section</p>
+        @if (Model.CourierComments != null)
+        {
+            foreach (var app in Model.CourierComments)
+            {
+                <hr style="margin:unset;padding:unset;" />
+                <p style="margin:unset;padding:unset" class="media-heading user_name"><strong style="color:blue">@app.ReviewerByName</strong>  To <strong>@app.ReviewerToName</strong></p>
+                <p style="margin:unset;padding:unset">@app.UpdatedBY.ToString("MM/dd/yyyy hh:mm tt")</p>
+                <p style="margin:unset;padding:unset">@app.ReviewMessage</p>
+            }
+        }
+    </div>
+    <div id="log_section" class="col-md-6" style="overflow-wrap:inherit; overflow-y: auto;height:200px;display:none">
+        <p>Log Section</p>
+        @if (Model.CourierLogSection != null)
+        {
+            <table width="100%" border="1">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Description</th>
+                        <th>By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var app in Model.CourierLogSection)
+                    {
+                        <tr>
+                            <td>@app.ActionDate</td>
+                            <td>@app.ActionStatus</td>
+                            <td>@app.Comments</td>
+                            <td>@app.ActionBy</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        }
+    </div>
+    @if (Model.IsApproved == 0)
+    {
+        <div style="text-align:center">
+            <br />
+            @*@if (Model.Status == 0)
+                {
+                    <button type="button" style="width:30%" class="btn btn-primary btn-sm" onclick="SubmitToDatabase()">Submit</button>
+                }
+                else if (Model.Status == 1)
+                {*@
+            <button type="button" style="width:30%" class="btn btn-success btn-sm" onclick="UpdateToDataBase(@Model.CourierRequestId)">Update </button>
+            @*}*@
+
+        </div>
+
+    }
+</div>
+</div>
+
+

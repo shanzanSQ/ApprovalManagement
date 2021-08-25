@@ -1,0 +1,2 @@
+UserName: Variable
+Password: First Two Letter of Email and 12345

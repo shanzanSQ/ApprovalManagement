@@ -1,0 +1,123 @@
+﻿@model IEnumerable<SQIndustryThree.Models.CourierRequestModel>
+<style type="text/css">
+    #fontDeskCourierTable td, th {
+        text-align: center;
+       
+
+    {
+        background-color: #9FF781;
+    }
+    }
+
+    .btn, .form-control {
+        border-radius: 0px;
+    }
+</style>
+
+<div class="box">
+    <table width="100%" class="table table-striped table-bordered" id="fontDeskCourierTable" style="overflow:scroll">
+        <thead>
+            <tr>
+                <th></th>
+                <th>SL</th>
+                <th>Request #</th>
+                <th>Requester</th>
+                <th>Department</th>
+                <th>Customer</th>
+                <th>Receiver</th>
+                <th>Country</th>
+                <th>Post Code</th>
+                <th>Address</th>
+                <th>Requested Dispatch Date</th>
+                <th>Requested Delivery Date</th>
+                <th>Product Description</th>
+                <th>Weight</th>
+                @*<th>Volume</th>
+                <th>Airway Bill no</th>*@
+                <th>Courier</th>
+                <th>Proposed Date</th>
+                <th>Cost</th>
+                <th>Remarks</th>
+                @*<th>Consolidation</th>*@
+                @*<th>Remarks</th>
+        <th>Status</th>
+        <th>Details</th>*@
+
+            </tr>
+        </thead>
+        <tbody>
+            @{ int count = 1;}
+            @foreach (var item in Model)
+            {
+            <tr class="rowclass" id="@count">
+                <td style='text-align: center;width:25px'><input type='checkbox' enablechecked class='approval' keyup="postCodeCheck(@count)" onclick="calculateTotal('@count')"
+                 id='enableCheck' value="@item.Cost "  data-CourierRequestId="@item.CourierRequestId" data-UserName=" @item.UserName" data-DeartmentName="@item.DeartmentName" data-Receiver="@item.Receiver"
+                 data-CountryName="@item.CountryName" data-PostCode=" @item.PostCode"  data-Address=" @item.Address" data-DispatchDate="@item.DispatchDate"   
+                 data-Deliverydate=" @item.Deliverydate" data-ProductDescription="@item.ProductDescription" data-Weight="@item.Weight"
+                 data-Volume=" @item.Volume"data-AirwayBillno="@item.AirwayBillno" data-ServiceProvider="@item.ServiceProvider"data-ProposedDate="@item.ProposedDate" 
+                 data-Cost="@item.Cost" data-Remarks="@item.Remarks"  data-Courier="@item.Courier"></td>"
+                <td>@count</td>
+                <td><p name="CourierRequestId">@item.CourierRequestId</td>
+                <td>@item.UserName</td>
+                <td>@item.DeartmentName</td>
+                <td>@item.BuyerName</td>
+                <td>@item.Receiver</td>
+                <td>@item.CountryName</td>
+                <td>@item.PostCode</td>
+                <td>@item.Address</td>
+                <td>@item.DispatchDate</td>
+                <td>@item.Deliverydate</td>
+                <td>@item.ProductDescription</td>
+                <td>@item.Weight</td>
+                @*<td>@item.Volume</td>
+                <td>@item.AirwayBillno</td>*@
+                <td>@item.ServiceProvider</td>
+                <td>@item.ProposedDate</td>
+                <td>@item.Cost</td>
+                <td>@item.Remarks</td>
+                @*<td id="Consolidation"><input id="leadTimeFrom" style="width:100%;overflow-wrap:break-word" type="text" value="@item.Cost" /> </td>*@
+             
+            </tr>
+                count++;
+            }
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    // $('#showmodal').on('show.bs.modal', function(event) {
+    //    var modalmap = $(event.relatedTarget);
+    //    getInvidualRequest(modalmap.data('idkey'));
+    //});
+    function getInvidualRequest(primarykey) {
+         var urlpath = '@Url.Action("IndividualRequestShow", "Visitor")';
+            $.ajax({
+                data: { PrimaryKey: primarykey },
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function (data) {
+
+                            if (data) {
+                                $('#showcanvas').empty();
+                                $('#showcanvas').append(data);
+                                $('#showmodal').show();
+                            }
+                        }
+                });
+    }
+    $('#visitorTable').dataTable({
+        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+            switch (aData[0]) {
+                case 'AAAA':
+                    $(nRow).css('color', 'red')
+                    break;
+                case 'BBBB':
+                    $(nRow).css('color', 'green')
+                    break;
+                case 'CCCC':
+                    $(nRow).css('color', 'blue')
+                    break;
+            }
+        }
+    });
+</script>

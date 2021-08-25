@@ -1,0 +1,72 @@
+﻿@model IEnumerable<SQIndustryThree.Models.VisitorRequestModel>
+
+
+<style>
+    #IourequestTable tr th, #IourequestTable tr td {
+        text-align: center;
+        padding: 5px;
+    }
+
+    button {
+        padding: 0;
+    }
+</style>
+<div class="box">
+     <!--<h3 style="text-align:center">My Visitor Request List</h3>
+    <!-- /.box-header -->
+    <div class="box-body">
+        <div class="col-xs-12" id="personlocdiv">
+            <table id="VisitorRequestTable" class="table-bordered table table-striped">
+                <thead>
+                    <tr>
+                        <th>SL</th>
+                        <th>RequestorId</th>
+                        <th>Requestor Name</th>
+                        <th>Department</th>
+                        <th>Business Unit</th>
+                        <th>Location</th>
+                        <th>Category</th>
+                        <th>Meeting With</th>
+                        <th>Visiting Date</th>
+                        <th>Total Visitor</th>
+                        <th>Action(Comments)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ int count = 1;}
+                    @foreach (var item in Model)
+                    {
+                    <tr>
+                        <td>@count</td>
+                        <td>@item.RequestorId</td>
+                        <td>@item.RequestorName</td>
+                        <td>@item.RequestorDepartment</td>
+                        <td>@item.BusinessUnitName</td>
+                        <td>@item.LocationName</td>
+                        <td>@item.CategoryName</td>
+                        <td>@item.MeetingWith</td>
+                        <td>@item.VisitDate.ToString("dd MMM yyyy")</td>
+                        <td>@item.TotalVisitor</td>
+                        @if (item.IsApproved == 3)
+                        {
+                            <td> <button type="button" class="btn  btn-block btn-primary btn-sm" data-toggle="modal" data-target="#myModal" onclick="VisitorDetailsApprover(@item.RequestorId,1)" data-idkey="@item.RequestorId">Pending</button></td>
+                        }
+                        else if (item.IsApproved == 1)
+                        {
+                            <td> <button type="button" class="btn  btn-block btn-success btn-sm" data-toggle="modal" data-target="#showmodal" onclick="VisitorDetailsApprover(@item.RequestorId,0)" data-idkey="@item.RequestorId">Approved</button></td>
+                        }
+                        else if (item.IsApproved == 2)
+                        {
+                            <td> <button type="button" class="btn  btn-block btn-danger btn-sm" data-toggle="modal" data-target="#showmodal" onclick="VisitorDetailsApprover(@item.RequestorId,0)" data-idkey="@item.RequestorId">Rejected</button></td>
+                        }
+                    </tr>
+                        count++;
+
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <!-- /.box-body -->
+</div>

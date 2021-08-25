@@ -1,0 +1,66 @@
+﻿
+<style>
+    #total_div {
+        margin-left: 20px;
+    }
+
+    .lable_table {
+        width: 20%;
+        font-weight: bold;
+    }
+</style>
+
+
+<div id="total_div" class="container-fluid">
+    <table id="datatable" class="table table-bordered table-striped compact table-hover" align="center" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Unit ID</th>
+                <th>Unit Name</th>
+            </tr>
+        </thead>
+
+
+    </table>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        $('#datatable').DataTable({
+            "columnDefs": [
+                {
+                    "width": "20%",
+                    "targets": [0]
+                }, {
+                    "className": "text-center custom-middle-align",
+                    "targets": [0, 1]
+                },
+                {
+                    "targets": [0],
+                    "visible": true
+                }
+            ],
+            "language":
+            {
+                "processing": "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>"
+            },
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "/Admin/GetAllBillUnits",
+                "type": "POST",
+                "dataType": "JSON"
+            },
+            "columns": [
+                {
+                    "data": "UnitID"
+                },
+                {
+                    "data": "UnitName"
+                }]
+        });
+
+
+    })
+</script>

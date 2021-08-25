@@ -1,0 +1,191 @@
+﻿<div class="row">
+    <div class="col-md-12">
+        <div class="col-md-4">
+            <label>Upload WFX PO</label>
+            <input type="file" placeholder="Upload PO" id="fileUpload" class="form-control form-control-sm" />
+            <br />
+            <input type="button" value="Upload" onclick="Upload()" class="btn btn-sm btn-success" /> &nbsp;&nbsp;
+            <input type="button" value="Insert Data" onclick="InsertData()" class="btn btn-sm btn-primary" />
+
+            <input type="hidden" value=""  class="btn btn-sm" id="dataBind" />
+        </div>
+    </div>
+</div>
+
+<br/>
+
+<div id="excelReport" style="overflow:scroll;">
+
+</div>
+
+@*@Html.Partial("_ExcelPartialView");*@
+
+<script src="~/Scripts/jszip.js"></script>
+<script src="~/Scripts/xlsx.full.min.js"></script>
+<script type="text/javascript">
+    function Upload() {
+        //Reference the FileUpload element.
+        var fileUpload = document.getElementById("fileUpload");
+        //Validate whether File is valid Excel file.
+        var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx)$/;
+        if (regex.test(fileUpload.value.toLowerCase())) {
+            if (typeof (FileReader) != "undefined") {
+                var reader = new FileReader();
+
+                //For Browsers other than IE.
+                if (reader.readAsBinaryString) {
+                    reader.onload = function (e) {
+                        ProcessExcel(e.target.result);
+                    };
+                    reader.readAsBinaryString(fileUpload.files[0]);
+                } else {
+                    //For IE Browser.
+                    reader.onload = function (e) {
+                    var data = "";
+                    var bytes = new Uint8Array(e.target.result);
+                    for (var i = 0; i < bytes.byteLength; i++) {
+                        data += String.fromCharCode(bytes[i]);
+                    }
+                        ProcessExcel(data);
+                    };
+                    reader.readAsArrayBuffer(fileUpload.files[0]);
+                }
+            } else {
+                alert("This browser does not support HTML5.");
+            }
+        } else {
+            alert("Please upload a valid Excel file.");
+        }
+    };
+    function ProcessExcel(data) {
+        var BillDetailsList = [];
+      //  var commonType = $('#typeId').val();
+        if ($('#fileUpload').val() == "") {
+            swal("Please Upload The File First");
+        } else {
+            //Read the Excel File data.
+            var workbook = XLSX.read(data, {type: 'binary'});
+            //Fetch the name of First Sheet.
+            var firstSheet = workbook.SheetNames[0];
+            //Read all rows from First Sheet into an JSON array.
+            var excelRows = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[firstSheet]);
+            //Add the data rows from Excel file.
+            const d = new Date();
+            for (var i = 0; i < excelRows.length; i++) {
+                var PoDetails = {};
+                PoDetails["PONumber"]=excelRows[i].PONo || "0";
+                PoDetails["SupllierName"] = excelRows[i].Supplier || "0";
+                PoDetails["ArticleName"] = excelRows[i].Article || "0";
+                PoDetails["ArticleCode"] = excelRows[i].ArticleCode || "N/A";
+                PoDetails["ColorName"] = excelRows[i].ColorName || "N/A";
+                PoDetails["SizeName"] = excelRows[i].Size || "N/A";
+                PoDetails["POQty"] = excelRows[i].POQty || 0;
+                PoDetails["Rate"] = excelRows[i].Rate || 0;
+                PoDetails["PoValue"] = (parseFloat(excelRows[i].POQty) * parseFloat(excelRows[i].Rate)) || 0;
+                PoDetails["DateInhouse"] = excelRows[i].DateInhouse || d;
+                PoDetails["POType"] = excelRows[i].POType || "N/A";
+                PoDetails["UOM"] = excelRows[i].UOM || "N/A";
+                PoDetails["Status"] = excelRows[i].Status || "N/A";
+                PoDetails["POCreatedBy"] = excelRows[i].POCreatedBy || "N/A";
+                PoDetails["POCreationDate"] = excelRows[i].POCreationDate || d;
+                if (excelRows[i].POQty != 0) {
+                    BillDetailsList.push(PoDetails);
+                }
+                //console.log(PoDetails);
+                //$("#dataBind").val(PoDetails);
+                //console.log($("#dataBind").val());
+            }
+            var urlpath = '@Url.Action("UploadExcelData", "BillApproval")';
+            $.ajax({
+                contentType: "application/json;charset=utf-8",
+                data: JSON.stringify(BillDetailsList),
+                //dataType: 'json',
+                url: urlpath,
+                type: "post",
+                async: true,
+                success: function (result) {
+                    //alert(result);
+                    //swal("Data Uploaded Successfully");
+                    $('#excelReport').empty();
+                    $('#excelReport').html(result);
+                    $("#POUploadTable").DataTable();
+                   // alert(result);
+                },
+                error: function (xhr, status, error) {
+                    alert(xhr.responseText);
+                }
+            });
+        }
+            };
+
+    function InsertData() {
+        //var totalList = [];
+        //$("#uploadtbl_body tr").each(function () {
+
+        //    var row = $(this).attr("id");
+
+        //    totalList.push(row);
+        //})
+
+        var BillDetailsList = [];
+
+        var table = $('#POUploadTable').DataTable();
+
+        var data = table
+            .rows()
+            .data();
+
+        data.each(function (value, index) {
+            var PoDetails = {};
+
+            PoDetails["PONumber"] = value[0] || "0";
+            PoDetails["SupllierName"] = value[1] || "0";
+            PoDetails["ArticleName"] = value[2] || "0";
+            PoDetails["ArticleCode"] = value[3] || "N/A";
+            PoDetails["ColorName"] = value[4] || "N/A";
+            PoDetails["SizeName"] = value[5] || "N/A";
+            PoDetails["UOM"] = value[6] || "N/A";
+            PoDetails["POType"] = value[7] || 0;
+            PoDetails["POQty"] = value[8] || 0;
+            PoDetails["Rate"] = value[9] || 0;
+            PoDetails["PoValue"] = value[10] || 0;            
+            PoDetails["DateInhouse"] = value[11] || "N/A";
+            PoDetails["Status"] = value[12] || "N/A";
+            PoDetails["POCreatedBy"] = value[13] || "N/A";
+            PoDetails["POCreationDate"] = value[14] || d;
+            if (value[8] != 0) {
+                BillDetailsList.push(PoDetails);
+            }
+
+            //console.log(`For index ${index}, data value is ${value[2]}`);
+
+            //alert(`For index ${index}, data value is ${value}`);
+        });
+
+       // console.log(data);
+        console.log(BillDetailsList);
+
+           var urlpath = '@Url.Action("UploadWFXFiletoDataBase", "BillApproval")';
+            $.ajax({
+                contentType: "application/json;charset=utf-8",
+                data: JSON.stringify(BillDetailsList),
+                //dataType: 'json',
+                url: urlpath,
+                type: "post",
+                async: true,
+                success: function (result) {
+                    //alert(result);
+                    //swal("Data Uploaded Successfully");
+                    $('#excelReport').empty();
+                    $('#excelReport').html(result);
+                    $("#POUploadTable").DataTable();
+                   // alert(result);
+                },
+                error: function (xhr, status, error) {
+                    alert(xhr.responseText);
+                }
+            });
+
+       // alert('The table has ' + data.length + ' records');
+    }
+</script>

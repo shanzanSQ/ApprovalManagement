@@ -1,0 +1,78 @@
+﻿@model SQIndustryThree.Models.VehicleRequestModel
+
+@{
+    ViewBag.Title = "_updateCourierBudgetpertialView ";
+}
+<div id="myprintmodal">
+    <h3 style="color: black;
+        text-align: center;
+        font-weight: bold">
+       
+    </h3>
+    <div>
+        @*<span style="float:right;">
+            @if (Model.Revision > 0)
+            {
+                <p style="text-align:center;font-weight:bold">
+                    No. of Revision: @Model.Revision
+                </p>
+            }
+        </span>*@
+    </div>
+
+    <div class="row">
+        <div>
+
+        </div>
+        <div>
+            <input id="primarykey" type="hidden" value="@Model.VehicleBudgetEntryId" />
+            <table border="1" width="90%" align="center" style="overflow-wrap:initial" class="">
+                <caption>Courier Type Information</caption>
+                <tbody>
+                    <tr>
+                        <td width="20%">Unit</td>
+                        <td>
+                            <select id="upBusinessunit">
+                                <option value="@Model.BusinessUnitId">@Model.BusinessUnitName</option>
+                            </select>
+                            <i style="width:20%;color:green;padding-left:2px;cursor:pointer" onclick="LoadBusinessUnit();" class="fa fa-refresh">Change</i>
+                        </td>
+                    </tr>
+                    @*<tr>
+            <td width="20%">Department</td>
+            <td>
+                <select id="upDepartment">
+                    <option value="@Model.DepartmentID">@Model.DepartmentName</option>
+                </select>
+                <i style="width:20%;color:green;padding-left:2px;cursor:pointer" onclick="LoadDepartment('#location');" class="fa fa-refresh">Change</i>
+            </td>
+        </tr>*@
+                    <tr>
+                        <td>Budget Year</td>
+                        <td><input disabled id="budgetYear" style="width:100%;overflow-wrap:break-word" type="text" value="@Model.BudgetYear" /> </td>
+                    </tr>
+                    <tr>
+                        <td>Month of Year</td>
+                        <td><input disabled id="monthOfYear" style="width:100%;overflow-wrap:break-word" type="text" value="@Model.MonthOfYear" /> </td>
+                    </tr>
+                    <tr>
+                        <td>Initial Amount</td>
+                        <td><input  id="upinialamount" style="width:100%;overflow-wrap:break-word" type="text" value="@Model.InialAmount" /> </td>
+
+                    </tr>
+                    <tr>
+                        <td>Amount</td>
+                        <td><input id="upamount" style="width:100%;overflow-wrap:break-word" type="text" value="@Model.Amount" /> </td>
+
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div style="text-align:center">
+            <br />
+            <button type="button" style="width:30%" class="btn btn-primary btn-sm" onclick="UpdateVehicleBudget(@Model.VehicleBudgetEntryId)">Update </button>
+        </div>
+    </div>
+</div>

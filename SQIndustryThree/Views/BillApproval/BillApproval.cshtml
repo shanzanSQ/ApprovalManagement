@@ -1,0 +1,804 @@
+﻿
+@{
+    ViewBag.Title = "BillApproval";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+
+<style type="text/css">
+    .modal-lg {
+        max-width: 80% !important;
+    }
+
+    .sweet-alert {
+        background-color: #DAF7A6;
+    }
+
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+
+    #billmenu {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #billSubmrnu li a {
+        color: white;
+    }
+
+    #billNavigaton {
+        background-color: #37474F;
+    }
+    /*#exceptionNavigaton{
+        padding:0px;
+        margin:0px;
+    }*/
+</style>
+<div class="container-fluid">
+    <h3 style="text-align: center;"><b>Bill Request Approval </b></h3>
+    <hr style="margin:0px" />
+    <div class="row">
+        <div id="billNavigaton" class="navbar navbar-default navbar-static-top">
+            <div id="billmenu">
+                <div class="navbar-collapse collapse">
+                    <ul id="billSubmrnu" class="nav navbar-nav">
+                        <li onclick="GetApproverRequestList(2,3)"><a href="#">Pending Request</a></li>
+                        <li onclick="GetApproverRequestList(2,1)"><a href="#">Approved Request</a></li>
+                        <li onclick="GetApproverRequestList(2,2)"><a href="#">Rejected Request</a></li>
+                        @*<li onclick="GetApproverRequestList(4,0)"><a href="#">HR Interaction</a></li>*@
+                    </ul>
+                </div>
+            </div>
+        </div>
+        @*  style="height:400px;width:100%;overflow:scroll"*@
+        <div id="billApprovalDashboard" style="width:100%;overflow:scroll">
+
+        </div>
+    </div>
+    <div class="modal" id="myModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Bill Approval Preview</h4>
+                </div>
+                <div id="modalbody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="PrintModal()">Print</button>
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <div class="modal" id="myQuality">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align: center">Bill Quality Preview</h4>
+                </div>
+                <div id="qualitybody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-sm" id="UpdateQuality" onclick="UpdateQuality()">Submit</button>
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+    <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h5 class="modal-title" id="myModalLabel">Capex Information</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12 modal_body_map">
+                            <div class="location-map" id="location-map">
+                                <div style="text-align:left" id="showcanvas">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 modal_body_end">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="text-align:center">
+                    <button style="text-align:right" class="btn btn-success" id="printCapex">Print This Capex</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+@*@Scripts.Render("~/bundles/jquery")*@
+<script type="text/javascript">
+    $("#billsubmenu").find('li:nth-child(1)').addClass("active");
+    GetApproverRequestList(2, 3);
+    $('#billsubmenu > li > a').click(function() {
+        $('li').removeClass();
+        $(this).parent().addClass('active');
+       // $("#spmenuid").html($(this).html());
+    });
+
+
+    //$('.bd-example-modal-lg').on('show.bs.modal', function (event) {
+    //    var modalmap = $(event.relatedTarget);
+    //    ShowSelectedCapex(modalmap.data('idkey'));
+    //});
+
+        function ShowSelectedCapex(primarykey) {
+            var urlpath = '@Url.Action("IndividualCapexShow", "CapexApproval")';
+            $.ajax({
+                data: {primarykey:primarykey},
+                url: urlpath,
+                type: "Post",
+                async: true,
+                        success: function(data) {
+                            if (data) {
+                                $('#showcanvas').empty();
+                                $('#showcanvas').append(data);
+                            }
+                        }
+                    });
+        }
+
+
+    var ExceptionRequestId = 0;
+
+    function UpdateQuality() {
+        var rating = "";
+        var qualityId = "";
+        var rating_name = "";
+        var check = false;
+
+        //if ($("#genaralInfodt>tbody>tr ").length == 0) {
+        //    toastr.error("Please checked the checkbox", "Checkbox", {
+        //        "positionClass": "toast-top-right",
+        //        "showDuration": "300",
+        //        "hideDuration": "1000",
+        //        "timeOut": "5000",
+        //        "closeButton": true
+        //    });
+        //    return false;
+        //}
+
+        $('#genaralInfodt>tbody>tr').each(function () {
+            //alert($(this).attr('id'));
+            var id = $(this).attr('id');
+
+
+            var rate = $('#start_rating_' + id).val();
+           // alert(rate);
+            if (rate == "") {
+                check = false;
+                return false;
+            }
+            else {
+                check = true;
+
+                var rate_name = $('#start_rating_' + id + ' option:selected').text();
+
+                qualityId += id + ",";
+                rating += rate + ",";
+                rating_name += rate_name + ",";
+            }
+
+
+            //alert(rating);
+        })
+
+       // alert(rating_name);
+
+        if (check == false) {
+
+            toastr.error("Please Rating All The Item", "Rating", {
+                "positionClass": "toast-top-right",
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "closeButton": true
+            });
+            return false;
+
+        } else {
+            var urlpath = '@Url.Action("UpdateQualityRating", "BillApproval")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({ qualityId: qualityId, rate: rating, rate_name: rating_name }),
+                url: urlpath,
+                type: "POST",
+                async: true,
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    if (data == true) {
+                        //swal({
+                        //    title: "Quality Rating Updated Successfully!",
+                        //    type: 'success',
+                        //    closeOnConfirm: false,
+                        //    closeOnCancel: true
+                        //}, function () {
+                        //        $("#myQuality").modal("hide");
+                        //})
+
+
+                        swal({
+                            title: "Quality Rating Updated Successfully!",
+                            type: 'success',
+                            closeOnCancel: true
+                        }, function () {
+                            $("#myQuality").modal("hide");
+                            //GetAllVisitorRequest(1, 0);
+                        });
+                    }
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+        }
+
+
+
+
+
+    }
+
+    function GetApproverRequestList(status,progrss) {
+        var urlpath = '@Url.Action("GetAllBillRequest", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: {Status: status,ViewName: '_allBillApprovalPartial',Progrss:progrss},
+            async: true,
+            success: function (data) {
+                if (data) {
+                    console.log(data);
+                    $('#billApprovalDashboard').empty();
+                    $('#billApprovalDashboard').append(data);
+                    $('#BillRequestTable').DataTable();
+                }
+            }
+        });
+    }
+    function BillDetailsApprover(masterID,status) {
+         var urlpath = '@Url.Action("BillRequestDetails", "BillApproval")';
+        $.ajax({
+            data: { MasterID: masterID, ViewName:"_billApproverModalView",Status:status},
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                $("#modalbody").html("");
+                $("#modalbody").append(data);
+                $("#myModal").modal("show");
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+
+
+    function LoadQuality(invoice, invoiceNo) {
+
+        var urlpath = '@Url.Action("QualityExist", "BillApproval")';
+        $.ajax({
+            data: { InvoiceKey: invoice},
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                if (data == 0) {
+                    //$("#myQuality").modal("hide");
+                    location.replace('/BillApproval/UpdateQuality?InvoiceKey=' + invoice + '&InvoiceNo=' + invoiceNo );
+                } else {
+                    location.replace('/BillApproval/UpdateQuality?InvoiceKey=' + invoice + '&InvoiceNo=' + invoiceNo);
+                }
+
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+
+        //alert(invoice);
+    }
+
+    function CheckQuality(invoice) {
+
+        var urlpath = '@Url.Action("QualityExist", "BillApproval")';
+        $.ajax({
+            data: { InvoiceKey: invoice},
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+                if (data == 0) {
+                    $("#myQuality").modal("hide");
+                    toastr.error("Invoice Quality Not Exist", "Not Exist ",
+                        {
+                            "progressBar": true,
+                            "positionClass": "toast-top-right",
+                            "showDuration": "300",
+                            "hideDuration": "1000",
+                            "timeOut": "5000",
+                            "closeButton": true
+                        });
+                } else {
+                    QualityPreview(invoice);
+                }
+
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+
+        //alert(invoice);
+    }
+
+    function QualityPreview(invoice) {
+        var urlpath = '@Url.Action("QualityPreview", "BillApproval")';
+        $.ajax({
+            data: { InvoiceKey: invoice, ViewName: "_billQualityModalView"},
+            url: urlpath,
+            type: "POST",
+            async: true,
+            success: function (data) {
+
+
+                    $("#qualitybody").html("");
+                    $("#qualitybody").append(data);
+                    $("#myQuality").modal("show");
+
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+
+    @*function ExceptionDetails(masterID,usertype) {
+        var urlpath = '@Url.Action("IndividualExceptionRequest", "Exception")';
+        $.ajax({
+            data: { MasterID: masterID,ViewName:"_approveOrRejectmodal",UserType:usertype},
+                url: urlpath,
+                type: "POST",
+                async: true,
+                success: function (data) {
+                    $("#modalbody").html("");
+                    $("#modalbody").append(data);
+                    $("#myModal").modal("show");
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+    }*@
+    function showComments() {
+        $("#comments_section").toggle();
+    }
+
+    function BillApproveOrReject(progress, masterId, commentText) {
+
+        var vVerify = 0;
+        var vinvoice = 0;
+        var checkVal = false;
+
+        $('#invoiceDetails tr').each(function () {
+
+            var id = $(this).attr('id');
+            //alert($(this).attr('id'));
+            var invoice = $('#apporver_InvoiceQty_' + id).html();
+            var checkQty = $('#checked_qty_' + id).val();
+            if (typeof checkQty === "undefined") {
+                checkVal = true;
+            } else {
+                if (parseInt(invoice) != parseInt(checkQty)) {
+
+                    checkVal = false;
+
+                    return false;
+                } else {
+                    checkVal = true;
+                }
+            }
+
+
+
+            //invoiceDetailKey += id;
+           // var checkQty = $('#checked_qty_' + id).val();
+            //verify += checkQty ;
+
+
+        })
+
+        if (progress == 2 && commentText == "") {
+            swal({
+                title: 'Please Add comment Before Reject',
+                type: 'error',
+                closeOnCancel: true
+            });
+        }
+        else {
+
+            if (checkVal == false  && progress == 1) {
+                toastr.error("Invoice Qty and Verified Qty Not Matched That's why You can not Approved", "Not Approved", {
+                    "positionClass": "toast-top-right",
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "closeButton": true
+                });
+                return false;
+            }
+            else {
+
+                var verify = "";
+                var invoiceDetailKey = "";
+                var verifyValue = "";
+
+                var general_procurement = $("#general_procurement").val() ? $("#general_procurement").val() : 0;
+                var capex_number = $("#capex_number").val() ? $("#capex_number").val() : 0;
+                var cost_center = $("#cost_center").val() ? $("#cost_center").val() : 0;
+
+                var certifying = 0;
+                if ($('#certifying').is(':checked')) {
+                    certifying = 1
+                }
+                else {
+                    certifying = 0
+                }
+
+                $('#invoiceDetails tr').each(function () {
+
+                    var id = $(this).attr('id');
+                    //alert($(this).attr('id'));
+                    invoiceDetailKey += id + ",";
+                    var checkQty = $('#checked_qty_' + id).val();//apporver_verifyValue_
+                    var checkValue = $('#apporver_verifyValue_' + id).html();
+                    //alert(checkValue);
+                    verify += checkQty + ",";
+                    verifyValue += checkValue + ",";
+
+                })
+
+                var fileUpload = [];
+                $('#attachedFileTable tr').each(function () {
+                    var filedate = {};
+                    filedate["BillFileName"] = $(this).find('td[name^="fileName"]').html();
+                    filedate["BillFilePath"] = $(this).find('td[name^="filePath"]').html();
+                    fileUpload.push(filedate);
+                });
+               // jsonData["BillFilesList"] = fileUpload;
+
+                var poFileUpload = [];
+                $('#poAttachedFileTable tr').each(function () {
+                    var filedata = {};
+                    filedata["POFileName"] = $(this).find('td[name^="fileName"]').html();
+                    filedata["POFilePath"] = $(this).find('td[name^="filePath"]').html();
+                    poFileUpload.push(filedata);
+                });
+
+                var grnFileUpload = [];
+                $('#grnAttachedFileTable tr').each(function () {
+                    var filedata = {};
+                    filedata["GRNFileName"] = $(this).find('td[name^="fileName"]').html();
+                    filedata["GRNFilePath"] = $(this).find('td[name^="filePath"]').html();
+                    grnFileUpload.push(filedata);
+                });
+               // var grnFileUpload =  poFileUpload;
+
+                //alert(verify);
+
+                var dcFileUpload = [];
+                var dcCount = 1;
+                $('#tableDocument tr').each(function () {
+                    var filedata = {};
+                    var Id = $(this).attr('id');
+
+                    if (typeof $('#fileName_' + Id).html() !== 'undefined' && $('#filePath_' + Id).html() !== 'undefined') {
+
+                        filedata["FileName"] = $('#fileName_' + Id).html();
+                        filedata["FilePath"] = $('#filePath_' + Id).html();
+                        filedata["DocumentName"] = $("#document_" + Id).val();
+                        filedata["Remarks"] = $("#remarks_" + Id).val();
+                        
+
+                        dcFileUpload.push(filedata);
+                        //alert($(this).attr('id'));
+                        
+                        
+                        //alert($('#fileName_' + Id).html() + " " + $('#filePath_' + Id).html() + " " + $("#document_name_" + Id).val() + " " + $("#remarks_" + Id).val());
+                    }
+
+                    //alert($(this).attr('id'));
+                   // alert($('#fileName_' + Id).html());
+                    
+                   // console.log($('#filePath_' + Id).html());
+                    alert($("#document_"+Id).val());
+                    //alert($("#document_name_4").val());
+                    //alert($(this).find("#remarks_" + dcCount).val());
+                    dcCount++;
+                })
+
+
+                var urlpath = '@Url.Action("BillApproveOrReject", "BillApproval")';
+                $.ajax({
+                    data: {
+                        CommentText: commentText, Progress: progress, RequestorId: masterId,
+                        invoiceDetailKey: invoiceDetailKey, verifyQty: verify, verifyValue: verifyValue,
+                        gRNFiles: grnFileUpload, poFiles: poFileUpload, billFiles: fileUpload, billDocList: dcFileUpload,
+                        ProcurementUserId: general_procurement, CapexInfoId: capex_number, CostCenterId: cost_center // Certifying: certifying
+                    },
+                    dataType: 'json',
+                    url: urlpath,
+                    type: "Post",
+                    async: true,
+                    success: function (result) {
+                        if (result) {
+                            swal({
+                                title: 'Done Successfully',
+                                type: 'success',
+                                closeOnCancel: true
+                            }, function () {
+                                $("#myModal").modal("hide");
+                                GetApproverRequestList(2, 3);
+                            });
+                        }
+                    }, error: function (xhr, status, error) {
+                        swal({
+                            title: 'Error Occoured',
+                            type: 'error',
+                            closeOnCancel: true
+                        });
+                    }
+                });
+            }
+
+
+
+
+        }
+
+    }
+
+
+    function DeletePOFileFromDatatbase(r, poId, filename, filepath) {
+
+       // alert(poId + filename + filepath.replace("\\", "\\"));
+
+         var urlpath = '@Url.Action("DeletePOFileFromDatatbase", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { POFileID: poId, FileName: filename, FilePath: filepath },
+            async: true,
+            success: function (data) {
+               var i = r.parentNode.parentNode.rowIndex;
+                document.getElementById("deletePOFileTable").deleteRow(i);
+            }
+        });
+    }
+
+    function DeleteBillFileFromDatatbase(r, billId, filename, filepath) {
+
+        var urlpath = '@Url.Action("DeleteBillFileFromDatatbase", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: { BillFileID: billId, FileName: filename, FilePath: filepath },
+            async: true,
+            success: function (data) {
+               var i = r.parentNode.parentNode.rowIndex;
+                document.getElementById("deleteBillFileTable").deleteRow(i);
+            }
+        });
+    }
+
+    function ReviewComment(masterID) {
+        var reviewTo = $("#reviewComment").val();
+        var reviewMessage = $("#reviewMessage").val();
+        if ($("#reviewMessage").val()=="") {
+            $("#reviewMessage").css({ "border-color": "#FF0000" });
+        } else {
+            var urlpath = '@Url.Action("SendBillComments", "BillApproval")';
+            $.ajax({
+                    data: { MasterID: masterID, ReviewTo: reviewTo, ReviewMessage: reviewMessage },
+                    dataType: 'json',
+                    url: urlpath,
+                    type: "Post",
+                    async: true,
+                    success: function (result) {
+                        if (result) {
+                            swal({
+                                            title: 'Comment Added Successfully',
+                                            type: 'success',
+                                            closeOnCancel: true
+                                        },
+                                function () {
+                                    $("#myModal").modal("hide");
+                                    GetApproverRequestList(2,3);
+                                });
+                        }
+                    }
+                });
+        }
+
+    }
+    function hideModal() {
+        $("#exampleModalCenter").modal("hide");
+        $("#myModal").modal("hide");
+         GetApproverRequestList(2, 3);
+    }
+    function ApprovalSection(progress, masterId, commentText) {
+        var urlpath = '@Url.Action("ApproveOrReject", "Exception")';
+            $.ajax({
+                data: { CommentText: commentText, Progress: progress, ExceptionMasterId: masterId },
+                dataType: 'json',
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function (result) {
+                    if (result) {
+
+                        swal({
+                            title: 'Done Successfully',
+                            type: 'success',
+                            closeOnCancel: true
+                        },function () {
+                               $("#myModal").modal("hide");
+                                GetApproverRequestList(2, 3);
+                            });
+                    }
+                }, error: function (xhr, status, error) {
+                    swal({
+                        title: 'Error Occoured',
+                        type: 'error',
+                        closeOnCancel: true
+                    });
+                }
+                    });
+    }
+    function CEApprovalOrReject(progress, masterId, commentText) {
+        if (progress == 2 && commentText == "") {
+            swal({
+                    title: 'Please Enter The Comment First',
+                    type: 'error',
+                    closeOnCancel: true
+                });
+        }
+        else {
+            var urlpath = '@Url.Action("ApproveOrReject", "Exception")';
+            $.ajax({
+                data: { CommentText: commentText, Progress: progress, ExceptionMasterId: masterId },
+                dataType: 'json',
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function (result) {
+                    if (result) {
+                        swal({
+                            title: 'Done Successfully',
+                            type: 'success',
+                            closeOnCancel: false
+                        }, function () {
+                                $("#exampleModalCenter").modal("show");
+                                ExceptionRequestId = masterId;
+                        });
+                    }
+                }, error: function (xhr, status, error) {
+                    swal({
+                        title: 'Error Occoured',
+                        type: 'error',
+                        closeOnCancel: true
+                    });
+                }
+                    });
+        }
+    }
+
+    function ChangeColor(id) {
+        $(id).css({ "border-color": "#d3d3d3" });
+    }
+    function ApproveOrreject(progress, masterId, commentText) {
+        if (progress == 2) {
+            if (commentText == "") {
+                swal({
+                    title: 'Please Enter The Comment First',
+                    type: 'error',
+                    closeOnCancel: true
+                });
+            } else {
+                ApprovalSection(progress, masterId, commentText);
+            }
+        } else {
+            ApprovalSection(progress, masterId, commentText);
+        }
+        //swal({
+        //        title: 'Are you sure?',
+        //        text: "You won't be able to revert this!",
+        //        type: 'warning',
+        //    showCancelButton: true,
+        //        closeOnConfirm: true,
+        //        confirmButtonText: 'Yes'
+        //    },function () {
+        //        finalApproverProceed(progress, masterId, commentText);
+        //    });
+
+
+    }
+
+    function PrintModal() {
+            var print_div = document.getElementById("printablearea");
+            var print_area = window.open();
+            print_area.document.write("<style>table{border-collapse:collapse;}</style><img width='20' height='20' src='../../Images/logo.png' /><img style='width:80px;' src='../../Images/logo.png' />");
+            print_area.document.write("<h1 style='text-align:center'>Exception Request Preview</h1>");
+            print_area.document.write(print_div.innerHTML);
+            print_area.document.close();
+            print_area.focus();
+            print_area.print();
+            print_area.close();
+    }
+
+    function FileUpload(row) {
+        var fileData = new FormData();
+        var fileUpload = $("#qualityFileUpload_" + row).prop('files');
+        if (fileUpload.length > 0) {
+            for (var i = 0; i < fileUpload.length; i++) {
+                fileData.append(fileUpload[i].name, fileUpload[i]);
+            }
+        }
+
+        var urlpath = '@Url.Action("DcFileUpload", "BillApproval")';
+        $.ajax({
+            url: urlpath,
+            type: "post",
+            processData: false,
+            contentType: false,
+            data: fileData  ,
+            success: function (result) {
+                for (var i = 0; i < result.length; i++) {
+                   //var newRow = $('<tr>');
+                   var cols = "";
+                    cols += '<span style="display:none" name="fileName" style="color:white;background-color: black;" for="fileName" id="fileName_' + row + '">' + result[i].FileName + '</span>';
+                    cols += '<span style="display:none" name="filePath" id="filePath_' + row + '">' + result[i].FilePath + '</span>';
+                   //cols += '<input type="button" style="margin:2px" class="btn btn-danger btn-sm" id="deleteFile_'+row+'" onclick="DeleteFile('+i+',\''+result[i].ServerFileName+'\')"   value="X">';
+                    //newRow.append(cols);
+                    $("#attachedFileTable_" + row).html(cols);
+                }
+                //$("#qualityFileUpload_" + row).val('');
+
+                alert("File Uploaded");
+            },
+            error: function (err) {
+                alert(err.responseText);
+            }
+        });
+    }
+</script>
+
+

@@ -1,0 +1,78 @@
+﻿
+<style>
+    #BillRequestTable tr th, #BillRequestTable tr td {
+        text-align: center;
+        padding: 5px;
+    }
+
+    button {
+        padding: 0;
+    }
+</style>
+<div class="box">
+    <!--<h3 style="text-align:center">My Visitor Request List</h3>
+    <!-- /.box-header -->
+    <div class="box-body">
+        <div class="col-xs-12" id="personlocdiv">
+            <table id="BillPaymentTable" class="table-bordered table table-striped" width="100%" style="overflow:scroll">
+                <thead>
+                    <tr>
+                        <th style="text-align:center">SL</th>
+                        <th style="text-align:center; width:100px;">Request ID</th>
+                        <th style="text-align:center">Supplier Name</th>
+                        <th style="text-align:center">Transaction No</th>
+                        <th style="text-align:center">Payment Type</th>
+                        <th style="text-align:center">Cheque/TT No</th>
+                        <th style="text-align:center">Cheque/TT Amount</th>
+                        <th style="text-align:center">Cheque/TT Date</th>
+                        <th style="text-align:center">Invoice No</th>
+                        <th style="text-align:center">Invoice Date</th>
+                        @*<th style="text-align:center; width:200px;">Bill Amount</th>
+                        <th style="text-align:center">Paid Amount</th>
+                        <th style="text-align:center">Outstanding Amount</th>*@
+                        <th style="text-align:center">Requestor</th>
+                        @*<th style="text-align:center">Details</th>*@
+
+                        @*<th style="text-align:center">Check No Update</th>*@
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ViewBag.ChequePayment != null)
+                    {
+
+                    
+                         int count = 1;
+                        foreach (var item in @ViewBag.ChequePayment)
+                        {
+                        <tr id="@item["BillAllocationMasterId"]">
+                            <td style="text-align:center">@count</td>
+
+                            @*<td style="text-align:center">Approved</td>*@
+                            <td style="text-align:center">@item["InvoiceKey"]</td>
+                            <td style="text-align:center">@item["Supplier"]</td>
+                            <td style="text-align:center">@item["PaymentTransactionNo"]</td>
+                            <td style="text-align:center">@item["PaymentModeType"]</td>
+                            <td style="text-align:center">@item["ChequeOrTTNo"]</td>
+                            <td style="text-align:center">@item["ChequeOrTTAmount"].ToString("N")</td>
+                            <td style="text-align:center">@item["ChequeOrTTDate"].ToString("yyyy-MM-dd")</td>
+                            <td style="text-align:center">@item["InvoiceNo"]</td>
+                            <td style="text-align:center">@item["InvoiceDate"].ToString("yyyy-MM-dd")</td>
+                            @*<td style="text-align:center">@item["BillAmount"]</td>
+                            <td style="text-align:center">@item["Paid"]</td>
+                            <td style="text-align:center">@item["BalanceAmount"]</td>*@
+                            <td style="text-align:center">@item["UserName"]</td>
+                           @* <td style="text-align:center"> <button type="button" class="btn  btn-block btn-primary btn-sm" data-toggle="modal" data-target="#myModal" onclick="BillRequestDetails(@item["InvoiceKey"],0,'_billModalRequestView')" data-idkey="@item["InvoiceKey"]">Details</button></td>*@
+                            @*<td style="text-align:center"> <button type="button" class="btn  btn-block btn-info btn-sm" data-toggle="modal" data-target="#chequeInfo" onclick="APTranstion(@item["InvoiceKey"],1)" data-idkey="@item["InvoiceKey"]">Cheque No Update</button></td>*@
+                        </tr>
+                            count++;
+
+                        }
+
+                        }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <!-- /.box-body -->
+</div>

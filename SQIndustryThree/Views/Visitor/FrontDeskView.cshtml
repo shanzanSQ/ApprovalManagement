@@ -1,0 +1,129 @@
+﻿<font size="2" face="Calibri">
+    <div class="container-fluid">
+        <h3 style="text-align:center">Visitor Approval </h3>
+        <div class="row">
+            <div class="col-md-2">
+                <ul class="nav" id="visitorSubmenu">
+                    <li onclick="GetVisitorByFrontDesk(1)"><a href="#">Approved Visitor </a></li>
+                    <li onclick="GetVisitorByFrontDesk(2)"><a href="#">Arrived Visitor </a></li>
+                </ul>
+            </div>
+            <div class="col-md-10" id="getallvisitor" style="width: 100%;overflow:scroll;height: 100%">
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="showmodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h5 class="modal-title" id="myModalLabel">Visitor Information Request</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12 modal_body_map">
+                            <div class="location-map" id="location-map">
+                                <div style="text-align:left" id="showcanvas"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 modal_body_end">
+
+                        </div>
+                    </div>
+                </div>
+                @*<div class="modal-footer" style="text-align:center">
+                        <button style="text-align:right" class="btn btn-success" id="printCapex">Print This Capex</button>
+                    </div>*@
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade cameramodal" id="cameramodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h5 class="modal-title" id="myModalLabel">Visitor Information Request</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12 modal_body_map">
+                            <div class="location-map" id="location-map">
+                                <div style="text-align:left" id="cameracanvas"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 modal_body_end">
+
+                        </div>
+                    </div>
+                </div>
+                @*<div class="modal-footer" style="text-align:center">
+                        <button style="text-align:right" class="btn btn-success" id="printCapex">Print This Capex</button>
+                    </div>*@
+            </div>
+        </div>
+    </div>
+
+</font>
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script src="~/Assets/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="~/Assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        //GetSubMenuBYUserPermission();
+         GetVisitorByFrontDesk(1);
+    });
+
+    load();
+
+    function load() {
+        setTimeout("window.open(self.location, '_self');", 300000);
+    }
+
+
+    function UpdateFrontDesk(primarykey,isApproved) {
+         var urlpath = '@Url.Action("UpdateOrReject", "Visitor")';
+            $.ajax({
+                data: { PrimaryKey: primarykey, Status: isApproved },
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function(data) {
+                            if (data.isSuccess) {
+                               swal({
+                                  title: 'Successfully Done',
+                                  type: 'success',
+                                   closeOnCancel: true
+                               }, function () {
+                                       GetVisitorByFrontDesk(2);
+                               });
+                            }
+                        }
+                });
+    }
+
+    function GetVisitorByFrontDesk(variable) {
+        var urlpath = '@Url.Action("GetFrontDeskVisitor", "Visitor")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {Status:variable},
+                async: true,
+                success: function(data) {
+                       if (data) {
+                            $('#getallvisitor').empty();
+                            $('#getallvisitor').html(data);
+                            $("#visitorTable").DataTable();
+
+                        }
+                    }
+                });
+    }
+
+</script>

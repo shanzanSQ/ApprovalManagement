@@ -1,0 +1,74 @@
+﻿@model IEnumerable<SQIndustryThree.Models.VehicleRequestModel>
+<style>
+    #IourequestTable tr th, #IourequestTable tr td {
+        text-align: center;
+        padding: 5px;
+    }
+
+    button {
+        padding: 0;
+    }
+</style>
+<div class="box">
+    <h3 style="text-align:center">My Vehicle Request List</h3>
+    <!-- /.box-header -->
+    <div class="box-body">
+        <div class="col-xs-12" id="personlocdiv">
+            <table id="IourequestTable" class="table-bordered table table-striped">
+                <thead>
+                    <tr>
+                        <th>SL</th>
+                        <th>Request #</th>
+                        <th>Business Unit</th>
+                        <th>Travel Strat Date</th>
+                        <th>Start Time</th>
+                        <th>No of User</th>
+                        <th>Request By</th>
+                        <th>Create Date</th>
+                        <th>Action(Comments)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ int count = 1;}
+                    @foreach (var item in Model)
+                    {
+                    <tr>
+                        <td>@count</td>
+                        <td>@item.VehicleRequesMastertId</td>
+                        <td>@item.BusinessUnitName</td>
+                        <td>@item.TravelStratDate</td>
+                        <td>@item.StartTime</td>
+                        <td>@item.NoofUser</td>
+                        <td>@item.UserName</td>
+                        <td>@DateTime.Parse(@item.DateOfRequest).ToString("dd MMM yyyy")</td>
+                        @if (item.Status == 3)
+                        {
+                            <td> <button type="button" class="btn  btn-block btn-primary btn-sm" onclick="VehicleDetailsApprover(@item.VehicleRequesMastertId,1)">Disburse(@item.Pending)</button></td>
+                        }
+                        else
+                        {
+                            if (item.IsApproved == 3)
+                            {
+                                <td> <button type="button" class="btn  btn-block btn-primary btn-sm" data-toggle="modal" data-target="#myModal" onclick="VehicleDetailsApprover(@item.VehicleRequesMastertId,1)" data-idkey="@item.VehicleRequesMastertId">Pending(@item.Pending)</button></td>
+                            }
+                            else if (item.IsApproved == 1)
+                            {
+                                <td> <button type="button" class="btn  btn-block btn-success btn-sm" data-toggle="modal" data-target="#showmodal" onclick="VehicleDetailsApprover(@item.VehicleRequesMastertId,0)" data-idkey="@item.VehicleRequesMastertId">Approved(@item.Pending)</button></td>
+
+                            }
+                            else if (item.IsApproved == 2)
+                            {
+                    <td> <button type="button" class="btn  btn-block btn-danger btn-sm" data-toggle="modal" data-target="#showmodal" onclick="VehicleDetailsApprover(@item.VehicleRequesMastertId,0)" data-idkey="@item.VehicleRequesMastertId">Rejected(@item.Pending)</button></td>
+                            }
+                        }
+                    </tr>
+                        count++;
+
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <!-- /.box-body -->
+</div>

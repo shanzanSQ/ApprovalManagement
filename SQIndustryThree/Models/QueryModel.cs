@@ -15,5 +15,6 @@ namespace SQIndustryThree.Models
         public string ReviewComment { get; set; }
         public string UpdateDate { get; set; }
         public string DesignationName { get; set; }
+        public int ApproverNO { get; set; }
     }
 }
